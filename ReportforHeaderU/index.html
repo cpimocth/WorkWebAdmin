@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Intelligence Price Monitor | TPSO</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Sarabun', sans-serif; background-color: #f1f5f9; color: #334155; }
+        .table-container { max-height: calc(100vh - 450px); overflow: auto; border-radius: 12px; background: white; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05); border: 1px solid #e2e8f0; }
+        table { border-collapse: separate; border-spacing: 0; width: 100%; }
+        thead th { position: sticky; top: 0; z-index: 100; background: #e2e8f0 !important; border-bottom: 3px solid #cbd5e1; color: #1e293b; font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; padding: 15px 12px; }
+        .sticky-code { position: sticky; left: 0; z-index: 80; background: #f8fafc; width: 90px; border-right: 2px solid #e2e8f0; text-align: center; }
+        .sticky-item { position: sticky; left: 90px; z-index: 80; background: #ffffff; border-right: 3px solid #cbd5e1; width: 320px; max-width: 320px; }
+        thead th.sticky-code { z-index: 110; }
+        thead th.sticky-item { z-index: 110; }
+        .code-text { font-family: 'Courier New', Courier, monospace; font-weight: 600; color: #64748b; }
+        .item-text { font-size: 14px; font-weight: 600; color: #1e293b; line-height: 1.2; }
+        .pic-text { font-size: 11px; color: #94a3b8; font-weight: 400; margin-top: 2px; }
+        .heat-cell-mini { width: 62px; height: 24px; display: flex; align-items: center; justify-content: center; border-radius: 3px; font-weight: 800; font-size: 0.75rem; margin: 1px auto; }
+        .label-mini { font-size: 8px; color: #94a3b8; text-transform: uppercase; font-weight: bold; margin-right: 4px; width: 15px; display: inline-block; }
+        tbody tr:hover td { background-color: #eef2ff !important; }
+        .stats-gradient { background: linear-gradient(135deg, #787878 0%, #334155 100%); }
+        .table-container::-webkit-scrollbar { width: 8px; height: 8px; }
+        .table-container::-webkit-scrollbar-thumb { background: #94a3b8; border-radius: 10px; }
+        .sort-pill { transition: all 0.2s; cursor: pointer; }
+        .sort-pill:hover { background-color: #ffffff; color: #4f46e5; transform: scale(1.05); }
+        
+        .top-mover-card { background: white; border-radius: 12px; padding: 10px; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
+        .top-mover-title { font-size: 10px; font-weight: 900; color: #64748b; text-transform: uppercase; letter-spacing: 0.1em; border-bottom: 2px solid #f1f5f9; padding-bottom: 4px; margin-bottom: 6px; }
+        .top-mover-item { 
+            font-size: 10.5px; display: flex; justify-content: space-between; align-items: center; 
+            padding: 3px 6px; border-radius: 6px; margin-bottom: 1px; border: 1px solid transparent;
+            transition: all 0.2s ease; cursor: default;
+        }
+        .item-active-highlight { background-color: #eff6ff !important; border-color: #3b82f6 !important; transform: translateX(3px); z-index: 10; }
+        .count-badge { background: #f1f5f9; color: #64748b; padding: 0px 4px; border-radius: 4px; font-size: 9px; font-weight: 800; margin-left: 4px; border: 1px solid #e2e8f0; }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+
+    <div class="max-w-[1900px] mx-auto">
+        <div id="topMoversPanel" class="grid grid-cols-1 md:grid-cols-4 gap-3 mb-6">
+            <div class="top-mover-card"><div class="top-mover-title">📍 Central Top 10</div><div id="top-CEN"></div></div>
+            <div class="top-mover-card"><div class="top-mover-title">📍 Northeast Top 10</div><div id="top-NE"></div></div>
+            <div class="top-mover-card"><div class="top-mover-title">📍 North Top 10</div><div id="top-N"></div></div>
+            <div class="top-mover-card"><div class="top-mover-title">📍 South Top 10</div><div id="top-S"></div></div>
+        </div>
+
+        <div class="flex flex-col lg:flex-row gap-4 mb-6">
+            <div class="flex-grow bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="flex items-center gap-3">
+                        <div>
+                            <h1 class="text-3xl font-black text-slate-800 tracking-tight italic">REL Analysis ชุดนอกเขต</h1>
+                            <p id="dataDate" class="text-sm text-indigo-600 font-bold uppercase tracking-widest mt-1 text-slate-800">Loading...</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex flex-wrap gap-3">
+                    <select id="setFilter" class="px-4 py-3 bg-blue-50 border border-blue-200 rounded-2xl text-sm font-bold text-blue-700 outline-none cursor-pointer min-w-[200px]">
+                        <option value="นอกเขต">🏘️ นอกเขต (ทั้งหมด)</option>
+                        <option value="คำนวณ">✅ นอกเขต (คำนวณ)</option>
+                        <option value="ไม่คำนวณ">🚫 นอกเขต (ไม่คำนวณ)</option>
+                    </select>
+
+                    <div class="relative flex-grow min-w-[300px]">
+                        <input type="text" id="searchInput" placeholder="ค้นหา รหัส, รายการ หรือผู้ดูแล (ใช้ * ได้)..." 
+                            class="w-full px-5 py-3 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-indigo-500/10 outline-none text-base transition-all font-medium">
+                        <span class="absolute right-4 top-3.5 opacity-30 text-xl text-slate-400">🔍</span>
+                    </div>
+
+                    <select id="picFilter" class="px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-bold text-slate-600 outline-none min-w-[150px]">
+                        <option value="all">🧔 ผู้ดูแลทุกคน</option>
+                    </select>
+
+                    <select id="statusFilter" class="px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-bold text-slate-600 outline-none hover:border-indigo-400 transition-all cursor-pointer min-w-[150px]">
+                        <option value="all">📊 สถานะทั้งหมด</option>
+                        <option value="outlier">⚠️ พบความขัดแย้ง</option>
+                        <option value="up">📈 ขึ้นทุกภาค</option>
+                        <option value="down">📉 ลงทุกภาค</option>
+                        <option value="normal">⚪ รายการปกติ</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="stats-gradient px-8 py-5 rounded-3xl shadow-2xl flex items-center gap-6 text-white min-w-[650px]">
+                <div class="text-center min-w-[80px]"><p class="text-[9px] font-black text-indigo-300 uppercase tracking-[0.2em] mb-1">Matching</p><h2 id="stat-match" class="text-3xl font-black italic text-white">0</h2></div>
+                <div class="w-[1px] h-10 bg-white/10"></div>
+                <div class="text-center"><p class="text-[9px] font-black text-emerald-400 uppercase tracking-[0.1em] mb-1">Rising</p><h2 id="stat-up" class="text-3xl font-black italic text-emerald-400">0</h2></div>
+                <div class="w-[1px] h-10 bg-white/10"></div>
+                <div class="text-center"><p class="text-[9px] font-black text-amber-400 uppercase tracking-[0.1em] mb-1">Conflict</p><h2 id="stat-outlier" class="text-3xl font-black italic text-amber-400">0</h2></div>
+                <div class="w-[1px] h-10 bg-white/10"></div>
+                <div class="text-center"><p class="text-[9px] font-black text-rose-400 uppercase tracking-[0.1em] mb-1">Dropping</p><h2 id="stat-down" class="text-3xl font-black italic text-rose-400">0</h2></div>
+                <div class="w-[1px] h-10 bg-white/10"></div>
+                <div class="text-center"><p class="text-[9px] font-black text-slate-400 uppercase tracking-[0.1em] mb-1">Normal</p><h2 id="stat-normal" class="text-3xl font-black italic text-slate-300">0</h2></div>
+            </div>
+        </div>
+
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th class="sticky-code">
+                            <div class="flex flex-col items-center gap-1">
+                                <span>ID</span>
+                                <button onclick="sortTable('id')" class="sort-pill px-1 bg-white/30 rounded text-[8px] font-black uppercase">↑↓ Sort</button>
+                            </div>
+                        </th>
+                        <th class="sticky-item text-left px-8">Product Description / PIC</th>
+                        <th class="text-center">Central</th>
+                        <th class="text-center">NE</th>
+                        <th class="text-center">North</th>
+                        <th class="text-center">South</th>
+                        <th class="bg-slate-300 border-l border-slate-400 text-center min-w-[280px]">
+                            <div class="flex flex-col gap-2 text-center items-center justify-center">
+                                <span>MARKET ANALYSIS</span>
+                                <div class="flex gap-2">
+                                    <button onclick="sortTable('top')" class="sort-pill px-2 py-1 bg-white/80 rounded text-[10px] shadow-sm font-bold uppercase">↑↓ SORT TOP</button>
+                                    <button onclick="sortTable('avg')" class="sort-pill px-2 py-1 bg-white/80 rounded text-[10px] shadow-sm font-bold uppercase">↑↓ SORT AVG</button>
+                                </div>
+                            </div>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        let rawItems = [];
+        let currentSort = { col: 'id', dir: 'asc' };
+        const monthNames = ["", "มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
+
+        function getCellStyle(v) {
+            if (v === undefined || v === null || v === 100) return 'background: #fff; color: #cbd5e1; border: 1px solid #f1f5f9;';
+            const diff = Math.abs(v - 100);
+            const intensity = Math.min(diff * 0.45, 0.9);
+            return v > 100 ? `background: rgba(16, 185, 129, ${intensity}); color: ${intensity > 0.4 ? 'white' : '#064e3b'};` : `background: rgba(244, 63, 94, ${intensity}); color: ${intensity > 0.4 ? 'white' : '#881337'};`;
+        }
+
+        function getAnalysis(dataObj) {
+            if (!dataObj) return { avg: 100, top: {n: '-', v: 100}, status: 'normal', msg: '-', css: 'text-slate-200' };
+            const regions = [
+                {n:'CEN', v:dataObj.กลาง_REL}, {n:'NE', v:dataObj.ตะวันออกเฉียงเหนือ_REL}, 
+                {n:'N', v:dataObj.เหนือ_REL}, {n:'S', v:dataObj.ใต้_REL}
+            ].filter(r => r.v != null && r.v !== 0);
+            
+            if (regions.length === 0) return { avg: 100, top: {n: '-', v: 100}, status: 'normal', msg: '-', css: 'text-slate-200' };
+            
+            const avg = regions.reduce((s, r) => s + r.v, 0) / regions.length;
+            const top = regions.reduce((p, c) => Math.abs(c.v - 100) > Math.abs(p.v - 100) ? c : p);
+            const upCount = regions.filter(r => r.v > 100).length;
+            const downCount = regions.filter(r => r.v < 100).length;
+            
+            let status = 'normal', msg = 'Stable Trend', css = 'text-slate-400 border-slate-100';
+            if (upCount === regions.length) { status = 'up'; msg = 'Universal Rise'; css = 'bg-emerald-50 text-emerald-700 border-emerald-100'; }
+            else if (downCount === regions.length) { status = 'down'; msg = 'Universal Fall'; css = 'bg-rose-50 text-rose-700 border-rose-100'; }
+            else if ((upCount >= 2 && downCount >= 1) || (downCount >= 2 && upCount >= 1)) {
+                status = 'outlier';
+                const minor = upCount < downCount ? regions.filter(r => r.v > 100) : regions.filter(r => r.v < 100);
+                msg = `🚨 ${minor.map(m => m.n).join(', ')} สวนกระแส`;
+                css = 'bg-amber-50 text-amber-700 border-amber-200';
+            }
+            return { avg, top, status, msg, css };
+        }
+
+        function syncMovers(itemName, active) {
+            const safeName = btoa(encodeURIComponent(itemName)).replace(/=/g, "");
+            document.querySelectorAll(`.mover-${safeName}`).forEach(el => {
+                active ? el.classList.add('item-active-highlight') : el.classList.remove('item-active-highlight');
+            });
+        }
+
+        function updateTopMovers(data) {
+            const regions = [
+                {id: 'top-CEN', f: 'กลาง_REL'}, {id: 'top-NE', f: 'ตะวันออกเฉียงเหนือ_REL'},
+                {id: 'top-N', f: 'เหนือ_REL'}, {id: 'top-S', f: 'ใต้_REL'}
+            ];
+            let allNames = [];
+            const results = regions.map(reg => {
+                const sorted = [...data].filter(g => g.monthData && g.monthData[reg.f] != null)
+                    .sort((a, b) => Math.abs(b.monthData[reg.f] - 100) - Math.abs(a.monthData[reg.f] - 100)).slice(0, 10);
+                allNames.push(...sorted.map(s => s.รายการ));
+                return { id: reg.id, items: sorted, field: reg.f };
+            });
+            const counts = allNames.reduce((acc, n) => { acc[n] = (acc[n] || 0) + 1; return acc; }, {});
+
+            results.forEach(res => {
+                document.getElementById(res.id).innerHTML = res.items.map((g, idx) => {
+                    const val = g.monthData[res.field];
+                    const repeat = counts[g.รายการ];
+                    const safe = btoa(encodeURIComponent(g.รายการ)).replace(/=/g, "");
+                    return `<div class="top-mover-item mover-${safe}" onmouseover="syncMovers('${g.รายการ}', true)" onmouseout="syncMovers('${g.รายการ}', false)">
+                        <span class="truncate w-32 font-bold text-slate-700">${idx+1}. ${g.รายการ}${repeat > 1 ? `<span class="count-badge">${repeat}</span>`:''}</span>
+                        <span class="font-bold ${val > 100 ? 'text-emerald-600' : 'text-rose-600'}">${val.toFixed(2)}</span>
+                    </div>`;
+                }).join('');
+            });
+        }
+
+        function matchWildcard(str, rule) {
+            if (!str) return false;
+            if (!rule.includes('*')) return str.toLowerCase().includes(rule.toLowerCase());
+            const regex = new RegExp("^" + rule.split("*").map(s => s.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&')).join(".*") + "$", "i");
+            return regex.test(str);
+        }
+
+        function sortTable(type) {
+            currentSort.dir = (currentSort.col === type && currentSort.dir === 'desc') ? 'asc' : 'desc';
+            currentSort.col = type;
+            renderTable();
+        }
+
+        function renderTable() {
+            const searchInput = document.getElementById('searchInput').value;
+            const picFilter = document.getElementById('picFilter').value;
+            const statusFilter = document.getElementById('statusFilter').value;
+            const setFilter = document.getElementById('setFilter').value;
+            const tbody = document.getElementById('tableBody');
+            
+            const groupMap = {};
+            rawItems.forEach(item => {
+                // Logic 1: Filter "Nokket" base
+                if (!item.ชุด || !item.ชุด.includes("นอกเขต")) return;
+
+                // Logic 2: Specific Calculation Logic
+                if (setFilter === "คำนวณ" && item.ชุด.includes("ไม่คำนวณ")) return;
+                if (setFilter === "ไม่คำนวณ" && !item.ชุด.includes("ไม่คำนวณ")) return;
+
+                if (!groupMap[item.CODE7]) {
+                    groupMap[item.CODE7] = { CODE7: item.CODE7, รายการ: item.รายการ, ผู้ดูแล: item.ผู้ดูแล, monthData: null, weekData: null };
+                }
+                if (item.ชุด.startsWith("เดือน")) groupMap[item.CODE7].monthData = item;
+                if (item.ชุด.startsWith("สัปดาห์")) groupMap[item.CODE7].weekData = item;
+            });
+
+            let data = Object.values(groupMap).map(g => ({ ...g, _m: getAnalysis(g.monthData || g.weekData) }));
+
+            data = data.filter(g => (matchWildcard(g.รายการ || "", searchInput) || matchWildcard(g.CODE7?.toString() || "", searchInput)) && (picFilter === 'all' || g.ผู้ดูแล === picFilter) && (statusFilter === 'all' || g._m.status === statusFilter));
+
+            if (currentSort.col) {
+                data.sort((a, b) => {
+                    let vA, vB;
+                    if (currentSort.col === 'id') { vA = a.CODE7; vB = b.CODE7; }
+                    else if (currentSort.col === 'top') { vA = a._m.top.v; vB = b._m.top.v; }
+                    else { vA = a._m.avg; vB = b._m.avg; }
+                    return currentSort.dir === 'desc' ? (vB < vA ? -1 : 1) : (vA < vB ? -1 : 1);
+                });
+            }
+
+            updateTopMovers(data);
+
+            document.getElementById('stat-match').innerText = data.length;
+            document.getElementById('stat-up').innerText = data.filter(i => i._m.status === 'up').length;
+            document.getElementById('stat-down').innerText = data.filter(i => i._m.status === 'down').length;
+            document.getElementById('stat-outlier').innerText = data.filter(i => i._m.status === 'outlier').length;
+            document.getElementById('stat-normal').innerText = data.filter(i => i._m.status === 'normal').length;
+
+            tbody.innerHTML = data.map(g => {
+                const renderCell = (f) => `<td class="px-2 py-3 border-b border-slate-100">
+                    <div class="flex flex-col gap-0.5">
+                        <div class="flex items-center"><span class="label-mini text-blue-400">M</span><div class="heat-cell-mini" style="${getCellStyle(g.monthData?.[f])}">${g.monthData?.[f]?.toFixed(2) || '-'}</div></div>
+                        <div class="flex items-center"><span class="label-mini text-indigo-400">W</span><div class="heat-cell-mini" style="${getCellStyle(g.weekData?.[f])}">${g.weekData?.[f]?.toFixed(2) || '-'}</div></div>
+                    </div></td>`;
+                
+                return `<tr class="border-b border-slate-100">
+                    <td class="px-4 py-5 sticky-code"><span class="code-text text-[11px]">${g.CODE7}</span></td>
+                    <td class="px-8 py-5 sticky-item bg-white"><div class="item-text">${g.รายการ}</div><div class="pic-text">ผู้ดูแล: ${g.ผู้ดูแล || '-'}</div></td>
+                    ${renderCell('กลาง_REL')} ${renderCell('ตะวันออกเฉียงเหนือ_REL')} ${renderCell('เหนือ_REL')} ${renderCell('ใต้_REL')}
+                    <td class="px-6 py-4 bg-slate-50 border-l-2 border-slate-200">
+                        <div class="flex flex-col gap-1 items-center">
+                            <span class="text-[10px] font-bold text-slate-700 uppercase">Top: ${g._m.top.n} <b class="${g._m.top.v > 100 ? 'text-emerald-600':'text-rose-600'}">${g._m.top.v.toFixed(2)}</b></span>
+                            <span class="px-2 py-0.5 rounded border text-[9px] font-bold uppercase ${g._m.css}">${g._m.msg}</span>
+                            <span class="text-[9px] text-slate-400">Monthly Avg: <b class="${g._m.avg > 100 ? 'text-emerald-500':'text-rose-600'}">${g._m.avg.toFixed(2)}</b></span>
+                        </div>
+                    </td></tr>`;
+            }).join('');
+        }
+
+        async function init() {
+            try {
+                const res = await fetch('ReportforHeaderU.json');
+                rawItems = await res.json();
+                const pics = [...new Set(rawItems.map(i => i.ผู้ดูแล).filter(p => p))].sort();
+                document.getElementById('picFilter').innerHTML = '<option value="all">🧔 ผู้ดูแลทุกคน</option>' + pics.map(p => `<option value="${p}">${p}</option>`).join('');
+                if (rawItems[0]) document.getElementById('dataDate').innerText = `ข้อมูลเดือน ${monthNames[rawItems[0].MONTH]} พ.ศ. ${rawItems[0].YEAR}`;
+                renderTable();
+            } catch (e) { console.error(e); }
+        }
+
+        document.getElementById('searchInput').addEventListener('input', renderTable);
+        document.getElementById('picFilter').addEventListener('change', renderTable);
+        document.getElementById('statusFilter').addEventListener('change', renderTable);
+        document.getElementById('setFilter').addEventListener('change', renderTable);
+        init();
+    </script>
+</body>
+</html>
