@@ -1,234 +1,292 @@
 <!DOCTYPE html>
 <html lang="th">
-
-http://127.0.0.1:8800/ 
-กำหนด proxy
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CPI Selection - Admin & Staff</title>
-    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;800&display=swap" rel="stylesheet">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ระบบรายงานสถิติดัชนีราคาผู้บริโภค (CPI)</title>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
     <style>
         :root {
-            --primary: #0984e3;
-            --admin-color: #d63031; /* สีแดงสำหรับส่วนบริหาร */
-            --main-text: #2d3436;
-            --sub-text: #636e72;
-            --bg-color: #f8f9fa;
-            --border-color: #dfe6e9;
+            --primary: #0b3d91;
+            --primary-dark: #082c68;
+            --accent: #c62828;
+            --accent-soft: #fdecec;
+            --text-main: #1f2937;
+            --text-sub: #6b7280;
+            --bg-main: linear-gradient(135deg, #eef3f8 0%, #f8fafc 100%);
+            --card-bg: rgba(255, 255, 255, 0.96);
+            --border: #d9e2ec;
+            --shadow: 0 20px 50px rgba(15, 23, 42, 0.10);
+        }
+
+        * {
+            box-sizing: border-box;
         }
 
         body {
-            font-family: 'Sarabun', sans-serif;
             margin: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            font-family: "Sarabun", sans-serif;
+            background: var(--bg-main);
+            color: var(--text-main);
             min-height: 100vh;
-            background-color: var(--bg-color);
-            color: var(--main-text);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 32px 20px;
         }
 
-        /* ปรับขนาดการ์ดให้กว้างขึ้นเพื่อรองรับ 2 ฝั่ง */
+        .page-wrap {
+            width: 100%;
+            max-width: 980px;
+        }
+
         .card {
-            background: #ffffff;
-            padding: 2.5rem;
-            border-radius: 24px;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08);
+            background: var(--card-bg);
+            border: 1px solid rgba(217, 226, 236, 0.9);
+            border-radius: 28px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+
+        .top-bar {
+            height: 8px;
+            background: linear-gradient(90deg, var(--primary) 0%, #2563eb 60%, #60a5fa 100%);
+        }
+
+        .card-inner {
+            padding: 44px 38px 36px;
+        }
+
+        .header {
             text-align: center;
-            max-width: 900px;
-            width: 95%;
-            border: 1px solid var(--border-color);
+            margin-bottom: 34px;
         }
 
-        .main-title {
-            margin-bottom: 1rem;
+        .header-badge {
+            display: inline-block;
+            padding: 8px 18px;
+            border-radius: 999px;
+            background: rgba(11, 61, 145, 0.08);
+            color: var(--primary);
+            font-size: 0.92rem;
+            font-weight: 700;
+            margin-bottom: 16px;
+            letter-spacing: 0.2px;
         }
 
-        h2 {
-            font-size: 1.6rem;
+        .header h1 {
             margin: 0;
+            font-size: 2rem;
+            line-height: 1.35;
             font-weight: 800;
+            color: var(--primary-dark);
         }
 
-        /* แบ่ง Layout เป็น 2 คอลัมน์ */
-        .grid-main {
+        .header p {
+            margin: 14px auto 0;
+            max-width: 700px;
+            font-size: 1rem;
+            line-height: 1.8;
+            color: var(--text-sub);
+        }
+
+        .content-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 2rem;
-            margin-top: 1rem;
+            grid-template-columns: 1fr;
+            gap: 24px;
         }
 
-        /* เส้นคั่นกลาง (แสดงเฉพาะบนจอใหญ่) */
-        .vertical-divider {
-            border-right: 1px solid var(--border-color);
+        .section {
+            border: 1px solid var(--border);
+            border-radius: 22px;
+            padding: 28px;
+            background: linear-gradient(180deg, #ffffff 0%, #fbfdff 100%);
         }
 
         .section-header {
             display: flex;
             align-items: center;
+            gap: 14px;
+            margin-bottom: 20px;
+        }
+
+        .section-icon {
+            width: 52px;
+            height: 52px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
             justify-content: center;
-            margin-bottom: 1.5rem;
+            font-size: 1.3rem;
+            background: var(--accent-soft);
+            color: var(--accent);
+            border: 1px solid rgba(198, 40, 40, 0.12);
+            flex-shrink: 0;
         }
 
-        .section-label {
+        .section-title-wrap h2 {
+            margin: 0;
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: #991b1b;
+        }
+
+        .section-title-wrap p {
+            margin: 6px 0 0;
+            color: var(--text-sub);
             font-size: 0.95rem;
-            font-weight: 600;
-            padding: 5px 18px;
-            border-radius: 50px;
-        }
-
-        /* สีฟ้าสำหรับผู้เก็บข้อมูล */
-        .label-staff {
-            color: var(--primary);
-            background: rgba(9, 132, 227, 0.08);
-        }
-
-        /* สีแดงสำหรับบริหาร */
-        .label-admin {
-            color: var(--admin-color);
-            background: rgba(214, 48, 49, 0.08);
         }
 
         .btn-group {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
+            display: grid;
+            gap: 14px;
+            margin-top: 8px;
         }
 
         .pill-link {
-            padding: 14px;
-            background: #f1f2f6;
-            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            padding: 17px 20px;
             text-decoration: none;
-            color: var(--main-text);
-            font-size: 0.95rem;
-            font-weight: 600;
-            transition: 0.3s;
-            border: 1px solid transparent;
+            border-radius: 16px;
+            font-size: 1rem;
+            font-weight: 700;
+            transition: all 0.25s ease;
+            border: 1px solid #f3c4c4;
+            background: #fffafa;
+            color: #8b1e1e;
+        }
+
+        .pill-link .arrow {
+            font-size: 1.1rem;
+            opacity: 0.85;
+            transition: transform 0.25s ease;
         }
 
         .pill-link:hover {
-            background: var(--main-text);
+            background: var(--accent);
             color: #ffffff;
+            border-color: var(--accent);
+            transform: translateY(-2px);
+            box-shadow: 0 14px 24px rgba(198, 40, 40, 0.18);
         }
 
-        /* สไตล์ปุ่มฝั่งบริหาร */
-        .pill-link.admin-btn:hover {
-            background: var(--admin-color);
-            border-color: var(--admin-color);
+        .pill-link:hover .arrow {
+            transform: translateX(4px);
         }
 
-        .grid-inner {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 8px;
-        }
-        /* สีแดงสำหรับส่วนบริหาร */
-        .label-admin {
-            color: #d63031; 
-            background: rgba(214, 48, 49, 0.1);
-            border: 1px solid rgba(214, 48, 49, 0.2);
-        }
-
-        /* ปุ่มฝั่งบริหารให้เป็นขอบแดง และ hover เป็นสีแดง */
-        .admin-btn {
-            border: 1px solid #fab1a0 !important;
-            color: #d63031 !important;
-        }
-
-        .admin-btn:hover {
-            background: #d63031 !important;
-            color: #ffffff !important;
-            border-color: #d63031 !important;
-        }
-
-        /* ข้อความคำเตือนสีแดง */
-        .warning-text {
-            color: #d63031;
-            font-size: 0.85rem;
+        .notice {
+            margin-top: 18px;
+            padding: 14px 16px;
+            border-radius: 14px;
+            background: #fff6f6;
+            border: 1px solid #ffd6d6;
+            color: #a61b1b;
+            font-size: 0.92rem;
+            line-height: 1.7;
             font-weight: 600;
-            margin-top: 15px;
         }
 
-        /* Responsive: จอมือถือให้เรียงต่อกัน */
+        .footer-note {
+            margin-top: 26px;
+            text-align: center;
+            color: var(--text-sub);
+            font-size: 0.9rem;
+        }
+
         @media (max-width: 768px) {
-            .grid-main {
-                grid-template-columns: 1fr;
+            .card-inner {
+                padding: 32px 20px 24px;
             }
-            .vertical-divider {
-                border-right: none;
-                border-bottom: 1px solid var(--border-color);
-                padding-bottom: 2rem;
+
+            .header h1 {
+                font-size: 1.55rem;
+            }
+
+            .header p {
+                font-size: 0.95rem;
+            }
+
+            .section {
+                padding: 22px 18px;
+            }
+
+            .pill-link {
+                padding: 15px 16px;
+                font-size: 0.96rem;
             }
         }
     </style>
 </head>
-
 <body>
+    <div class="page-wrap">
+        <div class="card">
+            <div class="top-bar"></div>
 
-    <!-- <div class="card"> -->
-        <div class="main-title">
-            <h2>ระบบรายงานสถิติดัชนีราคาผู้บริโภค (CPI)</h2>
-            <p style="color: var(--sub-text);">กรุณาเลือกส่วนงานที่ท่านรับผิดชอบ</p>
-        </div>
-
-        <div class="grid-main">
-            
-            <!-- <div class="vertical-divider">
-                <div class="section-header">
-                    <div class="section-label label-staff">👤 ส่วนงานเก็บข้อมูล</div>
+            <div class="card-inner">
+                <div class="header">
+                    <div class="header-badge">Consumer Price Index Reporting System</div>
+                    <h1>ระบบรายงานสถิติดัชนีราคาผู้บริโภค (CPI)</h1>
+                    <p>
+                        กรุณาเลือกส่วนงานที่ท่านรับผิดชอบ เพื่อเข้าสู่เมนูรายงานและสรุปผลข้อมูล
+                        สำหรับการใช้งานในส่วนบริหาร ระบบจะกำหนดให้มีการยืนยันสิทธิ์ก่อนเข้าใช้งาน
+                    </p>
                 </div>
-                <div class="btn-group" style="padding-right: 10px;">
-                    <a href="G/index.html" class="pill-link">จำนวนการเก็บข้อมูล ชุดทั่วไป</a>
-                    <a href="U/index.html" class="pill-link">จำนวนการเก็บข้อมูล ชุดนอกเขต</a>
-                    <a href="PopularProducts/index.html" class="pill-link">ราคายอดนิยม (เว็บ)</a>
-                    
-                    <p style="font-size: 0.8rem; color: var(--sub-text); margin-top: 10px;">📋 ราคาส่วนกลาง</p>
-                    <div class="grid-inner">
-                        <a href="#" class="pill-link">ชุด บ</a>
-                        <a href="#" class="pill-link">ชุด บ1</a>
-                        <a href="#" class="pill-link">ชุด น</a>
-                        <a href="#" class="pill-link">ชุด อ</a>
+
+                <div class="content-grid">
+                    <div class="section">
+                        <div class="section-header">
+                            <div class="section-icon">🛡️</div>
+                            <div class="section-title-wrap">
+                                <h2>ส่วนงานบริหาร (Admin)</h2>
+                                <p>สำหรับผู้มีสิทธิ์เข้าถึงรายงานสรุปภาพรวมและข้อมูลชุดนอกเขต</p>
+                            </div>
+                        </div>
+
+                        <div class="btn-group">
+                            <a href="javascript:void(0);" onclick="checkAuth('ReportforHeaderG/index.html')" class="pill-link">
+                                <span>📊 สรุปผลภาพรวมจังหวัด</span>
+                                <span class="arrow">→</span>
+                            </a>
+
+                            <a href="javascript:void(0);" onclick="checkAuth('ReportforHeaderU/index.html')" class="pill-link">
+                                <span>📈 สรุปผลชุดนอกเขต</span>
+                                <span class="arrow">→</span>
+                            </a>
+
+                            <a href="javascript:void(0);" onclick="checkAuth('CPI_Dashboard_automation/index.html')" class="pill-link">
+                                <span>📈 CPI Dashboard Contribution Report</span>
+                                <span class="arrow">→</span>
+                            </a>
+                        </div>
+
+                        <div class="notice">
+                            หมายเหตุ: เมนูนี้สงวนสิทธิ์สำหรับเจ้าหน้าที่ส่วนงานบริหารที่ได้รับรหัสผ่านสำหรับเข้าใช้งานระบบเท่านั้น
+                        </div>
                     </div>
                 </div>
-            </div> -->
 
-            <div>
-                <div class="section-header">
-                     <div class="section-label label-admin">🚨 ส่วนงานบริหาร (Admin)</div>
+                <div class="footer-note">
+                    สำนัก/หน่วยงานที่รับผิดชอบระบบรายงานข้อมูล CPI
+                </div>
             </div>
-
-            <div class="btn-group">
-                <a href="javascript:void(0);" onclick="checkAuth('ReportforHeaderG/index.html')" class="pill-link admin-btn">
-                    📊 สรุปผลภาพรวมจังหวัด
-                </a>
-                <a href="javascript:void(0);" onclick="checkAuth('ReportforHeaderU/index.html')" class="pill-link admin-btn">
-                    📈 สรุปผลชุดนอกเขต
-                </a>
-            </div>
-
-            <p class="warning-text">
-                * เฉพาะส่วนงานบริหารที่ถือรหัสผ่านเท่านั้น
-            </p>
-            </div>
-
         </div>
     </div>
 
-<script>
-    function checkAuth(targetUrl) {
-        const pass = "1234"; // รหัสผ่านที่คุณต้องการ
-        const userInput = prompt("กรุณากรอกรหัสผ่านเพื่อเข้าสู่ส่วนบริหาร:");
+    <script>
+        function checkAuth(targetUrl) {
+            const pass = "1234";
+            const userInput = prompt("กรุณากรอกรหัสผ่านเพื่อเข้าสู่ส่วนบริหาร");
 
-        if (userInput === pass) {
-            window.location.href = targetUrl; // ถ้าถูกจะไปที่หน้า ReportforHeaderG/index.html
-        } else if (userInput !== null) {
-            alert("รหัสผ่านไม่ถูกต้อง!");
+            if (userInput === pass) {
+                window.location.href = targetUrl;
+            } else if (userInput !== null) {
+                alert("รหัสผ่านไม่ถูกต้อง");
+            }
         }
-    }
-</script>
-
+    </script>
 </body>
-
 </html>
