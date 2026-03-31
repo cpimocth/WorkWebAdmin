@@ -1,301 +1,551 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Intelligence Price Monitor | TPSO</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        body { font-family: 'Sarabun', sans-serif; background-color: #f1f5f9; color: #334155; }
-        .table-container { max-height: calc(100vh - 450px); overflow: auto; border-radius: 12px; background: white; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05); border: 1px solid #e2e8f0; }
-        table { border-collapse: separate; border-spacing: 0; width: 100%; }
-        thead th { position: sticky; top: 0; z-index: 100; background: #e2e8f0 !important; border-bottom: 3px solid #cbd5e1; color: #1e293b; font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; padding: 15px 12px; }
-        .sticky-code { position: sticky; left: 0; z-index: 80; background: #f8fafc; width: 90px; border-right: 2px solid #e2e8f0; text-align: center; }
-        .sticky-item { position: sticky; left: 90px; z-index: 80; background: #ffffff; border-right: 3px solid #cbd5e1; width: 320px; max-width: 320px; }
-        thead th.sticky-code { z-index: 110; }
-        thead th.sticky-item { z-index: 110; }
-        .code-text { font-family: 'Courier New', Courier, monospace; font-weight: 600; color: #64748b; }
-        .item-text { font-size: 14px; font-weight: 600; color: #1e293b; line-height: 1.2; }
-        .pic-text { font-size: 11px; color: #94a3b8; font-weight: 400; margin-top: 2px; }
-        .heat-cell-mini { width: 62px; height: 24px; display: flex; align-items: center; justify-content: center; border-radius: 3px; font-weight: 800; font-size: 0.75rem; margin: 1px auto; }
-        .label-mini { font-size: 8px; color: #94a3b8; text-transform: uppercase; font-weight: bold; margin-right: 4px; width: 15px; display: inline-block; }
-        tbody tr:hover td { background-color: #eef2ff !important; }
-        .stats-gradient { background: linear-gradient(135deg, #787878 0%, #334155 100%); }
-        .table-container::-webkit-scrollbar { width: 8px; height: 8px; }
-        .table-container::-webkit-scrollbar-thumb { background: #94a3b8; border-radius: 10px; }
-        .sort-pill { transition: all 0.2s; cursor: pointer; }
-        .sort-pill:hover { background-color: #ffffff; color: #4f46e5; transform: scale(1.05); }
-        
-        .top-mover-card { background: white; border-radius: 12px; padding: 10px; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
-        .top-mover-title { font-size: 10px; font-weight: 900; color: #64748b; text-transform: uppercase; letter-spacing: 0.1em; border-bottom: 2px solid #f1f5f9; padding-bottom: 4px; margin-bottom: 6px; }
-        .top-mover-item { 
-            font-size: 10.5px; display: flex; justify-content: space-between; align-items: center; 
-            padding: 3px 6px; border-radius: 6px; margin-bottom: 1px; border: 1px solid transparent;
-            transition: all 0.2s ease; cursor: default;
-        }
-        .item-active-highlight { background-color: #eff6ff !important; border-color: #3b82f6 !important; transform: translateX(3px); z-index: 10; }
-        .count-badge { background: #f1f5f9; color: #64748b; padding: 0px 4px; border-radius: 4px; font-size: 9px; font-weight: 800; margin-left: 4px; border: 1px solid #e2e8f0; }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>REL / AVG / Compare Dashboard ชุด G</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Sarabun', sans-serif; background: linear-gradient(180deg, #eef2ff 0%, #f8fafc 22%, #ffffff 100%); color:#0f172a; }
+    .glass { background: rgba(255,255,255,.82); backdrop-filter: blur(10px); border: 1px solid rgba(148,163,184,.16); box-shadow: 0 10px 35px rgba(15,23,42,.08); }
+    .table-shell { max-height: calc(100vh - 310px); overflow: auto; }
+    .table-shell::-webkit-scrollbar { width: 10px; height: 10px; }
+    .table-shell::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 999px; }
+    table { border-collapse: separate; border-spacing: 0; width: max-content; min-width: 100%; }
+    thead th { position: sticky; top: 0; z-index: 30; background: #f8fafc; }
+    .sticky-1 { position: sticky; left: 0; z-index: 31; background: #fff; }
+    .sticky-2 { position: sticky; left: 94px; z-index: 31; background: #fff; }
+    .sticky-3 { position: sticky; left: 214px; z-index: 31; background: #fff; }
+    .sticky-4 { position: sticky; left: 338px; z-index: 31; background: #fff; }
+    tbody tr:hover td { background: #f8fbff; }
+    .metric-chip { font-size: 11px; font-weight: 700; border-radius: 999px; padding: 6px 10px; border: 1px solid #dbeafe; color:#334155; background:white; }
+    .metric-chip.active { background: linear-gradient(135deg,#4f46e5,#6366f1); color:white; border-color: transparent; box-shadow: 0 8px 20px rgba(79,70,229,.22); }
+    .heat { display:inline-flex; min-width:64px; justify-content:center; align-items:center; padding:6px 8px; border-radius:10px; font-weight:800; font-size:12px; }
+    .mini-card { background: linear-gradient(180deg,#ffffff,#f8fafc); border:1px solid #e2e8f0; }
+    .top-movers-strip { display:grid; grid-template-columns: repeat(5, minmax(240px, 1fr)); gap: 14px; }
+    .mover-card { background: linear-gradient(180deg,#ffffff,#f8fafc); border:1px solid #e2e8f0; border-radius:20px; padding:16px; box-shadow: 0 8px 24px rgba(15,23,42,.05); }
+    .mover-item { display:flex; align-items:flex-start; justify-content:space-between; gap:10px; padding:8px 10px; border-radius:12px; cursor:pointer; transition:all .18s ease; border:1px solid transparent; }
+    .mover-item:hover { background:#f8fbff; border-color:#dbeafe; transform: translateY(-1px); }
+    .mover-item.active { background:#eff6ff; border-color:#93c5fd; box-shadow: inset 0 0 0 1px rgba(59,130,246,.06); }
+    .row-highlight td { background:#eff6ff !important; }
+    .row-highlight .sticky-1, .row-highlight .sticky-2, .row-highlight .sticky-3, .row-highlight .sticky-4 { background:#dbeafe !important; }
+    .metric-rel { color:#4f46e5; border-color:#c7d2fe; background:#eef2ff; }
+    .metric-rel.active { background: linear-gradient(135deg,#4f46e5,#6366f1); color:white; border-color: transparent; }
+    .metric-avg { color:#0f766e; border-color:#99f6e4; background:#ecfeff; }
+    .metric-avg.active { background: linear-gradient(135deg,#0f766e,#14b8a6); color:white; border-color: transparent; }
+    .metric-compare { color:#b45309; border-color:#fde68a; background:#fffbeb; }
+    .metric-compare.active { background: linear-gradient(135deg,#d97706,#f59e0b); color:white; border-color: transparent; }
+    @media (max-width: 1450px) { .top-movers-strip { grid-template-columns: repeat(3, minmax(240px, 1fr)); } }
+    @media (max-width: 1024px) { .top-movers-strip { grid-template-columns: repeat(2, minmax(220px, 1fr)); } }
+    @media (max-width: 640px) { .top-movers-strip { grid-template-columns: 1fr; } }
+  </style>
 </head>
-<body class="p-4 md:p-8">
-
-    <div class="max-w-[1900px] mx-auto">
-        <div id="topMoversPanel" class="grid grid-cols-1 md:grid-cols-4 gap-3 mb-6">
-            <div class="top-mover-card"><div class="top-mover-title">📍 Central Top 10</div><div id="top-CEN"></div></div>
-            <div class="top-mover-card"><div class="top-mover-title">📍 Northeast Top 10</div><div id="top-NE"></div></div>
-            <div class="top-mover-card"><div class="top-mover-title">📍 North Top 10</div><div id="top-N"></div></div>
-            <div class="top-mover-card"><div class="top-mover-title">📍 South Top 10</div><div id="top-S"></div></div>
+<body class="min-h-screen p-5 lg:p-7">
+  <div class="max-w-[1800px] mx-auto space-y-5">
+    <section class="glass rounded-[28px] p-6 lg:p-7">
+      <div class="flex flex-col xl:flex-row xl:items-start xl:justify-between gap-5">
+        <div>
+          <div class="inline-flex items-center rounded-full bg-slate-900 text-white text-[11px] font-bold px-3 py-1.5 mb-3">TPSO • Price Intelligence</div>
+          <h1 class="text-3xl lg:text-5xl font-extrabold tracking-tight leading-tight">Dashboard วิเคราะห์ <span class="text-indigo-600">REL / AVG / Compare</span> ชุด U</h1>
+          <p id="dataDate" class="mt-3 text-sm lg:text-base text-slate-600 font-semibold">กำลังโหลดข้อมูล...</p>
+          <p class="mt-2 text-sm text-slate-500">หน้าเว็บจะโหลด <b>ReportforHeaderU.xlsx</b> จากโฟลเดอร์เดียวกันอัตโนมัติทันที • ไม่ต้องอัปโหลดไฟล์ • แสดงทั้งรายเดือนและรายสัปดาห์ในตารางเดียว</p>
         </div>
+        <div class="grid sm:grid-cols-2 gap-3 min-w-[320px]">
+          <div class="mini-card rounded-2xl p-4">
+            <div class="text-[11px] uppercase tracking-[0.18em] font-extrabold text-slate-500 mb-2">Data source</div>
+            <div class="text-lg font-extrabold text-slate-800">ReportforHeaderU.xlsx</div>
+            <div id="rowCountLabel" class="text-sm text-slate-500 mt-1"></div>
+            <div id="fileStatus" class="text-xs text-slate-500 mt-2">กำลังลองอ่านไฟล์อัตโนมัติ...</div>
+            <div id="fileDebug" class="text-[11px] text-slate-400 mt-1 break-all"></div>
+          </div>
+          <div class="mini-card rounded-2xl p-4">
+            <div class="text-[11px] uppercase tracking-[0.18em] font-extrabold text-slate-500 mb-2">โหมดการเรียง</div>
+            <div class="text-lg font-extrabold text-slate-800">เรียงตามรหัสสินค้า</div>
+            <div class="text-sm text-slate-500 mt-1">ถ้ารหัสเดียวกันจะแสดง รายเดือน ก่อน รายสัปดาห์</div>
+          </div>
+        </div>
+      </div>
+    </section>
 
-        <div class="flex flex-col lg:flex-row gap-4 mb-6">
-            <div class="flex-grow bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
-                <div class="flex items-center justify-between mb-4">
-                    <div class="flex items-center gap-3">
-                        <div>
-                            <h1 class="text-3xl font-black text-slate-800 tracking-tight italic">REL Analysis ชุดนอกเขต</h1>
-                            <p id="dataDate" class="text-sm text-indigo-600 font-bold uppercase tracking-widest mt-1 text-slate-800">Loading...</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="flex flex-wrap gap-3">
-                    <select id="setFilter" class="px-4 py-3 bg-blue-50 border border-blue-200 rounded-2xl text-sm font-bold text-blue-700 outline-none cursor-pointer min-w-[200px]">
-                        <option value="นอกเขต">🏘️ นอกเขต (ทั้งหมด)</option>
-                        <option value="คำนวณ">✅ นอกเขต (คำนวณ)</option>
-                        <option value="ไม่คำนวณ">🚫 นอกเขต (ไม่คำนวณ)</option>
-                    </select>
+    <section class="grid grid-cols-2 lg:grid-cols-5 gap-3">
+      <div class="glass rounded-3xl p-4"><div class="text-[11px] font-bold tracking-[0.15em] uppercase text-slate-500">รายการที่แสดง</div><div id="kpiRows" class="text-4xl font-extrabold mt-1">0</div><div class="text-sm text-slate-500 mt-1">หลังกรอง</div></div>
+      <div class="glass rounded-3xl p-4"><div class="text-[11px] font-bold tracking-[0.15em] uppercase text-slate-500">สูงกว่า 100</div><div id="kpiUp" class="text-4xl font-extrabold mt-1 text-emerald-600">0</div><div class="text-sm text-slate-500 mt-1">ดูจาก REL เฉลี่ย</div></div>
+      <div class="glass rounded-3xl p-4"><div class="text-[11px] font-bold tracking-[0.15em] uppercase text-slate-500">ต่ำกว่า 100</div><div id="kpiDown" class="text-4xl font-extrabold mt-1 text-rose-600">0</div><div class="text-sm text-slate-500 mt-1">ดูจาก REL เฉลี่ย</div></div>
+      <div class="glass rounded-3xl p-4"><div class="text-[11px] font-bold tracking-[0.15em] uppercase text-slate-500">สวนทาง</div><div id="kpiMixed" class="text-4xl font-extrabold mt-1 text-amber-600">0</div><div class="text-sm text-slate-500 mt-1">ภาคขึ้นลงไม่เหมือนกัน</div></div>
+      <div class="glass rounded-3xl p-4"><div class="text-[11px] font-bold tracking-[0.15em] uppercase text-slate-500">คงที่</div><div id="kpiStable" class="text-4xl font-extrabold mt-1 text-slate-700">0</div><div class="text-sm text-slate-500 mt-1">REL ใกล้ 100</div></div>
+    </section>
 
-                    <div class="relative flex-grow min-w-[300px]">
-                        <input type="text" id="searchInput" placeholder="ค้นหา รหัส, รายการ หรือผู้ดูแล (ใช้ * ได้)..." 
-                            class="w-full px-5 py-3 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-indigo-500/10 outline-none text-base transition-all font-medium">
-                        <span class="absolute right-4 top-3.5 opacity-30 text-xl text-slate-400">🔍</span>
-                    </div>
+    <section class="glass rounded-[28px] p-5">
+      <div class="grid lg:grid-cols-5 gap-3">
+        <div>
+          <label class="block text-xs font-bold tracking-[0.14em] uppercase text-slate-500 mb-2">ชุดข้อมูล</label>
+          <select id="segmentFilter" class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 font-semibold text-slate-700 outline-none">
+            <option value="all">ทั้งหมด</option>
+            <option value="เมืองทั่วไป">เมืองทั่วไป</option>
+            <option value="เมืองรายได้น้อย">เมืองรายได้น้อย</option>
+            <option value="เมืองไม่คำนวณ">เมืองไม่คำนวณ</option>
+          </select>
+        </div>
+        <div class="lg:col-span-2">
+          <label class="block text-xs font-bold tracking-[0.14em] uppercase text-slate-500 mb-2">ค้นหา</label>
+          <input id="searchInput" class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 font-semibold text-slate-700 outline-none" placeholder="ค้นหา รหัส / รายการ / ผู้ดูแล" />
+        </div>
+        <div>
+          <label class="block text-xs font-bold tracking-[0.14em] uppercase text-slate-500 mb-2">ผู้ดูแล</label>
+          <select id="ownerFilter" class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 font-semibold text-slate-700 outline-none"></select>
+        </div>
+        <div>
+          <label class="block text-xs font-bold tracking-[0.14em] uppercase text-slate-500 mb-2">สถานะ</label>
+          <select id="statusFilter" class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 font-semibold text-slate-700 outline-none">
+            <option value="all">ทั้งหมด</option>
+            <option value="up">ขึ้น</option>
+            <option value="down">ลง</option>
+            <option value="mixed">สวนทาง</option>
+            <option value="stable">คงที่</option>
+          </select>
+        </div>
+      </div>
+      <div class="grid lg:grid-cols-2 gap-3 mt-4">
+        <div class="rounded-3xl bg-slate-50 border border-slate-200 p-4">
+          <div class="text-xs font-bold tracking-[0.14em] uppercase text-slate-500 mb-3">เลือกการแสดงผล</div>
+          <div class="flex flex-wrap gap-2" id="metricViewGroup">
+            <button class="metric-chip active metric-rel" data-view="all">ทั้ง 3 ค่า</button>
+            <button class="metric-chip metric-rel" data-view="REL">REL</button>
+            <button class="metric-chip metric-avg" data-view="AVG">AVG</button>
+            <button class="metric-chip metric-compare" data-view="COMPARE">Compare</button>
+          </div>
+        </div>
+        <div class="rounded-3xl bg-slate-50 border border-slate-200 p-4">
+          <div class="text-xs font-bold tracking-[0.14em] uppercase text-slate-500 mb-3">การเรียง</div>
+          <div class="flex flex-wrap gap-2" id="sortGroup">
+            <button class="metric-chip active" data-sort="code">รหัสสินค้า</button>
+            <button class="metric-chip" data-sort="relDesc">REL มากไปน้อย</button>
+            <button class="metric-chip" data-sort="relAsc">REL น้อยไปมาก</button>
+            <button class="metric-chip" data-sort="avgDesc">AVG มากไปน้อย</button>
+            <button class="metric-chip" data-sort="compareDesc">Compare มากไปน้อย</button>
+          </div>
+        </div>
+      </div>
+    </section>
 
-                    <select id="picFilter" class="px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-bold text-slate-600 outline-none min-w-[150px]">
-                        <option value="all">🧔 ผู้ดูแลทุกคน</option>
-                    </select>
+    <section class="glass rounded-[28px] overflow-hidden">
+      <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3 px-5 py-4 border-b border-slate-200 bg-white/70">
+        <div>
+          <div class="text-xs font-bold tracking-[0.14em] uppercase text-slate-500">ตารางหลัก</div>
+          <div class="text-lg font-extrabold text-slate-800">แสดงทั้งรายเดือนและรายสัปดาห์ในตารางเดียว</div>
+        </div>
+        <div class="text-sm text-slate-500">เรียงตามรหัสสินค้าเป็นค่าเริ่มต้น และมีคอลัมน์บอกชัดว่าเป็น <span class="font-bold text-slate-700">รายเดือน</span> หรือ <span class="font-bold text-slate-700">รายสัปดาห์</span></div>
+      </div>
+      <div class="table-shell">
+        <table>
+          <thead>
+            <tr class="text-xs uppercase tracking-[0.12em] text-slate-500">
+              <th class="sticky-1 px-4 py-3 border-b border-slate-200 w-[94px] min-w-[94px] text-left">รหัส</th>
+              <th class="sticky-2 px-4 py-3 border-b border-slate-200 w-[120px] min-w-[120px] text-left">ประเภท</th>
+              <th class="sticky-3 px-4 py-3 border-b border-slate-200 w-[124px] min-w-[124px] text-left">ชุดข้อมูล</th>
+              <th class="sticky-4 px-4 py-3 border-b border-slate-200 min-w-[300px] text-left">รายการ</th>
+              <th class="px-4 py-3 border-b border-slate-200 min-w-[110px] text-left">ผู้ดูแล</th>
+              <th class="px-4 py-3 border-b border-slate-200 text-center min-w-[96px]">BKK</th>
+              <th class="px-4 py-3 border-b border-slate-200 text-center min-w-[96px]">CEN</th>
+              <th class="px-4 py-3 border-b border-slate-200 text-center min-w-[96px]">NE</th>
+              <th class="px-4 py-3 border-b border-slate-200 text-center min-w-[96px]">N</th>
+              <th class="px-4 py-3 border-b border-slate-200 text-center min-w-[96px]">S</th>
+              <th class="px-4 py-3 border-b border-slate-200 text-center min-w-[130px]">REL เฉลี่ย</th>
+              <th class="px-4 py-3 border-b border-slate-200 text-left min-w-[150px]">Signal</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody"></tbody>
+        </table>
+      </div>
+    </section>
 
-                    <select id="statusFilter" class="px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-bold text-slate-600 outline-none hover:border-indigo-400 transition-all cursor-pointer min-w-[150px]">
-                        <option value="all">📊 สถานะทั้งหมด</option>
-                        <option value="outlier">⚠️ พบความขัดแย้ง</option>
-                        <option value="up">📈 ขึ้นทุกภาค</option>
-                        <option value="down">📉 ลงทุกภาค</option>
-                        <option value="normal">⚪ รายการปกติ</option>
-                    </select>
-                </div>
+    <section class="glass rounded-[28px] p-5">
+      <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3 mb-4">
+        <div>
+          <div class="text-xs font-bold tracking-[0.14em] uppercase text-slate-500">ภาพรวมการเคลื่อนไหว</div>
+          <div id="topMoverTitle" class="text-2xl font-extrabold text-slate-800">Top Movers by REL</div>
+        </div>
+        <div class="flex flex-wrap items-center gap-2">
+          <span class="text-xs font-bold text-slate-500 mr-1">เลือก mover</span>
+          <div id="moverMetricGroup" class="flex flex-wrap gap-2">
+            <button class="metric-chip active metric-rel" data-mover="REL">REL</button>
+            <button class="metric-chip metric-avg" data-mover="AVG">AVG</button>
+            <button class="metric-chip metric-compare" data-mover="COMPARE">Compare</button>
+          </div>
+        </div>
+      </div>
+      <div id="topMovers" class="top-movers-strip"></div>
+    </section>
+  </div>
+
+
+<script>
+const monthNames = ["", "มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
+const regions = ['BKK','CEN','NE','N','S'];
+
+let rawData = [];
+let metricView = 'all';
+let sortMode = 'code';
+let moverMetric = 'REL';
+let selectedMoverKey = null;
+
+function normalizeThai(v){ return (v ?? '').toString().trim(); }
+function parseNumber(v){
+  if (v === null || v === undefined || v === '') return null;
+  const n = Number(String(v).replace(/,/g,'').trim());
+  return Number.isFinite(n) ? n : null;
+}
+
+function detectFrequency(v){
+  const t = normalizeThai(v);
+  if (t.includes('สัปดาห์')) return 'รายสัปดาห์';
+  if (t.includes('เดือน')) return 'รายเดือน';
+  return t || 'ไม่ระบุ';
+}
+function detectSegment(v){
+  const t = normalizeThai(v);
+  if (t.includes('เมืองรายได้น้อย')) return 'เมืองรายได้น้อย';
+  if (t.includes('เมืองไม่คำนวณ')) return 'เมืองไม่คำนวณ';
+  if (t.includes('เมืองทั่วไป')) return 'เมืองทั่วไป';
+  return 'เมืองทั่วไป';
+}
+function parseSetParts(v){
+  const t = normalizeThai(v);
+  const parts = t.split('_');
+  return {
+    frequency: detectFrequency(parts[0] || t),
+    segment: detectSegment(parts[1] || t)
+  };
+}
+function pick(obj, keys){
+  for (const k of keys){
+    if (Object.prototype.hasOwnProperty.call(obj, k) && obj[k] !== undefined) return obj[k];
+  }
+  return undefined;
+}
+function mapRegion(raw){
+  const t = normalizeThai(raw);
+  if (t === 'กรุงเทพและปริมณฑล') return 'BKK';
+  if (t === 'กลาง') return 'CEN';
+  if (t === 'ตะวันออกเฉียงเหนือ') return 'NE';
+  if (t === 'เหนือ') return 'N';
+  if (t === 'ใต้') return 'S';
+  return null;
+}
+function mapWorkbookRows(rows){
+  const normalized = rows.map(r => {
+    const out = {};
+    for (const [k,v] of Object.entries(r || {})) out[normalizeThai(k)] = v;
+    return out;
+  });
+
+  const grouped = new Map();
+
+  for (const row of normalized) {
+    const month = parseNumber(row['MONTH'] ?? row['Month'] ?? row['เดือน']);
+    const year = parseNumber(row['YEAR'] ?? row['Year'] ?? row['ปี']);
+    const code = String(row['CODE7'] ?? row['Code7'] ?? row['รหัส'] ?? row['รหัสสินค้า'] ?? '').trim();
+    const item = String(row['รายการ'] ?? row['ITEM_NAME'] ?? row['สินค้า'] ?? '').trim();
+    const owner = String(row['ผู้ดูแล'] ?? row['PIC'] ?? '').trim();
+    const setText = String(row['ชุด'] ?? row['segment'] ?? row['ชุดข้อมูล'] ?? '').trim();
+    const region = mapRegion(row['ภาค'] ?? row['region'] ?? row['Region']);
+
+    if (!code || !item || !setText || !region) continue;
+
+    const setInfo = parseSetParts(setText);
+    const key = [year ?? '', month ?? '', code, item, owner, setInfo.frequency, setInfo.segment].join('|');
+
+    if (!grouped.has(key)) {
+      grouped.set(key, {
+        MONTH: month,
+        YEAR: year,
+        CODE7: code,
+        รายการ: item,
+        ผู้ดูแล: owner,
+        segment: setInfo.segment,
+        frequency: setInfo.frequency,
+        BKK_REL: null, BKK_AVG: null, BKK_COMPARE: null,
+        CEN_REL: null, CEN_AVG: null, CEN_COMPARE: null,
+        NE_REL: null, NE_AVG: null, NE_COMPARE: null,
+        N_REL: null, N_AVG: null, N_COMPARE: null,
+        S_REL: null, S_AVG: null, S_COMPARE: null,
+      });
+    }
+
+    const rec = grouped.get(key);
+    rec[`${region}_AVG`] = parseNumber(row['AVG']);
+    rec[`${region}_COMPARE`] = parseNumber(row['COMPARE_PRICE'] ?? row['COMPARE']);
+    rec[`${region}_REL`] = parseNumber(row['REL']);
+  }
+
+  return Array.from(grouped.values()).filter(r => r.CODE7 && r.รายการ);
+}
+function num(v) {
+  return typeof v === 'number' && !Number.isNaN(v) ? v : null;
+}
+function avg(values) {
+  const ok = values.filter(v => typeof v === 'number');
+  return ok.length ? ok.reduce((a,b)=>a+b,0)/ok.length : null;
+}
+function relStyle(v) {
+  if (v == null) return 'background:#f8fafc;color:#94a3b8;border:1px solid #e2e8f0;';
+  const diff = Math.abs(v - 100);
+  const alpha = Math.min(0.18 + diff * 0.045, 0.95);
+  if (Math.abs(diff) < 0.15) return 'background:#f8fafc;color:#475569;border:1px solid #e2e8f0;';
+  if (v > 100) return `background:rgba(16,185,129,${alpha});color:${alpha > .45 ? '#fff' : '#065f46'};`;
+  return `background:rgba(244,63,94,${alpha});color:${alpha > .45 ? '#fff' : '#881337'};`;
+}
+function badgeType(freq) {
+  return freq === 'รายเดือน'
+    ? '<span class="inline-flex items-center rounded-full bg-indigo-50 text-indigo-700 border border-indigo-100 px-3 py-1 text-xs font-extrabold">รายเดือน</span>'
+    : '<span class="inline-flex items-center rounded-full bg-emerald-50 text-emerald-700 border border-emerald-100 px-3 py-1 text-xs font-extrabold">รายสัปดาห์</span>';
+}
+function getMetrics(row) {
+  const relVals = regions.map(r => num(row[`${r}_REL`])).filter(v => v != null);
+  const avgVals = regions.map(r => num(row[`${r}_AVG`])).filter(v => v != null);
+  const compareVals = regions.map(r => num(row[`${r}_COMPARE`])).filter(v => v != null);
+
+  const relAvg = avg(relVals);
+  const avgAvg = avg(avgVals);
+  const compareAvg = avg(compareVals);
+  const above = relVals.filter(v => v > 100.15).length;
+  const below = relVals.filter(v => v < 99.85).length;
+
+  let status = 'stable';
+  let signal = 'คงที่';
+  let signalClass = 'bg-slate-100 text-slate-700 border-slate-200';
+
+  if (above && !below) {
+    status = 'up'; signal = 'ขึ้น'; signalClass = 'bg-emerald-50 text-emerald-700 border-emerald-200';
+  } else if (below && !above) {
+    status = 'down'; signal = 'ลง'; signalClass = 'bg-rose-50 text-rose-700 border-rose-200';
+  } else if (above && below) {
+    status = 'mixed'; signal = 'สวนทาง'; signalClass = 'bg-amber-50 text-amber-700 border-amber-200';
+  }
+  return { relAvg, avgAvg, compareAvg, status, signal, signalClass };
+}
+function formatMetricBlock(row, region) {
+  const rel = num(row[`${region}_REL`]);
+  const avgVal = num(row[`${region}_AVG`]);
+  const comp = num(row[`${region}_COMPARE`]);
+
+  if (metricView === 'REL') return `<div class="heat" style="${relStyle(rel)}">${rel == null ? '-' : rel.toFixed(2)}</div>`;
+  if (metricView === 'AVG') return `<div class="text-sm font-bold text-slate-700">${avgVal == null ? '-' : avgVal.toFixed(2)}</div>`;
+  if (metricView === 'COMPARE') return `<div class="text-sm font-bold text-slate-700">${comp == null ? '-' : comp.toFixed(2)}</div>`;
+  return `
+    <div class="space-y-1">
+      <div class="heat" style="${relStyle(rel)}">${rel == null ? '-' : rel.toFixed(2)}</div>
+      <div class="text-[11px] text-slate-500 leading-tight">AVG <span class="font-bold text-slate-700">${avgVal == null ? '-' : avgVal.toFixed(2)}</span></div>
+      <div class="text-[11px] text-slate-500 leading-tight">CMP <span class="font-bold text-slate-700">${comp == null ? '-' : comp.toFixed(2)}</span></div>
+    </div>`;
+}
+function matchesText(row, q) {
+  if (!q) return true;
+  const s = q.toLowerCase();
+  return [row.CODE7, row['รายการ'], row['ผู้ดูแล'], row.segment, row.frequency].some(v => (v || '').toString().toLowerCase().includes(s));
+}
+function rowKey(r) {
+  return [r.CODE7, r.frequency, r.segment, r['รายการ']].join('|');
+}
+function moverValueStyle(v, metric) {
+  if (v == null) return 'text-slate-400';
+  if (metric === 'REL') return v >= 100 ? 'text-emerald-600' : 'text-rose-600';
+  if (metric === 'AVG') return 'text-teal-700';
+  return 'text-amber-700';
+}
+function getFilteredRows() {
+  const q = document.getElementById('searchInput').value.trim();
+  const owner = document.getElementById('ownerFilter').value;
+  const segment = document.getElementById('segmentFilter').value;
+  const status = document.getElementById('statusFilter').value;
+
+  let rows = rawData.map(r => ({...r, _metrics:getMetrics(r)})).filter(r => {
+    return matchesText(r, q)
+      && (owner === 'all' || r['ผู้ดูแล'] === owner)
+      && (segment === 'all' || r.segment === segment)
+      && (status === 'all' || r._metrics.status === status);
+  });
+
+  rows.sort((a, b) => {
+    if (sortMode === 'relDesc') return (b._metrics.relAvg ?? -Infinity) - (a._metrics.relAvg ?? -Infinity);
+    if (sortMode === 'relAsc') return (a._metrics.relAvg ?? Infinity) - (b._metrics.relAvg ?? Infinity);
+    if (sortMode === 'avgDesc') return (b._metrics.avgAvg ?? -Infinity) - (a._metrics.avgAvg ?? -Infinity);
+    if (sortMode === 'compareDesc') return (b._metrics.compareAvg ?? -Infinity) - (a._metrics.compareAvg ?? -Infinity);
+
+    const codeCompare = a.CODE7.localeCompare(b.CODE7, 'th');
+    if (codeCompare !== 0) return codeCompare;
+    const freqCompare = (a.frequency === 'รายเดือน' ? 0 : 1) - (b.frequency === 'รายเดือน' ? 0 : 1);
+    if (freqCompare !== 0) return freqCompare;
+    return a.segment.localeCompare(b.segment, 'th');
+  });
+  return rows;
+}
+function renderKPIs(rows) {
+  document.getElementById('kpiRows').textContent = rows.length.toLocaleString('en-US');
+  document.getElementById('kpiUp').textContent = rows.filter(r => r._metrics.status === 'up').length.toLocaleString('en-US');
+  document.getElementById('kpiDown').textContent = rows.filter(r => r._metrics.status === 'down').length.toLocaleString('en-US');
+  document.getElementById('kpiMixed').textContent = rows.filter(r => r._metrics.status === 'mixed').length.toLocaleString('en-US');
+  document.getElementById('kpiStable').textContent = rows.filter(r => r._metrics.status === 'stable').length.toLocaleString('en-US');
+}
+function renderTopMovers(rows) {
+  const topWrap = document.getElementById('topMovers');
+  const title = document.getElementById('topMoverTitle');
+  title.textContent = `Top Movers by ${moverMetric}`;
+  topWrap.innerHTML = regions.map(region => {
+    const field = `${region}_${moverMetric}`;
+    const baseline = moverMetric === 'REL' ? 100 : 0;
+    const top = rows
+      .filter(r => num(r[field]) != null)
+      .sort((a,b) => Math.abs((b[field] ?? baseline) - baseline) - Math.abs((a[field] ?? baseline) - baseline))
+      .slice(0,5);
+
+    return `<div class="mover-card">
+      <div class="flex items-center justify-between gap-3">
+        <div class="text-[11px] font-bold tracking-[0.16em] uppercase text-slate-500">${region}</div>
+        <div class="text-[10px] font-bold rounded-full px-2.5 py-1 ${moverMetric === 'REL' ? 'bg-indigo-50 text-indigo-700' : moverMetric === 'AVG' ? 'bg-teal-50 text-teal-700' : 'bg-amber-50 text-amber-700'}">${moverMetric}</div>
+      </div>
+      <div class="mt-3 space-y-2">
+        ${top.map((r, idx) => {
+          const key = rowKey(r);
+          const activeClass = selectedMoverKey === key ? 'active' : '';
+          return `
+          <button type="button" class="mover-item ${activeClass}" data-row-key="${key}">
+            <div class="min-w-0 text-left">
+              <div class="text-xs font-extrabold text-slate-700">${idx+1}. ${r['รายการ']}</div>
+              <div class="text-[11px] text-slate-500">${r.CODE7} • ${r.frequency} • ${r.segment}</div>
             </div>
-            
-            <div class="stats-gradient px-8 py-5 rounded-3xl shadow-2xl flex items-center gap-6 text-white min-w-[650px]">
-                <div class="text-center min-w-[80px]"><p class="text-[9px] font-black text-indigo-300 uppercase tracking-[0.2em] mb-1">Matching</p><h2 id="stat-match" class="text-3xl font-black italic text-white">0</h2></div>
-                <div class="w-[1px] h-10 bg-white/10"></div>
-                <div class="text-center"><p class="text-[9px] font-black text-emerald-400 uppercase tracking-[0.1em] mb-1">Rising</p><h2 id="stat-up" class="text-3xl font-black italic text-emerald-400">0</h2></div>
-                <div class="w-[1px] h-10 bg-white/10"></div>
-                <div class="text-center"><p class="text-[9px] font-black text-amber-400 uppercase tracking-[0.1em] mb-1">Conflict</p><h2 id="stat-outlier" class="text-3xl font-black italic text-amber-400">0</h2></div>
-                <div class="w-[1px] h-10 bg-white/10"></div>
-                <div class="text-center"><p class="text-[9px] font-black text-rose-400 uppercase tracking-[0.1em] mb-1">Dropping</p><h2 id="stat-down" class="text-3xl font-black italic text-rose-400">0</h2></div>
-                <div class="w-[1px] h-10 bg-white/10"></div>
-                <div class="text-center"><p class="text-[9px] font-black text-slate-400 uppercase tracking-[0.1em] mb-1">Normal</p><h2 id="stat-normal" class="text-3xl font-black italic text-slate-300">0</h2></div>
-            </div>
-        </div>
+            <div class="text-sm font-extrabold ${moverValueStyle(r[field], moverMetric)}">${r[field] == null ? '-' : r[field].toFixed(2)}</div>
+          </button>`;
+        }).join('') || '<div class="text-sm text-slate-400">ไม่มีข้อมูล</div>'}
+      </div>
+    </div>`;
+  }).join('');
 
-        <div class="table-container">
-            <table>
-                <thead>
-                    <tr>
-                        <th class="sticky-code">
-                            <div class="flex flex-col items-center gap-1">
-                                <span>ID</span>
-                                <button onclick="sortTable('id')" class="sort-pill px-1 bg-white/30 rounded text-[8px] font-black uppercase">↑↓ Sort</button>
-                            </div>
-                        </th>
-                        <th class="sticky-item text-left px-8">Product Description / PIC</th>
-                        <th class="text-center">Central</th>
-                        <th class="text-center">NE</th>
-                        <th class="text-center">North</th>
-                        <th class="text-center">South</th>
-                        <th class="bg-slate-300 border-l border-slate-400 text-center min-w-[280px]">
-                            <div class="flex flex-col gap-2 text-center items-center justify-center">
-                                <span>MARKET ANALYSIS</span>
-                                <div class="flex gap-2">
-                                    <button onclick="sortTable('top')" class="sort-pill px-2 py-1 bg-white/80 rounded text-[10px] shadow-sm font-bold uppercase">↑↓ SORT TOP</button>
-                                    <button onclick="sortTable('avg')" class="sort-pill px-2 py-1 bg-white/80 rounded text-[10px] shadow-sm font-bold uppercase">↑↓ SORT AVG</button>
-                                </div>
-                            </div>
-                        </th>
-                    </tr>
-                </thead>
-                <tbody id="tableBody"></tbody>
-            </table>
-        </div>
-    </div>
+  topWrap.querySelectorAll('.mover-item').forEach(btn => {
+    btn.addEventListener('click', () => {
+      selectedMoverKey = btn.dataset.rowKey;
+      renderTable();
+      const rowEl = document.querySelector(`tr[data-row-key="${CSS.escape(selectedMoverKey)}"]`);
+      if (rowEl) rowEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    });
+  });
+}
+function renderTable() {
+  const rows = getFilteredRows();
+  renderKPIs(rows);
+  renderTopMovers(rows);
+  const tbody = document.getElementById('tableBody');
+  tbody.innerHTML = rows.map(r => `
+    <tr class="border-b border-slate-100 ${selectedMoverKey === rowKey(r) ? 'row-highlight' : ''}" data-row-key="${rowKey(r)}">
+      <td class="sticky-1 px-4 py-4 border-b border-slate-100 font-mono text-sm font-bold text-slate-700">${r.CODE7}</td>
+      <td class="sticky-2 px-4 py-4 border-b border-slate-100">${badgeType(r.frequency)}</td>
+      <td class="sticky-3 px-4 py-4 border-b border-slate-100 text-sm font-bold text-slate-700">${r.segment}</td>
+      <td class="sticky-4 px-4 py-4 border-b border-slate-100"><div class="font-extrabold text-slate-800">${r['รายการ']}</div></td>
+      <td class="px-4 py-4 border-b border-slate-100 text-sm font-semibold text-slate-600">${r['ผู้ดูแล'] || '-'}</td>
+      <td class="px-4 py-4 border-b border-slate-100 text-center">${formatMetricBlock(r,'BKK')}</td>
+      <td class="px-4 py-4 border-b border-slate-100 text-center">${formatMetricBlock(r,'CEN')}</td>
+      <td class="px-4 py-4 border-b border-slate-100 text-center">${formatMetricBlock(r,'NE')}</td>
+      <td class="px-4 py-4 border-b border-slate-100 text-center">${formatMetricBlock(r,'N')}</td>
+      <td class="px-4 py-4 border-b border-slate-100 text-center">${formatMetricBlock(r,'S')}</td>
+      <td class="px-4 py-4 border-b border-slate-100 text-center"><div class="heat" style="${relStyle(r._metrics.relAvg)}">${r._metrics.relAvg == null ? '-' : r._metrics.relAvg.toFixed(2)}</div></td>
+      <td class="px-4 py-4 border-b border-slate-100"><span class="inline-flex rounded-full border px-3 py-1 text-xs font-extrabold ${r._metrics.signalClass}">${r._metrics.signal}</span></td>
+    </tr>`).join('');
+}
+function initHeader() {
+  if (!rawData.length) {
+    document.getElementById('dataDate').textContent = 'ยังไม่พบข้อมูล';
+    document.getElementById('rowCountLabel').textContent = '0 แถว';
+    return;
+  }
+  const maxYear = Math.max(...rawData.map(r => r.YEAR || 0));
+  const maxMonth = Math.max(...rawData.map(r => r.MONTH || 0));
+  document.getElementById('dataDate').textContent = `ข้อมูลล่าสุด: เดือน ${monthNames[maxMonth] || '-'} พ.ศ. ${maxYear}`;
+  document.getElementById('rowCountLabel').textContent = `โหลดข้อมูล ${rawData.length.toLocaleString('en-US')} แถว`;
+}
+function initControls() {
+  const owners = [...new Set(rawData.map(r => r['ผู้ดูแล']).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'th'));
+  document.getElementById('ownerFilter').innerHTML = '<option value="all">ผู้ดูแลทุกคน</option>' + owners.map(o => `<option value="${o}">${o}</option>`).join('');
 
-    <script>
-        let rawItems = [];
-        let currentSort = { col: 'id', dir: 'asc' };
-        const monthNames = ["", "มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
+  document.querySelectorAll('#metricViewGroup .metric-chip').forEach(btn => {
+    btn.onclick = () => {
+      metricView = btn.dataset.view;
+      document.querySelectorAll('#metricViewGroup .metric-chip').forEach(x => x.classList.remove('active'));
+      btn.classList.add('active');
+      renderTable();
+    };
+  });
+  document.querySelectorAll('#sortGroup .metric-chip').forEach(btn => {
+    btn.onclick = () => {
+      sortMode = btn.dataset.sort;
+      document.querySelectorAll('#sortGroup .metric-chip').forEach(x => x.classList.remove('active'));
+      btn.classList.add('active');
+      renderTable();
+    };
+  });
+  document.querySelectorAll('#moverMetricGroup .metric-chip').forEach(btn => {
+    btn.onclick = () => {
+      moverMetric = btn.dataset.mover;
+      selectedMoverKey = null;
+      document.querySelectorAll('#moverMetricGroup .metric-chip').forEach(x => x.classList.remove('active'));
+      btn.classList.add('active');
+      renderTable();
+    };
+  });
+  document.getElementById('searchInput').oninput = renderTable;
+  document.getElementById('ownerFilter').onchange = renderTable;
+  document.getElementById('segmentFilter').onchange = renderTable;
+  document.getElementById('statusFilter').onchange = renderTable;
+}
+async function loadWorkbookFromArrayBuffer(buffer, sourceLabel='ไฟล์ที่เลือก'){
+  const workbook = XLSX.read(buffer, {type:'array'});
+  const sheetName = workbook.SheetNames[0];
+  const sheet = workbook.Sheets[sheetName];
+  const rows = XLSX.utils.sheet_to_json(sheet, {defval:null});
+  rawData = mapWorkbookRows(rows);
+  document.getElementById('fileStatus').textContent = `โหลดจาก ${sourceLabel} สำเร็จ`;
+  document.getElementById('fileDebug').textContent = `sheet: ${sheetName} | rows: ${rows.length} | mapped: ${rawData.length} | schema: MONTH,YEAR,CODE7,รายการ,ชุด,ผู้ดูแล,ภาค,AVG,COMPARE_PRICE,REL`;
+  initHeader();
+  initControls();
+  renderTable();
+}
+async function tryAutoLoadSameFolder(){
+  const fileStatus = document.getElementById('fileStatus');
+  const fileDebug = document.getElementById('fileDebug');
+  const candidates = [
+    'ReportforHeaderU.xlsx',
+    './ReportforHeaderU.xlsx',
+    new URL('ReportforHeaderU.xlsx', window.location.href).toString()
+  ];
+  let lastError = '';
+  for (const candidate of candidates){
+    try{
+      fileDebug.textContent = `กำลังลอง: ${candidate}`;
+      const res = await fetch(candidate, {cache:'no-store'});
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const buf = await res.arrayBuffer();
+      await loadWorkbookFromArrayBuffer(buf, 'ReportforHeaderU.xlsx');
+      fileStatus.textContent = 'โหลดอัตโนมัติสำเร็จ';
+      fileDebug.textContent = `โหลดจาก: ${candidate}`;
+      return;
+    }catch(err){
+      lastError = String(err && err.message ? err.message : err);
+    }
+  }
+  fileStatus.textContent = 'ยังไม่พบไฟล์อัตโนมัติ';
+  fileDebug.textContent = `สาเหตุล่าสุด: ${lastError}`;
+  initHeader();
+  initControls();
+  renderTable();
+}
 
-        function getCellStyle(v) {
-            if (v === undefined || v === null || v === 100) return 'background: #fff; color: #cbd5e1; border: 1px solid #f1f5f9;';
-            const diff = Math.abs(v - 100);
-            const intensity = Math.min(diff * 0.45, 0.9);
-            return v > 100 ? `background: rgba(16, 185, 129, ${intensity}); color: ${intensity > 0.4 ? 'white' : '#064e3b'};` : `background: rgba(244, 63, 94, ${intensity}); color: ${intensity > 0.4 ? 'white' : '#881337'};`;
-        }
 
-        function getAnalysis(dataObj) {
-            if (!dataObj) return { avg: 100, top: {n: '-', v: 100}, status: 'normal', msg: '-', css: 'text-slate-200' };
-            const regions = [
-                {n:'CEN', v:dataObj.กลาง_REL}, {n:'NE', v:dataObj.ตะวันออกเฉียงเหนือ_REL}, 
-                {n:'N', v:dataObj.เหนือ_REL}, {n:'S', v:dataObj.ใต้_REL}
-            ].filter(r => r.v != null && r.v !== 0);
-            
-            if (regions.length === 0) return { avg: 100, top: {n: '-', v: 100}, status: 'normal', msg: '-', css: 'text-slate-200' };
-            
-            const avg = regions.reduce((s, r) => s + r.v, 0) / regions.length;
-            const top = regions.reduce((p, c) => Math.abs(c.v - 100) > Math.abs(p.v - 100) ? c : p);
-            const upCount = regions.filter(r => r.v > 100).length;
-            const downCount = regions.filter(r => r.v < 100).length;
-            
-            let status = 'normal', msg = 'Stable Trend', css = 'text-slate-400 border-slate-100';
-            if (upCount === regions.length) { status = 'up'; msg = 'Universal Rise'; css = 'bg-emerald-50 text-emerald-700 border-emerald-100'; }
-            else if (downCount === regions.length) { status = 'down'; msg = 'Universal Fall'; css = 'bg-rose-50 text-rose-700 border-rose-100'; }
-            else if ((upCount >= 2 && downCount >= 1) || (downCount >= 2 && upCount >= 1)) {
-                status = 'outlier';
-                const minor = upCount < downCount ? regions.filter(r => r.v > 100) : regions.filter(r => r.v < 100);
-                msg = `🚨 ${minor.map(m => m.n).join(', ')} สวนกระแส`;
-                css = 'bg-amber-50 text-amber-700 border-amber-200';
-            }
-            return { avg, top, status, msg, css };
-        }
+initHeader();
+initControls();
+renderTable();
+tryAutoLoadSameFolder();
+</script>
 
-        function syncMovers(itemName, active) {
-            const safeName = btoa(encodeURIComponent(itemName)).replace(/=/g, "");
-            document.querySelectorAll(`.mover-${safeName}`).forEach(el => {
-                active ? el.classList.add('item-active-highlight') : el.classList.remove('item-active-highlight');
-            });
-        }
-
-        function updateTopMovers(data) {
-            const regions = [
-                {id: 'top-CEN', f: 'กลาง_REL'}, {id: 'top-NE', f: 'ตะวันออกเฉียงเหนือ_REL'},
-                {id: 'top-N', f: 'เหนือ_REL'}, {id: 'top-S', f: 'ใต้_REL'}
-            ];
-            let allNames = [];
-            const results = regions.map(reg => {
-                const sorted = [...data].filter(g => g.monthData && g.monthData[reg.f] != null)
-                    .sort((a, b) => Math.abs(b.monthData[reg.f] - 100) - Math.abs(a.monthData[reg.f] - 100)).slice(0, 10);
-                allNames.push(...sorted.map(s => s.รายการ));
-                return { id: reg.id, items: sorted, field: reg.f };
-            });
-            const counts = allNames.reduce((acc, n) => { acc[n] = (acc[n] || 0) + 1; return acc; }, {});
-
-            results.forEach(res => {
-                document.getElementById(res.id).innerHTML = res.items.map((g, idx) => {
-                    const val = g.monthData[res.field];
-                    const repeat = counts[g.รายการ];
-                    const safe = btoa(encodeURIComponent(g.รายการ)).replace(/=/g, "");
-                    return `<div class="top-mover-item mover-${safe}" onmouseover="syncMovers('${g.รายการ}', true)" onmouseout="syncMovers('${g.รายการ}', false)">
-                        <span class="truncate w-32 font-bold text-slate-700">${idx+1}. ${g.รายการ}${repeat > 1 ? `<span class="count-badge">${repeat}</span>`:''}</span>
-                        <span class="font-bold ${val > 100 ? 'text-emerald-600' : 'text-rose-600'}">${val.toFixed(2)}</span>
-                    </div>`;
-                }).join('');
-            });
-        }
-
-        function matchWildcard(str, rule) {
-            if (!str) return false;
-            if (!rule.includes('*')) return str.toLowerCase().includes(rule.toLowerCase());
-            const regex = new RegExp("^" + rule.split("*").map(s => s.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&')).join(".*") + "$", "i");
-            return regex.test(str);
-        }
-
-        function sortTable(type) {
-            currentSort.dir = (currentSort.col === type && currentSort.dir === 'desc') ? 'asc' : 'desc';
-            currentSort.col = type;
-            renderTable();
-        }
-
-        function renderTable() {
-            const searchInput = document.getElementById('searchInput').value;
-            const picFilter = document.getElementById('picFilter').value;
-            const statusFilter = document.getElementById('statusFilter').value;
-            const setFilter = document.getElementById('setFilter').value;
-            const tbody = document.getElementById('tableBody');
-            
-            const groupMap = {};
-            rawItems.forEach(item => {
-                // Logic 1: Filter "Nokket" base
-                if (!item.ชุด || !item.ชุด.includes("นอกเขต")) return;
-
-                // Logic 2: Specific Calculation Logic
-                if (setFilter === "คำนวณ" && item.ชุด.includes("ไม่คำนวณ")) return;
-                if (setFilter === "ไม่คำนวณ" && !item.ชุด.includes("ไม่คำนวณ")) return;
-
-                if (!groupMap[item.CODE7]) {
-                    groupMap[item.CODE7] = { CODE7: item.CODE7, รายการ: item.รายการ, ผู้ดูแล: item.ผู้ดูแล, monthData: null, weekData: null };
-                }
-                if (item.ชุด.startsWith("เดือน")) groupMap[item.CODE7].monthData = item;
-                if (item.ชุด.startsWith("สัปดาห์")) groupMap[item.CODE7].weekData = item;
-            });
-
-            let data = Object.values(groupMap).map(g => ({ ...g, _m: getAnalysis(g.monthData || g.weekData) }));
-
-            data = data.filter(g => (matchWildcard(g.รายการ || "", searchInput) || matchWildcard(g.CODE7?.toString() || "", searchInput)) && (picFilter === 'all' || g.ผู้ดูแล === picFilter) && (statusFilter === 'all' || g._m.status === statusFilter));
-
-            if (currentSort.col) {
-                data.sort((a, b) => {
-                    let vA, vB;
-                    if (currentSort.col === 'id') { vA = a.CODE7; vB = b.CODE7; }
-                    else if (currentSort.col === 'top') { vA = a._m.top.v; vB = b._m.top.v; }
-                    else { vA = a._m.avg; vB = b._m.avg; }
-                    return currentSort.dir === 'desc' ? (vB < vA ? -1 : 1) : (vA < vB ? -1 : 1);
-                });
-            }
-
-            updateTopMovers(data);
-
-            document.getElementById('stat-match').innerText = data.length;
-            document.getElementById('stat-up').innerText = data.filter(i => i._m.status === 'up').length;
-            document.getElementById('stat-down').innerText = data.filter(i => i._m.status === 'down').length;
-            document.getElementById('stat-outlier').innerText = data.filter(i => i._m.status === 'outlier').length;
-            document.getElementById('stat-normal').innerText = data.filter(i => i._m.status === 'normal').length;
-
-            tbody.innerHTML = data.map(g => {
-                const renderCell = (f) => `<td class="px-2 py-3 border-b border-slate-100">
-                    <div class="flex flex-col gap-0.5">
-                        <div class="flex items-center"><span class="label-mini text-blue-400">M</span><div class="heat-cell-mini" style="${getCellStyle(g.monthData?.[f])}">${g.monthData?.[f]?.toFixed(2) || '-'}</div></div>
-                        <div class="flex items-center"><span class="label-mini text-indigo-400">W</span><div class="heat-cell-mini" style="${getCellStyle(g.weekData?.[f])}">${g.weekData?.[f]?.toFixed(2) || '-'}</div></div>
-                    </div></td>`;
-                
-                return `<tr class="border-b border-slate-100">
-                    <td class="px-4 py-5 sticky-code"><span class="code-text text-[11px]">${g.CODE7}</span></td>
-                    <td class="px-8 py-5 sticky-item bg-white"><div class="item-text">${g.รายการ}</div><div class="pic-text">ผู้ดูแล: ${g.ผู้ดูแล || '-'}</div></td>
-                    ${renderCell('กลาง_REL')} ${renderCell('ตะวันออกเฉียงเหนือ_REL')} ${renderCell('เหนือ_REL')} ${renderCell('ใต้_REL')}
-                    <td class="px-6 py-4 bg-slate-50 border-l-2 border-slate-200">
-                        <div class="flex flex-col gap-1 items-center">
-                            <span class="text-[10px] font-bold text-slate-700 uppercase">Top: ${g._m.top.n} <b class="${g._m.top.v > 100 ? 'text-emerald-600':'text-rose-600'}">${g._m.top.v.toFixed(2)}</b></span>
-                            <span class="px-2 py-0.5 rounded border text-[9px] font-bold uppercase ${g._m.css}">${g._m.msg}</span>
-                            <span class="text-[9px] text-slate-400">Monthly Avg: <b class="${g._m.avg > 100 ? 'text-emerald-500':'text-rose-600'}">${g._m.avg.toFixed(2)}</b></span>
-                        </div>
-                    </td></tr>`;
-            }).join('');
-        }
-
-        async function init() {
-            try {
-                const res = await fetch('ReportforHeaderU.json');
-                rawItems = await res.json();
-                const pics = [...new Set(rawItems.map(i => i.ผู้ดูแล).filter(p => p))].sort();
-                document.getElementById('picFilter').innerHTML = '<option value="all">🧔 ผู้ดูแลทุกคน</option>' + pics.map(p => `<option value="${p}">${p}</option>`).join('');
-                if (rawItems[0]) document.getElementById('dataDate').innerText = `ข้อมูลเดือน ${monthNames[rawItems[0].MONTH]} พ.ศ. ${rawItems[0].YEAR}`;
-                renderTable();
-            } catch (e) { console.error(e); }
-        }
-
-        document.getElementById('searchInput').addEventListener('input', renderTable);
-        document.getElementById('picFilter').addEventListener('change', renderTable);
-        document.getElementById('statusFilter').addEventListener('change', renderTable);
-        document.getElementById('setFilter').addEventListener('change', renderTable);
-        init();
-    </script>
 </body>
 </html>
