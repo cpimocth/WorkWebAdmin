@@ -1502,6 +1502,7 @@
         <div class="admin-panel">
           
           <h3>ระบบจัดการข้อมูลและรายงานอัตโนมัติ </h3>
+          <h4>ใช้รหัส 1234 </h4>
           <p>
             <!-- โซนนี้ออกแบบให้สื่อชัดว่าเป็น “ศูนย์ควบคุมภาพรวม” ของระบบรายงาน CPI สำหรับผู้มีสิทธิ์ใช้งานในระดับบริหาร
           โดยแยกการใช้งานที่ต้องยืนยันสิทธิ์ออกจากเว็บ dashboard ทั่วไปอย่างชัดเจน -->
@@ -1534,7 +1535,19 @@
                 )
               "
             >
-              <span>📈 Dashboard ช่วยทำรายงาน 6.20 ใน 12C</span>
+              <span>📈 Dashboard ช่วยทำรายงาน 6.20/12C</span>
+              <span>↗</span>
+            </a>
+            <a
+              class="admin-btn main"
+              href="javascript:void(0);"
+              onclick="
+                checkAuth(
+                  'https://cpimocth.github.io/WorkWebAdmin/semiReport/index.html',
+                )
+              "
+            >
+              <span>📈 Report ผู้บริหาร 6.20</span>
               <span>↗</span>
             </a>
             <a
