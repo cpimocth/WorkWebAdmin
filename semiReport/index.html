@@ -1,0 +1,1036 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>CPI Report Viewer</title>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <style>
+    :root{
+      --line:#111;
+      --head:#f1f1f1;
+      --sub:#fafafa;
+      --accent:#0f766e;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:Tahoma,"Noto Sans Thai",sans-serif;
+      color:#111;
+      background:#f6f7f9;
+    }
+    .wrap{
+      max-width:1800px;
+      margin:0 auto;
+      padding:16px;
+      display:grid;
+      grid-template-columns:420px 1fr;
+      gap:16px;
+      align-items:start;
+    }
+    .panel{
+      background:#fff;
+      border:1px solid #d7dce2;
+      border-radius:14px;
+      box-shadow:0 2px 14px rgba(0,0,0,.04);
+      padding:16px;
+    }
+    .controls-panel{
+      position:sticky;
+      top:0;
+      height:calc(100vh - 16px);
+      overflow:auto;
+    }
+    h1,h2,h3,h4{margin:0 0 10px 0}
+    h1{font-size:24px}
+    h3{font-size:16px}
+    h4{font-size:14px}
+    .muted{color:#555}
+    .grid{display:grid;gap:14px}
+    .grid-2{grid-template-columns:1fr 1fr}
+    .controls{display:grid;gap:10px}
+    .row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+    input[type="file"],textarea,select,button,input[type="text"]{font:inherit}
+    textarea{
+      width:100%;
+      min-height:120px;
+      padding:10px;
+      border:1px solid #c9ced6;
+      border-radius:10px;
+      background:#fff;
+    }
+    input[type="text"],select{
+      padding:8px 10px;
+      border:1px solid #c9ced6;
+      border-radius:10px;
+      background:#fff;
+    }
+    button{
+      border:none;
+      background:#111;
+      color:#fff;
+      padding:10px 14px;
+      border-radius:10px;
+      cursor:pointer;
+    }
+    button.secondary{background:#eceff3;color:#111}
+    button.accent{background:var(--accent)}
+    .code-box{
+      border:1px solid #d7dce2;
+      border-radius:12px;
+      padding:12px;
+      background:#fafbfd;
+      display:flex;
+      flex-direction:column;
+      min-height:320px;
+    }
+    .code-box h4{
+      line-height:1.35;
+      min-height:72px;
+      display:flex;
+      align-items:flex-start;
+      margin-bottom:10px;
+    }
+    .code-box textarea{
+      flex:1;
+      min-height:180px;
+      resize:vertical;
+    }
+    .report-title{text-align:center;line-height:1.6;margin-bottom:16px}
+    .report-title .big{font-size:26px;font-weight:700}
+    .report-title .mid{font-size:18px;font-weight:700}
+    table{width:100%;border-collapse:collapse;background:#fff;font-size:13px}
+    .report-table th,.report-table td{
+      border:1px solid var(--line);
+      padding:6px 8px;
+      vertical-align:middle;
+    }
+    .report-table th{
+      background:var(--head);
+      text-align:center;
+      font-weight:700;
+    }
+    .report-table .subhead th{background:var(--sub)}
+    .report-table td.num{text-align:right;font-variant-numeric:tabular-nums}
+    .report-table td.center{text-align:center}
+    .report-table .group-row td{background:#f7f7f7;font-weight:700}
+    .indent-1{padding-left:20px !important}
+    .indent-2{padding-left:36px !important}
+    .indent-3{padding-left:52px !important}
+    .small{font-size:12px}
+    .pages{display:grid;gap:18px;min-width:0}
+    .page{
+      background:#fff;
+      border:1px solid #d7dce2;
+      border-radius:16px;
+      padding:18px;
+      overflow:auto;
+    }
+    .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+    .empty{
+      padding:24px;
+      border:1px dashed #c9ced6;
+      border-radius:12px;
+      text-align:center;
+      color:#555;
+      background:#fff;
+    }
+    @media print{
+      body{background:#fff}
+      .controls-panel{display:none !important}
+      .wrap{grid-template-columns:1fr;max-width:none;padding:0}
+      .page{break-inside:avoid;border:none;box-shadow:none;padding:0}
+    }
+    @media (max-width:1200px){
+      .wrap{grid-template-columns:360px 1fr}
+    }
+    @media (max-width:1000px){
+      .wrap{grid-template-columns:1fr}
+      .controls-panel{
+        position:relative;
+        top:auto;
+        height:auto;
+        overflow:visible;
+      }
+      .grid-2{grid-template-columns:1fr}
+      table{font-size:12px}
+      .code-box{min-height:auto}
+      .code-box h4{min-height:auto}
+      .code-box textarea{min-height:140px}
+    }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <div class="panel controls-panel">
+    <h1>ตัวแสดงผลรายงาน CPI จากไฟล์ XLSX</h1>
+    <div class="muted">รายงานรายการเปลี่ยนแปลงใช้ DEFAULT_CODES1 แยกอิสระ และแสดงสัดส่วนรายการเพิ่มขึ้น/ลดลง/คงที่เป็นเปอร์เซ็นต์</div>
+
+    <div class="controls" style="margin-top:12px">
+      <div class="row">
+        <input id="fileInput" type="file" accept=".xlsx,.xls" multiple />
+        <button class="accent" id="buildBtn">สร้างรายงาน</button>
+        <button class="secondary" id="loadSampleBtn">โหลดค่าเริ่มต้นทั้ง 4 ชุด</button>
+        <button class="secondary" id="printBtn">พิมพ์ / Export PDF</button>
+        <button class="secondary" id="exportExcelBtn">Export Excel</button>
+        <button class="secondary" id="resetDataBtn">Refresh / เริ่มใหม่</button>
+      </div>
+
+      <div class="row">
+        <label>เลือกเดือนหลักที่ต้องการดู:
+          <select id="periodSelect"></select>
+        </label>
+        <span class="small muted">เปลี่ยนเดือนแล้วรายงานอัปเดตทันที</span>
+      </div>
+
+      
+
+      <div class="grid grid-2">
+        <div class="code-box">
+          <h4>ายงาน 1 (ชุดทั่วไป)</h4>
+          <textarea id="codeList2"></textarea>
+        </div>
+        <div class="code-box">
+          <h4>รายงาน 2 (เปรียบเทียบ)</h4>
+          <textarea id="codeList3"></textarea>
+        </div>
+        <div class="code-box">
+          <h4>รายงาน 3 (ย้อนหลัง YoY)</h4>
+          <textarea id="codeList4"></textarea>
+        </div>
+        <div class="code-box">
+          <h4>รายงาน 4 รายงานรายการเปลี่ยนแปลง</h4>
+          <textarea id="codeList1"></textarea>
+        </div>
+      </div>
+
+      <div class="grid grid-2">
+        <div>
+          <label><strong>ตัวเลือกสรุป</strong></label>
+          <div class="row" style="margin-top:8px">
+            <label>Metric สรุป:
+              <select id="summaryMetric">
+                <option value="MoM" selected>MoM</option>
+                <option value="YoY">YoY</option>
+                <option value="AoA">AoA</option>
+              </select>
+            </label>
+            <label>จำนวนรายการเด่น:
+              <select id="topN">
+                <option>10</option>
+                <option selected>15</option>
+                <option>20</option>
+                <option>30</option>
+              </select>
+            </label>
+          </div>
+        </div>
+        <div class="small muted" style="margin-top:24px">
+          คอลัมน์ “สัดส่วนน้ำหนัก / เดือนล่าสุด” ยังใช้ตรรกะเดิมจากไฟล์เดิม:
+          แปลงเป็นเปอร์เซ็นต์โดยเทียบกับรหัส 0000000000000000 = 100
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="output" class="pages">
+    <div class="empty">ยังไม่มีข้อมูล กรุณาอัปโหลดไฟล์ XLSX แล้วกด “สร้างรายงาน”</div>
+  </div>
+</div>
+
+<script>
+
+const DEFAULT_CODES2 = ["0000000000000000","1000000000000000","1100000000000000","1110000000000000",
+  "1111000000000000","1112000000000000","1120000000000000","1121000000000000",
+  "1122000000000000","1130000000000000","1131000000000000","1140000000000000",
+  "1150000000000000","1200000000000000","2000000000000000","3000000000000000",
+  "4000000000000000","5000000000000000","6000000000000000","7000000000000000",
+  "8000000000000000"];
+const DEFAULT_CODES3 = [...DEFAULT_CODES2];
+const DEFAULT_CODES4 = [...DEFAULT_CODES2];
+const DEFAULT_CODES1 = [
+    "1111001000000000", "1111002000000000", "1121101000000000", "1121103000000000",
+    "1121104000000000", "1121204000000000", "1122102000000000", "1123101000000000",
+    "1123102000000000", "1123103000000000", "1123104000000000", "1123202000000000",
+    "1123204000000000", "1123304000000000", "1123302000000000", "1131001000000000",
+    "1132001000000000", "1132002000000000", "1132003000000000", "1132004000000000",
+    "1132006000000000", "1141101000000000", "1141102000000000", "1141103000000000",
+    "1141104000000000", "1141105000000000", "1141106000000000", "1141107000000000",
+    "1141108000000000", "1141109000000000", "1141110000000000", "1141115000000000",
+    "1141116000000000", "1141117000000000", "1141118000000000", "1141123000000000",
+    "1141201000000000", "1141203000000000", "1142101000000000", "1142102000000000",
+    "1142103000000000", "1142104000000000", "1142105000000000", "1142106000000000",
+    "1142107000000000", "1142108000000000", "1142110000000000", "1142111000000000",
+    "1142112000000000", "1142113000000000", "1142116000000000", "1142117000000000",
+    "1152101000000000", "1152104000000000", "1152105000000000", "1152202000000000",
+    "1152203000000000", "1152210000000000", "1160002000000000", "1160005000000000",
+    "1160012000000000", "1171001000000000", "1171004000000000", "1171006000000000",
+    "1230002000000000", "1230007000000000", "1230008000000000", "1230011000000000",
+    "1230015000000000", "1230016000000000", "2112002000000000", "2122002000000000",
+    "3110001000000000", "3210001000000000", "3220001000000000", "3520002000000000",
+    "3520003000000000", "3520009000000000", "3520011000000000", "3600001000000000",
+    "3600003000000000", "3600004000000000", "3600005000000000", "3600010000000000",
+    "3600013000000000", "4210001000000000", "4210002000000000", "4210003000000000",
+    "4210008000000000", "4210011000000000", "4210013000000000", "4210020000000000",
+    "4210021000000000", "4210022000000000", "5110001000000000", "5110002000000000",
+    "5110003000000000", "5110006000000000", "5110010000000000", "5120007000000000",
+    "5220003000000000", "5220004000000000", "5220006000000000", "5220007000000000",
+    "5220009000000000", "5220010000000000", "5220011000000000", "5320001000000000",
+    "6124006000000000", "6130002000000000", "6211001000000000", "6211002000000000",
+    "6212001000000000", "6212002000000000", "6213001000000000", "6213002000000000",
+    "6214001000000000", "6214002000000000", "7100001000000000", "7210001000000000",
+    "7230001000000000"
+]
+
+const TH_MONTHS = ["ม.ค.","ก.พ.","มี.ค.","เม.ย.","พ.ค.","มิ.ย.","ก.ค.","ส.ค.","ก.ย.","ต.ค.","พ.ย.","ธ.ค."];
+const TH_MONTHS_FULL = ["มกราคม","กุมภาพันธ์","มีนาคม","เมษายน","พฤษภาคม","มิถุนายน","กรกฎาคม","สิงหาคม","กันยายน","ตุลาคม","พฤศจิกายน","ธันวาคม"];
+
+const state = {
+  files: [],
+  records: [],
+  byPeriod: new Map(),
+  periods: [],
+  latestKey: null,
+};
+
+const loadedFileNames = new Set();
+const loadedRecordKeys = new Set();
+
+const $ = sel => document.querySelector(sel);
+const fmt = (v, d = 2) => (v === "" || v === null || v === undefined || isNaN(v)) ? "" : Number(v).toLocaleString("th-TH", {minimumFractionDigits:d, maximumFractionDigits:d});
+const fmt0 = (v) => (v === "" || v === null || v === undefined || isNaN(v)) ? "" : Number(v).toLocaleString("th-TH", {maximumFractionDigits:0});
+const fmtPct = (v, d = 2) => (v === "" || v === null || v === undefined || isNaN(v)) ? "" : `${Number(v).toLocaleString("th-TH", {minimumFractionDigits:d, maximumFractionDigits:d})}%`;
+const METRICS = ["MoM","YoY","AoA"];
+const esc = (s) => String(s ?? "").replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+const keyOf = (year, month) => `${year}-${String(month).padStart(2,"0")}`;
+const parseKey = (k) => ({year: Number(k.slice(0,4)), month: Number(k.slice(5,7))});
+const thaiPeriod = (k) => {
+  const {year, month} = parseKey(k);
+  return `${TH_MONTHS_FULL[month-1]} ${year}`;
+};
+const sortPeriodKeys = (arr) => arr.slice().sort((a,b) => {
+  const pa = parseKey(a), pb = parseKey(b);
+  return pa.year === pb.year ? pa.month - pb.month : pa.year - pb.year;
+});
+
+function getCurrentKey(){
+  return $("#periodSelect")?.value || state.latestKey;
+}
+function populatePeriodSelect(){
+  const el = $("#periodSelect");
+  if(!el) return;
+  el.innerHTML = state.periods.slice().reverse().map(k => `<option value="${k}">${thaiPeriod(k)}</option>`).join("");
+  if(state.latestKey) el.value = state.latestKey;
+}
+function normalizeCodes(text){
+  return text.split(/[\s,;]+/).map(s => s.trim()).filter(Boolean);
+}
+function setCodeList(idx, codes){
+  $("#codeList" + idx).value = codes.join("\n");
+}
+function getCodeList(idx){
+  return normalizeCodes($("#codeList" + idx).value);
+}
+function findPrevKey(currentKey){
+  const {year, month} = parseKey(currentKey);
+  let y = year, m = month - 1;
+  if(m === 0){ m = 12; y -= 1; }
+  return keyOf(y,m);
+}
+function findYoYKey(currentKey){
+  const {year, month} = parseKey(currentKey);
+  return keyOf(year - 1, month);
+}
+function detectLevel(code){
+  const s = String(code || "");
+  const trimmed = s.replace(/0+$/,'');
+  return trimmed.length;
+}
+function indentClass(code){
+  const lvl = detectLevel(code);
+  if (lvl <= 1) return "";
+  if (lvl <= 2) return "indent-1";
+  if (lvl <= 4) return "indent-2";
+  return "indent-3";
+}
+function levelGroup(code){
+  const lvl = detectLevel(code);
+  return lvl <= 1 || lvl <= 2 || lvl <= 3 || lvl <= 4;
+}
+function getRec(periodKey, code){
+  return state.byPeriod.get(periodKey)?.get(code) || null;
+}
+function getTotalWeight(){
+  return Number(getRec(getCurrentKey(), "0000000000000000")?.["Weight"] || 0);
+}
+function fmtWeightPercent(v){
+  const total = getTotalWeight();
+  if(v === "" || v === null || v === undefined || isNaN(v) || !total) return "";
+  return ((Number(v) / total) * 100).toFixed(2);
+}
+function makeRecordKey(r){
+  return [r.__periodKey, r.__code, Number(r["Index"] ?? ""), Number(r["Weight"] ?? "")].join("|");
+}
+
+function rebuildLoadedRecordKeys(){
+  loadedRecordKeys.clear();
+  state.records.forEach(r => {
+    if(r?.__periodKey && r?.__code){
+      loadedRecordKeys.add(makeRecordKey(r));
+    }
+  });
+}
+
+function loadDefaults(){
+  setCodeList(1, DEFAULT_CODES1);
+  setCodeList(2, DEFAULT_CODES2);
+  setCodeList(3, DEFAULT_CODES3);
+  setCodeList(4, DEFAULT_CODES4);
+}
+$("#loadSampleBtn").addEventListener("click", loadDefaults);
+$("#printBtn").addEventListener("click", () => window.print());
+
+function rerenderIfReady(){
+  if(state.latestKey) renderAll();
+}
+[1,2,3,4].forEach(i => $("#codeList" + i).addEventListener("input", rerenderIfReady));
+$("#summaryMetric").addEventListener("change", () => { if(state.latestKey) renderAll(); });
+$("#topN").addEventListener("change", () => { if(state.latestKey) renderAll(); });
+$("#periodSelect").addEventListener("change", () => { if(state.latestKey) renderAll(); });
+
+async function readWorkbook(file){
+  const data = await file.arrayBuffer();
+  const wb = XLSX.read(data, {type:"array"});
+  const ws = wb.Sheets[wb.SheetNames[0]];
+  const rows = XLSX.utils.sheet_to_json(ws, {header:1, defval:""});
+  if(rows.length < 7) return [];
+  const headers = rows[5];
+  return rows.slice(6).filter(r => r.some(v => v !== "")).map(r => {
+    const obj = {};
+    headers.forEach((h, i) => obj[h] = r[i]);
+    obj.__file = file.name;
+    obj.__periodKey = keyOf(Number(obj["ปี"]), Number(obj["เดือน"]));
+    obj.__code = String(obj["รหัส"] ?? "");
+    obj.__label = String(obj["กลุ่ม"] ?? "");
+    return obj;
+  });
+}
+
+async function buildData(){
+  const files = [...$("#fileInput").files];
+  if(!files.length && !state.records.length){
+    $("#output").innerHTML = `<div class="empty">กรุณาเลือกไฟล์ก่อน</div>`;
+    return false;
+  }
+
+  const newFiles = files.filter(f => !loadedFileNames.has(f.name));
+  state.files.push(...newFiles);
+
+  for(const f of newFiles){
+    const records = await readWorkbook(f);
+    let addedCount = 0;
+    for(const rec of records){
+      if(!rec.__code) continue;
+      const recKey = makeRecordKey(rec);
+      if(loadedRecordKeys.has(recKey)) continue;
+      state.records.push(rec);
+      loadedRecordKeys.add(recKey);
+      addedCount++;
+    }
+    loadedFileNames.add(f.name);
+    console.log(`Loaded ${f.name}: added ${addedCount} new rows`);
+  }
+
+  const valid = state.records.filter(r => r.__code);
+  state.records = valid;
+  state.byPeriod = new Map();
+  for(const r of valid){
+    const k = r.__periodKey;
+    if(!state.byPeriod.has(k)) state.byPeriod.set(k, new Map());
+    state.byPeriod.get(k).set(r.__code, r);
+  }
+  state.periods = sortPeriodKeys([...state.byPeriod.keys()]);
+  state.latestKey = state.periods[state.periods.length - 1] || null;
+  populatePeriodSelect();
+  $("#fileInput").value = "";
+  return !!state.latestKey;
+}
+
+function getLatestRecords(){
+  const currentKey = getCurrentKey();
+  if(!currentKey) return [];
+  return [...(state.byPeriod.get(currentKey)?.values() || [])];
+}
+
+function getSummaryRows(metric){
+  const codes1 = new Set(getCodeList(1));
+  let rows = getLatestRecords().filter(r => r.__code !== "0000000000000000");
+  if(codes1.size){
+    rows = rows.filter(r => codes1.has(r.__code));
+  }
+  return rows.filter(r => r.__label);
+}
+
+function countChange(metric, rows){
+  const sourceRows = rows || getSummaryRows(metric);
+  let up = 0, down = 0, flat = 0;
+  for(const r of sourceRows){
+    const v = Number(r[metric] ?? 0);
+    if(v > 0) up++;
+    else if(v < 0) down++;
+    else flat++;
+  }
+  const total = sourceRows.length;
+  return {
+    up,
+    down,
+    flat,
+    total,
+    upPct: total ? (up / total) * 100 : 0,
+    downPct: total ? (down / total) * 100 : 0,
+    flatPct: total ? (flat / total) * 100 : 0,
+  };
+}
+
+function getMetricSummary(metric){
+  const rows = getSummaryRows(metric);
+  const counts = countChange(metric, rows);
+  return { metric, rows, ...counts };
+}
+
+function selectedRows(periodKey, idx){
+  const codes = getCodeList(idx);
+  return codes.map(code => getRec(periodKey, code)).filter(Boolean);
+}
+
+function buildSummaryPage(){
+  const metric = $("#summaryMetric").value;
+  const latest = getCurrentKey();
+  const topN = Number($("#topN").value || 15);
+  const rows = getSummaryRows(metric);
+  const counts = countChange(metric, rows);
+  const metricSummaries = Object.fromEntries(METRICS.map(m => [m, getMetricSummary(m)]));
+
+  const rowsByCode = rows.slice().sort((a,b) => String(a.__code).localeCompare(String(b.__code)));
+
+  const bodyByCode = rowsByCode.map((r, i) => `
+    <tr>
+      <td class="center">${i+1}</td>
+      <td class="mono">${esc(r.__code)}</td>
+      <td>${esc(r.__label)}</td>
+      <td class="num">${fmtWeightPercent(r["Weight"])}</td>
+      <td class="num">${fmt(r["MoM"],2)}</td>
+      <td class="num">${fmt(r["YoY"],2)}</td>
+      <td class="num">${fmt(r["AoA"],2)}</td>
+    </tr>
+  `).join("");
+
+  const rises = rows
+    .filter(r => Number(r[metric] ?? 0) > 0)
+    .sort((a,b) => Number(b[metric] ?? 0) - Number(a[metric] ?? 0))
+    .slice(0, topN);
+
+  const falls = rows
+    .filter(r => Number(r[metric] ?? 0) < 0)
+    .sort((a,b) => Number(a[metric] ?? 0) - Number(b[metric] ?? 0))
+    .slice(0, topN);
+
+  const riseRows = rises.map((r, i) => `
+    <tr>
+      <td class="center">${i+1}</td>
+      <td class="mono">${esc(r.__code)}</td>
+      <td>${esc(r.__label)}</td>
+      <td class="num">${fmtWeightPercent(r["Weight"])}</td>
+      <td class="num">${fmt(r["MoM"],2)}</td>
+      <td class="num">${fmt(r["YoY"],2)}</td>
+      <td class="num">${fmt(r["AoA"],2)}</td>
+    </tr>
+  `).join("");
+
+  const fallRows = falls.map((r, i) => `
+    <tr>
+      <td class="center">${i+1}</td>
+      <td class="mono">${esc(r.__code)}</td>
+      <td>${esc(r.__label)}</td>
+      <td class="num">${fmtWeightPercent(r["Weight"])}</td>
+      <td class="num">${fmt(r["MoM"],2)}</td>
+      <td class="num">${fmt(r["YoY"],2)}</td>
+      <td class="num">${fmt(r["AoA"],2)}</td>
+    </tr>
+  `).join("");
+
+  const summaryKinds = [
+    { label: "สินค้าที่มีราคาสูงขึ้น", keyCount: "up", keyPct: "upPct" },
+    { label: "สินค้าที่มีราคาลดลง", keyCount: "down", keyPct: "downPct" },
+    { label: "สินค้าที่มีราคาไม่เปลี่ยนแปลง", keyCount: "flat", keyPct: "flatPct" }
+  ];
+
+  const summaryRows = summaryKinds.map(item => `
+    <tr>
+      <td>${item.label}</td>
+      ${METRICS.map(m => {
+        const s = metricSummaries[m];
+        return `<td class="center">${fmt0(s[item.keyCount])} / ${fmtPct(s[item.keyPct])}</td>`;
+      }).join("")}
+    </tr>
+  `).join("");
+
+  return `
+    <section class="page">
+      <div class="report-title" style="margin-top:24px;">
+        <div class="big">รายการสินค้าอุปโภค - บริโภค ที่มีการเปลี่ยนแปลง (${esc(metric)})</div>
+        <div class="mid">ประจำเดือน${esc(thaiPeriod(latest))}</div>
+        <div class="small muted">ใช้ DEFAULT_CODES1 แยกอิสระสำหรับรายงานนี้</div>
+      </div>
+
+      <div style="margin-bottom:16px; line-height:1.9;">
+        <div><strong>1. จำนวนรายการสินค้าที่เปลี่ยนแปลง</strong></div>
+        <div style="padding-left:24px;">1.1 สินค้าที่มีราคาสูงขึ้น ${fmt0(metricSummaries.MoM.up)} รายการ คิดเป็น ${fmtPct(metricSummaries.MoM.upPct)} | YoY ${fmt0(metricSummaries.YoY.up)} รายการ ${fmtPct(metricSummaries.YoY.upPct)} | AoA ${fmt0(metricSummaries.AoA.up)} รายการ ${fmtPct(metricSummaries.AoA.upPct)}</div>
+        <div style="padding-left:24px;">1.2 สินค้าที่มีราคาลดลง ${fmt0(metricSummaries.MoM.down)} รายการ คิดเป็น ${fmtPct(metricSummaries.MoM.downPct)} | YoY ${fmt0(metricSummaries.YoY.down)} รายการ ${fmtPct(metricSummaries.YoY.downPct)} | AoA ${fmt0(metricSummaries.AoA.down)} รายการ ${fmtPct(metricSummaries.AoA.downPct)}</div>
+        <div style="padding-left:24px;">1.3 สินค้าที่มีราคาไม่เปลี่ยนแปลง ${fmt0(metricSummaries.MoM.flat)} รายการ คิดเป็น ${fmtPct(metricSummaries.MoM.flatPct)} | YoY ${fmt0(metricSummaries.YoY.flat)} รายการ ${fmtPct(metricSummaries.YoY.flatPct)} | AoA ${fmt0(metricSummaries.AoA.flat)} รายการ ${fmtPct(metricSummaries.AoA.flatPct)}</div>
+        <div style="padding-left:24px;" class="small muted">รวมทั้งหมด MoM ${fmt0(metricSummaries.MoM.total)} รายการ | YoY ${fmt0(metricSummaries.YoY.total)} รายการ | AoA ${fmt0(metricSummaries.AoA.total)} รายการ</div>
+      </div>
+
+      <div style="margin-bottom:8px;"><strong>ตารางจำนวนรายการ / ร้อยละ</strong></div>
+      <table class="report-table" style="margin-bottom:18px; max-width:760px;">
+        <thead>
+          <tr>
+            <th style="width:260px">รายการ / สัดส่วนของน้ำหนัก</th>
+            <th style="width:160px">MoM</th>
+            <th style="width:160px">YoY</th>
+            <th style="width:160px">AoA</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${summaryRows}
+        </tbody>
+      </table>
+
+      <div style="margin-bottom:8px;"><strong>2. การเปลี่ยนแปลงของราคาสินค้าที่สำคัญ</strong></div>
+      <table class="report-table" style="margin-bottom:18px;">
+        <thead>
+          <tr>
+            <th style="width:48px">ลำดับ</th>
+            <th style="width:170px">รหัส</th>
+            <th>รายการสินค้า</th>
+            <th style="width:120px">สัดส่วน/น้ำหนัก</th>
+            <th style="width:90px">MoM</th>
+            <th style="width:90px">YoY</th>
+            <th style="width:90px">AoA</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${bodyByCode || `<tr><td colspan="5" class="center">ไม่มีข้อมูล</td></tr>`}
+        </tbody>
+      </table>
+
+      <div style="margin-bottom:8px;"><strong>3. การเปลี่ยนแปลงของราคาสินค้าที่สำคัญ</strong></div>
+      <div class="grid grid-2">
+        <div>
+          <h3>รายการที่เพิ่มขึ้นสูงสุด</h3>
+          <table class="report-table">
+            <thead>
+              <tr>
+                <th style="width:48px">ลำดับ</th>
+                <th style="width:170px">รหัส</th>
+                <th>รายการสินค้า</th>
+                <th style="width:120px">สัดส่วน/น้ำหนัก</th>
+                <th style="width:90px">MoM</th>
+            <th style="width:90px">YoY</th>
+            <th style="width:90px">AoA</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${riseRows || `<tr><td colspan="5" class="center">ไม่มีข้อมูล</td></tr>`}
+            </tbody>
+          </table>
+        </div>
+
+        <div>
+          <h3>รายการที่ลดลงสูงสุด</h3>
+          <table class="report-table">
+            <thead>
+              <tr>
+                <th style="width:48px">ลำดับ</th>
+                <th style="width:170px">รหัส</th>
+                <th>รายการสินค้า</th>
+                <th style="width:120px">สัดส่วน/น้ำหนัก</th>
+                <th style="width:90px">MoM</th>
+            <th style="width:90px">YoY</th>
+            <th style="width:90px">AoA</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${fallRows || `<tr><td colspan="5" class="center">ไม่มีข้อมูล</td></tr>`}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  `;
+}
+
+function buildHierarchyPage(){
+  const rows = selectedRows(getCurrentKey(), 2);
+  const body = rows.map(r => `
+    <tr class="${levelGroup(r.__code) ? 'group-row' : ''}">
+      <td class="mono">${esc(r.__code)}</td>
+      <td class="${indentClass(r.__code)}">${esc(r.__label)}</td>
+      <td class="num">${fmtWeightPercent(r["Weight"])}</td>
+      <td class="num">${fmt(r["MoM"],2)}</td>
+      <td class="num">${fmt(r["YoY"],2)}</td>
+      <td class="num">${fmt(r["AoA"],2)}</td>
+      <td class="num">${fmt(r["Coutribute MoM %"],5)}</td>
+      <td class="num">${fmt(r["Coutribute YoY %"],5)}</td>
+      <td class="num">${fmt(r["Coutribute AoA %"],5)}</td>
+    </tr>
+  `).join("");
+
+  return `
+    <section class="page">
+      <div class="report-title">
+        <div class="big">ชุดทั่วไป ของประเทศ เดือน${esc(thaiPeriod(getCurrentKey()))}</div>
+        <div class="small muted">ใช้ DEFAULT_CODES2 แยกอิสระสำหรับรายงานนี้</div>
+      </div>
+      <table class="report-table">
+        <thead>
+          <tr>
+            <th style="width:180px">รหัส</th>
+            <th>กลุ่ม/รายการ</th>
+            <th style="width:120px">สัดส่วนน้ำหนัก<br>เดือนล่าสุด</th>
+            <th style="width:80px">MoM</th>
+            <th style="width:80px">YoY</th>
+            <th style="width:80px">AoA</th>
+            <th style="width:110px">Con_MoM</th>
+            <th style="width:110px">Con_YoY</th>
+            <th style="width:110px">Con_AoA</th>
+          </tr>
+        </thead>
+        <tbody>${body || `<tr><td colspan="9" class="center">ไม่พบข้อมูลตามรหัสที่ระบุ</td></tr>`}</tbody>
+      </table>
+    </section>
+  `;
+}
+
+function buildComparePage(){
+  const cur = getCurrentKey();
+  const prev = findPrevKey(cur);
+  const yoy = findYoYKey(cur);
+  const codes3 = getCodeList(3);
+
+  const rows = codes3.map(code => {
+    const a = getRec(cur, code);
+    const b = getRec(prev, code);
+    const c = getRec(yoy, code);
+    return {code, cur:a, prev:b, yoy:c, label:(a||b||c)?.__label || ""};
+  }).filter(r => r.label);
+
+  const body = rows.map(r => `
+    <tr class="${levelGroup(r.code) ? 'group-row' : ''}">
+      <td class="${indentClass(r.code)}">${esc(r.label)}</td>
+      <td class="num">${fmtWeightPercent(r.cur?.["Weight"])}</td>
+      <td class="num">${fmt(r.cur?.["Index"],2)}</td>
+      <td class="num">${fmt(r.cur?.["MoM"],2)}</td>
+      <td class="num">${fmt(r.cur?.["YoY"],2)}</td>
+      <td class="num">${fmt(r.cur?.["AoA"],2)}</td>
+      <td class="num">${fmt(r.prev?.["Index"],2)}</td>
+      <td class="num">${fmt(r.prev?.["MoM"],2)}</td>
+      <td class="num">${fmt(r.prev?.["YoY"],2)}</td>
+      <td class="num">${fmt(r.prev?.["AoA"],2)}</td>
+      <td class="num">${fmt(r.yoy?.["Index"],2)}</td>
+      <td class="num">${fmt(r.yoy?.["MoM"],2)}</td>
+      <td class="num">${fmt(r.yoy?.["YoY"],2)}</td>
+      <td class="num">${fmt(r.yoy?.["AoA"],2)}</td>
+      <td class="num">${fmt(r.cur?.["Coutribute MoM %"],4)}</td>
+      <td class="num">${fmt(r.cur?.["Coutribute YoY %"],4)}</td>
+      <td class="num">${fmt(r.cur?.["Coutribute AoA %"],4)}</td>
+    </tr>
+  `).join("");
+
+  return `
+    <section class="page">
+      <div class="report-title">
+        <div class="big">ดัชนีราคาผู้บริโภคและอัตราการเปลี่ยนแปลง</div>
+        <div class="mid">เปรียบเทียบ ${esc(thaiPeriod(cur))} / ${esc(thaiPeriod(prev))} / ${esc(thaiPeriod(yoy))}</div>
+        <div class="small muted">ใช้ DEFAULT_CODES3 แยกอิสระสำหรับรายงานนี้</div>
+      </div>
+      <table class="report-table">
+        <thead>
+          <tr>
+            <th rowspan="2">รายการ</th>
+            <th rowspan="2">สัดส่วน<br>น้ำหนัก<br>${esc(TH_MONTHS[parseKey(cur).month-1])} ${String(parseKey(cur).year).slice(2)}</th>
+            <th colspan="4">${esc(thaiPeriod(cur))}</th>
+            <th colspan="4">${esc(thaiPeriod(prev))}</th>
+            <th colspan="4">${esc(thaiPeriod(yoy))}</th>
+            <th colspan="3">Contribution (${esc(thaiPeriod(cur))})</th>
+          </tr>
+          <tr class="subhead">
+            <th>ดัชนี</th><th>M/M</th><th>Y/Y</th><th>A/A</th>
+            <th>ดัชนี</th><th>M/M</th><th>Y/Y</th><th>A/A</th>
+            <th>ดัชนี</th><th>M/M</th><th>Y/Y</th><th>A/A</th>
+            <th>M/M</th><th>Y/Y</th><th>A/A</th>
+          </tr>
+        </thead>
+        <tbody>${body || `<tr><td colspan="17" class="center">ไม่พบข้อมูล</td></tr>`}</tbody>
+      </table>
+    </section>
+  `;
+}
+
+function buildHistoryPage(){
+  const codes4 = getCodeList(4);
+  const periods = sortPeriodKeys(state.periods);
+
+  const byYear = {};
+  for(const p of periods){
+    const {year, month} = parseKey(p);
+    byYear[year] ??= {};
+    byYear[year][month] = p;
+  }
+
+  const years = Object.keys(byYear).map(Number).sort((a,b)=>a-b);
+
+  let body = "";
+
+  codes4.forEach(code => {
+    const labelRec = periods.map(p => getRec(p, code)).find(Boolean);
+    if(!labelRec) return;
+
+    let firstRow = true;
+
+    years.forEach(year => {
+      const tds = [];
+      let sum = 0, count = 0;
+
+      for(let m=1;m<=12;m++){
+        const rec = getRec(keyOf(year,m), code);
+        const val = rec?.["YoY"];
+        if(val !== undefined && val !== null && val !== ""){
+          sum += Number(val);
+          count++;
+        }
+        tds.push(`<td class="num">${fmt(val,2)}</td>`);
+      }
+
+      const avg = count ? sum/count : "";
+
+      body += `
+        <tr>
+          ${firstRow ? `<td rowspan="${years.length}" class="indent-1">${esc(labelRec.__label)}</td>` : ""}
+          <td class="center">${year}</td>
+          ${tds.join("")}
+          <td class="num"><strong>${fmt(avg,2)}</strong></td>
+        </tr>
+      `;
+
+      firstRow = false;
+    });
+  });
+
+  return `
+    <section class="page">
+      <div class="report-title">
+        <div class="big">ดัชนีราคาผู้บริโภคทั่วไปรายปี</div>
+        <div class="mid">ตารางการเปลี่ยนแปลงเปรียบเทียบเดือนเดียวกันปีก่อน (YoY)</div>
+        <div class="small muted">ใช้ DEFAULT_CODES4 แยกอิสระสำหรับรายงานนี้</div>
+      </div>
+
+      <table class="report-table">
+        <thead>
+          <tr>
+            <th style="width:240px">หมวด</th>
+            <th style="width:70px">ปี</th>
+            ${TH_MONTHS.map(m => `<th>${m}</th>`).join("")}
+            <th style="width:90px">เฉลี่ยปี</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${body || `<tr><td colspan="15" class="center">ไม่มีข้อมูล</td></tr>`}
+        </tbody>
+      </table>
+    </section>
+  `;
+}
+
+function renderAll(){
+  if(!state.latestKey){
+    $("#output").innerHTML = `<div class="empty">ไม่พบข้อมูลที่อ่านได้จากไฟล์</div>`;
+    return;
+  }
+  $("#output").innerHTML = [
+    buildHierarchyPage(),
+    buildComparePage(),
+    buildHistoryPage(),
+    buildSummaryPage()
+  ].join("");
+}
+
+$("#buildBtn").addEventListener("click", async () => {
+  const ok = await buildData();
+  if(ok) renderAll();
+});
+
+function sanitizeSheetName(name){
+  return String(name || "Sheet")
+    .replace(/[\\\/\?\*\[\]\:]/g, " ")
+    .trim()
+    .slice(0, 31) || "Sheet";
+}
+
+function exportReportToExcel(){
+  if(!state.latestKey){
+    alert("ไม่มีข้อมูลให้ Export");
+    return;
+  }
+
+  const wb = XLSX.utils.book_new();
+  const pages = document.querySelectorAll(".page");
+
+  function addTitleBlock(rows, lines){
+    lines.filter(Boolean).forEach(line => rows.push([line]));
+    rows.push([]);
+  }
+
+  function extractTableRows(table){
+    if(!table) return [];
+    return [...table.querySelectorAll("tr")].map(tr =>
+      [...tr.children].map(td => (td.innerText || "").trim())
+    );
+  }
+
+  function appendTable(rows, tableRows){
+    if(!tableRows.length) return;
+    tableRows.forEach(r => rows.push(r));
+    rows.push([]);
+  }
+
+  function setCols(ws, rows){
+    const colCount = Math.max(0, ...rows.map(r => r.length));
+    ws["!cols"] = Array.from({length: colCount}, (_, c) => {
+      let maxLen = 10;
+      rows.forEach(r => {
+        const v = String(r[c] || "");
+        maxLen = Math.max(maxLen, v.length);
+      });
+      return {wch: Math.min(maxLen + 2, 40)};
+    });
+  }
+
+  const sheetConfigs = [
+    {
+      name: `ชุดทั่วไป ${thaiPeriod(getCurrentKey())}`,
+      buildRows: () => {
+        const rows = [];
+        addTitleBlock(rows, [
+          `ชุดทั่วไป ของประเทศ เดือน${thaiPeriod(getCurrentKey())}`,
+          "ใช้ DEFAULT_CODES2 แยกอิสระสำหรับรายงานนี้"
+        ]);
+        appendTable(rows, extractTableRows(pages[0]?.querySelector(".report-table")));
+        return rows;
+      }
+    },
+    {
+      name: "ดัชนีราคาผู้บริโภคและอัตราการเปลี่ยนแปลง",
+      buildRows: () => {
+        const rows = [];
+        addTitleBlock(rows, [
+          "ดัชนีราคาผู้บริโภคและอัตราการเปลี่ยนแปลง",
+          `เปรียบเทียบ ${thaiPeriod(getCurrentKey())} / ${thaiPeriod(findPrevKey(getCurrentKey()))} / ${thaiPeriod(findYoYKey(getCurrentKey()))}`,
+          "ใช้ DEFAULT_CODES3 แยกอิสระสำหรับรายงานนี้"
+        ]);
+        appendTable(rows, extractTableRows(pages[1]?.querySelector(".report-table")));
+        return rows;
+      }
+    },
+    {
+      name: "ดัชนีราคาผู้บริโภคทั่วไปรายปี",
+      buildRows: () => {
+        const rows = [];
+        addTitleBlock(rows, [
+          "ดัชนีราคาผู้บริโภคทั่วไปรายปี",
+          "ตารางการเปลี่ยนแปลงเปรียบเทียบเดือนเดียวกันปีก่อน (YoY)",
+          "ใช้ DEFAULT_CODES4 แยกอิสระสำหรับรายงานนี้"
+        ]);
+        const blocks = [...(pages[2]?.querySelectorAll("h3, table.report-table") || [])];
+        let pendingTitle = null;
+        blocks.forEach(el => {
+          if(el.tagName.toLowerCase() === "h3"){
+            pendingTitle = el.innerText.trim();
+          }else if(el.tagName.toLowerCase() === "table"){
+            if(pendingTitle) rows.push([pendingTitle]);
+            appendTable(rows, extractTableRows(el));
+            pendingTitle = null;
+          }
+        });
+        return rows;
+      }
+    },
+    {
+      name: "รายการสินค้าอุปโภค - บริโภค ที่มีการเปลี่ยนแปลง",
+      buildRows: () => {
+        const rows = [];
+        const page = pages[3];
+        addTitleBlock(rows, [
+          page?.querySelector(".report-title .big")?.innerText?.trim() || "รายการสินค้าอุปโภค - บริโภค ที่มีการเปลี่ยนแปลง",
+          page?.querySelector(".report-title .mid")?.innerText?.trim() || "",
+          page?.querySelector(".report-title .small")?.innerText?.trim() || ""
+        ]);
+
+        const summaryBlock = [...(page?.children || [])].find(el => el.tagName?.toLowerCase() === "div" && el.innerText.includes("1. จำนวนรายการสินค้าที่เปลี่ยนแปลง"));
+        if(summaryBlock){
+          summaryBlock.innerText
+            .split(/\n+/)
+            .map(s => s.trim())
+            .filter(Boolean)
+            .forEach(line => rows.push([line]));
+          rows.push([]);
+        }
+
+        const sectionTitles = [...(page?.querySelectorAll("div > strong, h3") || [])].map(el => el.innerText.trim());
+        const tables = [...(page?.querySelectorAll("table.report-table") || [])];
+
+        if(sectionTitles[0]) rows.push([sectionTitles[0]]);
+        appendTable(rows, extractTableRows(tables[0]));
+
+        if(sectionTitles[1]) rows.push([sectionTitles[1]]);
+        appendTable(rows, extractTableRows(tables[1]));
+
+        if(sectionTitles[2]) rows.push([sectionTitles[2]]);
+        appendTable(rows, extractTableRows(tables[2]));
+
+        if(sectionTitles[3]) rows.push([sectionTitles[3]]);
+        appendTable(rows, extractTableRows(tables[3]));
+
+        return rows;
+      }
+    }
+  ];
+
+  sheetConfigs.forEach((config, idx) => {
+    const rows = config.buildRows();
+    const ws = XLSX.utils.aoa_to_sheet(rows);
+    setCols(ws, rows);
+    XLSX.utils.book_append_sheet(wb, ws, sanitizeSheetName(config.name) || `Sheet${idx+1}`);
+  });
+
+  XLSX.writeFile(wb, "CPI_Report.xlsx");
+}
+
+document.getElementById("exportExcelBtn").addEventListener("click", exportReportToExcel);
+document.getElementById("resetDataBtn").addEventListener("click", () => {
+  state.files = [];
+  state.records = [];
+  state.byPeriod = new Map();
+  state.periods = [];
+  state.latestKey = null;
+  loadedFileNames.clear();
+  loadedRecordKeys.clear();
+  $("#fileInput").value = "";
+  $("#periodSelect").innerHTML = "";
+  $("#output").innerHTML = `<div class="empty">ยังไม่มีข้อมูล กรุณาอัปโหลดไฟล์ XLSX แล้วกด “สร้างรายงาน”</div>`;
+  loadDefaults();
+});
+loadDefaults();
+</script>
+</body>
+</html>
