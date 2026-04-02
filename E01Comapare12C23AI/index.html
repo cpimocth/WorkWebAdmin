@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>CPI Compare Final</title>
+  <title>CPI Compare Final v3</title>
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <style>
     :root{
@@ -80,6 +80,16 @@
     .g2{background:#f8fbff}
     .diff-bad{color:var(--red);font-weight:900}
     .summary-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+
+    .filter-row th{position:sticky;background:#fffefc;z-index:2}
+    .filter-row input{
+      width:100%;padding:5px 6px;border:1px solid #cbd5e1;border-radius:8px;
+      font-size:12px;background:#fff;
+    }
+    th.sortable{cursor:pointer;user-select:none}
+    th.sortable .sort-ind{font-size:11px;color:#667085;margin-left:4px}
+    tr.row-has-diff td{background:#fffaf8}
+    tr.row-has-missing td{background:#fffdf7}
     .thin{font-weight:500}
     .small{font-size:12px}
     .loading{display:inline-block;width:14px;height:14px;border:2px solid #9cb7ff;border-top-color:transparent;border-radius:50%;animation:spin .8s linear infinite;vertical-align:-2px;margin-right:8px}
@@ -106,7 +116,7 @@
         <p class="muted">จับคู่ด้วย <b>รหัส 7 ตัวแรก</b> แล้วเทียบ <b>น้ำหนัก</b>, <b>สัมพัทธ์น้ำหนัก</b>, <b>สัมพัทธ์ราคา</b>, และ <b>ดัชนี</b></p>
       </div>
       <div class="pill-note">
-        <div><b>เวอร์ชันนี้อ่านไฟล์ไวขึ้น</b></div>
+        <div><b>เวอร์ชันนี้อ่านไฟล์ไวขึ้น + กรองรายคอลัมน์ได้</b></div>
         <div class="small">ใช้ Web Worker แยกงานอ่าน Excel และเทียบข้อมูลออกจากหน้าเว็บหลัก พร้อมรองรับการอ่านชีตแบบ dense ให้ค่าถูกต้อง</div>
       </div>
     </div>
@@ -118,7 +128,7 @@
       <div class="pair-layout">
         <div class="file-panel main">
           <div class="tag main">ไฟล์หลัก (Reference)</div>
-          <h3 style="margin-top:10px">ไฟล์อ้างอิง / ไฟล์ถูกต้อง</h3>
+          <h3 style="margin-top:10px">ไฟล์อ้างอิง / ไฟล์ถูกต้อง / ไฟล์หลัก 12C</h3>
           <div class="upload-box">
             <label for="mainFile">อัปโหลดไฟล์หลัก</label>
             <input id="mainFile" type="file" accept=".xlsx,.xls" />
@@ -130,7 +140,7 @@
 
         <div class="file-panel compare">
           <div class="tag compare">ไฟล์เทียบ (Compare)</div>
-          <h3 style="margin-top:10px">ไฟล์ที่จะนำมาเทียบ</h3>
+          <h3 style="margin-top:10px">ไฟล์ที่จะนำมาเทียบ 23AI</h3>
           <div class="upload-box">
             <label for="compareFile">อัปโหลดไฟล์เทียบ</label>
             <input id="compareFile" type="file" accept=".xlsx,.xls" />
@@ -143,7 +153,7 @@
     <div class="card span12">
       <h2>2) ตั้งค่าและ mapping</h2>
       <div class="controls">
-        <div><label>Threshold ส่วนต่าง</label><input id="threshold" type="number" step="0.000001" value="0.0001" /></div>
+        <div><label>Threshold ส่วนต่าง</label><input id="threshold" type="number" step="0.000001" value="0.00000" /></div>
         <div><label>ชีตไฟล์หลัก</label><select id="mainSheet"></select></div>
         <div><label>ชีตไฟล์เทียบ</label><select id="compareSheet"></select></div>
         <div><label>แถวเริ่มต้นไฟล์หลัก</label><input id="mainStartRow" type="number" value="8" min="1" /></div>
@@ -563,34 +573,55 @@ els.runBtn.addEventListener('click', () => {
   worker.postMessage(buildComparePayload());
 });
 
+
 function renderTable(tableEl, rows, mode){
+  const t = currentThreshold();
   let html = '';
   if(mode === 'diff' || mode === 'all'){
     html += `
       <thead>
         <tr class="group">
-          <th rowspan="2">รหัส 7 ตัว</th>
-          <th rowspan="2">ชื่อรายการ</th>
+          <th rowspan="2" class="sortable" data-type="text">รหัส 7 ตัว<span class="sort-ind"></span></th>
+          <th rowspan="2" class="sortable" data-type="text">ชื่อรายการ<span class="sort-ind"></span></th>
           <th colspan="2" class="group-start">แถวอ้างอิง</th>
           <th colspan="3" class="group-start">น้ำหนัก</th>
           <th colspan="3" class="group-start">สัมพัทธ์น้ำหนัก</th>
           <th colspan="3" class="group-start">สัมพัทธ์ราคา</th>
           <th colspan="3" class="group-start">ดัชนี</th>
-          <th rowspan="2" class="group-start group-end">ข้อมูลไม่ครบ</th>
+          <th rowspan="2" class="group-start group-end sortable" data-type="text">ข้อมูลไม่ครบ<span class="sort-ind"></span></th>
         </tr>
         <tr class="sub">
-          <th class="group-start">หลัก</th><th>เทียบ</th>
-          <th class="group-start g1">หลัก</th><th class="g1">เทียบ</th><th class="g1">ต่าง</th>
-          <th class="group-start g2">หลัก</th><th class="g2">เทียบ</th><th class="g2">ต่าง</th>
-          <th class="group-start g1">หลัก</th><th class="g1">เทียบ</th><th class="g1">ต่าง</th>
-          <th class="group-start g2">หลัก</th><th class="g2">เทียบ</th><th class="g2">ต่าง</th>
+          <th class="group-start sortable" data-type="num">หลัก<span class="sort-ind"></span></th><th class="sortable" data-type="num">เทียบ<span class="sort-ind"></span></th>
+          <th class="group-start g1 sortable" data-type="num">หลัก<span class="sort-ind"></span></th><th class="g1 sortable" data-type="num">เทียบ<span class="sort-ind"></span></th><th class="g1 sortable" data-type="num">ต่าง<span class="sort-ind"></span></th>
+          <th class="group-start g2 sortable" data-type="num">หลัก<span class="sort-ind"></span></th><th class="g2 sortable" data-type="num">เทียบ<span class="sort-ind"></span></th><th class="g2 sortable" data-type="num">ต่าง<span class="sort-ind"></span></th>
+          <th class="group-start g1 sortable" data-type="num">หลัก<span class="sort-ind"></span></th><th class="g1 sortable" data-type="num">เทียบ<span class="sort-ind"></span></th><th class="g1 sortable" data-type="num">ต่าง<span class="sort-ind"></span></th>
+          <th class="group-start g2 sortable" data-type="num">หลัก<span class="sort-ind"></span></th><th class="g2 sortable" data-type="num">เทียบ<span class="sort-ind"></span></th><th class="g2 sortable" data-type="num">ต่าง<span class="sort-ind"></span></th>
+        </tr>
+        <tr class="filter-row">
+          <th><input data-col="0" placeholder="กรองรหัส"></th>
+          <th><input data-col="1" placeholder="กรองชื่อ"></th>
+          <th class="group-start"><input data-col="2" placeholder="แถวหลัก"></th>
+          <th><input data-col="3" placeholder="แถวเทียบ"></th>
+          <th class="group-start"><input data-col="4" placeholder="น้ำหนักหลัก"></th>
+          <th><input data-col="5" placeholder="น้ำหนักเทียบ"></th>
+          <th><input data-col="6" placeholder="ต่าง"></th>
+          <th class="group-start"><input data-col="7" placeholder="สัมพัทธ์น้ำหนักหลัก"></th>
+          <th><input data-col="8" placeholder="สัมพัทธ์น้ำหนักเทียบ"></th>
+          <th><input data-col="9" placeholder="ต่าง"></th>
+          <th class="group-start"><input data-col="10" placeholder="สัมพัทธ์ราคาหลัก"></th>
+          <th><input data-col="11" placeholder="สัมพัทธ์ราคาเทียบ"></th>
+          <th><input data-col="12" placeholder="ต่าง"></th>
+          <th class="group-start"><input data-col="13" placeholder="ดัชนีหลัก"></th>
+          <th><input data-col="14" placeholder="ดัชนีเทียบ"></th>
+          <th><input data-col="15" placeholder="ต่าง"></th>
+          <th class="group-start group-end"><input data-col="16" placeholder="ข้อมูลไม่ครบ"></th>
         </tr>
       </thead><tbody>`;
     for(const r of rows){
-      const t = currentThreshold();
       const miss = r.missingFields && r.missingFields.length ? r.missingFields.join(', ') : '-';
+      const rowCls = `${r.hasAnyDiff ? 'row-has-diff' : ''} ${r.missingFields && r.missingFields.length ? 'row-has-missing' : ''}`.trim();
       html += `
-        <tr>
+        <tr class="${rowCls}">
           <td class="code">${escapeHtml(r.code7)}</td>
           <td>${escapeHtml(r.mainName || r.compareName || '')}<br><span class="muted code">${escapeHtml(r.mainCode)} ↔ ${escapeHtml(r.compareCode)}</span></td>
           <td class="right group-start">${fmtInt(r.mainRow)}</td>
@@ -620,17 +651,25 @@ function renderTable(tableEl, rows, mode){
     html += `
       <thead>
         <tr>
-          <th>รหัส 7 ตัว</th>
-          <th>รหัสไฟล์หลัก</th>
-          <th>ชื่อรายการ</th>
-          <th>แถวไฟล์หลัก</th>
-          <th>แถวไฟล์เทียบ</th>
-          <th>สาเหตุ</th>
+          <th class="sortable" data-type="text">รหัส 7 ตัว<span class="sort-ind"></span></th>
+          <th class="sortable" data-type="text">รหัสไฟล์หลัก<span class="sort-ind"></span></th>
+          <th class="sortable" data-type="text">ชื่อรายการ<span class="sort-ind"></span></th>
+          <th class="sortable" data-type="num">แถวไฟล์หลัก<span class="sort-ind"></span></th>
+          <th class="sortable" data-type="num">แถวไฟล์เทียบ<span class="sort-ind"></span></th>
+          <th class="sortable" data-type="text">สาเหตุ<span class="sort-ind"></span></th>
+        </tr>
+        <tr class="filter-row">
+          <th><input data-col="0" placeholder="กรองรหัส"></th>
+          <th><input data-col="1" placeholder="กรองรหัสหลัก"></th>
+          <th><input data-col="2" placeholder="กรองชื่อ"></th>
+          <th><input data-col="3" placeholder="แถวหลัก"></th>
+          <th><input data-col="4" placeholder="แถวเทียบ"></th>
+          <th><input data-col="5" placeholder="กรองสาเหตุ"></th>
         </tr>
       </thead><tbody>`;
     for(const r of rows){
       html += `
-      <tr>
+      <tr class="row-has-missing">
         <td class="code">${escapeHtml(r.code7)}</td>
         <td class="code">${escapeHtml(r.mainCode || '')}</td>
         <td>${escapeHtml(r.mainName || '')}</td>
@@ -642,6 +681,7 @@ function renderTable(tableEl, rows, mode){
     html += '</tbody>';
   }
   tableEl.innerHTML = html;
+  enableTableFeatures(tableEl);
 }
 
 function buildSummary(report){
@@ -700,6 +740,99 @@ function updateDashboard(report){
   renderTable(els.unmatchedTable, report.unmatched, 'unmatched');
   renderTable(els.allTable, report.matched, 'all');
 }
+
+
+function parseFilterExpression(raw){
+  const s = String(raw || '').trim();
+  if(!s) return null;
+  const m = s.match(/^(>=|<=|>|<|=)?\s*(-?\d+(?:\.\d+)?)$/);
+  if(m){
+    return { type:'numeric', op:m[1] || 'contains', value:Number(m[2]) };
+  }
+  return { type:'text', value:s.toLowerCase() };
+}
+
+function rowMatchesFilters(row, filters){
+  for(const [colStr, expr] of Object.entries(filters)){
+    const col = Number(colStr);
+    const cell = row.children[col];
+    const text = (cell?.innerText || '').trim();
+    if(expr.type === 'text'){
+      if(!text.toLowerCase().includes(expr.value)) return false;
+    }else{
+      const cleaned = text.replace(/,/g,'').replace(/[^0-9.\-]/g,'');
+      const num = cleaned === '' ? NaN : Number(cleaned);
+      if(Number.isNaN(num)) return false;
+      if(expr.op === '>=' && !(num >= expr.value)) return false;
+      if(expr.op === '<=' && !(num <= expr.value)) return false;
+      if(expr.op === '>' && !(num > expr.value)) return false;
+      if(expr.op === '<' && !(num < expr.value)) return false;
+      if(expr.op === '=' && !(num === expr.value)) return false;
+      if(expr.op === 'contains' && !String(num).includes(String(expr.value))) return false;
+    }
+  }
+  return true;
+}
+
+function applyTableFilters(tableEl){
+  const inputs = tableEl.querySelectorAll('.filter-row input');
+  const filters = {};
+  inputs.forEach(i => {
+    const expr = parseFilterExpression(i.value);
+    if(expr) filters[i.dataset.col] = expr;
+  });
+  tableEl.querySelectorAll('tbody tr').forEach(row => {
+    row.style.display = rowMatchesFilters(row, filters) ? '' : 'none';
+  });
+}
+
+function getCellSortValue(row, col, type){
+  const text = (row.children[col]?.innerText || '').trim();
+  if(type === 'num'){
+    const cleaned = text.replace(/,/g,'').replace(/[^0-9.\-]/g,'');
+    const num = cleaned === '' ? Number.NEGATIVE_INFINITY : Number(cleaned);
+    return Number.isNaN(num) ? Number.NEGATIVE_INFINITY : num;
+  }
+  return text.toLowerCase();
+}
+
+function enableTableFeatures(tableEl){
+  const inputs = tableEl.querySelectorAll('.filter-row input');
+  inputs.forEach(input => {
+    input.addEventListener('input', () => applyTableFilters(tableEl));
+  });
+
+  const sortableHeaders = tableEl.querySelectorAll('th.sortable');
+  sortableHeaders.forEach(th => {
+    th.addEventListener('click', () => {
+      const tbody = tableEl.querySelector('tbody');
+      const rows = Array.from(tbody.querySelectorAll('tr'));
+      const current = th.dataset.sortDir === 'asc' ? 'asc' : (th.dataset.sortDir === 'desc' ? 'desc' : '');
+      const next = current === 'asc' ? 'desc' : 'asc';
+      sortableHeaders.forEach(h => {
+        h.dataset.sortDir = '';
+        const ind = h.querySelector('.sort-ind');
+        if(ind) ind.textContent = '';
+      });
+      th.dataset.sortDir = next;
+      const ind = th.querySelector('.sort-ind');
+      if(ind) ind.textContent = next === 'asc' ? '▲' : '▼';
+
+      const col = th.cellIndex;
+      const type = th.dataset.type || 'text';
+      rows.sort((a,b) => {
+        const av = getCellSortValue(a, col, type);
+        const bv = getCellSortValue(b, col, type);
+        if(av < bv) return next === 'asc' ? -1 : 1;
+        if(av > bv) return next === 'asc' ? 1 : -1;
+        return 0;
+      });
+      rows.forEach(r => tbody.appendChild(r));
+      applyTableFilters(tableEl);
+    });
+  });
+}
+
 
 function buildCsv(rows){
   const header = [
