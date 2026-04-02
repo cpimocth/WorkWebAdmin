@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CPI Compare Final</title>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <style>
+    :root{
+      --bg:#f4f7fb; --card:#fff; --line:#d7dee8; --text:#172033; --muted:#667085;
+      --blue:#175cd3; --blue-soft:#eef4ff; --gray-soft:#f8fafc; --purple:#6938ef; --purple-soft:#f4f3ff;
+      --green:#067647; --green-soft:#ecfdf3; --orange:#b54708; --orange-soft:#fffaeb; --red:#b42318; --red-soft:#fef3f2;
+      --shadow:0 10px 28px rgba(16,24,40,.06);
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--text)}
+    .wrap{max-width:1660px;margin:0 auto;padding:24px}
+    .card{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:18px;box-shadow:var(--shadow)}
+    .grid{display:grid;grid-template-columns:repeat(12,1fr);gap:16px}
+    .span12{grid-column:span 12}
+    h1{margin:0 0 8px;font-size:30px}
+    h2{margin:0 0 10px;font-size:20px}
+    h3{margin:0 0 8px;font-size:16px}
+    p{margin:6px 0}
+    .muted{color:var(--muted)}
+    .hero{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;align-items:flex-start}
+    .pill-note{background:var(--blue-soft);border:1px solid #c6d6ff;padding:12px 14px;border-radius:14px;color:#194185}
+    .pair-layout{display:grid;grid-template-columns:1fr auto 1fr;gap:16px;align-items:stretch}
+    .file-panel{border:1px solid var(--line);border-radius:18px;padding:16px;background:#fbfdff}
+    .file-panel.main{outline:2px solid #dbe7ff}
+    .file-panel.compare{outline:2px solid #e4e7ec}
+    .tag{display:inline-flex;align-items:center;padding:6px 10px;border-radius:999px;font-weight:800;font-size:12px}
+    .tag.main{background:var(--blue-soft);color:#1849a9}
+    .tag.compare{background:#f2f4f7;color:#344054}
+    .vsbox{display:flex;align-items:center;justify-content:center;min-width:90px}
+    .vs{padding:14px 16px;border-radius:999px;font-weight:900;background:var(--purple-soft);color:var(--purple);border:1px solid #ddd6fe}
+    .upload-box{margin-top:10px;padding:14px;border:1px dashed #94a3b8;border-radius:14px;background:#fff}
+    label{display:block;font-size:13px;font-weight:700;margin-bottom:6px}
+    input[type="text"], input[type="number"], select{
+      width:100%;padding:10px 12px;border:1px solid #cbd5e1;border-radius:12px;background:#fff;color:var(--text)
+    }
+    input[type="file"]{width:100%}
+    .controls{display:grid;grid-template-columns:repeat(6,1fr);gap:12px}
+    .mapping-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+    .mapping-card{border:1px solid var(--line);border-radius:16px;padding:14px;background:#fcfcfd}
+    .compare-map{display:grid;grid-template-columns:1.15fr .35fr 1.15fr;gap:10px;margin-top:12px}
+    .compare-map > div{padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:#fff}
+    .compare-map .arrow{display:flex;align-items:center;justify-content:center;font-weight:900;background:var(--gray-soft)}
+    .btns{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+    button{border:0;border-radius:12px;padding:11px 16px;font-weight:800;cursor:pointer}
+    .primary{background:var(--blue);color:#fff}
+    .secondary{background:#eef2f6;color:#101828}
+    .notice{padding:14px 16px;border-radius:14px;background:var(--blue-soft);border:1px solid #c7d7fe;color:#194185}
+    .dangerText{color:var(--red)}
+    .count-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
+    .metric-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+    .pill{border:1px solid var(--line);border-radius:16px;padding:14px;background:#fff}
+    .pill .k{font-size:12px;color:var(--muted)}
+    .pill .v{font-size:26px;font-weight:900;margin-top:6px}
+    .pill.ok{background:var(--green-soft);color:var(--green)}
+    .pill.warn{background:var(--orange-soft);color:var(--orange)}
+    .pill.bad{background:var(--red-soft);color:var(--red)}
+    .pill.purple{background:var(--purple-soft);color:var(--purple)}
+    .tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+    .tab{padding:9px 14px;border-radius:999px;border:1px solid #c7d7fe;background:#eef4ff;color:#1849a9;cursor:pointer;font-weight:800}
+    .tab.active{background:var(--blue);color:#fff;border-color:var(--blue)}
+    .panel{display:none}
+    .panel.active{display:block}
+    .tablewrap{max-height:680px;overflow:auto;border:1px solid var(--line);border-radius:16px;background:#fff}
+    table{width:100%;border-collapse:separate;border-spacing:0;font-size:13px}
+    th, td{padding:8px 10px;border-bottom:1px solid #eaecf0;text-align:left;vertical-align:top;background:#fff}
+    thead th{position:sticky;z-index:2;background:#f8fafc}
+    thead tr.group th{top:0;background:#eef4ff;color:#1849a9;font-size:12px}
+    thead tr.sub th{top:34px}
+    .right{text-align:right}
+    .code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+    .group-start{border-left:5px solid #dc2626 !important}
+    .group-end{border-right:5px solid #dc2626 !important}
+    .g1{background:#fcfcfd}
+    .g2{background:#f8fbff}
+    .diff-bad{color:var(--red);font-weight:900}
+    .summary-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+    .thin{font-weight:500}
+    .small{font-size:12px}
+    .loading{display:inline-block;width:14px;height:14px;border:2px solid #9cb7ff;border-top-color:transparent;border-radius:50%;animation:spin .8s linear infinite;vertical-align:-2px;margin-right:8px}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    @media (max-width:1200px){
+      .controls{grid-template-columns:repeat(3,1fr)}
+      .count-grid{grid-template-columns:repeat(2,1fr)}
+      .metric-grid{grid-template-columns:repeat(2,1fr)}
+    }
+    @media (max-width:920px){
+      .pair-layout,.mapping-grid,.summary-grid,.compare-map{grid-template-columns:1fr}
+      .controls,.count-grid,.metric-grid{grid-template-columns:1fr}
+      .vsbox{min-width:0}
+      thead tr.sub th{top:58px}
+    }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card" style="margin-bottom:16px">
+    <div class="hero">
+      <div>
+        <h1>เปรียบเทียบ CPI: ไฟล์หลัก vs ไฟล์เทียบ</h1>
+        <p class="muted">จับคู่ด้วย <b>รหัส 7 ตัวแรก</b> แล้วเทียบ <b>น้ำหนัก</b>, <b>สัมพัทธ์น้ำหนัก</b>, <b>สัมพัทธ์ราคา</b>, และ <b>ดัชนี</b></p>
+      </div>
+      <div class="pill-note">
+        <div><b>เวอร์ชันนี้อ่านไฟล์ไวขึ้น</b></div>
+        <div class="small">ใช้ Web Worker แยกงานอ่าน Excel และเทียบข้อมูลออกจากหน้าเว็บหลัก พร้อมรองรับการอ่านชีตแบบ dense ให้ค่าถูกต้อง</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid">
+    <div class="card span12">
+      <h2>1) เลือกไฟล์</h2>
+      <div class="pair-layout">
+        <div class="file-panel main">
+          <div class="tag main">ไฟล์หลัก (Reference)</div>
+          <h3 style="margin-top:10px">ไฟล์อ้างอิง / ไฟล์ถูกต้อง</h3>
+          <div class="upload-box">
+            <label for="mainFile">อัปโหลดไฟล์หลัก</label>
+            <input id="mainFile" type="file" accept=".xlsx,.xls" />
+            <p class="muted">ค่าเริ่มต้น: เริ่มแถว 8, รหัส=A, ชื่อ=C, สัมพัทธ์น้ำหนัก=F, สัมพัทธ์ราคา=G, น้ำหนัก=H, ดัชนี=I</p>
+          </div>
+        </div>
+
+        <div class="vsbox"><div class="vs">เทียบกับ</div></div>
+
+        <div class="file-panel compare">
+          <div class="tag compare">ไฟล์เทียบ (Compare)</div>
+          <h3 style="margin-top:10px">ไฟล์ที่จะนำมาเทียบ</h3>
+          <div class="upload-box">
+            <label for="compareFile">อัปโหลดไฟล์เทียบ</label>
+            <input id="compareFile" type="file" accept=".xlsx,.xls" />
+            <p class="muted">ค่าเริ่มต้น: เริ่มแถว 2, รหัส=A, ชื่อ=B, น้ำหนัก=C, สัมพัทธ์น้ำหนัก=G, สัมพัทธ์ราคา=H, ดัชนี=I</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card span12">
+      <h2>2) ตั้งค่าและ mapping</h2>
+      <div class="controls">
+        <div><label>Threshold ส่วนต่าง</label><input id="threshold" type="number" step="0.000001" value="0.0001" /></div>
+        <div><label>ชีตไฟล์หลัก</label><select id="mainSheet"></select></div>
+        <div><label>ชีตไฟล์เทียบ</label><select id="compareSheet"></select></div>
+        <div><label>แถวเริ่มต้นไฟล์หลัก</label><input id="mainStartRow" type="number" value="8" min="1" /></div>
+        <div><label>แถวเริ่มต้นไฟล์เทียบ</label><input id="compareStartRow" type="number" value="2" min="1" /></div>
+        <div><label>ใช้รหัสกี่ตัวแรกจากไฟล์เทียบ</label><input id="compareCodeLen" type="number" value="7" min="1" /></div>
+      </div>
+
+      <div style="height:14px"></div>
+
+      <div class="mapping-grid">
+        <div class="mapping-card">
+          <div class="tag main">ไฟล์หลัก</div>
+          <div class="controls" style="margin-top:10px">
+            <div><label>คอลัมน์รหัส</label><input id="mainCodeCol" type="text" value="A" /></div>
+            <div><label>คอลัมน์ชื่อ</label><input id="mainNameCol" type="text" value="C" /></div>
+            <div><label>คอลัมน์น้ำหนัก</label><input id="mainWeightCol" type="text" value="H" /></div>
+            <div><label>คอลัมน์สัมพัทธ์น้ำหนัก</label><input id="mainRelWeightCol" type="text" value="F" /></div>
+            <div><label>คอลัมน์สัมพัทธ์ราคา</label><input id="mainRelPriceCol" type="text" value="G" /></div>
+            <div><label>คอลัมน์ดัชนี</label><input id="mainIndexCol" type="text" value="I" /></div>
+          </div>
+        </div>
+
+        <div class="mapping-card">
+          <div class="tag compare">ไฟล์เทียบ</div>
+          <div class="controls" style="margin-top:10px">
+            <div><label>คอลัมน์รหัส</label><input id="compareCodeCol" type="text" value="A" /></div>
+            <div><label>คอลัมน์ชื่อ</label><input id="compareNameCol" type="text" value="B" /></div>
+            <div><label>คอลัมน์น้ำหนัก</label><input id="compareWeightCol" type="text" value="C" /></div>
+            <div><label>คอลัมน์สัมพัทธ์น้ำหนัก</label><input id="compareRelWeightCol" type="text" value="G" /></div>
+            <div><label>คอลัมน์สัมพัทธ์ราคา</label><input id="compareRelPriceCol" type="text" value="H" /></div>
+            <div><label>คอลัมน์ดัชนี</label><input id="compareIndexCol" type="text" value="I" /></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="compare-map">
+        <div><b>ไฟล์หลัก</b><br>น้ำหนัก = H<br>สัมพัทธ์น้ำหนัก = F<br>สัมพัทธ์ราคา = G<br>ดัชนี = I</div>
+        <div class="arrow">เทียบกับ</div>
+        <div><b>ไฟล์เทียบ</b><br>น้ำหนัก = C<br>สัมพัทธ์น้ำหนัก = G<br>สัมพัทธ์ราคา = H<br>ดัชนี = I</div>
+      </div>
+
+      <div class="btns">
+        <button class="primary" id="runBtn">เริ่มเปรียบเทียบ</button>
+        <button class="secondary" id="downloadCsvBtn">ดาวน์โหลดผลต่างเป็น CSV</button>
+        <button class="secondary" id="downloadHtmlBtn">บันทึกรายงานหน้านี้เป็น HTML</button>
+      </div>
+    </div>
+
+    <div class="card span12"><div class="notice" id="status">ยังไม่ได้ประมวลผล</div></div>
+
+    <div class="card span12">
+      <h2>3) สรุปจำนวนรายการ</h2>
+      <div class="count-grid">
+        <div class="pill"><div class="k">รายการในไฟล์หลัก</div><div class="v" id="mainCount">-</div></div>
+        <div class="pill"><div class="k">รายการในไฟล์เทียบ</div><div class="v" id="compareCount">-</div></div>
+        <div class="pill ok"><div class="k">จับคู่ได้</div><div class="v" id="matchedCount">-</div></div>
+        <div class="pill warn"><div class="k">ต่างเกิน Threshold</div><div class="v" id="diffCount">-</div></div>
+        <div class="pill bad"><div class="k">เทียบไม่ได้ / ข้อมูลไม่ครบ</div><div class="v" id="unmatchedCount">-</div></div>
+      </div>
+    </div>
+
+    <div class="card span12">
+      <h2>4) สรุปตามหัวข้อ</h2>
+      <div class="metric-grid">
+        <div class="pill"><div class="k">น้ำหนัก ต่างเกิน Threshold</div><div class="v" id="metricWeightDiffCount">-</div><div class="muted" id="metricWeightMax">ค่าสูงสุด -</div></div>
+        <div class="pill purple"><div class="k">สัมพัทธ์น้ำหนัก ต่างเกิน Threshold</div><div class="v" id="metricRelWeightDiffCount">-</div><div class="muted" id="metricRelWeightMax">ค่าสูงสุด -</div></div>
+        <div class="pill warn"><div class="k">สัมพัทธ์ราคา ต่างเกิน Threshold</div><div class="v" id="metricRelPriceDiffCount">-</div><div class="muted" id="metricRelPriceMax">ค่าสูงสุด -</div></div>
+        <div class="pill bad"><div class="k">ดัชนี ต่างเกิน Threshold</div><div class="v" id="metricIndexDiffCount">-</div><div class="muted" id="metricIndexMax">ค่าสูงสุด -</div></div>
+      </div>
+    </div>
+
+    <div class="card span12">
+      <div class="tabs">
+        <div class="tab active" data-tab="summary">สรุป</div>
+        <div class="tab" data-tab="diff">รายการที่ต่าง</div>
+        <div class="tab" data-tab="unmatched">รายการที่เทียบไม่ได้</div>
+        <div class="tab" data-tab="all">รายการที่จับคู่ได้ทั้งหมด</div>
+      </div>
+
+      <div id="summary" class="panel active">
+        <div id="summaryBox" class="notice">รอข้อมูล...</div>
+      </div>
+
+      <div id="diff" class="panel">
+        <div class="tablewrap"><table id="diffTable"></table></div>
+      </div>
+
+      <div id="unmatched" class="panel">
+        <div class="tablewrap"><table id="unmatchedTable"></table></div>
+      </div>
+
+      <div id="all" class="panel">
+        <div class="tablewrap"><table id="allTable"></table></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const workerCode = `
+  importScripts('https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js');
+
+  const books = { main:null, compare:null };
+
+  function normalizeCol(v){ return String(v || '').trim().toUpperCase(); }
+  function cellAddress(col,row){ return normalizeCol(col) + row; }
+  function colToIndex(col){
+    const s = normalizeCol(col);
+    let n = 0;
+    for(let i=0;i<s.length;i++) n = n * 26 + (s.charCodeAt(i) - 64);
+    return n - 1;
+  }
+  function readCell(sheet,col,row){
+    if(Array.isArray(sheet)){
+      const r = row - 1;
+      const c = colToIndex(col);
+      const cell = sheet[r] && sheet[r][c];
+      return cell ? cell.v : null;
+    }
+    const cell = sheet[cellAddress(col,row)];
+    return cell ? cell.v : null;
+  }
+  function toText(v){ return v == null ? '' : String(v).trim(); }
+  function toNum(v){
+    if (v == null || v === '') return null;
+    if (typeof v === 'number') return Number.isFinite(v) ? v : null;
+    let s = String(v).trim().replace(/,/g,'');
+    if (!s) return null;
+    const n = Number(s);
+    return Number.isFinite(n) ? n : null;
+  }
+  function firstN(str,len){ return toText(str).replace(/\\s+/g,'').substring(0,len); }
+  function rangeEndRow(sheet){
+    const ref = sheet['!ref']; if(!ref) return 0;
+    return XLSX.utils.decode_range(ref).e.r + 1;
+  }
+  function makeMetric(mainVal, compareVal, threshold){
+    const hasBoth = mainVal != null && compareVal != null;
+    const diff = hasBoth ? Math.abs(mainVal - compareVal) : null;
+    return { main: mainVal, compare: compareVal, diff, isMissing: !hasBoth, isDifferent: hasBoth && diff > threshold };
+  }
+
+  function extractRows(workbook, cfg){
+    const sheet = workbook.Sheets[cfg.sheetName];
+    const endRow = rangeEndRow(sheet);
+    const rows = [];
+    for(let r=cfg.startRow; r<=endRow; r++){
+      const rawCode = readCell(sheet, cfg.codeCol, r);
+      const code7 = firstN(rawCode, cfg.codeLen);
+      if(!code7) continue;
+      rows.push({
+        row: r,
+        code7,
+        rawCode: toText(rawCode),
+        name: toText(readCell(sheet, cfg.nameCol, r)),
+        weight: toNum(readCell(sheet, cfg.weightCol, r)),
+        relWeight: toNum(readCell(sheet, cfg.relWeightCol, r)),
+        relPrice: toNum(readCell(sheet, cfg.relPriceCol, r)),
+        indexVal: toNum(readCell(sheet, cfg.indexCol, r))
+      });
+    }
+    return rows;
+  }
+
+  function compareData(mainRows, compareRows, threshold){
+    const compareMap = new Map();
+    for(const row of compareRows){
+      if(!compareMap.has(row.code7)) compareMap.set(row.code7, row);
+    }
+
+    const matched = [];
+    const unmatched = [];
+    const metricStats = {
+      weight: {count:0, max:0},
+      relWeight: {count:0, max:0},
+      relPrice: {count:0, max:0},
+      index: {count:0, max:0}
+    };
+
+    for(const m of mainRows){
+      const c = compareMap.get(m.code7);
+      if(!c){
+        unmatched.push({
+          code7:m.code7, mainCode:m.rawCode, mainName:m.name, mainRow:m.row,
+          reason:'ไม่พบรหัสในไฟล์เทียบ'
+        });
+        continue;
+      }
+
+      const metrics = {
+        weight: makeMetric(m.weight, c.weight, threshold),
+        relWeight: makeMetric(m.relWeight, c.relWeight, threshold),
+        relPrice: makeMetric(m.relPrice, c.relPrice, threshold),
+        index: makeMetric(m.indexVal, c.indexVal, threshold)
+      };
+
+      for(const [key, meta] of Object.entries(metrics)){
+        if(meta.isDifferent){
+          metricStats[key].count += 1;
+          metricStats[key].max = Math.max(metricStats[key].max, meta.diff);
+        }
+      }
+
+      const missingFields = Object.entries(metrics)
+        .filter(([,v]) => v.isMissing)
+        .map(([k]) => ({weight:'น้ำหนัก', relWeight:'สัมพัทธ์น้ำหนัก', relPrice:'สัมพัทธ์ราคา', index:'ดัชนี'})[k]);
+
+      const rec = {
+        code7: m.code7,
+        mainCode: m.rawCode,
+        compareCode: c.rawCode,
+        mainName: m.name,
+        compareName: c.name,
+        mainRow: m.row,
+        compareRow: c.row,
+        weightMain: metrics.weight.main, weightCompare: metrics.weight.compare, weightDiff: metrics.weight.diff,
+        relWeightMain: metrics.relWeight.main, relWeightCompare: metrics.relWeight.compare, relWeightDiff: metrics.relWeight.diff,
+        relPriceMain: metrics.relPrice.main, relPriceCompare: metrics.relPrice.compare, relPriceDiff: metrics.relPrice.diff,
+        indexMain: metrics.index.main, indexCompare: metrics.index.compare, indexDiff: metrics.index.diff,
+        missingFields,
+        hasAnyDiff: Object.values(metrics).some(v => v.isDifferent)
+      };
+      matched.push(rec);
+
+      if(missingFields.length){
+        unmatched.push({
+          code7:m.code7, mainCode:m.rawCode, mainName:m.name || c.name, mainRow:m.row, compareRow:c.row,
+          reason:'มีคู่เทียบ แต่ข้อมูลไม่ครบในหัวข้อ: ' + missingFields.join(', ')
+        });
+      }
+    }
+
+    const diffs = matched.filter(r => r.hasAnyDiff).sort((a,b) => {
+      const aMax = Math.max(a.weightDiff||0, a.relWeightDiff||0, a.relPriceDiff||0, a.indexDiff||0);
+      const bMax = Math.max(b.weightDiff||0, b.relWeightDiff||0, b.relPriceDiff||0, b.indexDiff||0);
+      return bMax - aMax;
+    });
+
+    return { matched, unmatched, diffs, metricStats };
+  }
+
+  self.onmessage = (e) => {
+    const msg = e.data;
+
+    if(msg.type === 'loadWorkbook'){
+      try{
+        const wb = XLSX.read(msg.buffer, {
+          type:'array',
+          dense:true,
+          raw:true,
+          cellFormula:false,
+          cellHTML:false,
+          cellNF:false,
+          cellStyles:false
+        });
+        books[msg.kind] = wb;
+        self.postMessage({ type:'loaded', kind:msg.kind, fileName:msg.fileName, sheetNames:wb.SheetNames });
+      }catch(err){
+        self.postMessage({ type:'error', stage:'loadWorkbook', message:err.message });
+      }
+      return;
+    }
+
+    if(msg.type === 'compare'){
+      try{
+        const mainRows = extractRows(books.main, msg.mainCfg);
+        const compareRows = extractRows(books.compare, msg.compareCfg);
+        const result = compareData(mainRows, compareRows, msg.threshold);
+        self.postMessage({
+          type:'compared',
+          report: { ...result, mainRowsCount: mainRows.length, compareRowsCount: compareRows.length }
+        });
+      }catch(err){
+        self.postMessage({ type:'error', stage:'compare', message:err.message });
+      }
+    }
+  };
+`;
+
+const worker = new Worker(URL.createObjectURL(new Blob([workerCode], { type:'application/javascript' })));
+
+const state = {
+  report:null,
+  mainFileName:'',
+  compareFileName:'',
+  sheetNames:{ main:[], compare:[] }
+};
+
+const els = {
+  mainFile: document.getElementById('mainFile'),
+  compareFile: document.getElementById('compareFile'),
+  mainSheet: document.getElementById('mainSheet'),
+  compareSheet: document.getElementById('compareSheet'),
+  runBtn: document.getElementById('runBtn'),
+  downloadCsvBtn: document.getElementById('downloadCsvBtn'),
+  downloadHtmlBtn: document.getElementById('downloadHtmlBtn'),
+  status: document.getElementById('status'),
+  mainCount: document.getElementById('mainCount'),
+  compareCount: document.getElementById('compareCount'),
+  matchedCount: document.getElementById('matchedCount'),
+  diffCount: document.getElementById('diffCount'),
+  unmatchedCount: document.getElementById('unmatchedCount'),
+  summaryBox: document.getElementById('summaryBox'),
+  diffTable: document.getElementById('diffTable'),
+  unmatchedTable: document.getElementById('unmatchedTable'),
+  allTable: document.getElementById('allTable'),
+  metricWeightDiffCount: document.getElementById('metricWeightDiffCount'),
+  metricRelWeightDiffCount: document.getElementById('metricRelWeightDiffCount'),
+  metricRelPriceDiffCount: document.getElementById('metricRelPriceDiffCount'),
+  metricIndexDiffCount: document.getElementById('metricIndexDiffCount'),
+  metricWeightMax: document.getElementById('metricWeightMax'),
+  metricRelWeightMax: document.getElementById('metricRelWeightMax'),
+  metricRelPriceMax: document.getElementById('metricRelPriceMax'),
+  metricIndexMax: document.getElementById('metricIndexMax')
+};
+
+function setStatus(msg, isError=false, loading=false){
+  els.status.innerHTML = (loading ? '<span class="loading"></span>' : '') + msg;
+  els.status.className = isError ? 'notice dangerText' : 'notice';
+}
+function fmtMaybe(v, digits=6){ return v == null ? '-' : Number(v).toFixed(digits); }
+function fmtInt(v){ return v == null ? '-' : Number(v).toLocaleString('th-TH'); }
+function escapeHtml(str){
+  return String(str ?? '').replace(/[&<>"']/g, s => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[s]));
+}
+function fillSheetSelect(selectEl, names){
+  selectEl.innerHTML = '';
+  names.forEach((name, i) => {
+    const opt = document.createElement('option');
+    opt.value = name; opt.textContent = name; if(i===0) opt.selected = true;
+    selectEl.appendChild(opt);
+  });
+}
+function currentThreshold(){ return Number(document.getElementById('threshold').value); }
+
+worker.onmessage = (e) => {
+  const msg = e.data;
+  if(msg.type === 'loaded'){
+    if(msg.kind === 'main'){
+      state.mainFileName = msg.fileName;
+      state.sheetNames.main = msg.sheetNames;
+      fillSheetSelect(els.mainSheet, msg.sheetNames);
+      setStatus('อ่านไฟล์หลักแล้ว: ' + msg.fileName);
+    }else{
+      state.compareFileName = msg.fileName;
+      state.sheetNames.compare = msg.sheetNames;
+      fillSheetSelect(els.compareSheet, msg.sheetNames);
+      setStatus('อ่านไฟล์เทียบแล้ว: ' + msg.fileName);
+    }
+    return;
+  }
+  if(msg.type === 'compared'){
+    state.report = msg.report;
+    updateDashboard(msg.report);
+    setStatus('เปรียบเทียบเสร็จแล้ว: จับคู่ได้ ' + fmtInt(msg.report.matched.length) + ' รายการ | ต่างอย่างน้อย 1 หัวข้อ ' + fmtInt(msg.report.diffs.length) + ' รายการ');
+    return;
+  }
+  if(msg.type === 'error'){
+    setStatus('เกิดข้อผิดพลาด (' + msg.stage + '): ' + msg.message, true);
+  }
+};
+
+async function uploadToWorker(file, kind){
+  const buffer = await file.arrayBuffer();
+  worker.postMessage({ type:'loadWorkbook', kind, fileName:file.name, buffer }, [buffer]);
+}
+
+els.mainFile.addEventListener('change', async (e) => {
+  const file = e.target.files?.[0];
+  if(!file) return;
+  setStatus('กำลังอ่านไฟล์หลัก...', false, true);
+  await uploadToWorker(file, 'main');
+});
+
+els.compareFile.addEventListener('change', async (e) => {
+  const file = e.target.files?.[0];
+  if(!file) return;
+  setStatus('กำลังอ่านไฟล์เทียบ...', false, true);
+  await uploadToWorker(file, 'compare');
+});
+
+function buildComparePayload(){
+  return {
+    type:'compare',
+    threshold: currentThreshold(),
+    mainCfg: {
+      sheetName: els.mainSheet.value,
+      startRow: Number(document.getElementById('mainStartRow').value),
+      codeCol: document.getElementById('mainCodeCol').value,
+      nameCol: document.getElementById('mainNameCol').value,
+      weightCol: document.getElementById('mainWeightCol').value,
+      relWeightCol: document.getElementById('mainRelWeightCol').value,
+      relPriceCol: document.getElementById('mainRelPriceCol').value,
+      indexCol: document.getElementById('mainIndexCol').value,
+      codeLen: 7
+    },
+    compareCfg: {
+      sheetName: els.compareSheet.value,
+      startRow: Number(document.getElementById('compareStartRow').value),
+      codeCol: document.getElementById('compareCodeCol').value,
+      nameCol: document.getElementById('compareNameCol').value,
+      weightCol: document.getElementById('compareWeightCol').value,
+      relWeightCol: document.getElementById('compareRelWeightCol').value,
+      relPriceCol: document.getElementById('compareRelPriceCol').value,
+      indexCol: document.getElementById('compareIndexCol').value,
+      codeLen: Number(document.getElementById('compareCodeLen').value)
+    }
+  };
+}
+
+els.runBtn.addEventListener('click', () => {
+  if(!state.sheetNames.main.length || !state.sheetNames.compare.length){
+    setStatus('กรุณาอัปโหลดทั้งไฟล์หลักและไฟล์เทียบก่อน', true);
+    return;
+  }
+  setStatus('กำลังเปรียบเทียบข้อมูล...', false, true);
+  worker.postMessage(buildComparePayload());
+});
+
+function renderTable(tableEl, rows, mode){
+  let html = '';
+  if(mode === 'diff' || mode === 'all'){
+    html += `
+      <thead>
+        <tr class="group">
+          <th rowspan="2">รหัส 7 ตัว</th>
+          <th rowspan="2">ชื่อรายการ</th>
+          <th colspan="2" class="group-start">แถวอ้างอิง</th>
+          <th colspan="3" class="group-start">น้ำหนัก</th>
+          <th colspan="3" class="group-start">สัมพัทธ์น้ำหนัก</th>
+          <th colspan="3" class="group-start">สัมพัทธ์ราคา</th>
+          <th colspan="3" class="group-start">ดัชนี</th>
+          <th rowspan="2" class="group-start group-end">ข้อมูลไม่ครบ</th>
+        </tr>
+        <tr class="sub">
+          <th class="group-start">หลัก</th><th>เทียบ</th>
+          <th class="group-start g1">หลัก</th><th class="g1">เทียบ</th><th class="g1">ต่าง</th>
+          <th class="group-start g2">หลัก</th><th class="g2">เทียบ</th><th class="g2">ต่าง</th>
+          <th class="group-start g1">หลัก</th><th class="g1">เทียบ</th><th class="g1">ต่าง</th>
+          <th class="group-start g2">หลัก</th><th class="g2">เทียบ</th><th class="g2">ต่าง</th>
+        </tr>
+      </thead><tbody>`;
+    for(const r of rows){
+      const t = currentThreshold();
+      const miss = r.missingFields && r.missingFields.length ? r.missingFields.join(', ') : '-';
+      html += `
+        <tr>
+          <td class="code">${escapeHtml(r.code7)}</td>
+          <td>${escapeHtml(r.mainName || r.compareName || '')}<br><span class="muted code">${escapeHtml(r.mainCode)} ↔ ${escapeHtml(r.compareCode)}</span></td>
+          <td class="right group-start">${fmtInt(r.mainRow)}</td>
+          <td class="right">${fmtInt(r.compareRow)}</td>
+
+          <td class="right group-start g1">${fmtMaybe(r.weightMain)}</td>
+          <td class="right g1">${fmtMaybe(r.weightCompare)}</td>
+          <td class="right g1 ${r.weightDiff != null && r.weightDiff > t ? 'diff-bad' : ''}">${fmtMaybe(r.weightDiff)}</td>
+
+          <td class="right group-start g2">${fmtMaybe(r.relWeightMain)}</td>
+          <td class="right g2">${fmtMaybe(r.relWeightCompare)}</td>
+          <td class="right g2 ${r.relWeightDiff != null && r.relWeightDiff > t ? 'diff-bad' : ''}">${fmtMaybe(r.relWeightDiff)}</td>
+
+          <td class="right group-start g1">${fmtMaybe(r.relPriceMain)}</td>
+          <td class="right g1">${fmtMaybe(r.relPriceCompare)}</td>
+          <td class="right g1 ${r.relPriceDiff != null && r.relPriceDiff > t ? 'diff-bad' : ''}">${fmtMaybe(r.relPriceDiff)}</td>
+
+          <td class="right group-start g2">${fmtMaybe(r.indexMain)}</td>
+          <td class="right g2">${fmtMaybe(r.indexCompare)}</td>
+          <td class="right g2 ${r.indexDiff != null && r.indexDiff > t ? 'diff-bad' : ''}">${fmtMaybe(r.indexDiff)}</td>
+
+          <td class="group-start group-end">${escapeHtml(miss)}</td>
+        </tr>`;
+    }
+    html += '</tbody>';
+  } else {
+    html += `
+      <thead>
+        <tr>
+          <th>รหัส 7 ตัว</th>
+          <th>รหัสไฟล์หลัก</th>
+          <th>ชื่อรายการ</th>
+          <th>แถวไฟล์หลัก</th>
+          <th>แถวไฟล์เทียบ</th>
+          <th>สาเหตุ</th>
+        </tr>
+      </thead><tbody>`;
+    for(const r of rows){
+      html += `
+      <tr>
+        <td class="code">${escapeHtml(r.code7)}</td>
+        <td class="code">${escapeHtml(r.mainCode || '')}</td>
+        <td>${escapeHtml(r.mainName || '')}</td>
+        <td class="right">${fmtInt(r.mainRow)}</td>
+        <td class="right">${fmtInt(r.compareRow)}</td>
+        <td>${escapeHtml(r.reason || '')}</td>
+      </tr>`;
+    }
+    html += '</tbody>';
+  }
+  tableEl.innerHTML = html;
+}
+
+function buildSummary(report){
+  return `
+    <div class="summary-grid">
+      <div class="mapping-card">
+        <div class="tag main">ไฟล์หลัก</div>
+        <p><b>${escapeHtml(state.mainFileName || '-')}</b></p>
+        <p class="muted thin">ใช้เป็นข้อมูลอ้างอิง</p>
+      </div>
+      <div class="mapping-card">
+        <div class="tag compare">ไฟล์เทียบ</div>
+        <p><b>${escapeHtml(state.compareFileName || '-')}</b></p>
+        <p class="muted thin">นำมาเทียบกับไฟล์หลัก</p>
+      </div>
+      <div class="mapping-card">
+        <p><b>Threshold ที่ใช้:</b> ${fmtMaybe(currentThreshold())}</p>
+        <p class="muted thin">จับคู่ด้วยรหัส ${fmtInt(Number(document.getElementById('compareCodeLen').value))} ตัวแรกของไฟล์เทียบ</p>
+      </div>
+    </div>
+
+    <div class="compare-map" style="margin-top:12px">
+      <div><b>ไฟล์หลัก</b><br>น้ำหนัก = ${escapeHtml(document.getElementById('mainWeightCol').value)}<br>สัมพัทธ์น้ำหนัก = ${escapeHtml(document.getElementById('mainRelWeightCol').value)}<br>สัมพัทธ์ราคา = ${escapeHtml(document.getElementById('mainRelPriceCol').value)}<br>ดัชนี = ${escapeHtml(document.getElementById('mainIndexCol').value)}</div>
+      <div class="arrow">เทียบกับ</div>
+      <div><b>ไฟล์เทียบ</b><br>น้ำหนัก = ${escapeHtml(document.getElementById('compareWeightCol').value)}<br>สัมพัทธ์น้ำหนัก = ${escapeHtml(document.getElementById('compareRelWeightCol').value)}<br>สัมพัทธ์ราคา = ${escapeHtml(document.getElementById('compareRelPriceCol').value)}<br>ดัชนี = ${escapeHtml(document.getElementById('compareIndexCol').value)}</div>
+    </div>
+
+    <div style="margin-top:14px">
+      <p>จับคู่ได้ <b>${fmtInt(report.matched.length)}</b> รายการ จากไฟล์หลัก <b>${fmtInt(report.mainRowsCount)}</b> รายการ และไฟล์เทียบ <b>${fmtInt(report.compareRowsCount)}</b> รายการ</p>
+      <p>รายการที่ต่างเกิน Threshold อย่างน้อย 1 หัวข้อ จำนวน <b>${fmtInt(report.diffs.length)}</b> รายการ</p>
+      <p>รายการที่เทียบไม่ได้หรือข้อมูลไม่ครบ จำนวน <b>${fmtInt(report.unmatched.length)}</b> รายการ</p>
+      <p><b>หัวข้อที่ใช้เทียบ:</b> น้ำหนัก, สัมพัทธ์น้ำหนัก, สัมพัทธ์ราคา, ดัชนี</p>
+    </div>
+  `;
+}
+
+function updateDashboard(report){
+  els.mainCount.textContent = fmtInt(report.mainRowsCount);
+  els.compareCount.textContent = fmtInt(report.compareRowsCount);
+  els.matchedCount.textContent = fmtInt(report.matched.length);
+  els.diffCount.textContent = fmtInt(report.diffs.length);
+  els.unmatchedCount.textContent = fmtInt(report.unmatched.length);
+
+  els.metricWeightDiffCount.textContent = fmtInt(report.metricStats.weight.count);
+  els.metricRelWeightDiffCount.textContent = fmtInt(report.metricStats.relWeight.count);
+  els.metricRelPriceDiffCount.textContent = fmtInt(report.metricStats.relPrice.count);
+  els.metricIndexDiffCount.textContent = fmtInt(report.metricStats.index.count);
+
+  els.metricWeightMax.textContent = 'ค่าสูงสุด ' + fmtMaybe(report.metricStats.weight.max);
+  els.metricRelWeightMax.textContent = 'ค่าสูงสุด ' + fmtMaybe(report.metricStats.relWeight.max);
+  els.metricRelPriceMax.textContent = 'ค่าสูงสุด ' + fmtMaybe(report.metricStats.relPrice.max);
+  els.metricIndexMax.textContent = 'ค่าสูงสุด ' + fmtMaybe(report.metricStats.index.max);
+
+  els.summaryBox.innerHTML = buildSummary(report);
+  renderTable(els.diffTable, report.diffs, 'diff');
+  renderTable(els.unmatchedTable, report.unmatched, 'unmatched');
+  renderTable(els.allTable, report.matched, 'all');
+}
+
+function buildCsv(rows){
+  const header = [
+    'code7','main_code','compare_code','name_main','name_compare','main_row','compare_row',
+    'weight_main','weight_compare','weight_diff',
+    'rel_weight_main','rel_weight_compare','rel_weight_diff',
+    'rel_price_main','rel_price_compare','rel_price_diff',
+    'index_main','index_compare','index_diff','missing_fields'
+  ];
+  const lines = [header.join(',')];
+  for(const r of rows){
+    const vals = [
+      r.code7, r.mainCode, r.compareCode, r.mainName, r.compareName, r.mainRow, r.compareRow,
+      r.weightMain, r.weightCompare, r.weightDiff,
+      r.relWeightMain, r.relWeightCompare, r.relWeightDiff,
+      r.relPriceMain, r.relPriceCompare, r.relPriceDiff,
+      r.indexMain, r.indexCompare, r.indexDiff,
+      (r.missingFields || []).join('|')
+    ].map(v => '"' + String(v ?? '').replace(/"/g,'""') + '"');
+    lines.push(vals.join(','));
+  }
+  return '\ufeff' + lines.join('\n');
+}
+function downloadBlob(content, filename, type){
+  const blob = new Blob([content], {type});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename; a.click();
+  setTimeout(() => URL.revokeObjectURL(url), 1200);
+}
+
+els.downloadCsvBtn.addEventListener('click', () => {
+  if(!state.report){ setStatus('ยังไม่มีผลลัพธ์ให้ดาวน์โหลด', true); return; }
+  downloadBlob(buildCsv(state.report.diffs), 'cpi_compare_differences.csv', 'text/csv;charset=utf-8');
+});
+
+els.downloadHtmlBtn.addEventListener('click', () => {
+  downloadBlob(document.documentElement.outerHTML, 'cpi_compare_final.html', 'text/html;charset=utf-8');
+});
+
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById(tab.dataset.tab).classList.add('active');
+  });
+});
+</script>
+</body>
+</html>
