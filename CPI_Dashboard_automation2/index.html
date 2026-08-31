@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TPSO CPI Report | 6.1.7 Relative Report</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <style>
+    :root{
+      --navy:#0c2d58;
+      --navy2:#123d72;
+      --blue:#1679bd;
+      --sky:#dff4ff;
+      --sky2:#eef9ff;
+      --cyan:#8fd7f7;
+      --green:#08a45b;
+      --red:#e02020;
+      --orange:#f3a61c;
+      --yellow:#ffd44d;
+      --ink:#142033;
+      --muted:#62748a;
+      --line:#c9d9e7;
+      --paper:#ffffff;
+      --bg:#eaf7fd;
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{
+      margin:0;
+      font-family:"Tahoma","Leelawadee UI","Noto Sans Thai",Arial,sans-serif;
+      color:var(--ink);
+      background:
+        radial-gradient(circle at 10% 0%,rgba(68,173,224,.18),transparent 24%),
+        linear-gradient(180deg,#eefaff 0%,#e8f4fb 45%,#f5fbff 100%);
+    }
+    button,input,select,textarea{font:inherit}
+    button{cursor:pointer}
+    .appbar{
+      position:sticky;top:0;z-index:1000;
+      background:rgba(7,34,67,.94);
+      color:#fff;
+      box-shadow:0 12px 30px rgba(7,34,67,.22);
+      backdrop-filter:blur(16px);
+    }
+    .appbar-inner{
+      max-width:1500px;margin:auto;padding:12px 18px;
+      display:grid;grid-template-columns:auto 1fr auto;gap:18px;align-items:center;
+    }
+    .brand{display:flex;align-items:center;gap:12px;min-width:230px}
+    .brand-mark{
+      width:44px;height:44px;border-radius:13px;
+      display:grid;place-items:center;font-weight:900;font-size:18px;
+      background:linear-gradient(145deg,#22a5e5,#0a63a4);box-shadow:inset 0 0 0 2px rgba(255,255,255,.18)
+    }
+    .brand strong{font-size:18px;display:block;line-height:1.05}
+    .brand small{color:#a9d8f3;font-weight:700}
+    .toolbar{display:flex;gap:9px;align-items:center;flex-wrap:wrap;min-width:0}
+    .tool-btn,.tool-select{
+      border:1px solid rgba(255,255,255,.18);border-radius:11px;
+      background:rgba(255,255,255,.09);color:#fff;padding:9px 12px;font-weight:800;
+    }
+    .tool-btn:hover{background:rgba(255,255,255,.16)}
+    .tool-select{min-width:155px}
+    .tool-select option{color:#111;background:#fff}
+    .nav-pages{display:flex;gap:5px;flex-wrap:wrap;justify-content:flex-end}
+    .nav-pages a{
+      color:#d8ecfa;text-decoration:none;font-weight:900;font-size:12px;
+      padding:7px 9px;border-radius:9px;border:1px solid rgba(255,255,255,.12)
+    }
+    .nav-pages a:hover{background:rgba(255,255,255,.13)}
+    .shell{max-width:1500px;margin:0 auto;padding:22px 18px 70px}
+    .dropzone{
+      min-height:70vh;display:grid;place-items:center;text-align:center;
+      border:2px dashed #88c9eb;border-radius:34px;background:rgba(255,255,255,.82);
+      box-shadow:0 18px 60px rgba(50,120,160,.10);padding:30px;
+    }
+    .dropzone.drag{border-color:#1679bd;background:#e6f7ff}
+    .drop-card{max-width:760px}
+    .drop-icon{width:100px;height:100px;margin:0 auto 20px;border-radius:30px;background:linear-gradient(145deg,#1a83c6,#0d4d89);display:grid;place-items:center;color:#fff;font-size:44px;box-shadow:0 18px 35px rgba(20,112,175,.24)}
+    .drop-card h1{font-size:34px;margin:0 0 10px;color:var(--navy)}
+    .drop-card p{color:var(--muted);font-size:17px;line-height:1.7}
+    .primary-btn{border:0;border-radius:14px;background:linear-gradient(135deg,#0d6eaf,#1496d4);color:#fff;padding:13px 20px;font-weight:900;box-shadow:0 12px 24px rgba(12,109,174,.24)}
+    .subnote{margin-top:16px;padding:12px 16px;background:#f5fbff;border:1px solid #c7e6f6;border-radius:13px;color:#557084;font-size:13px}
+    #report{display:none}
+    .statusbar{
+      max-width:1160px;margin:0 auto 14px;display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap;
+      padding:12px 14px;border:1px solid #c9e2ef;border-radius:15px;background:rgba(255,255,255,.8);box-shadow:0 8px 20px rgba(53,117,150,.08)
+    }
+    .statusbar .meta{font-size:13px;color:#587286;font-weight:700}
+    .statusbar .actions{display:flex;gap:8px;flex-wrap:wrap}
+    .mini-btn{border:1px solid #c3dae8;background:#fff;color:#15436d;border-radius:10px;padding:8px 11px;font-weight:900;font-size:12px}
+    .mini-btn:hover{background:#edf8ff}
+    .report-page{
+      max-width:1160px;margin:0 auto 28px;background:var(--paper);border:1px solid #d7e8f2;border-radius:22px;
+      box-shadow:0 18px 46px rgba(47,101,132,.12);overflow:hidden;position:relative;
+    }
+    .page-topline{height:7px;background:linear-gradient(90deg,#f0c234 0 21%,#65bce9 21% 100%)}
+    .page-head{padding:26px 30px 18px;display:flex;justify-content:space-between;gap:20px;align-items:flex-start}
+    .page-title{margin:0;color:#111827;font-size:29px;line-height:1.17;font-weight:900;letter-spacing:-.5px}
+    .page-subtitle{margin:7px 0 0;color:#5c6f82;font-size:15px;font-weight:700}
+    .page-no{min-width:54px;height:54px;border-radius:18px;background:#e1f3fc;color:#0f628f;display:grid;place-items:center;font-weight:900;font-size:20px}
+    .page-body{padding:0 30px 30px}
+    .ribbon{
+      background:linear-gradient(90deg,#236fab,#3f8ac2);color:#fff;padding:13px 18px;border-radius:12px;
+      font-size:22px;font-weight:900;text-align:center;box-shadow:0 9px 18px rgba(42,113,165,.17);margin-bottom:18px
+    }
+    .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+    .grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+    .grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+    .kpi{border-radius:18px;padding:17px;background:#f5fbff;border:1px solid #d2e9f6}
+    .kpi .label{font-size:12px;color:#658095;font-weight:900;text-transform:uppercase;letter-spacing:.06em}
+    .kpi .value{font-size:30px;font-weight:900;margin-top:6px}
+    .kpi .hint{font-size:12px;color:#7d8da0;margin-top:5px}
+    .positive{color:var(--green)!important}.negative{color:var(--red)!important}.neutral{color:#2f6f98!important}
+    .compare-table{width:100%;border-collapse:separate;border-spacing:0;border:1px solid #bdd8e8;border-radius:16px;overflow:hidden}
+    .compare-table th,.compare-table td{padding:14px 16px;border-right:1px solid #d4e4ee;border-bottom:1px solid #d4e4ee;text-align:center}
+    .compare-table tr:last-child td{border-bottom:0}.compare-table th:last-child,.compare-table td:last-child{border-right:0}
+    .compare-table thead th{background:#dff3fc;font-size:14px;font-weight:900;color:#173d5d}
+    .compare-table thead th:nth-child(2){background:#f2c7e6;color:#47223d}.compare-table thead th:nth-child(3){background:#d9d3f2;color:#302758}
+    .compare-table tbody td:first-child{text-align:left;font-weight:900;background:#fbfdff}
+    .metric-val{font-size:19px;font-weight:900;font-variant-numeric:tabular-nums}
+    .highlights{margin-top:20px;background:linear-gradient(180deg,#e8f6ff,#f8fdff);border-top:9px solid #a9d6f0;border-radius:15px;padding:18px 22px}
+    .highlights h3{margin:0 0 10px;font-size:24px;font-style:italic;color:#102d4d}
+    .highlights p{margin:0;line-height:1.75;font-size:15px;font-weight:700;color:#253b51}
+    .chart-card{border:1px solid #d7e7f0;border-radius:18px;padding:18px;background:#fff}
+    .chart-wrap{height:330px;position:relative}
+    .section-note{padding:12px 14px;border-radius:12px;background:#fff8dc;border:1px solid #f0db89;color:#735d1f;font-size:13px;font-weight:700}
+    .metric-board{display:grid;grid-template-columns:1.35fr repeat(3,1fr);border:1px solid #bdd9e9;border-radius:15px;overflow:hidden;margin-top:18px}
+    .metric-board>div{padding:9px 11px;border-right:1px solid #d9e7ef;border-bottom:1px solid #d9e7ef;min-height:43px;display:flex;align-items:center}
+    .metric-board>div:nth-child(4n){border-right:0}
+    .metric-board .head{background:#e8f6fd;font-weight:900;justify-content:center}
+    .metric-board .name{font-weight:800;font-size:12px}
+    .barcell{position:relative;justify-content:flex-start!important;overflow:hidden}
+    .barcell .bar{position:absolute;left:50%;height:11px;border-radius:7px;opacity:.88}
+    .barcell .bar.neg{right:50%;left:auto;background:#ef2a2a}.barcell .bar.pos{background:#1681bd}
+    .barcell .num{position:relative;z-index:2;width:100%;text-align:center;font-size:12px;font-weight:900}
+    .component-header{padding:10px 14px;border-radius:11px 11px 0 0;background:#d6f2ff;border:1px solid #72b9e1;border-bottom:0;font-size:18px;font-weight:900}
+    .component-table{width:100%;border-collapse:collapse;border:1px solid #72b9e1;margin-bottom:18px}
+    .component-table th{background:#8cd2f4;color:#102f4b;font-weight:900;font-size:14px;padding:10px;border:1px solid #4a9ed0}
+    .component-table td{padding:10px 12px;border:1px solid #83b9d9;vertical-align:middle;font-size:13px;line-height:1.45}
+    .component-table td:first-child{font-weight:900;width:24%}.component-table td:nth-child(2){width:22%;text-align:center;font-size:15px;font-weight:900}.component-table td:nth-child(3){width:54%}
+    .region-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px}
+    .region-card{border-radius:13px;overflow:hidden;border:1px solid #ccddea;background:#f8fcff}
+    .region-card .rh{padding:11px 8px;color:#fff;font-weight:900;text-align:center;min-height:58px;display:grid;place-items:center}
+    .region-card .rv{font-size:24px;font-weight:900;text-align:center;padding:10px 8px}
+    .region-card .list{padding:10px;font-size:12px;line-height:1.55;min-height:170px}
+    .region-card .up-list{color:#087f43;font-weight:800}.region-card .down-list{color:#c71919;font-weight:800;margin-top:8px}
+    .regional-table{width:100%;border-collapse:collapse;margin-top:18px}
+    .regional-table th,.regional-table td{border:1px solid #55a2d2;padding:11px 12px;text-align:center;font-size:13px}
+    .regional-table th{background:#8bd2f3;font-weight:900}.regional-table td:first-child{text-align:left;font-weight:900}
+    .table-toolbar{display:flex;align-items:center;justify-content:flex-end;gap:9px;flex-wrap:wrap;margin:0 0 12px}
+    .table-toolbar .limit-label{font-size:12px;font-weight:900;color:#526779}
+    .table-limit-select{appearance:auto;border:1px solid #9fc8df;background:#fff;color:#17324a;border-radius:10px;padding:7px 10px;font-weight:900;min-width:88px;box-shadow:0 2px 8px rgba(20,70,105,.06)}
+    .regional-control-group{display:flex;align-items:center;gap:8px;padding:6px 9px;border:1px solid #c8dfec;background:#f7fbfe;border-radius:12px}
+    .regional-check{display:inline-flex;align-items:center;gap:7px;cursor:pointer;font-size:12px;font-weight:900;color:#24465f;user-select:none}
+    .regional-check input{width:16px;height:16px;accent-color:#1679bd}
+    .contrib-inline{display:block;margin-top:2px;font-size:10px;line-height:1.25;font-weight:800;color:#64748b}
+    .driver-contrib{font-size:10px;font-weight:900;color:#475569;white-space:nowrap}
+    .outlook-layout{display:grid;grid-template-columns:1.05fr .95fr;gap:18px}
+    .outlook-box{border-radius:18px;padding:18px;border:1px solid #d4e4ed;background:#f9fdff}
+    .outlook-box h3{margin:0 0 12px;font-size:19px}.outlook-list{margin:0;padding-left:24px;line-height:1.65;font-size:14px;font-weight:700}
+    .outlook-list li{margin-bottom:8px}
+    .editor{margin-top:14px;border-top:1px dashed #bdd5e4;padding-top:12px}
+    .editor summary{cursor:pointer;font-weight:900;color:#1b668f}
+    .editor textarea,.editor input{width:100%;margin-top:8px;border:1px solid #bfd8e6;border-radius:10px;padding:10px;background:#fff;line-height:1.55}
+    .editor textarea{min-height:100px;resize:vertical}
+    .forecast-strip{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:14px}
+    .forecast-strip .f{padding:14px;border-radius:14px;background:#eaf7ff;border:1px solid #c8e5f4;text-align:center}
+    .forecast-strip strong{display:block;font-size:20px;color:#0b4e7d}.forecast-strip span{font-size:11px;color:#617b8d;font-weight:800}
+    .detail-wrap{overflow:auto;border:1px solid #c7d8e4;border-radius:14px}
+    .detail-table{min-width:1200px;width:100%;border-collapse:collapse;font-size:12px}
+    .detail-table th,.detail-table td{border:1px solid #cbdbe6;padding:8px 9px;text-align:right;white-space:nowrap}
+    .detail-table th{background:#eef7fc;color:#1b3e58;font-weight:900;text-align:center;position:sticky;top:0;z-index:3}
+    .detail-table td:first-child,.detail-table td:nth-child(2){text-align:left}.detail-table td:nth-child(2){white-space:normal;min-width:230px}
+    .detail-table .major td{background:#dcecf6;font-weight:900}.detail-table .sub td{background:#f8fbfd;font-weight:800}
+    .poster{background:linear-gradient(145deg,#061b46,#0b2e68 56%,#08214d);color:#fff;border-radius:0 0 20px 20px;padding:26px;min-height:900px;position:relative;overflow:hidden}
+    .poster::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 85% 10%,rgba(72,169,236,.18),transparent 23%),radial-gradient(circle at 15% 85%,rgba(255,209,57,.10),transparent 25%);pointer-events:none}
+    .poster>*{position:relative}
+    .poster-head{display:grid;grid-template-columns:1fr 390px;gap:22px;align-items:start}
+    .poster-brand{font-size:24px;font-weight:900;color:#4bc3ff}.poster h2{font-size:44px;line-height:1.05;margin:14px 0 7px;color:#ffd445}.poster .poster-period{font-size:28px;font-weight:900}.poster .poster-yoy{font-size:26px;margin-top:6px}
+    .mini-rate-card{background:rgba(232,241,250,.88);color:#122b49;border-radius:12px;padding:11px 13px;margin-bottom:11px}
+    .mini-rate-card h4{margin:0 0 7px;text-align:center;font-size:13px}.mini-rate-grid{display:grid;grid-template-columns:1.4fr repeat(4,1fr);gap:4px;font-size:11px}.mini-rate-grid>*{padding:5px 3px;text-align:center;font-weight:900}.mini-rate-grid .hdr{background:#d5e7f3;border-radius:6px}
+    .poster-summary{margin-top:16px;background:#fff;color:#172944;border-radius:22px;padding:17px 20px;line-height:1.55;font-size:13px;font-weight:700}
+    .poster-bottom{display:grid;grid-template-columns:320px 1fr;gap:20px;margin-top:18px}
+    .poster-card{background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.15);border-radius:18px;padding:16px}
+    .poster-card h3{margin:0 0 12px;color:#ffd445;font-size:18px}
+    .poster-donut{height:250px}.poster-outlook{background:#fff;color:#14243d}.poster-outlook h3{color:#111827}.poster-outlook ul{font-size:13px;line-height:1.55;padding-left:20px;margin:0}.poster-outlook .downh{color:#c71919;margin-top:12px;font-weight:900}
+    .weight-legend{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:10px;font-size:11px}.weight-legend div{display:flex;justify-content:space-between;gap:8px;border-bottom:1px solid rgba(255,255,255,.14);padding-bottom:4px}
+    .footer{padding:10px 30px 17px;color:#5c768b;font-size:11px;text-align:center;font-weight:700}
+    .toast{position:fixed;right:18px;bottom:18px;z-index:3000;background:#0d3158;color:#fff;border-radius:13px;padding:11px 14px;box-shadow:0 14px 35px rgba(0,0,0,.2);display:none;max-width:420px;font-size:13px;font-weight:800}
+    .loading{position:fixed;inset:0;z-index:4000;background:rgba(4,24,48,.78);display:none;place-items:center;color:#fff;backdrop-filter:blur(8px)}
+    .loading .box{text-align:center}.spinner{width:46px;height:46px;border-radius:50%;border:5px solid rgba(255,255,255,.25);border-top-color:#fff;margin:0 auto 13px;animation:spin 1s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}
+    @media(max-width:1100px){
+      .appbar-inner{grid-template-columns:1fr}.nav-pages{justify-content:flex-start}.poster-head,.poster-bottom,.outlook-layout,.grid-2{grid-template-columns:1fr}.region-grid{grid-template-columns:repeat(2,1fr)}.poster{min-height:0}.poster-head{gap:12px}
+    }
+    @media(max-width:720px){
+      .page-head,.page-body{padding-left:16px;padding-right:16px}.page-title{font-size:23px}.grid-3,.grid-4{grid-template-columns:1fr 1fr}.metric-board{grid-template-columns:1.3fr repeat(3,.9fr)}.region-grid{grid-template-columns:1fr}.poster h2{font-size:34px}.poster-period{font-size:23px!important}.forecast-strip{grid-template-columns:1fr}.toolbar{align-items:stretch}.tool-btn,.tool-select{width:100%}.brand{min-width:0}
+    }
+    @media print{
+      .appbar,.statusbar,.toast,.loading{display:none!important}.shell{max-width:none;padding:0;background:#fff}.report-page{box-shadow:none;border:0;border-radius:0;margin:0;page-break-after:always;break-after:page}.report-page:last-child{page-break-after:auto}body{background:#fff}
+    }
+  </style>
+</head>
+<body>
+  <div class="appbar">
+    <div class="appbar-inner">
+      <div class="brand">
+        <div class="brand-mark">CPI</div>
+        <div><strong>TPSO CPI Report</strong><small>โครงสร้างรายงานตาม Cpig</small></div>
+      </div>
+      <div class="toolbar">
+        <input id="fileInput" type="file" accept=".xlsx,.xls" multiple hidden />
+        <button class="tool-btn" onclick="document.getElementById('fileInput').click()">📂 นำเข้า Excel 6.1.7</button>
+        <select id="periodSelect" class="tool-select" onchange="onPeriodChange()" title="งวดข้อมูล"><option>ยังไม่มีข้อมูล</option></select>
+        <select id="datasetSelect" class="tool-select" onchange="onDatasetChange()" title="ชุดดัชนี"><option>ยังไม่มีข้อมูล</option></select>
+        <select id="regionSelect" class="tool-select" onchange="renderAll()" title="พื้นที่"><option>ยังไม่มีข้อมูล</option></select>
+        <button class="tool-btn" onclick="window.print()">🖨️ พิมพ์ / PDF</button>
+      </div>
+      <div class="nav-pages">
+        <a href="#page-1">1 สรุป</a><a href="#page-2">2 ภาพรวม</a><a href="#page-3">3 YoY</a><a href="#page-4">4 MoM</a><a href="#page-5">5 AoA</a><a href="#page-6">6 ภาค</a><a href="#page-7">7 แนวโน้ม</a><a href="#page-8">8 ตาราง</a><a href="#page-9">9 Poster</a>
+      </div>
+    </div>
+  </div>
+
+  <main class="shell">
+    <section id="dropzone" class="dropzone">
+      <div class="drop-card">
+        <div class="drop-icon">📊</div>
+        <h1>CPI Report Builder</h1>
+        <p>รองรับไฟล์ <b>6.1.7 รายงานค่าสัมพัทธ์ผู้บริโภค.xlsx</b> โครงสร้างใหม่ โดยระบบจะอ่านหัวตารางจากแถว <b>รหัส / หมวด/รายการ / ดัชนี / MoM / YoY / AoA / Contribute</b> อัตโนมัติ แล้วจัดการนำเสนอเรียงตามรายงาน Cpig</p>
+        <button class="primary-btn" onclick="document.getElementById('fileInput').click()">เลือก Excel (เลือกได้หลายเดือน / หลายภาค)</button>
+        <div class="subnote"><b>ระบบอ่านทั้ง “ชุดดัชนี” และ “พื้นที่” จากหัวไฟล์ Excel โดยตรง</b><br>ชุดทั่วไป = <b>G</b> • ชุดรายได้น้อย = <b>L</b> • ชุดนอกเขต = <b>U</b> และวิเคราะห์แยกจากกันทุกหน้า<br>พื้นที่รองรับ ประเทศไทย / กรุงเทพฯและปริมณฑล / ภาคกลาง / ภาคเหนือ / ภาคตะวันออกเฉียงเหนือ / ภาคใต้ / พื้นที่อื่น ๆ โดย <b>ไม่ใช้ (GM) เป็นตัวตัดสินว่าเป็นกรุงเทพฯหรือเป็นชนิดชุด</b><br>ถ้าอัปโหลดหลายไฟล์ในงวดเดียวกัน ระบบจะรวมหน้า “จำแนกรายภาค” เฉพาะชุดที่เลือก และถ้าอัปโหลดหลายเดือน กราฟแนวโน้มจะต่อเฉพาะชุดเดียวกัน</div>
+      </div>
+    </section>
+
+    <div id="report">
+      <div class="statusbar">
+        <div class="meta" id="statusMeta">-</div>
+        <div class="actions">
+          <button class="mini-btn" onclick="capturePage('page-1')">📷 PNG หน้า 1</button>
+          <button class="mini-btn" onclick="capturePage('page-9')">📷 PNG Poster</button>
+          <button class="mini-btn" onclick="exportCurrentExcel()">📥 Export ตาราง</button>
+        </div>
+      </div>
+
+      <section class="report-page" id="page-1">
+        <div class="page-topline"></div>
+        <div class="page-head"><div><h2 class="page-title" id="p1Title">ดัชนีราคาผู้บริโภค</h2><p class="page-subtitle" id="p1Sub">-</p></div><div class="page-no">1</div></div>
+        <div class="page-body">
+          <div class="ribbon" id="headlineRibbon">ดัชนีราคาผู้บริโภค เท่ากับ -</div>
+          <table class="compare-table">
+            <thead><tr><th>เมื่อเทียบกับระยะเวลา</th><th id="summaryHeadlineHead">ดัชนีราคาผู้บริโภคชุดทั่วไป</th><th>ดัชนีราคาผู้บริโภคพื้นฐาน</th></tr></thead>
+            <tbody id="summaryCompareBody"></tbody>
+          </table>
+          <div class="highlights"><h3>Highlights</h3><p id="highlightsText">-</p></div>
+        </div>
+        <div class="footer">กองดัชนีเศรษฐกิจการค้า • สำนักงานนโยบายและยุทธศาสตร์การค้า</div>
+      </section>
+
+      <section class="report-page" id="page-2">
+        <div class="page-topline"></div>
+        <div class="page-head"><div><h2 class="page-title" id="p2Title">สถิติอัตราเงินเฟ้อและภาพรวมดัชนีราคาผู้บริโภค</h2><p class="page-subtitle" id="p2Sub">-</p></div><div class="page-no">2</div></div>
+        <div class="page-body">
+          <div class="grid-3" id="headlineKpis"></div>
+          <div class="chart-card" style="margin-top:16px"><div class="chart-wrap"><canvas id="trendChart"></canvas></div></div>
+          <div class="table-toolbar" style="margin-top:14px"><span class="limit-label">แสดงหมวดในตาราง</span><select id="overviewLimitSelect" class="table-limit-select" onchange="renderAll()"><option value="3">3</option><option value="6">6</option><option value="9">9</option><option value="12" selected>12</option><option value="15">15</option><option value="20">20</option><option value="30">30</option></select><span class="limit-label">รายการ</span></div>
+          <div class="metric-board" id="metricBoard"></div>
+        </div>
+        <div class="footer">กราฟแนวโน้มใช้ข้อมูลทุกงวดที่อัปโหลดสำหรับพื้นที่ที่เลือก</div>
+      </section>
+
+      <section class="report-page" id="page-3">
+        <div class="page-topline"></div>
+        <div class="page-head"><div><h2 class="page-title" id="p3Title">อัตราการเปลี่ยนแปลงดัชนีราคาผู้บริโภค ชุดทั่วไป</h2><p class="page-subtitle" id="p3Sub">เทียบกับเดือนเดียวกันของปีก่อน (YoY)</p></div><div class="page-no">3</div></div>
+        <div class="page-body"><div class="table-toolbar"><span class="limit-label">สินค้าสำคัญต่อกลุ่ม</span><select id="yoyLimitSelect" class="table-limit-select" onchange="renderAll()"><option value="3" selected>3</option><option value="6">6</option><option value="9">9</option><option value="12">12</option><option value="15">15</option><option value="20">20</option><option value="30">30</option></select><span class="limit-label">รายการ</span></div><div id="yoyComponents"></div></div>
+        <div class="footer">สินค้าสำคัญที่ส่งผลกระทบคัดจากรายการย่อยตาม Contribution ของ YoY</div>
+      </section>
+
+      <section class="report-page" id="page-4">
+        <div class="page-topline"></div>
+        <div class="page-head"><div><h2 class="page-title" id="p4Title">อัตราการเปลี่ยนแปลงดัชนีราคาผู้บริโภค ชุดทั่วไป</h2><p class="page-subtitle" id="p4Sub">เทียบกับเดือนก่อนหน้า (MoM)</p></div><div class="page-no">4</div></div>
+        <div class="page-body"><div class="table-toolbar"><span class="limit-label">สินค้าสำคัญต่อกลุ่ม</span><select id="momLimitSelect" class="table-limit-select" onchange="renderAll()"><option value="3" selected>3</option><option value="6">6</option><option value="9">9</option><option value="12">12</option><option value="15">15</option><option value="20">20</option><option value="30">30</option></select><span class="limit-label">รายการ</span></div><div id="momComponents"></div></div>
+        <div class="footer">สินค้าสำคัญที่ส่งผลกระทบคัดจากรายการย่อยตาม Contribution ของ MoM</div>
+      </section>
+
+      <section class="report-page" id="page-5">
+        <div class="page-topline"></div>
+        <div class="page-head"><div><h2 class="page-title" id="p5Title">อัตราการเปลี่ยนแปลงดัชนีราคาผู้บริโภค ชุดทั่วไป</h2><p class="page-subtitle" id="p5Sub">เฉลี่ยสะสมตั้งแต่ต้นปี (AoA)</p></div><div class="page-no">5</div></div>
+        <div class="page-body"><div class="table-toolbar"><span class="limit-label">สินค้าสำคัญต่อกลุ่ม</span><select id="aoaLimitSelect" class="table-limit-select" onchange="renderAll()"><option value="3" selected>3</option><option value="6">6</option><option value="9">9</option><option value="12">12</option><option value="15">15</option><option value="20">20</option><option value="30">30</option></select><span class="limit-label">รายการ</span></div><div id="aoaComponents"></div></div>
+        <div class="footer">สินค้าสำคัญที่ส่งผลกระทบคัดจากรายการย่อยตาม Contribution ของ AoA</div>
+      </section>
+
+      <section class="report-page" id="page-6">
+        <div class="page-topline"></div>
+        <div class="page-head"><div><h2 class="page-title" id="p6Title">อัตราการเปลี่ยนแปลงของเงินเฟ้อ (YoY) จำแนกรายภาค</h2><p class="page-subtitle" id="p6Sub">-</p></div><div class="page-no">6</div></div>
+        <div class="page-body">
+          <div id="regionalNote" class="section-note" style="display:none;margin-bottom:14px"></div>
+          <div class="table-toolbar">
+            <div class="regional-control-group"><span class="limit-label">เปรียบเทียบ</span><select id="regionalMetricSelect" class="table-limit-select" onchange="renderAll()"><option value="yoy" selected>YoY</option><option value="mom">MoM</option><option value="aoa">AoA</option></select></div>
+            <div class="regional-control-group"><label class="regional-check"><input type="checkbox" id="regionalContributionToggle" onchange="renderAll()"> แสดง Contribute</label></div>
+            <div class="regional-control-group"><span class="limit-label">แสดงสินค้า ↑ / ↓ ต่อภาค</span><select id="regionalProductLimitSelect" class="table-limit-select" onchange="renderAll()"><option value="3">3</option><option value="6" selected>6</option><option value="9">9</option><option value="12">12</option><option value="15">15</option><option value="20">20</option><option value="30">30</option></select><span class="limit-label">รายการ</span></div>
+          </div>
+          <div class="region-grid" id="regionCards"></div>
+          <div id="regionalTableWrap"></div>
+          <div class="highlights" style="margin-top:18px"><h3 style="font-style:normal">สรุปรายภาค</h3><p id="regionalNarrative">-</p></div>
+        </div>
+        <div class="footer">หน้า 6 จะสมบูรณ์เมื่ออัปโหลดไฟล์ของแต่ละภาคในงวดเดียวกัน</div>
+      </section>
+
+      <section class="report-page" id="page-7">
+        <div class="page-topline"></div>
+        <div class="page-head"><div><h2 class="page-title" id="p7Title">แนวโน้มอัตราเงินเฟ้อทั่วไป</h2><p class="page-subtitle" id="p7Sub">-</p></div><div class="page-no">7</div></div>
+        <div class="page-body">
+          <div class="outlook-layout">
+            <div class="chart-card"><div class="chart-wrap" style="height:360px"><canvas id="outlookChart"></canvas></div><div class="section-note" style="margin-top:10px">เส้นกราฟเป็นข้อมูลจริงจาก Excel ที่อัปโหลด ไม่ใช่ค่าคาดการณ์ล่วงหน้า</div></div>
+            <div>
+              <div class="outlook-box"><h3 class="positive">ปัจจัยสนับสนุนให้อัตราเงินเฟ้อสูงขึ้น</h3><ul class="outlook-list" id="outlookUpList"></ul></div>
+              <div class="outlook-box" style="margin-top:12px"><h3 class="negative">ปัจจัยสนับสนุนให้อัตราเงินเฟ้อลดลง</h3><ul class="outlook-list" id="outlookDownList"></ul></div>
+            </div>
+          </div>
+          <div class="forecast-strip">
+            <div class="f"><strong id="forecastRange">-</strong><span>กรอบคาดการณ์เงินเฟ้อทั้งปี</span></div>
+            <div class="f"><strong id="forecastMid">-</strong><span>ค่ากลาง</span></div>
+            <div class="f"><strong id="nextRelease">-</strong><span>กำหนดเผยแพร่ครั้งต่อไป</span></div>
+          </div>
+          <details class="editor"><summary>✏️ แก้ไขข้อความแนวโน้มสำหรับงวดนี้</summary>
+            <label>ปัจจัยหนุน (1 บรรทัด = 1 ข้อ)<textarea id="outlookUpInput"></textarea></label>
+            <label>ปัจจัยลด (1 บรรทัด = 1 ข้อ)<textarea id="outlookDownInput"></textarea></label>
+            <div class="grid-3" style="margin-top:8px"><label>กรอบทั้งปี<input id="forecastRangeInput" /></label><label>ค่ากลาง<input id="forecastMidInput" /></label><label>เผยแพร่ครั้งต่อไป<input id="nextReleaseInput" /></label></div>
+            <button class="primary-btn" style="margin-top:10px" onclick="saveOutlook()">บันทึกข้อความแนวโน้ม</button>
+          </details>
+        </div>
+        <div class="footer">ข้อความแนวโน้มไม่ได้อยู่ในไฟล์ 6.1.7 จึงแยกเป็นข้อมูลที่ผู้ใช้แก้ไขและบันทึกเฉพาะงวด</div>
+      </section>
+
+      <section class="report-page" id="page-8">
+        <div class="page-topline"></div>
+        <div class="page-head"><div><h2 class="page-title" id="p8Title">ตารางแสดงดัชนีราคาผู้บริโภคทั่วไปและอัตราการเปลี่ยนแปลง</h2><p class="page-subtitle" id="p8Sub">-</p></div><div class="page-no">8</div></div>
+        <div class="page-body"><div class="table-toolbar"><span class="limit-label">แสดงรายการในตาราง</span><select id="detailLimitSelect" class="table-limit-select" onchange="renderAll()"><option value="3">3</option><option value="6">6</option><option value="9">9</option><option value="12">12</option><option value="15">15</option><option value="20">20</option><option value="30" selected>30</option></select><span class="limit-label">รายการ</span></div><div class="detail-wrap"><table class="detail-table"><thead id="detailHead"></thead><tbody id="detailBody"></tbody></table></div><div class="section-note" style="margin-top:12px">คอลัมน์อัตราการเปลี่ยนแปลงของ “เดือนก่อน” จะแสดงเมื่อมีการอัปโหลดไฟล์งวดก่อนหน้าของพื้นที่เดียวกัน; ดัชนีเดือนก่อนอ่านได้โดยตรงจากไฟล์ปัจจุบัน</div></div>
+        <div class="footer">ชุดดัชนี ปีฐาน และชื่อพื้นที่อ่านจากหัวรายงานใน Excel</div>
+      </section>
+
+      <section class="report-page" id="page-9">
+        <div class="page-topline"></div>
+        <div class="poster" id="posterArea">
+          <div class="poster-head">
+            <div>
+              <div class="poster-brand">TPSO • Trade Policy and Strategy Office</div>
+              <h2 id="posterMainTitle">อัตราเงินเฟ้อทั่วไป</h2>
+              <div class="poster-period" id="posterPeriod">-</div>
+              <div class="poster-yoy">เปลี่ยนแปลง <b id="posterYoy">-</b> (YoY)</div>
+              <div style="margin-top:8px;font-size:14px;color:#b8d8ef;font-weight:800" id="posterRegion">-</div>
+            </div>
+            <div>
+              <div class="mini-rate-card" id="posterHeadlineCard"></div>
+              <div class="mini-rate-card" id="posterCoreCard"></div>
+            </div>
+          </div>
+          <div class="poster-summary" id="posterSummary">-</div>
+          <div class="poster-bottom">
+            <div>
+              <div class="poster-card"><h3>สัดส่วนน้ำหนัก</h3><div class="poster-donut"><canvas id="posterWeightChart"></canvas></div><div class="weight-legend" id="weightLegend"></div></div>
+              <div class="poster-card" style="margin-top:14px"><h3>สรุปตัวเลขสำคัญ</h3><div id="posterKpiList" style="font-size:13px;line-height:1.8;font-weight:800"></div></div>
+            </div>
+            <div class="poster-card poster-outlook"><h3 id="posterOutlookTitle">แนวโน้มอัตราเงินเฟ้อทั่วไป</h3><ul id="posterOutlookUp"></ul><div class="downh">ปัจจัยที่ช่วยชะลอเงินเฟ้อ</div><ul id="posterOutlookDown"></ul><div class="forecast-strip" style="grid-template-columns:1fr 1fr;margin-top:14px"><div class="f"><strong id="posterForecastRange">-</strong><span>กรอบคาดการณ์ทั้งปี</span></div><div class="f"><strong id="posterForecastMid">-</strong><span>ค่ากลาง</span></div></div></div>
+          </div>
+        </div>
+        <div class="footer">One-page infographic ตามแนวทาง PowerPoint ที่แนบมา • กด “PNG Poster” ด้านบนเพื่อบันทึก</div>
+      </section>
+    </div>
+  </main>
+
+  <div class="loading" id="loading"><div class="box"><div class="spinner"></div><b>กำลังอ่านและจัดโครงสร้างข้อมูล...</b></div></div>
+  <div class="toast" id="toast"></div>
+
+<script>
+  const MONTHS_FULL = ['', 'มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
+  const MONTHS_SHORT = ['', 'ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+  const REGION_ORDER = ['NATIONAL','BKK','CENTRAL','NORTH','NE','SOUTH'];
+  const REGIONAL_IDS = ['BKK','CENTRAL','NORTH','NE','SOUTH'];
+  const REGION_LABEL = {NATIONAL:'ภาพรวมประเทศ',BKK:'กรุงเทพฯ และปริมณฑล',CENTRAL:'ภาคกลาง',NORTH:'ภาคเหนือ',NE:'ภาคตะวันออกเฉียงเหนือ',SOUTH:'ภาคใต้'};
+  const REGION_COLOR = {BKK:'#59697c',CENTRAL:'#1dbf94',NORTH:'#ef7777',NE:'#f3a61c',SOUTH:'#27889d',NATIONAL:'#1476ad'};
+  const DATASET_ORDER = ['G','L','U','UNKNOWN'];
+  const DATASET_LABEL = {G:'ชุดทั่วไป',L:'ชุดรายได้น้อย',U:'ชุดนอกเขต',UNKNOWN:'ไม่ระบุชุด'};
+  const DATASET_FULL_LABEL = {G:'ดัชนีราคาผู้บริโภคชุดทั่วไป',L:'ดัชนีราคาผู้บริโภคชุดรายได้น้อย',U:'ดัชนีราคาผู้บริโภคชุดนอกเขต',UNKNOWN:'ดัชนีราคาผู้บริโภค'};
+  const TABLE_LIMIT_OPTIONS = [3,6,9,12,15,20,30];
+  const state = {reports:[], trendChart:null, outlookChart:null, posterWeightChart:null};
+
+  const SUMMARY_CODES = [
+    ['0000000','รวมทุกรายการ'],['1000000','อาหารและเครื่องดื่มไม่มีแอลกอฮอล์'],['9100000','- อาหารสด'],['8000000','หมวดอื่น ๆ ที่ไม่ใช่อาหารและเครื่องดื่ม'],['2000000','เครื่องนุ่งห่มและรองเท้า'],['3000000','เคหสถาน'],['4000000','การตรวจรักษาและบริการส่วนบุคคล'],['5000000','พาหนะ การขนส่งและการสื่อสาร'],['9200000','- พลังงาน'],['6000000','การบันเทิง การอ่าน การศึกษาฯ'],['7000000','ยาสูบและเครื่องดื่มมีแอลกอฮอล์'],['9300000','ดัชนีราคาผู้บริโภคพื้นฐาน']
+  ];
+  const FOOD_CODES = [
+    ['1110000','ข้าว แป้ง และผลิตภัณฑ์จากแป้ง'],['1120000','เนื้อสัตว์ เป็ด ไก่ และสัตว์น้ำ'],['1130000','ไข่และผลิตภัณฑ์นม'],['1141100','ผักสด'],['1142100','ผลไม้สด'],['1150000','เครื่องประกอบอาหาร'],['1160000','เครื่องดื่มไม่มีแอลกอฮอล์'],['1170000','ผลิตภัณฑ์น้ำตาล'],['1200000','อาหารสำเร็จรูป']
+  ];
+  const NONFOOD_CODES = [
+    ['2000000','เครื่องนุ่งห่มและรองเท้า'],['3000000','เคหสถาน'],['4000000','การตรวจรักษาและบริการส่วนบุคคล'],['5000000','พาหนะ การขนส่ง และการสื่อสาร'],['6000000','การบันเทิง การอ่าน การศึกษา และการศาสนา'],['7000000','ยาสูบและเครื่องดื่มมีแอลกอฮอล์']
+  ];
+  const DETAIL_CODES = [
+    ['0000000','ดัชนีราคาผู้บริโภคทั่วไป','major'],['1000000','หมวดอาหารและเครื่องดื่มไม่มีแอลกอฮอล์','major'],['1110000','ข้าว แป้งและผลิตภัณฑ์จากแป้ง',''],['1120000','เนื้อสัตว์ เป็ดไก่และสัตว์น้ำ',''],['1130000','ไข่และผลิตภัณฑ์นม',''],['1140000','ผักและผลไม้',''],['1141100','- ผักสด','sub'],['1142100','- ผลไม้สด','sub'],['1150000','เครื่องประกอบอาหาร',''],['1160000','เครื่องดื่มไม่มีแอลกอฮอล์',''],['1170000','ผลิตภัณฑ์น้ำตาล',''],['1200000','อาหารสำเร็จรูป',''],['1230000','- อาหารพร้อมทาน','sub'],['1240000','- อาหารจากร้านยอดนิยม','sub'],['1250000','- อาหารฟาสต์ฟู้ด/delivery','sub'],['8000000','หมวดอื่น ๆ ที่ไม่ใช่อาหารและเครื่องดื่ม','major'],['2000000','หมวดเครื่องนุ่งห่มและรองเท้า',''],['3000000','หมวดเคหสถาน',''],['4000000','หมวดการตรวจรักษาและบริการส่วนบุคคล',''],['5000000','หมวดพาหนะการขนส่งและการสื่อสาร',''],['5100000','- ค่าโดยสารสาธารณะ','sub'],['5220000','- น้ำมันเชื้อเพลิง','sub'],['5400000','- การสื่อสาร','sub'],['6000000','หมวดการบันเทิง การอ่าน การศึกษาฯ',''],['7000000','หมวดยาสูบและเครื่องดื่มมีแอลกอฮอล์',''],['9300000','ดัชนีราคาผู้บริโภคพื้นฐาน','major'],['9000000','กลุ่มอาหารสดและพลังงาน','major'],['9100000','- อาหารสด','sub'],['9200000','- พลังงาน','sub']
+  ];
+  const WEIGHT_CODES = [
+    ['1000000','อาหารและเครื่องดื่มไม่มีแอลกอฮอล์'],['2000000','เครื่องนุ่งห่มและรองเท้า'],['3000000','เคหสถาน'],['4000000','การตรวจรักษาและบริการส่วนบุคคล'],['5000000','พาหนะ การขนส่งฯ'],['6000000','การบันเทิง/การศึกษา'],['7000000','ยาสูบ/แอลกอฮอล์']
+  ];
+
+  function n(v){
+    if(v===null || v===undefined || v==='') return null;
+    if(typeof v==='number') return Number.isFinite(v)?v:null;
+    const s=String(v).replace(/,/g,'').replace(/%/g,'').trim();
+    if(!s) return null;
+    const x=Number(s); return Number.isFinite(x)?x:null;
+  }
+  function txt(v){return String(v??'').trim()}
+  function fmt(v,d=2){return v===null||v===undefined||Number.isNaN(v)?'—':Number(v).toLocaleString('th-TH',{minimumFractionDigits:d,maximumFractionDigits:d})}
+  function fmtSigned(v,d=2){if(v===null||v===undefined||Number.isNaN(v))return '—'; const x=Number(v); return `${x>0?'+':''}${fmt(x,d)}`}
+  function cls(v){return v>0?'positive':v<0?'negative':'neutral'}
+  function escapeHtml(s){return String(s??'').replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]))}
+  function toast(msg){const el=document.getElementById('toast');el.textContent=msg;el.style.display='block';clearTimeout(toast.t);toast.t=setTimeout(()=>el.style.display='none',3600)}
+  function setLoading(on){document.getElementById('loading').style.display=on?'grid':'none'}
+  function getTableLimit(id,fallback=3){const el=document.getElementById(id);const v=Number(el?.value);return TABLE_LIMIT_OPTIONS.includes(v)?v:fallback}
+  function regionOrderIndex(id){const i=REGION_ORDER.indexOf(id);return i>=0?i:99}
+  function datasetOrderIndex(id){const i=DATASET_ORDER.indexOf(id);return i>=0?i:99}
+  function datasetLabel(reportOrType){const t=typeof reportOrType==='string'?reportOrType:reportOrType?.datasetType;return DATASET_LABEL[t]||DATASET_LABEL.UNKNOWN}
+  function datasetFullLabel(reportOrType){const t=typeof reportOrType==='string'?reportOrType:reportOrType?.datasetType;return DATASET_FULL_LABEL[t]||DATASET_FULL_LABEL.UNKNOWN}
+  function areaId(label){let h=2166136261;for(let i=0;i<label.length;i++){h^=label.charCodeAt(i);h=Math.imul(h,16777619)}return `AREA_${(h>>>0).toString(36).toUpperCase()}`}
+  function periodKey(y,m){return Number(y)*100+Number(m)}
+  function periodLabel(y,m){return `${MONTHS_FULL[m]||m} ${y}`}
+  function periodShort(y,m){return `${MONTHS_SHORT[m]||m} ${String(y).slice(-2)}`}
+  function prevPeriod(y,m){return m===1?{y:y-1,m:12}:{y,m:m-1}}
+  function normalizeCode(v){
+    let s=txt(v).replace(/\.0$/,'').replace(/\s/g,'');
+    if(!s)return '';
+    if(/^\d+$/.test(s) && s.length<16)s=s.padEnd(16,'0');
+    return s;
+  }
+  function code7To16(c){return String(c).padEnd(16,'0')}
+  function sigLen(code){const s=normalizeCode(code); return s.replace(/0+$/,'').length}
+  function prefixForCode7(c){return String(c).replace(/0+$/,'')}
+  function findRow(report,code7){return report?.byCode.get(code7To16(code7)) || null}
+  function contribValue(row,metric){
+    if(!row)return 0;
+    const key={mom:'cMom',yoy:'cYoy',aoa:'cAoa'}[metric];
+    const cv=row[key]; if(cv!==null&&cv!==undefined)return Number(cv)||0;
+    return ((row.weightShare||0)*(row[metric]||0))/100;
+  }
+
+  function detectDataset(meta,fileName=''){
+    const metaText=String(meta||'').replace(/\s+/g,' ').trim();
+    const fileText=String(fileName||'').replace(/[_\-]+/g,' ');
+    const t=`${metaText} ${fileText}`.replace(/\s+/g,' ').trim();
+
+    // ชนิดชุดอ่านจากข้อความหัวรายงานเท่านั้น โดย (GM) ไม่ใช่ชนิดชุด
+    if(/ชุด\s*รายได้\s*น้อย|ชุด\s*รายน้อย|รายได้\s*น้อย/.test(t))return {id:'L',label:DATASET_LABEL.L,fullLabel:DATASET_FULL_LABEL.L};
+    if(/ชุด\s*นอกเขต|นอกเขต/.test(t))return {id:'U',label:DATASET_LABEL.U,fullLabel:DATASET_FULL_LABEL.U};
+    if(/ชุด\s*ทั่วไป/.test(t))return {id:'G',label:DATASET_LABEL.G,fullLabel:DATASET_FULL_LABEL.G};
+
+    return {id:'UNKNOWN',label:DATASET_LABEL.UNKNOWN,fullLabel:DATASET_FULL_LABEL.UNKNOWN};
+  }
+
+  function detectRegion(meta,fileName=''){
+    // พื้นที่ต้องอ่านจากข้อความในหัวรายงานก่อนเสมอ: (GM) เป็นรหัสชุดรายงาน ไม่ใช่รหัสกรุงเทพฯ
+    const metaText=String(meta||'').replace(/\s+/g,' ').trim();
+    const fileText=String(fileName||'').replace(/[_\-]+/g,' ');
+    const t=`${metaText} ${fileText}`.replace(/\s+/g,' ').trim();
+
+    // ตรวจชื่อพื้นที่ที่ระบุชัดในหัวไฟล์
+    if(/กรุงเทพ(?:มหานคร|ฯ)?\s*(?:และ|&)\s*ปริมณฑล|กรุงเทพ(?:มหานคร|ฯ)?\s*\/\s*ปริมณฑล|กรุงเทพ.*ปริมณฑล/i.test(t))return {id:'BKK',label:REGION_LABEL.BKK};
+    if(/ภาคตะวันออกเฉียงเหนือ|ภาคอีสาน|อีสาน/.test(t))return {id:'NE',label:REGION_LABEL.NE};
+    if(/ภาคเหนือ/.test(t))return {id:'NORTH',label:REGION_LABEL.NORTH};
+    if(/ภาคกลาง/.test(t))return {id:'CENTRAL',label:REGION_LABEL.CENTRAL};
+    if(/ภาคใต้/.test(t))return {id:'SOUTH',label:REGION_LABEL.SOUTH};
+    if(/(?:ของ\s*)?ประเทศไทย|ทั้งประเทศ|ภาพรวมประเทศ/.test(t))return {id:'NATIONAL',label:REGION_LABEL.NATIONAL};
+
+    // รองรับชื่อพื้นที่อื่น เช่น จังหวัด โดยดึงข้อความหลังคำว่า “ของ ...” ก่อน (GM)/เดือน
+    const areaMatch=metaText.match(/ของ\s+(.+?)\s*(?:\([A-Za-z0-9]{1,8}\))?\s*เดือน/i);
+    if(areaMatch){
+      const label=areaMatch[1].replace(/\s+/g,' ').replace(/[,:;]+$/,'').trim();
+      if(label)return {id:areaId(label),label};
+    }
+
+    // fallback จากรหัสพื้นที่แบบเดิมในชื่อไฟล์เท่านั้น (ไม่ใช้ GM)
+    const ft=fileText.toUpperCase();
+    if(/(?:^|\s)(TG|TL|TU)(?:\s|$)/.test(ft))return {id:'NATIONAL',label:REGION_LABEL.NATIONAL};
+    if(/(?:^|\s)(BG|BL|10)(?:\s|$)/.test(ft))return {id:'BKK',label:REGION_LABEL.BKK};
+    if(/(?:^|\s)(CC|CL|CU)(?:\s|$)/.test(ft))return {id:'CENTRAL',label:REGION_LABEL.CENTRAL};
+    if(/(?:^|\s)(NN|NL|NU)(?:\s|$)/.test(ft))return {id:'NORTH',label:REGION_LABEL.NORTH};
+    if(/(?:^|\s)(EE|EL|EU)(?:\s|$)/.test(ft))return {id:'NE',label:REGION_LABEL.NE};
+    if(/(?:^|\s)(SS|SL|SU)(?:\s|$)/.test(ft))return {id:'SOUTH',label:REGION_LABEL.SOUTH};
+
+    return {id:areaId(fileName||'พื้นที่ที่นำเข้า'),label:'พื้นที่ที่นำเข้า'};
+  }
+
+  function parseMonthFromText(s){
+    s=String(s||'').replace(/\s+/g,' ');
+    const full=MONTHS_FULL.slice(1).map((m,i)=>({m:i+1,name:m})).find(x=>s.includes(x.name));
+    if(full)return full.m;
+    for(let i=1;i<=12;i++){if(s.includes(MONTHS_SHORT[i]))return i;}
+    return null;
+  }
+
+  function parseReport(arrayRows,fileName){
+    let headerRow=-1;
+    for(let i=0;i<Math.min(arrayRows.length,30);i++){
+      const row=arrayRows[i].map(x=>txt(x));
+      if(row.some(x=>x==='รหัส') && row.some(x=>x.includes('หมวด/รายการ'))){headerRow=i;break;}
+    }
+    if(headerRow<0)throw new Error(`ไม่พบหัวตาราง “รหัส / หมวด/รายการ” ใน ${fileName}`);
+    const headers=arrayRows[headerRow].map(x=>txt(x));
+    const meta=arrayRows.slice(0,headerRow).flat().filter(Boolean).join(' ');
+    const dataset=detectDataset(meta,fileName);
+    const region=detectRegion(meta,fileName);
+    const indexCols=headers.map((h,i)=>({h,i})).filter(x=>x.h.startsWith('ดัชนี '));
+    const shareCols=headers.map((h,i)=>({h,i})).filter(x=>x.h.startsWith('สัดส่วนน้ำหนัก'));
+    const weightCols=headers.map((h,i)=>({h,i})).filter(x=>/^น้ำหนัก\s/.test(x.h));
+    if(!indexCols.length)throw new Error(`ไม่พบคอลัมน์ดัชนีใน ${fileName}`);
+    const currentIndexCol=indexCols[indexCols.length-1];
+    const prevIndexCol=indexCols.length>1?indexCols[0]:null;
+    let month=parseMonthFromText(meta) || parseMonthFromText(currentIndexCol.h);
+    let year=null;
+    const ym=(meta.match(/ปี\s*(25\d{2})/)||currentIndexCol.h.match(/(25\d{2})/)); if(ym)year=Number(ym[1]);
+    if(!month)month=parseMonthFromText(currentIndexCol.h);
+    if(!year){const y=currentIndexCol.h.match(/(25\d{2})/);if(y)year=Number(y[1]);}
+    if(!month||!year)throw new Error(`อ่านเดือน/ปีไม่ได้จาก ${fileName}`);
+    let baseYear=null; const bm=meta.match(/ปีฐาน\s*(25\d{2})/); if(bm)baseYear=Number(bm[1]);
+    const idxByExact=(names)=>{for(const name of names){const i=headers.findIndex(h=>h.trim().toLowerCase()===name.toLowerCase());if(i>=0)return i;}return -1};
+    const iCode=idxByExact(['รหัส']); const iName=idxByExact(['หมวด/รายการ','รายการ']);
+    const iRelW=idxByExact(['สัมพัทธ์น้ำหนัก']); const iRelP=idxByExact(['สัมพัทธ์ราคา']);
+    const iMom=idxByExact(['MoM']); const iYoy=idxByExact(['YoY']); const iAoa=idxByExact(['AoA']); const iQoq=idxByExact(['QoQ']); const iHoh=idxByExact(['HoH']);
+    const findContrib=(key)=>headers.findIndex(h=>h.replace(/\s/g,'').toLowerCase()===`contribute${key}`.toLowerCase());
+    const iCMom=findContrib('MoM'),iCYoy=findContrib('YoY'),iCAoa=findContrib('AoA'),iCQoq=findContrib('QoQ'),iCHoh=findContrib('HoH');
+    const iGroup=headers.findIndex(h=>h.toLowerCase().includes('group and sub group'));
+    const prevShare=shareCols.length>1?shareCols[0].i:-1, currShare=shareCols.length?shareCols[shareCols.length-1].i:-1;
+    const prevWeight=weightCols.length>1?weightCols[0].i:-1, currWeight=weightCols.length?weightCols[weightCols.length-1].i:-1;
+    const rows=[];
+    for(let r=headerRow+1;r<arrayRows.length;r++){
+      const a=arrayRows[r]; const code=normalizeCode(a[iCode]); if(!code)continue;
+      const name=txt(a[iName]); if(!name)continue;
+      rows.push({
+        code,name,level:sigLen(code),
+        weightSharePrev:prevShare>=0?n(a[prevShare]):null,weightPrev:prevWeight>=0?n(a[prevWeight]):null,indexPrev:prevIndexCol?n(a[prevIndexCol.i]):null,
+        weightShare:currShare>=0?n(a[currShare]):null,relWeight:iRelW>=0?n(a[iRelW]):null,relPrice:iRelP>=0?n(a[iRelP]):null,weight:currWeight>=0?n(a[currWeight]):null,index:n(a[currentIndexCol.i]),
+        mom:iMom>=0?n(a[iMom]):null,yoy:iYoy>=0?n(a[iYoy]):null,aoa:iAoa>=0?n(a[iAoa]):null,qoq:iQoq>=0?n(a[iQoq]):null,hoh:iHoh>=0?n(a[iHoh]):null,
+        cMom:iCMom>=0?n(a[iCMom]):null,cYoy:iCYoy>=0?n(a[iCYoy]):null,cAoa:iCAoa>=0?n(a[iCAoa]):null,cQoq:iCQoq>=0?n(a[iCQoq]):null,cHoh:iCHoh>=0?n(a[iCHoh]):null,group:iGroup>=0?txt(a[iGroup]):''
+      });
+    }
+    const byCode=new Map(rows.map(x=>[x.code,x]));
+    return {fileName,meta,datasetType:dataset.id,datasetLabel:dataset.label,datasetFullLabel:dataset.fullLabel,regionId:region.id,regionLabel:region.label,month,year,key:periodKey(year,month),baseYear,rows,byCode};
+  }
+
+  async function importFiles(files){
+    if(!files?.length)return; setLoading(true);
+    let ok=0,fail=[];
+    try{
+      for(const file of files){
+        try{
+          const buf=await file.arrayBuffer();
+          const wb=XLSX.read(buf,{type:'array',cellFormula:false,cellHTML:false,cellStyles:false});
+          const ws=wb.Sheets[wb.SheetNames[0]];
+          const arr=XLSX.utils.sheet_to_json(ws,{header:1,defval:'',raw:false});
+          const report=parseReport(arr,file.name);
+          const k=`${report.key}|${report.datasetType}|${report.regionId}`;
+          const old=state.reports.findIndex(x=>`${x.key}|${x.datasetType}|${x.regionId}`===k);
+          if(old>=0)state.reports.splice(old,1,report);else state.reports.push(report);
+          ok++;
+        }catch(e){console.error(e);fail.push(`${file.name}: ${e.message}`)}
+      }
+      if(ok){
+        state.reports.sort((a,b)=>b.key-a.key || datasetOrderIndex(a.datasetType)-datasetOrderIndex(b.datasetType) || regionOrderIndex(a.regionId)-regionOrderIndex(b.regionId));
+        rebuildSelectors();
+        document.getElementById('dropzone').style.display='none'; document.getElementById('report').style.display='block';
+        renderAll(); toast(`นำเข้าสำเร็จ ${ok} ไฟล์${fail.length?` • ไม่สำเร็จ ${fail.length} ไฟล์`:''}`);
+      }
+      if(fail.length)console.warn(fail.join('\n'));
+    }finally{setLoading(false)}
+  }
+
+  function rebuildSelectors(){
+    const ps=document.getElementById('periodSelect');
+    const periods=[...new Map(state.reports.map(r=>[r.key,{key:r.key,y:r.year,m:r.month}])).values()].sort((a,b)=>b.key-a.key);
+    const old=Number(ps.value);ps.innerHTML=periods.map(p=>`<option value="${p.key}">${periodLabel(p.y,p.m)}</option>`).join('');
+    if(periods.some(p=>p.key===old))ps.value=old;else if(periods.length)ps.value=periods[0].key;
+    rebuildDatasetSelector();
+  }
+  function rebuildDatasetSelector(){
+    const key=Number(document.getElementById('periodSelect').value);
+    const ds=document.getElementById('datasetSelect');
+    const old=ds.value;
+    const types=[...new Set(state.reports.filter(r=>r.key===key).map(r=>r.datasetType))].sort((a,b)=>datasetOrderIndex(a)-datasetOrderIndex(b));
+    ds.innerHTML=types.map(t=>`<option value="${escapeHtml(t)}">${escapeHtml(t)} • ${escapeHtml(DATASET_LABEL[t]||DATASET_LABEL.UNKNOWN)}</option>`).join('');
+    if(types.includes(old))ds.value=old;else if(types.includes('G'))ds.value='G';else if(types.length)ds.value=types[0];
+    rebuildRegionSelector();
+  }
+  function rebuildRegionSelector(){
+    const key=Number(document.getElementById('periodSelect').value);
+    const datasetType=document.getElementById('datasetSelect').value;
+    const rs=document.getElementById('regionSelect');const old=rs.value;
+    const regs=state.reports.filter(r=>r.key===key&&r.datasetType===datasetType).sort((a,b)=>regionOrderIndex(a.regionId)-regionOrderIndex(b.regionId));
+    rs.innerHTML=regs.map(r=>`<option value="${escapeHtml(r.regionId)}">${escapeHtml(r.regionLabel)}</option>`).join('');
+    if(regs.some(r=>r.regionId===old))rs.value=old;else if(regs.some(r=>r.regionId==='NATIONAL'))rs.value='NATIONAL';else if(regs.length)rs.value=regs[0].regionId;
+  }
+  function onPeriodChange(){rebuildDatasetSelector();renderAll()}
+  function onDatasetChange(){rebuildRegionSelector();renderAll()}
+  function currentReport(){const key=Number(document.getElementById('periodSelect').value),datasetType=document.getElementById('datasetSelect').value,reg=document.getElementById('regionSelect').value;return state.reports.find(r=>r.key===key&&r.datasetType===datasetType&&r.regionId===reg)||null}
+  function previousReport(report){if(!report)return null;const p=prevPeriod(report.year,report.month);return state.reports.find(r=>r.year===p.y&&r.month===p.m&&r.datasetType===report.datasetType&&r.regionId===report.regionId)||null}
+
+  function ratePhrase(v){if(v===null||v===undefined)return 'ไม่พบข้อมูล';if(v>0)return `สูงขึ้นร้อยละ ${fmt(Math.abs(v))}`;if(v<0)return `ลดลงร้อยละ ${fmt(Math.abs(v))}`;return 'ไม่เปลี่ยนแปลง'}
+  function metricLabel(report,metric){
+    if(metric==='yoy')return `เดือน${MONTHS_FULL[report.month]} ${report.year-1} (YoY)`;
+    if(metric==='mom'){const p=prevPeriod(report.year,report.month);return `เดือน${MONTHS_FULL[p.m]} ${p.y} (MoM)`}
+    return `เฉลี่ย ${report.month} เดือน (ม.ค.–${MONTHS_SHORT[report.month]}) ปี ${report.year} เทียบช่วงเดียวกันปีก่อน (AoA)`;
+  }
+  function topDrivers(report,metric,positive=true,limit=3,scopeRows=null){
+    const rows=(scopeRows||report.rows).filter(r=>r.level>=7 && r.name && !/รวม|หมวด|กลุ่ม/.test(r.name));
+    const filtered=rows.filter(r=>{const c=contribValue(r,metric);return positive?c>0:c<0});
+    filtered.sort((a,b)=>positive?contribValue(b,metric)-contribValue(a,metric):contribValue(a,metric)-contribValue(b,metric));
+    const out=[];for(const r of filtered){if(!out.some(x=>x.name===r.name))out.push(r);if(out.length>=limit)break;}return out;
+  }
+  function topChildNames(report,categoryCode7,metric,sign,limit=3){
+    const prefix=prefixForCode7(categoryCode7); const parent=findRow(report,categoryCode7);
+    let kids=report.rows.filter(r=>r.code!==parent?.code && r.code.startsWith(prefix) && r.level>=7);
+    let same=kids.filter(r=>sign>0?contribValue(r,metric)>0:sign<0?contribValue(r,metric)<0:true);
+    if(!same.length)same=kids;
+    same.sort((a,b)=>Math.abs(contribValue(b,metric))-Math.abs(contribValue(a,metric)));
+    const names=[];for(const r of same){if(r.name&&!names.includes(r.name))names.push(r.name);if(names.length>=limit)break;}return names;
+  }
+  function importantBroadDrivers(report,metric){
+    const codes=[...FOOD_CODES,...NONFOOD_CODES];
+    const rows=codes.map(([c])=>findRow(report,c)).filter(Boolean);
+    const pos=rows.filter(r=>contribValue(r,metric)>0).sort((a,b)=>contribValue(b,metric)-contribValue(a,metric)).slice(0,3);
+    const neg=rows.filter(r=>contribValue(r,metric)<0).sort((a,b)=>contribValue(a,metric)-contribValue(b,metric)).slice(0,3);
+    return {pos,neg};
+  }
+  function generateSummary(report){
+    const h=findRow(report,'0000000'),core=findRow(report,'9300000');if(!h)return '-';
+    const yoy=importantBroadDrivers(report,'yoy'),mom=importantBroadDrivers(report,'mom');
+    const names=(arr)=>arr.map(x=>x.name.replace(/^หมวด/,'')).join(', ');
+    let s=`${datasetFullLabel(report)}${report.regionLabel==='ภาพรวมประเทศ'?' ของประเทศ':` (${report.regionLabel})`} เดือน${MONTHS_FULL[report.month]} ${report.year} เท่ากับ ${fmt(h.index)} เมื่อเทียบกับเดือนเดียวกันของปีก่อน ${ratePhrase(h.yoy)} (YoY)`;
+    if(yoy.pos.length)s+=` โดยหมวดที่มีส่วนผลักดันสำคัญ ได้แก่ ${names(yoy.pos)}`;
+    if(yoy.neg.length)s+=` ขณะที่หมวดที่ช่วยชะลอ ได้แก่ ${names(yoy.neg)}`;
+    s+=` เมื่อเทียบกับเดือนก่อน ${ratePhrase(h.mom)} (MoM)`;
+    if(mom.pos.length)s+=` ด้านรายการที่ผลักดันขึ้นในเดือนนี้ ได้แก่ ${names(mom.pos)}`;
+    if(mom.neg.length)s+=` ส่วนแรงกดดันลงสำคัญ ได้แก่ ${names(mom.neg)}`;
+    if(h.aoa!==null)s+=` และเฉลี่ย ${report.month} เดือนแรก ${ratePhrase(h.aoa)} (AoA)`;
+    if(core)s+=` สำหรับเงินเฟ้อพื้นฐาน ${ratePhrase(core.yoy)} (YoY), ${ratePhrase(core.mom)} (MoM) และ ${ratePhrase(core.aoa)} (AoA)`;
+    return s+' .';
+  }
+
+  function renderPage1(report){
+    const h=findRow(report,'0000000'),core=findRow(report,'9300000');
+    document.getElementById('p1Title').textContent=`${datasetFullLabel(report)} • ${report.regionLabel}`;
+    document.getElementById('p1Sub').textContent=`เดือน${MONTHS_FULL[report.month]} ${report.year}${report.baseYear?` • ปีฐาน ${report.baseYear} = 100`:''} • ${report.datasetType}`;
+    document.getElementById('headlineRibbon').textContent=`${datasetFullLabel(report)} เดือน${MONTHS_FULL[report.month]} ${report.year} เท่ากับ ${fmt(h?.index)}`;
+    document.getElementById('summaryHeadlineHead').textContent=datasetFullLabel(report);
+    const rows=[['yoy',metricLabel(report,'yoy')],['mom',metricLabel(report,'mom')],['aoa',metricLabel(report,'aoa')]];
+    document.getElementById('summaryCompareBody').innerHTML=rows.map(([m,l])=>`<tr><td>${escapeHtml(l)}</td><td><span class="metric-val ${cls(h?.[m])}">${fmtSigned(h?.[m])}</span></td><td><span class="metric-val ${cls(core?.[m])}">${fmtSigned(core?.[m])}</span></td></tr>`).join('');
+    document.getElementById('highlightsText').textContent=generateSummary(report);
+  }
+
+  function renderTrend(report){
+    let reps=state.reports.filter(r=>r.regionId===report.regionId&&r.datasetType===report.datasetType).sort((a,b)=>a.key-b.key);
+    const labels=[],idx=[],yoy=[],coreYoy=[];
+    if(reps.length===1 && findRow(report,'0000000')?.indexPrev!==null){const p=prevPeriod(report.year,report.month);labels.push(periodShort(p.y,p.m));idx.push(findRow(report,'0000000').indexPrev);yoy.push(null);coreYoy.push(null)}
+    for(const r of reps){labels.push(periodShort(r.year,r.month));idx.push(findRow(r,'0000000')?.index??null);yoy.push(findRow(r,'0000000')?.yoy??null);coreYoy.push(findRow(r,'9300000')?.yoy??null)}
+    const ctx=document.getElementById('trendChart'); if(state.trendChart)state.trendChart.destroy();
+    state.trendChart=new Chart(ctx,{data:{labels,datasets:[{type:'bar',label:'ดัชนี',data:idx,yAxisID:'yIndex',backgroundColor:'rgba(35,122,183,.68)',borderRadius:5},{type:'line',label:`${datasetLabel(report)} YoY`,data:yoy,yAxisID:'yRate',borderColor:'#e31c1c',backgroundColor:'#e31c1c',tension:.28,pointRadius:3,spanGaps:true},{type:'line',label:'เงินเฟ้อพื้นฐาน YoY',data:coreYoy,yAxisID:'yRate',borderColor:'#efb51f',backgroundColor:'#efb51f',tension:.28,pointRadius:3,spanGaps:true}]},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{position:'bottom',labels:{font:{weight:'bold'}}}},scales:{yRate:{position:'left',title:{display:true,text:'อัตราการเปลี่ยนแปลง (%)'},grid:{color:'rgba(0,0,0,.06)'}},yIndex:{position:'right',title:{display:true,text:'ดัชนี'},grid:{drawOnChartArea:false}}}}});
+  }
+
+  function renderMetricBoard(report){
+    const head='<div class="head">รายการ</div><div class="head">YoY</div><div class="head">MoM</div><div class="head">AoA</div>';
+    const data=SUMMARY_CODES.slice(0,getTableLimit('overviewLimitSelect',12)).map(([c,label])=>({label,row:findRow(report,c)}));
+    const max={yoy:Math.max(1,...data.map(x=>Math.abs(x.row?.yoy||0))),mom:Math.max(1,...data.map(x=>Math.abs(x.row?.mom||0))),aoa:Math.max(1,...data.map(x=>Math.abs(x.row?.aoa||0)))};
+    const cell=(v,m)=>{const w=Math.min(48,Math.abs(v||0)/max[m]*45);return `<div class="barcell"><span class="bar ${v<0?'neg':'pos'}" style="width:${w}%;${v<0?'':'left:50%'}"></span><span class="num ${cls(v)}">${fmtSigned(v)}</span></div>`};
+    document.getElementById('metricBoard').innerHTML=head+data.map(x=>`<div class="name">${escapeHtml(x.label)}</div>${cell(x.row?.yoy,'yoy')}${cell(x.row?.mom,'mom')}${cell(x.row?.aoa,'aoa')}`).join('');
+  }
+  function renderPage2(report){
+    const h=findRow(report,'0000000'),core=findRow(report,'9300000');
+    document.getElementById('p2Title').textContent=`สถิติอัตราการเปลี่ยนแปลงและภาพรวม${datasetFullLabel(report)}`;document.getElementById('p2Sub').textContent=`เดือน${MONTHS_FULL[report.month]} ${report.year} • ${datasetLabel(report)} (${report.datasetType}) • ${report.regionLabel}`;
+    document.getElementById('headlineKpis').innerHTML=`<div class="kpi"><div class="label">ดัชนี</div><div class="value">${fmt(h?.index)}</div><div class="hint">${escapeHtml(datasetLabel(report))} (${escapeHtml(report.datasetType)})</div></div><div class="kpi"><div class="label">YoY ${escapeHtml(datasetLabel(report))}</div><div class="value ${cls(h?.yoy)}">${fmtSigned(h?.yoy)}%</div><div class="hint">เทียบเดือนเดียวกันปีก่อน</div></div><div class="kpi"><div class="label">เงินเฟ้อพื้นฐาน YoY</div><div class="value ${cls(core?.yoy)}">${fmtSigned(core?.yoy)}%</div><div class="hint">ไม่รวมอาหารสดและพลังงาน</div></div>`;
+    renderTrend(report);renderMetricBoard(report);
+  }
+
+  function componentTable(report,metric,codes,titleCode,titleFallback,driverLimit=3){
+    const root=findRow(report,titleCode);const direction=root?.[metric];
+    let html=`<div class="component-header">${escapeHtml(titleFallback)} <span class="${cls(direction)}">${ratePhrase(direction)}</span></div><table class="component-table"><thead><tr><th>กลุ่มสินค้า</th><th>ทิศทาง</th><th>สินค้าสำคัญที่ส่งผลกระทบ</th></tr></thead><tbody>`;
+    for(const [code,label] of codes){const row=findRow(report,code);const v=row?.[metric];const names=row?topChildNames(report,code,metric,Math.sign(v||0),driverLimit):[];let desc='—';if(v>0)desc=`จากการสูงขึ้นของราคา${names.length?names.join(' • '):'รายการย่อยในกลุ่ม'}`;else if(v<0)desc=`จากการลดลงของราคา${names.length?names.join(' • '):'รายการย่อยในกลุ่ม'}`;else if(v===0)desc='ราคาเฉลี่ยไม่เปลี่ยนแปลง';
+      html+=`<tr><td>${escapeHtml(label)}</td><td class="${cls(v)}">${v===null?'—':`${v>0?'+':v<0?'−':''} ร้อยละ ${fmt(Math.abs(v))}`}</td><td>${escapeHtml(desc)}</td></tr>`;
+    }
+    return html+'</tbody></table>';
+  }
+  function renderComponents(report,metric,targetId,subId){
+    const h=findRow(report,'0000000');document.getElementById(subId).innerHTML=`${metricLabel(report,metric)} <b class="${cls(h?.[metric])}">${ratePhrase(h?.[metric])}</b>`;
+    const selectId={yoy:'yoyLimitSelect',mom:'momLimitSelect',aoa:'aoaLimitSelect'}[metric];
+    const driverLimit=getTableLimit(selectId,3);
+    document.getElementById(targetId).innerHTML=componentTable(report,metric,FOOD_CODES,'1000000','หมวดอาหารและเครื่องดื่มไม่มีแอลกอฮอล์',driverLimit)+componentTable(report,metric,NONFOOD_CODES,'8000000','หมวดอื่น ๆ ที่ไม่ใช่อาหารและเครื่องดื่ม',driverLimit);
+  }
+
+  function regionalReports(report){return state.reports.filter(r=>r.key===report.key && r.datasetType===report.datasetType && REGIONAL_IDS.includes(r.regionId)).sort((a,b)=>regionOrderIndex(a.regionId)-regionOrderIndex(b.regionId))}
+  function renderPage6(report){
+    const reps=regionalReports(report);
+    const metricEl=document.getElementById('regionalMetricSelect');
+    const metric=['yoy','mom','aoa'].includes(metricEl?.value)?metricEl.value:'yoy';
+    const metricName={yoy:'YoY',mom:'MoM',aoa:'AoA'}[metric];
+    const showContribution=Boolean(document.getElementById('regionalContributionToggle')?.checked);
+    const contribKey={yoy:'cYoy',mom:'cMom',aoa:'cAoa'}[metric];
+    const contribLabel=(row)=>{
+      if(!showContribution||!row)return '';
+      const raw=row[contribKey];
+      const v=(raw!==null&&raw!==undefined)?Number(raw):contribValue(row,metric);
+      return `<span class="contrib-inline">Contribute ${fmtSigned(v,4)}</span>`;
+    };
+    const driverLabel=(row)=>{
+      if(!row)return '';
+      const base=escapeHtml(row.name);
+      if(!showContribution)return base;
+      const raw=row[contribKey];
+      const v=(raw!==null&&raw!==undefined)?Number(raw):contribValue(row,metric);
+      return `${base} <span class="driver-contrib">(${fmtSigned(v,4)})</span>`;
+    };
+
+    document.getElementById('p6Title').textContent=`อัตราการเปลี่ยนแปลงของเงินเฟ้อ (${metricName}) จำแนกรายภาค • ${datasetLabel(report)}`;
+    document.getElementById('p6Sub').textContent=`${metricLabel(report,metric)} • เดือน${MONTHS_FULL[report.month]} ${report.year} • ${report.datasetType}`;
+    const note=document.getElementById('regionalNote');
+    if(reps.length<5){
+      note.style.display='block';
+      note.textContent=`ขณะนี้มีข้อมูลรายภาค ${reps.length} พื้นที่สำหรับ ${datasetLabel(report)} (${report.datasetType}) ในงวดนี้ — อัปโหลดไฟล์ชุดเดียวกันของ กรุงเทพฯ/ปริมณฑล ภาคกลาง ภาคเหนือ ภาคตะวันออกเฉียงเหนือ และภาคใต้ เพื่อให้ครบตามรูปแบบรายงาน`;
+    }else note.style.display='none';
+
+    const cardReps=reps.length?reps:[report];
+    const regionCardsEl=document.getElementById('regionCards');
+    const regionalProductLimit=getTableLimit('regionalProductLimitSelect',6);
+    regionCardsEl.style.gridTemplateColumns=`repeat(${Math.max(1,Math.min(cardReps.length,5))}, minmax(0,1fr))`;
+    regionCardsEl.innerHTML=cardReps.map(r=>{
+      const h=findRow(r,'0000000');
+      const up=topDrivers(r,metric,true,regionalProductLimit),down=topDrivers(r,metric,false,regionalProductLimit);
+      const upHtml=up.map(x=>driverLabel(x)).join('<br>')||'—';
+      const downHtml=down.map(x=>driverLabel(x)).join('<br>')||'—';
+      return `<div class="region-card"><div class="rh" style="background:${REGION_COLOR[r.regionId]||'#1679bd'}">${escapeHtml(r.regionLabel)}</div><div class="rv ${cls(h?.[metric])}">${fmtSigned(h?.[metric])}%${contribLabel(h)}</div><div class="list"><div class="up-list">▲ ${upHtml}</div><div class="down-list">▼ ${downHtml}</div></div></div>`;
+    }).join('');
+
+    const tableData=cardReps.map(r=>({r,h:findRow(r,'0000000'),food:findRow(r,'1000000'),nf:findRow(r,'8000000')}));
+    const tableCell=(row)=>`<td class="${cls(row?.[metric])}"><b>${fmtSigned(row?.[metric])}</b>${contribLabel(row)}</td>`;
+    document.getElementById('regionalTableWrap').innerHTML=`<table class="regional-table"><thead><tr><th>ภาค</th><th>รวม<br><small>${metricName}${showContribution?' + Contribute':''}</small></th><th>อาหารและเครื่องดื่มไม่มีแอลกอฮอล์<br><small>${metricName}${showContribution?' + Contribute':''}</small></th><th>อื่น ๆ ที่ไม่ใช่อาหารและเครื่องดื่ม<br><small>${metricName}${showContribution?' + Contribute':''}</small></th></tr></thead><tbody>${tableData.map(x=>`<tr><td>${escapeHtml(x.r.regionLabel)}</td>${tableCell(x.h)}${tableCell(x.food)}${tableCell(x.nf)}</tr>`).join('')}</tbody></table>`;
+
+    if(tableData.length){
+      const sorted=[...tableData].sort((a,b)=>(b.h?.[metric]??-999)-(a.h?.[metric]??-999));
+      const commonUp=intersectionNames(cardReps.map(r=>topDrivers(r,metric,true,12).map(x=>x.name))).slice(0,5);
+      const commonDown=intersectionNames(cardReps.map(r=>topDrivers(r,metric,false,12).map(x=>x.name))).slice(0,5);
+      let p=`${metricLabel(report,metric)} ${sorted.map(x=>`${x.r.regionLabel} ${ratePhrase(x.h?.[metric])}`).join(' • ')}`;
+      if(commonUp.length)p+=` สินค้าที่เป็นแรงผลักดันร่วมหลายพื้นที่ ได้แก่ ${commonUp.join(', ')}`;
+      if(commonDown.length)p+=` ส่วนสินค้าที่ช่วยชะลอร่วม ได้แก่ ${commonDown.join(', ')}`;
+      if(showContribution)p+=` โดยตัวเลข Contribute แสดงสัดส่วนผลกระทบของรายการต่ออัตราการเปลี่ยนแปลง ${metricName}`;
+      document.getElementById('regionalNarrative').textContent=p+' .';
+    }
+  }
+  function intersectionNames(lists){if(!lists.length)return[];const counts=new Map();for(const list of lists){for(const name of new Set(list))counts.set(name,(counts.get(name)||0)+1)}const min=Math.max(2,Math.ceil(lists.length*.6));return [...counts.entries()].filter(([,c])=>c>=min).sort((a,b)=>b[1]-a[1]).map(([n])=>n)}
+
+  function outlookStorageKey(report){return `cpi-outlook-${report.key}-${report.datasetType}-${report.regionId}`}
+  function defaultOutlook(report){
+    if(report.datasetType==='G' && report.regionId==='NATIONAL' && report.year===2569 && report.month===7){return {up:[
+      'ราคาขายปลีกน้ำมันเชื้อเพลิงในประเทศทรงตัวสูงกว่าปีก่อน จากความขัดแย้งในตะวันออกกลางที่ยืดเยื้อ',
+      'ราคาอาหารสำเร็จรูปทยอยปรับสูงเป็นวงกว้าง รวมทั้งเครื่องประกอบอาหาร',
+      'ค่าใช้จ่ายในการเดินทาง โดยเฉพาะค่าโดยสารรถประจำทาง มีแรงกดดันจากราคาน้ำมัน',
+      'ราคาผักสดสำคัญมีแนวโน้มสูงกว่าปีก่อนจากฐานต่ำและความเสี่ยงด้านสภาพอากาศ'
+    ],down:[
+      'ค่ากระแสไฟฟ้ารอบพฤษภาคม-สิงหาคม 2569 ยังต่ำกว่าช่วงเดียวกันของปีก่อนเล็กน้อย',
+      'ราคาผลไม้สดมีแนวโน้มลดลงจากอุปทานเข้าสู่ตลาดในปริมาณมาก'
+    ],range:'1.5 - 2.5%',mid:'2.0%',next:'7 ก.ย. 2569'};}
+    return {up:[],down:[],range:'',mid:'',next:''};
+  }
+  function getOutlook(report){let v=null;try{v=JSON.parse(localStorage.getItem(outlookStorageKey(report)))}catch(e){}return v||defaultOutlook(report)}
+  function saveOutlook(){const r=currentReport();if(!r)return;const val={up:document.getElementById('outlookUpInput').value.split('\n').map(s=>s.trim()).filter(Boolean),down:document.getElementById('outlookDownInput').value.split('\n').map(s=>s.trim()).filter(Boolean),range:document.getElementById('forecastRangeInput').value.trim(),mid:document.getElementById('forecastMidInput').value.trim(),next:document.getElementById('nextReleaseInput').value.trim()};localStorage.setItem(outlookStorageKey(r),JSON.stringify(val));renderPage7(r);renderPage9(r);toast('บันทึกข้อความแนวโน้มแล้ว')}
+  function renderOutlookList(id,items){document.getElementById(id).innerHTML=(items?.length?items:['ยังไม่มีข้อความ — กด “แก้ไขข้อความแนวโน้มสำหรับงวดนี้” เพื่อเพิ่ม']).map(x=>`<li>${escapeHtml(x)}</li>`).join('')}
+  function renderOutlookChart(report){
+    const reps=state.reports.filter(r=>r.regionId===report.regionId&&r.datasetType===report.datasetType).sort((a,b)=>a.key-b.key);const labels=reps.map(r=>periodShort(r.year,r.month));const vals=reps.map(r=>findRow(r,'0000000')?.yoy??null);
+    const ctx=document.getElementById('outlookChart');if(state.outlookChart)state.outlookChart.destroy();state.outlookChart=new Chart(ctx,{type:'line',data:{labels,datasets:[{label:`${datasetLabel(report)} YoY`,data:vals,borderColor:'#1f5f91',backgroundColor:'rgba(75,165,219,.18)',fill:true,tension:.28,pointRadius:4,pointBackgroundColor:'#1f5f91'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{title:{display:true,text:'%'},grid:{color:'rgba(0,0,0,.08)'}},x:{grid:{color:'rgba(0,0,0,.05)'}}}}})
+  }
+  function renderPage7(report){const o=getOutlook(report);const nextM=report.month===12?1:report.month+1,nextY=report.month===12?report.year+1:report.year;document.getElementById('p7Title').textContent=report.datasetType==='G'?'แนวโน้มอัตราเงินเฟ้อทั่วไป':`แนวโน้ม${datasetFullLabel(report)}`;document.getElementById('p7Sub').textContent=`แนวโน้มเดือน${MONTHS_FULL[nextM]} ${nextY} • ${datasetLabel(report)} (${report.datasetType}) • อ้างอิงงวดล่าสุด ${MONTHS_FULL[report.month]} ${report.year}`;renderOutlookChart(report);renderOutlookList('outlookUpList',o.up);renderOutlookList('outlookDownList',o.down);document.getElementById('forecastRange').textContent=o.range||'—';document.getElementById('forecastMid').textContent=o.mid||'—';document.getElementById('nextRelease').textContent=o.next||'—';document.getElementById('outlookUpInput').value=(o.up||[]).join('\n');document.getElementById('outlookDownInput').value=(o.down||[]).join('\n');document.getElementById('forecastRangeInput').value=o.range||'';document.getElementById('forecastMidInput').value=o.mid||'';document.getElementById('nextReleaseInput').value=o.next||''}
+
+  function renderPage8(report){
+    const prev=previousReport(report),p=prevPeriod(report.year,report.month);document.getElementById('p8Title').textContent=`ตารางแสดง${datasetFullLabel(report)}และอัตราการเปลี่ยนแปลง`;document.getElementById('p8Sub').textContent=`เดือน${MONTHS_FULL[report.month]} ${report.year}${report.baseYear?` • ปีฐาน ${report.baseYear} = 100`:''} • ${datasetLabel(report)} (${report.datasetType}) • ${report.regionLabel}`;
+    document.getElementById('detailHead').innerHTML=`<tr><th rowspan="2">รหัส</th><th rowspan="2">รายการ</th><th rowspan="2">สัดส่วนน้ำหนัก</th><th colspan="4">${MONTHS_FULL[report.month]} ${report.year}</th><th colspan="4">${MONTHS_FULL[p.m]} ${p.y}</th></tr><tr><th>ดัชนี</th><th>MoM</th><th>YoY</th><th>AoA</th><th>ดัชนี</th><th>MoM</th><th>YoY</th><th>AoA</th></tr>`;
+    const detailLimit=getTableLimit('detailLimitSelect',30);
+    document.getElementById('detailBody').innerHTML=DETAIL_CODES.slice(0,detailLimit).map(([c,label,type])=>{const row=findRow(report,c),pr=prev?findRow(prev,c):null;if(!row)return '';const rowLabel=c==='0000000'?datasetFullLabel(report):label;return `<tr class="${type}"><td>${c}</td><td>${escapeHtml(rowLabel)}</td><td>${fmt(row.weightShare)}</td><td>${fmt(row.index)}</td><td class="${cls(row.mom)}">${fmt(row.mom)}</td><td class="${cls(row.yoy)}">${fmt(row.yoy)}</td><td class="${cls(row.aoa)}">${fmt(row.aoa)}</td><td>${fmt(row.indexPrev)}</td><td class="${cls(pr?.mom)}">${fmt(pr?.mom)}</td><td class="${cls(pr?.yoy)}">${fmt(pr?.yoy)}</td><td class="${cls(pr?.aoa)}">${fmt(pr?.aoa)}</td></tr>`}).join('');
+  }
+
+  function posterRateCard(title,row,prevRow){return `<h4>${escapeHtml(title)}</h4><div class="mini-rate-grid"><div class="hdr">งวด</div><div class="hdr">ดัชนี</div><div class="hdr">%MoM</div><div class="hdr">%YoY</div><div class="hdr">%AoA</div><div>ปัจจุบัน</div><div>${fmt(row?.index)}</div><div class="${cls(row?.mom)}">${fmt(row?.mom)}</div><div class="${cls(row?.yoy)}">${fmt(row?.yoy)}</div><div class="${cls(row?.aoa)}">${fmt(row?.aoa)}</div><div>เดือนก่อน</div><div>${fmt(row?.indexPrev)}</div><div>${fmt(prevRow?.mom)}</div><div>${fmt(prevRow?.yoy)}</div><div>${fmt(prevRow?.aoa)}</div></div>`}
+  function renderPosterWeight(report){
+    const parts=WEIGHT_CODES.map(([c,label])=>({label,row:findRow(report,c)})).filter(x=>x.row?.weightShare!==null);const colors=['#e9e5e2','#7bb5dd','#c5eef0','#d4f3f1','#ffd041','#ffe487','#d4d0d9'];
+    if(state.posterWeightChart)state.posterWeightChart.destroy();state.posterWeightChart=new Chart(document.getElementById('posterWeightChart'),{type:'doughnut',data:{labels:parts.map(x=>x.label),datasets:[{data:parts.map(x=>x.row.weightShare),backgroundColor:colors,borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,cutout:'48%',plugins:{legend:{display:false},tooltip:{callbacks:{label:(ctx)=>`${ctx.label}: ${fmt(ctx.raw)}%`}}}}});
+    document.getElementById('weightLegend').innerHTML=parts.map((x,i)=>`<div><span><i style="display:inline-block;width:9px;height:9px;border-radius:2px;background:${colors[i]};margin-right:5px"></i>${escapeHtml(x.label)}</span><b>${fmt(x.row.weightShare)}%</b></div>`).join('');
+  }
+  function renderPage9(report){
+    const h=findRow(report,'0000000'),core=findRow(report,'9300000'),prev=previousReport(report);const ph=prev?findRow(prev,'0000000'):null,pc=prev?findRow(prev,'9300000'):null;const o=getOutlook(report);
+    document.getElementById('posterMainTitle').textContent=report.datasetType==='G'?'อัตราเงินเฟ้อทั่วไป':datasetFullLabel(report);document.getElementById('posterOutlookTitle').textContent=report.datasetType==='G'?'แนวโน้มอัตราเงินเฟ้อทั่วไป':`แนวโน้ม${datasetFullLabel(report)}`;document.getElementById('posterPeriod').textContent=`เดือน${MONTHS_FULL[report.month]} ${report.year} • ${report.datasetType}`;document.getElementById('posterYoy').textContent=`${ratePhrase(h?.yoy)}`;document.getElementById('posterRegion').textContent=`${datasetLabel(report)} • ${report.regionLabel}`;
+    document.getElementById('posterHeadlineCard').innerHTML=posterRateCard(datasetFullLabel(report),h,ph);document.getElementById('posterCoreCard').innerHTML=posterRateCard('เงินเฟ้อพื้นฐาน • Core CPI',core,pc);document.getElementById('posterSummary').textContent=generateSummary(report);
+    renderPosterWeight(report);document.getElementById('posterKpiList').innerHTML=`${escapeHtml(datasetLabel(report))} <b>${fmt(h?.index)}</b><br>YoY <b class="${cls(h?.yoy)}">${fmtSigned(h?.yoy)}%</b><br>MoM <b class="${cls(h?.mom)}">${fmtSigned(h?.mom)}%</b><br>AoA <b class="${cls(h?.aoa)}">${fmtSigned(h?.aoa)}%</b><br>Core YoY <b class="${cls(core?.yoy)}">${fmtSigned(core?.yoy)}%</b>`;
+    renderOutlookList('posterOutlookUp',o.up);renderOutlookList('posterOutlookDown',o.down);document.getElementById('posterForecastRange').textContent=o.range||'—';document.getElementById('posterForecastMid').textContent=o.mid||'—';
+  }
+
+  function renderAll(){const report=currentReport();if(!report)return;const total=state.reports.length,setFiles=state.reports.filter(r=>r.key===report.key&&r.datasetType===report.datasetType).length;document.getElementById('statusMeta').textContent=`${periodLabel(report.year,report.month)} • ${datasetLabel(report)} (${report.datasetType}) • ${report.regionLabel} • ${report.rows.length.toLocaleString('th-TH')} แถว • โหลดแล้ว ${total} ไฟล์ (${setFiles} พื้นที่ของชุดนี้ในงวดนี้)`;const componentTitle=`อัตราการเปลี่ยนแปลง${datasetFullLabel(report)}`;document.getElementById('p3Title').textContent=componentTitle;document.getElementById('p4Title').textContent=componentTitle;document.getElementById('p5Title').textContent=componentTitle;renderPage1(report);renderPage2(report);renderComponents(report,'yoy','yoyComponents','p3Sub');renderComponents(report,'mom','momComponents','p4Sub');renderComponents(report,'aoa','aoaComponents','p5Sub');renderPage6(report);renderPage7(report);renderPage8(report);renderPage9(report)}
+
+  async function capturePage(id){const el=document.getElementById(id);if(!el)return;setLoading(true);try{const canvas=await html2canvas(el,{scale:2,backgroundColor:'#ffffff',useCORS:true});const a=document.createElement('a');const r=currentReport();a.download=`CPI_${id}_${r?.year||''}${String(r?.month||'').padStart(2,'0')}_${r?.datasetType||''}_${r?.regionId||''}.png`;a.href=canvas.toDataURL('image/png');a.click()}catch(e){console.error(e);toast('บันทึก PNG ไม่สำเร็จ: '+e.message)}finally{setLoading(false)}}
+  function exportCurrentExcel(){const r=currentReport();if(!r)return;const rows=r.rows.map(x=>({รหัส:x.code,'หมวด/รายการ':x.name,'สัดส่วนน้ำหนัก':x.weightShare,'ดัชนี':x.index,MoM:x.mom,YoY:x.yoy,AoA:x.aoa,ContributeMoM:x.cMom,ContributeYoY:x.cYoy,ContributeAoA:x.cAoa}));const ws=XLSX.utils.json_to_sheet(rows);const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'CPI');XLSX.writeFile(wb,`CPI_${r.year}${String(r.month).padStart(2,'0')}_${r.datasetType}_${r.regionId}.xlsx`)}
+
+  document.getElementById('fileInput').addEventListener('change',e=>importFiles([...e.target.files]));
+  const dz=document.getElementById('dropzone');
+  ['dragenter','dragover'].forEach(ev=>dz.addEventListener(ev,e=>{e.preventDefault();dz.classList.add('drag')}));
+  ['dragleave','drop'].forEach(ev=>dz.addEventListener(ev,e=>{e.preventDefault();dz.classList.remove('drag')}));
+  dz.addEventListener('drop',e=>importFiles([...e.dataTransfer.files].filter(f=>/\.xlsx?$/.test(f.name.toLowerCase()))));
+  window.addEventListener('error',e=>{console.error(e.error||e.message);setLoading(false)});
+  window.addEventListener('load',()=>{
+    if(typeof XLSX==='undefined') toast('ไม่สามารถโหลดตัวอ่าน Excel ได้ กรุณาเชื่อมต่ออินเทอร์เน็ตแล้วเปิดไฟล์ใหม่');
+  });
+</script>
+</body>
+</html>
