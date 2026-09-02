@@ -1,0 +1,2013 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ระบบราคากลางหลายไฟล์ — ทุกชีท</title>
+  <meta name="color-scheme" content="light">
+  <style>
+    :root {
+      --bg: #f3f6fb;
+      --surface: #ffffff;
+      --surface-soft: #f8fafc;
+      --ink: #14233a;
+      --muted: #68778b;
+      --line: #dfe7f1;
+      --line-strong: #cbd7e6;
+      --brand: #1769e0;
+      --brand-dark: #0d4fae;
+      --brand-soft: #eaf3ff;
+      --green: #087a59;
+      --green-soft: #e7f8f1;
+      --amber: #9a5a00;
+      --amber-soft: #fff4dd;
+      --red: #b4232b;
+      --red-soft: #fff0f1;
+      --purple: #6e3bc1;
+      --purple-soft: #f2ebff;
+      --shadow: 0 14px 38px rgba(25, 48, 81, .08);
+      --radius: 18px;
+    }
+    * { box-sizing: border-box; }
+    html, body { min-height: 100%; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: Tahoma, "Noto Sans Thai", "Leelawadee UI", system-ui, sans-serif;
+      font-size: 14px;
+    }
+    button, input, select { font: inherit; }
+    button { cursor: pointer; }
+    .hidden { display: none !important; }
+    .app-header {
+      position: sticky; top: 0; z-index: 50;
+      background: rgba(255,255,255,.96);
+      border-bottom: 1px solid var(--line);
+      backdrop-filter: blur(12px);
+    }
+    .header-inner, .main { width: min(1680px, calc(100% - 30px)); margin: 0 auto; }
+    .header-inner {
+      min-height: 76px; padding: 11px 0;
+      display: flex; align-items: center; justify-content: space-between; gap: 18px;
+    }
+    .brand { display: flex; align-items: center; gap: 13px; min-width: 0; }
+    .brand-icon {
+      width: 46px; height: 46px; border-radius: 14px; flex: 0 0 auto;
+      display: grid; place-items: center; color: #fff; font-size: 19px; font-weight: 900;
+      background: linear-gradient(145deg, #1674ef, #1749b9);
+      box-shadow: 0 10px 24px rgba(23,105,224,.24);
+    }
+    h1 { margin: 0; font-size: clamp(18px, 2vw, 24px); line-height: 1.25; }
+    .brand p { margin: 4px 0 0; color: var(--muted); font-size: 12px; }
+    .header-actions { display: flex; align-items: center; justify-content: flex-end; flex-wrap: wrap; gap: 8px; }
+    .btn {
+      min-height: 40px; padding: 9px 13px; border: 0; border-radius: 11px;
+      font-weight: 800; transition: .15s ease; white-space: nowrap;
+    }
+    .btn:hover { transform: translateY(-1px); }
+    .btn:disabled { cursor: not-allowed; opacity: .48; transform: none; }
+    .btn-primary { color: #fff; background: var(--brand); box-shadow: 0 8px 18px rgba(23,105,224,.18); }
+    .btn-primary:hover { background: var(--brand-dark); }
+    .btn-secondary { color: #29405e; background: #eef3f9; border: 1px solid #dce5f0; }
+    .btn-green { color: #fff; background: #07815d; }
+    .btn-report { color: #fff; background: var(--red); }
+    .main { padding: 22px 0 44px; }
+    .rule-card {
+      display: flex; align-items: center; justify-content: space-between; gap: 18px;
+      padding: 17px 19px; border: 1px solid #cfe1f9; border-radius: var(--radius);
+      background: linear-gradient(115deg, #eef6ff, #fff 70%);
+      box-shadow: 0 10px 28px rgba(33,89,157,.06);
+    }
+    .rule-main { display: flex; align-items: flex-start; gap: 11px; }
+    .rule-mark {
+      width: 36px; height: 36px; border-radius: 11px; display: grid; place-items: center;
+      flex: 0 0 auto; color: #fff; background: var(--brand); font-weight: 900;
+    }
+    .rule-card h2 { margin: 0; font-size: 15px; }
+    .rule-card p { margin: 5px 0 0; color: var(--muted); line-height: 1.55; font-size: 12px; }
+    code { padding: 2px 6px; border: 1px solid #d5e3f4; border-radius: 7px; background: #fff; color: #174f9f; }
+    .rule-badges { display: flex; gap: 7px; flex-wrap: wrap; justify-content: flex-end; }
+    .badge { display: inline-flex; align-items: center; gap: 4px; padding: 6px 9px; border-radius: 999px; font-size: 11px; font-weight: 900; white-space: nowrap; }
+    .badge-blue { color: #1556a9; background: #e4f0ff; }
+    .badge-green { color: #087452; background: #ddf7ec; }
+    .badge-report { color: #a51d27; background: #ffe5e7; border: 1px solid #ffc6ca; }
+    .status {
+      margin-top: 13px; min-height: 45px; padding: 10px 13px;
+      display: flex; align-items: center; gap: 9px;
+      border: 1px solid var(--line); border-radius: 13px; background: #fff; color: var(--muted);
+    }
+    .status-dot { width: 10px; height: 10px; border-radius: 50%; background: #94a3b8; flex: 0 0 auto; }
+    .status.loading .status-dot { background: var(--brand); animation: pulse 1s ease-in-out infinite; }
+    .status.success { border-color: #bce9d7; background: var(--green-soft); color: #086c4d; }
+    .status.success .status-dot { background: var(--green); }
+    .status.warning { border-color: #f0d59a; background: var(--amber-soft); color: #875000; }
+    .status.warning .status-dot { background: #c77700; }
+    .status.error { border-color: #f1b9b9; background: var(--red-soft); color: #9c2424; }
+    .status.error .status-dot { background: var(--red); }
+    @keyframes pulse { 0%,100% { transform: scale(.8); opacity:.55; } 50% { transform: scale(1.2); opacity:1; } }
+    .empty-state {
+      min-height: 330px; margin-top: 16px; padding: 40px 24px;
+      display: grid; place-items: center; text-align: center;
+      border: 1px dashed #bfd0e3; border-radius: var(--radius); background: #fff; box-shadow: var(--shadow);
+    }
+    .empty-icon { width: 76px; height: 76px; margin: 0 auto 17px; border-radius: 23px; display: grid; place-items: center; background: var(--brand-soft); color: var(--brand); font-size: 32px; font-weight: 900; }
+    .empty-state h2 { margin: 0; font-size: 21px; }
+    .empty-state p { max-width: 720px; margin: 9px auto 20px; color: var(--muted); line-height: 1.7; }
+    .empty-actions { display: flex; justify-content: center; flex-wrap: wrap; gap: 9px; }
+    .data-area { margin-top: 16px; }
+    .section-card { padding: 15px; border: 1px solid var(--line); border-radius: var(--radius); background: #fff; box-shadow: var(--shadow); margin-bottom: 13px; }
+    .section-title-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 11px; }
+    .section-title-row h2 { margin: 0; font-size: 15px; }
+    .section-title-row p { margin: 3px 0 0; color: var(--muted); font-size: 11px; }
+    .source-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 9px; }
+    .source-card {
+      width: 100%; padding: 12px 13px; border: 1px solid var(--line); border-radius: 14px;
+      background: var(--surface-soft); text-align: left; color: var(--ink);
+    }
+    .source-card:hover { border-color: #98bced; background: #f2f7ff; }
+    .source-card.active { border-color: #6fa8ed; box-shadow: 0 0 0 3px rgba(23,105,224,.10); background: #eef6ff; }
+    .source-name { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 900; font-size: 12px; }
+    .source-meta { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 8px; }
+    .mini-chip { padding: 4px 7px; border-radius: 999px; background: #fff; border: 1px solid #dfe7f1; color: #52627a; font-size: 10px; font-weight: 800; }
+    .mini-chip.report { color: #a51d27; background: #fff0f1; border-color: #ffc6ca; }
+    .source-count { margin-top: 7px; color: var(--muted); font-size: 10px; }
+    .report-notice {
+      margin-bottom: 13px; padding: 13px 15px; border: 1px solid #f1b6bb; border-radius: 15px;
+      display: flex; align-items: center; justify-content: space-between; gap: 13px;
+      background: linear-gradient(110deg, #fff0f1, #fff 75%);
+    }
+    .report-notice strong { color: #a51d27; }
+    .report-notice p { margin: 4px 0 0; color: #7c5960; font-size: 11px; }
+    .stats-grid { display: grid; grid-template-columns: repeat(5, minmax(0,1fr)); gap: 10px; margin-bottom: 13px; }
+    .stat-card { min-width:0; padding: 14px 15px; border:1px solid var(--line); border-radius:15px; background:#fff; box-shadow:0 8px 22px rgba(30,51,79,.045); }
+    .stat-label { margin:0 0 6px; color:var(--muted); font-size:11px; font-weight:800; }
+    .stat-value { margin:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:21px; font-weight:900; }
+    .stat-sub { margin:4px 0 0; color:#8794a6; font-size:10px; }
+    .panel { overflow:hidden; border:1px solid var(--line); border-radius:var(--radius); background:#fff; box-shadow:var(--shadow); }
+    .toolbar {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+      align-items:end; gap:10px; padding:14px; border-bottom:1px solid var(--line); background:#fbfcfe;
+    }
+    .control { min-width:0; }
+    .control label { display:block; margin:0 0 5px; color:#52627a; font-size:11px; font-weight:900; }
+    .input, .select { width:100%; height:40px; padding:8px 10px; border:1px solid var(--line-strong); border-radius:10px; outline:none; color:var(--ink); background:#fff; }
+    .input:focus, .select:focus { border-color:#6fa8ed; box-shadow:0 0 0 3px rgba(23,105,224,.10); }
+    .reset-wrap { display:flex; align-items:end; }
+    .reset-wrap .btn { width:100%; }
+    .table-wrap { max-height:68vh; overflow:auto; background:#fff; }
+    table { width:max-content; min-width:100%; border-collapse:separate; border-spacing:0; table-layout:fixed; }
+    th, td { padding:9px 10px; border-right:1px solid #e5ebf3; border-bottom:1px solid #e8edf4; vertical-align:middle; overflow-wrap:anywhere; }
+    th:last-child, td:last-child { border-right:0; }
+    thead th { position:sticky; top:0; z-index:12; min-height:48px; background:#e9f2ff; color:#164f9e; text-align:center; font-size:11px; font-weight:900; box-shadow:inset 0 -1px 0 #d6dfeb; }
+    tbody td { background:#fff; color:#27374d; font-size:12px; line-height:1.45; }
+    tbody tr:nth-child(even) td { background:#fbfcfe; }
+    tbody tr:hover td { background:#eef6ff; }
+    .set-cell { min-width:82px; text-align:center; font-weight:900; }
+    .meta-cell { min-width:78px; text-align:center; white-space:nowrap; }
+    .category-cell { min-width:240px; color:#314f78; font-weight:900; }
+    .item-code { min-width:170px; font-family:Consolas,"Courier New",monospace; color:#52627a; }
+    .item-name { min-width:410px; max-width:520px; }
+    .store-cell { min-width:120px; font-weight:800; }
+    .price-cell { min-width:105px; text-align:right; font-variant-numeric:tabular-nums; white-space:nowrap; }
+    .effective { color:#0d56b0; font-weight:900; background:#f1f7ff !important; }
+    .condition-cell { min-width:220px; color:#617086; }
+    .link-cell { min-width:76px; text-align:center; }
+    .set-badge { display:inline-flex; justify-content:center; min-width:42px; padding:4px 7px; border-radius:999px; color:#1556a9; background:#e4f0ff; font-weight:900; }
+    .report-row .set-badge { color:#a51d27; background:#ffe5e7; }
+    .report-tag { display:block; margin-top:4px; color:#a51d27; font-size:9px; font-weight:900; }
+    .blank { color:#c2cad4; }
+    .cell-link { display:inline-flex; align-items:center; justify-content:center; min-height:29px; padding:5px 8px; border-radius:8px; color:#0f5fc3; background:#eaf3ff; text-decoration:none; font-weight:900; }
+    .cell-link:hover { color:#fff; background:var(--brand); }
+    .table-footer { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:12px 14px; border-top:1px solid var(--line); background:#fbfcfe; }
+    .result-info { color:var(--muted); font-size:12px; }
+    .pagination { display:flex; align-items:center; gap:7px; }
+    .page-indicator { min-width:100px; text-align:center; color:#41546d; font-size:12px; font-weight:900; }
+    .drop-active::after { content:"วางไฟล์ Excel ที่นี่"; position:fixed; inset:12px; z-index:999; display:grid; place-items:center; border:4px dashed var(--brand); border-radius:28px; background:rgba(235,245,255,.95); color:var(--brand-dark); font-size:clamp(22px,4vw,42px); font-weight:900; pointer-events:none; }
+    .report-notice-actions { display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end; }
+    .week-control { margin-top:9px; padding-top:8px; border-top:1px dashed #f0b9be; display:flex; align-items:center; justify-content:space-between; gap:8px; }
+    .week-control label { color:#8d3038; font-size:10px; font-weight:900; }
+    .week-picker { width:118px; height:32px; padding:4px 8px; border:1px solid #e4a8ae; border-radius:9px; color:#8f2028; background:#fff; font-weight:800; }
+    .report-panel { margin-top:14px; border-color:#efc0c4; }
+    .report-panel-head { padding:15px; display:flex; align-items:center; justify-content:space-between; gap:14px; border-bottom:1px solid #f0d5d8; background:linear-gradient(110deg,#fff1f2,#fff 76%); }
+    .report-panel-head h2 { margin:0; color:#9f2029; font-size:16px; }
+    .report-panel-head p { margin:5px 0 0; color:#7a5b60; font-size:11px; line-height:1.55; }
+    .report-kpi-grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:9px; padding:14px 14px 0; }
+    .report-kpi { padding:12px 13px; border:1px solid var(--line); border-radius:13px; background:#fff; }
+    .report-kpi span { display:block; color:var(--muted); font-size:10px; font-weight:800; }
+    .report-kpi strong { display:block; margin-top:5px; font-size:20px; }
+    .report-kpi.complete { border-color:#bfe5d7; background:#f3fcf8; }
+    .report-kpi.complete strong { color:var(--green); }
+    .report-kpi.warning { border-color:#f2d49b; background:#fffaf0; }
+    .report-kpi.warning strong { color:var(--amber); }
+    .report-toolbar { grid-template-columns:160px 160px minmax(220px,1fr) minmax(230px,1.2fr) 180px; margin-top:14px; border-top:1px solid var(--line); }
+    .report-warning { margin:0 14px 12px; padding:10px 12px; border:1px solid #f2d49b; border-radius:11px; background:#fff8e8; color:#7d4d00; font-size:11px; line-height:1.55; }
+    .report-table-wrap { max-height:62vh; border-top:1px solid var(--line); }
+    .weekly-report-table th:nth-child(3), .weekly-report-table td:nth-child(3) { min-width:210px; }
+    .weekly-report-table th:nth-child(4), .weekly-report-table td:nth-child(4) { min-width:180px; }
+    .weekly-report-table th:nth-child(5), .weekly-report-table td:nth-child(5) { min-width:350px; }
+    .weekly-report-table th:nth-child(n+6):nth-child(-n+10), .weekly-report-table td:nth-child(n+6):nth-child(-n+10) { min-width:118px; text-align:right; }
+    .weekly-report-table th:nth-child(11), .weekly-report-table td:nth-child(11) { min-width:150px; }
+    .week-price { font-weight:800; color:#174f9f; }
+    .average-price { font-weight:900; color:#087a59; background:#eefbf6 !important; }
+    .report-status { display:inline-flex; padding:4px 7px; border-radius:999px; font-size:10px; font-weight:900; white-space:nowrap; }
+    .report-status.complete { color:#087452; background:#ddf7ec; }
+    .report-status.incomplete { color:#9a5a00; background:#fff0cc; }
+    .text-code { font-family:Consolas,"Courier New",monospace; white-space:nowrap; }
+    @media (max-width:1150px) { .report-toolbar { grid-template-columns:repeat(3,minmax(170px,1fr)); } .report-kpi-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+    @media (max-width:1150px) { .stats-grid { grid-template-columns:repeat(3,minmax(0,1fr)); } }
+    @media (max-width:760px) {
+      .header-inner,.main { width:min(100% - 18px,1680px); }
+      .header-inner { align-items:flex-start; flex-direction:column; }
+      .header-actions { width:100%; justify-content:stretch; }
+      .header-actions .btn { flex:1 1 145px; }
+      .rule-card { align-items:flex-start; flex-direction:column; }
+      .rule-badges { justify-content:flex-start; }
+      .stats-grid { grid-template-columns:1fr 1fr; }
+      .report-notice { align-items:flex-start; flex-direction:column; }
+      .table-footer { align-items:flex-start; flex-direction:column; }
+    }
+    @media (max-width:480px) { .stats-grid { grid-template-columns:1fr; } }
+</style>
+</head>
+<body>
+  <header class="app-header">
+    <div class="header-inner">
+      <div class="brand">
+        <div class="brand-icon">฿</div>
+        <div>
+          <h1>ระบบราคากลางหลายไฟล์ — ทุกชีท</h1>
+          <p>แยกชุด เดือน ปีจากชื่อไฟล์ • รหัสรายการคงเป็นข้อความ • ชุด อ. แยก REPORT สป1–สป4 และค่าเฉลี่ย</p>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button type="button" class="btn btn-primary" id="openFolderBtn">เลือกโฟลเดอร์</button>
+        <button type="button" class="btn btn-secondary" id="openFileBtn">เลือกหลายไฟล์</button>
+        <button type="button" class="btn btn-green" id="exportBtn" disabled>ส่งออกข้อมูลที่กรอง (.xlsx)</button>
+        <button type="button" class="btn btn-report" id="reportBtn" disabled>ส่งออก REPORT ชุด อ. (.xlsx)</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="main">
+    <section class="rule-card">
+      <div class="rule-main">
+        <div class="rule-mark">1</div>
+        <div>
+          <h2>อ่านทุกไฟล์ที่ชื่อขึ้นต้นด้วย <code>ไฟล์ราคากลาง</code> และอ่านทุกชีท</h2>
+          <p>ชื่อไฟล์ใช้แยก <strong>ชุด / เดือน / ปี</strong> อัตโนมัติ; ชุด อ. อ่าน <strong>สป1–สป4</strong> จากหัวกลุ่มสัปดาห์ในแต่ละชีทก่อน และใช้ชื่อไฟล์หรือตัวเลือกบนการ์ดเป็นทางสำรอง ส่วนรหัสรายการส่งออกเป็นข้อความเพื่อคงเลขทุกหลัก</p>
+        </div>
+      </div>
+      <div class="rule-badges">
+        <span class="badge badge-blue">หลายไฟล์พร้อมกัน</span>
+        <span class="badge badge-green">อ่านครบทุกชีท</span>
+        <span class="badge badge-report">ชุด อ. = สป1–สป4 + เฉลี่ย</span>
+      </div>
+    </section>
+
+    <div class="status" id="statusBox" role="status" aria-live="polite"><span class="status-dot"></span><span id="statusText">กำลังตรวจหาไฟล์ในโฟลเดอร์เดียวกัน…</span></div>
+
+    <section class="empty-state" id="emptyState">
+      <div>
+        <div class="empty-icon">↗</div>
+        <h2>เลือกโฟลเดอร์หรือเลือกไฟล์ Excel หลายไฟล์</h2>
+        <p>ระบบจะรับเฉพาะไฟล์ที่ชื่อขึ้นต้นด้วย <strong>ไฟล์ราคากลาง</strong> แล้วอ่านทุกชีท โดยไม่ฝังข้อมูล Excel ไว้ใน HTML</p>
+        <div class="empty-actions">
+          <button type="button" class="btn btn-primary" id="emptyOpenFolderBtn">เลือกโฟลเดอร์</button>
+          <button type="button" class="btn btn-secondary" id="emptyOpenFileBtn">เลือกหลายไฟล์</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="data-area hidden" id="dataArea">
+      <section class="section-card">
+        <div class="section-title-row"><div><h2>ไฟล์ที่อ่านทั้งหมด</h2><p>คลิกการ์ดเพื่อกรองเฉพาะไฟล์นั้น คลิกซ้ำเพื่อกลับเป็นทุกไฟล์</p></div></div>
+        <div class="source-grid" id="sourceCards"></div>
+      </section>
+
+      <section class="report-notice hidden" id="reportNotice">
+        <div><strong>ชุด อ. แยกเป็น REPORT รายสัปดาห์</strong><p id="reportNoticeText"></p></div>
+        <div class="report-notice-actions">
+          <button type="button" class="btn btn-secondary" id="viewReportBtn">ดูตาราง สป1–สป4</button>
+          <button type="button" class="btn btn-report" onclick="document.getElementById('reportBtn').click()">ส่งออก REPORT (.xlsx)</button>
+        </div>
+      </section>
+
+      <div class="stats-grid">
+        <article class="stat-card"><p class="stat-label">จำนวนไฟล์</p><p class="stat-value" id="statFiles">-</p><p class="stat-sub">ไฟล์ที่ตรง startsWith("ไฟล์ราคากลาง")</p></article>
+        <article class="stat-card"><p class="stat-label">ชุดที่พบ</p><p class="stat-value" id="statSets">-</p><p class="stat-sub">แยกจากชื่อไฟล์</p></article>
+        <article class="stat-card"><p class="stat-label">จำนวนชีทรวม</p><p class="stat-value" id="statSheets">-</p><p class="stat-sub">อ่านทุกชีททุกไฟล์</p></article>
+        <article class="stat-card"><p class="stat-label">รายการที่มีราคา</p><p class="stat-value" id="statPriced">-</p><p class="stat-sub">เป็นตัวกรองเริ่มต้น</p></article>
+        <article class="stat-card"><p class="stat-label">รายการข้อมูลทั้งหมด</p><p class="stat-value" id="statRows">-</p><p class="stat-sub">รวมมีราคาและไม่มีราคา</p></article>
+      </div>
+
+      <section class="panel">
+        <div class="toolbar">
+          <div class="control"><label for="fileSelect">ไฟล์ต้นทาง</label><select id="fileSelect" class="select"></select></div>
+          <div class="control"><label for="setSelect">ชุด</label><select id="setSelect" class="select"></select></div>
+          <div class="control"><label for="monthSelect">เดือน</label><select id="monthSelect" class="select"></select></div>
+          <div class="control"><label for="yearSelect">ปี พ.ศ.</label><select id="yearSelect" class="select"></select></div>
+          <div class="control"><label for="catSelect">หมวดหมู่ / ชีท (รหัส_ชื่อ)</label><select id="catSelect" class="select"><option value="">-- ทั้งหมด (ทุกชีท) --</option></select></div>
+          <div class="control"><label for="storeSelect">ห้าง / แหล่งข้อมูล</label><select id="storeSelect" class="select"></select></div>
+          <div class="control"><label for="priceFilterSelect">สถานะราคา</label><select id="priceFilterSelect" class="select"><option value="has_price" selected>เฉพาะรายการที่มีราคาตัวเลข</option><option value="all">ทั้งหมด</option><option value="promo_only">เฉพาะรายการที่มีราคาโปร</option><option value="no_price">เฉพาะรายการที่ราคายังว่าง</option></select></div>
+          <div class="control"><label for="searchInput">ค้นหาด่วน</label><input id="searchInput" class="input" type="search" placeholder="ชื่อสินค้า รหัส ร้าน ภาวะ…" autocomplete="off"></div>
+          <div class="control"><label for="pageSize">จำนวนต่อหน้า</label><select id="pageSize" class="select"><option value="25">25</option><option value="50" selected>50</option><option value="100">100</option><option value="200">200</option></select></div>
+          <div class="control reset-wrap"><button type="button" class="btn btn-secondary" id="resetBtn">ล้างตัวกรอง</button></div>
+        </div>
+
+        <div class="table-wrap" id="tableWrap">
+          <table aria-label="ข้อมูลราคากลางจากทุกไฟล์ทุกชีท">
+            <thead><tr>
+              <th>ชุด</th><th>เดือน</th><th>ปี</th><th>หมวดหมู่ (รหัส_ชื่อ)</th><th>รหัสรายการ</th><th>ชื่อรายการสินค้า</th><th>ห้าง/ร้าน</th><th>ราคาปกติ</th><th>ราคาโปร</th><th>ราคาที่ใช้</th><th>ภาวะ</th><th>ลิงก์</th>
+            </tr></thead>
+            <tbody id="tableBody"></tbody>
+          </table>
+        </div>
+        <div class="table-footer">
+          <div class="result-info" id="resultInfo">-</div>
+          <div class="pagination"><button type="button" class="btn btn-secondary" id="prevPageBtn">ก่อนหน้า</button><span class="page-indicator" id="pageIndicator">หน้า 1 / 1</span><button type="button" class="btn btn-secondary" id="nextPageBtn">ถัดไป</button></div>
+        </div>
+      </section>
+
+      <section class="panel report-panel hidden" id="weeklyReportPanel">
+        <div class="report-panel-head">
+          <div>
+            <h2>REPORT ชุด อ. — ราคาแยกรายสัปดาห์</h2>
+            <p>จับคู่ตาม เดือน / ปี / หมวด / รหัสรายการ / ชื่อรายการ แล้วนำหัวกลุ่ม “สัปดาห์ 1–4” ในไฟล์ไปลงคอลัมน์ สป1–สป4 โดยไม่ถือเป็นห้าง/ร้าน; ค่าเฉลี่ยจะแสดงเมื่อมีราคาครบทั้ง 4 สัปดาห์</p>
+          </div>
+          <button type="button" class="btn btn-report" id="reportExportInlineBtn">ส่งออก REPORT (.xlsx)</button>
+        </div>
+
+        <div class="report-kpi-grid">
+          <article class="report-kpi"><span>ไฟล์ชุด อ.</span><strong id="reportStatFiles">0</strong></article>
+          <article class="report-kpi"><span>รายการรายงาน</span><strong id="reportStatRows">0</strong></article>
+          <article class="report-kpi complete"><span>ครบ 4 สัปดาห์</span><strong id="reportStatComplete">0</strong></article>
+          <article class="report-kpi warning"><span>ยังไม่ครบ 4 สัปดาห์</span><strong id="reportStatIncomplete">0</strong></article>
+        </div>
+
+        <div class="toolbar report-toolbar">
+          <div class="control"><label for="reportMonthSelect">เดือน</label><select id="reportMonthSelect" class="select"></select></div>
+          <div class="control"><label for="reportYearSelect">ปี พ.ศ.</label><select id="reportYearSelect" class="select"></select></div>
+          <div class="control"><label for="reportCatSelect">หมวดหมู่ / ชีท</label><select id="reportCatSelect" class="select"></select></div>
+          <div class="control report-search"><label for="reportSearchInput">ค้นหาใน REPORT</label><input id="reportSearchInput" class="input" type="search" placeholder="รหัสหรือชื่อรายการ…" autocomplete="off"></div>
+          <div class="control reset-wrap"><button type="button" class="btn btn-secondary" id="reportResetBtn">ล้างตัวกรอง REPORT</button></div>
+        </div>
+
+        <div class="report-warning hidden" id="reportWeekWarning"></div>
+        <div class="table-wrap report-table-wrap" id="weeklyReportTableWrap">
+          <table class="weekly-report-table" aria-label="REPORT ชุด อ. แยกรายสัปดาห์">
+            <thead><tr>
+              <th>เดือน</th><th>ปี</th><th>หมวดหมู่ (รหัส_ชื่อ)</th><th>รหัสรายการ (ข้อความ)</th><th>ชื่อรายการสินค้า</th>
+              <th>สป1</th><th>สป2</th><th>สป3</th><th>สป4</th><th>ราคาเฉลี่ย 4 สัปดาห์</th><th>สถานะ</th>
+            </tr></thead>
+            <tbody id="weeklyReportBody"></tbody>
+          </table>
+        </div>
+        <div class="table-footer"><div class="result-info" id="weeklyReportInfo">-</div></div>
+      </section>
+    </section>
+  </main>
+
+  <input id="folderInput" type="file" accept=".xlsx,.xlsm" webkitdirectory directory multiple hidden>
+  <input id="fileInput" type="file" accept=".xlsx,.xlsm" multiple hidden>
+
+  <script>
+
+    'use strict';
+
+    const FILE_PREFIX = 'ไฟล์ราคากลาง';
+    const EXCEL_EXTENSION = /\.(xlsx|xlsm)$/i;
+    const EMPTY_CELL = Object.freeze({ text: '', link: '', type: '' });
+    const PRICE_DEFAULT = 'has_price';
+
+    const state = {
+      sources: [],
+      records: [],
+      filteredRecords: [],
+      categories: [],
+      stores: [],
+      totalSheets: 0,
+      totalRawRows: 0,
+      weeklyReportRows: [],
+      filteredWeeklyRows: [],
+      page: 1,
+      pageSize: 50,
+      busy: false,
+      filters: {
+        file: '', set: '', month: '', year: '', category: '', store: '', price: PRICE_DEFAULT, query: ''
+      },
+      reportFilters: { month: '', year: '', category: '', query: '' }
+    };
+
+    const el = {};
+    document.addEventListener('DOMContentLoaded', init);
+
+    function init() {
+      Object.assign(el, {
+        openFolderBtn: document.getElementById('openFolderBtn'),
+        openFileBtn: document.getElementById('openFileBtn'),
+        emptyOpenFolderBtn: document.getElementById('emptyOpenFolderBtn'),
+        emptyOpenFileBtn: document.getElementById('emptyOpenFileBtn'),
+        exportBtn: document.getElementById('exportBtn'),
+        reportBtn: document.getElementById('reportBtn'),
+        folderInput: document.getElementById('folderInput'),
+        fileInput: document.getElementById('fileInput'),
+        statusBox: document.getElementById('statusBox'),
+        statusText: document.getElementById('statusText'),
+        emptyState: document.getElementById('emptyState'),
+        dataArea: document.getElementById('dataArea'),
+        sourceCards: document.getElementById('sourceCards'),
+        reportNotice: document.getElementById('reportNotice'),
+        reportNoticeText: document.getElementById('reportNoticeText'),
+        viewReportBtn: document.getElementById('viewReportBtn'),
+        weeklyReportPanel: document.getElementById('weeklyReportPanel'),
+        reportExportInlineBtn: document.getElementById('reportExportInlineBtn'),
+        reportMonthSelect: document.getElementById('reportMonthSelect'),
+        reportYearSelect: document.getElementById('reportYearSelect'),
+        reportCatSelect: document.getElementById('reportCatSelect'),
+        reportSearchInput: document.getElementById('reportSearchInput'),
+        reportResetBtn: document.getElementById('reportResetBtn'),
+        reportWeekWarning: document.getElementById('reportWeekWarning'),
+        weeklyReportBody: document.getElementById('weeklyReportBody'),
+        weeklyReportInfo: document.getElementById('weeklyReportInfo'),
+        reportStatFiles: document.getElementById('reportStatFiles'),
+        reportStatRows: document.getElementById('reportStatRows'),
+        reportStatComplete: document.getElementById('reportStatComplete'),
+        reportStatIncomplete: document.getElementById('reportStatIncomplete'),
+        statFiles: document.getElementById('statFiles'),
+        statSets: document.getElementById('statSets'),
+        statSheets: document.getElementById('statSheets'),
+        statPriced: document.getElementById('statPriced'),
+        statRows: document.getElementById('statRows'),
+        fileSelect: document.getElementById('fileSelect'),
+        setSelect: document.getElementById('setSelect'),
+        monthSelect: document.getElementById('monthSelect'),
+        yearSelect: document.getElementById('yearSelect'),
+        catSelect: document.getElementById('catSelect'),
+        storeSelect: document.getElementById('storeSelect'),
+        priceFilterSelect: document.getElementById('priceFilterSelect'),
+        searchInput: document.getElementById('searchInput'),
+        pageSize: document.getElementById('pageSize'),
+        resetBtn: document.getElementById('resetBtn'),
+        tableBody: document.getElementById('tableBody'),
+        resultInfo: document.getElementById('resultInfo'),
+        pageIndicator: document.getElementById('pageIndicator'),
+        prevPageBtn: document.getElementById('prevPageBtn'),
+        nextPageBtn: document.getElementById('nextPageBtn')
+      });
+
+      el.openFolderBtn.addEventListener('click', chooseFolder);
+      el.emptyOpenFolderBtn.addEventListener('click', chooseFolder);
+      el.openFileBtn.addEventListener('click', () => { el.fileInput.value = ''; el.fileInput.click(); });
+      el.emptyOpenFileBtn.addEventListener('click', () => { el.fileInput.value = ''; el.fileInput.click(); });
+      el.folderInput.addEventListener('change', handleFolderInput);
+      el.fileInput.addEventListener('change', handleFileInput);
+      for (const control of [el.fileSelect, el.setSelect, el.monthSelect, el.yearSelect, el.catSelect, el.storeSelect, el.priceFilterSelect]) {
+        control.addEventListener('change', applyFiltersFromControls);
+      }
+      el.searchInput.addEventListener('input', applyFiltersFromControls);
+      el.pageSize.addEventListener('change', () => { state.pageSize = Number(el.pageSize.value) || 50; state.page = 1; renderPage(); });
+      el.resetBtn.addEventListener('click', resetFilters);
+      el.prevPageBtn.addEventListener('click', () => changePage(-1));
+      el.nextPageBtn.addEventListener('click', () => changePage(1));
+      el.exportBtn.addEventListener('click', exportFilteredCsv);
+      el.reportBtn.addEventListener('click', exportReportCsv);
+      el.reportExportInlineBtn.addEventListener('click', exportReportCsv);
+      el.viewReportBtn.addEventListener('click', () => {
+        el.weeklyReportPanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+      for (const control of [el.reportMonthSelect, el.reportYearSelect, el.reportCatSelect]) control.addEventListener('change', applyWeeklyReportFiltersFromControls);
+      el.reportSearchInput.addEventListener('input', applyWeeklyReportFiltersFromControls);
+      el.reportResetBtn.addEventListener('click', resetWeeklyReportFilters);
+      el.sourceCards.addEventListener('click', handleSourceCardClick);
+      el.sourceCards.addEventListener('change', handleWeekPickerChange);
+      setupDropHandlers();
+      tryAutoDiscoverFromHttpFolder();
+    }
+
+    function normalizeName(value) { return String(value || '').normalize('NFC'); }
+    function baseName(value) { return normalizeName(String(value || '').replace(/\\/g, '/').split('/').pop()); }
+    function isTargetExcelName(name) {
+      const clean = baseName(name);
+      return !clean.startsWith('~$') && clean.startsWith(FILE_PREFIX) && EXCEL_EXTENSION.test(clean);
+    }
+
+    function parseFileMetadata(fileName) {
+      const cleanName = baseName(fileName);
+      const stem = cleanName.replace(EXCEL_EXTENSION, '');
+
+      // ชุดอยู่ทันทีหลังคำว่า “ชุด” จึงไม่ให้ token สป. ที่วางก่อนเดือนถูกนับรวมเป็นชื่อชุด
+      const setMatch = stem.match(/^ไฟล์ราคากลาง\s*ชุด\s*([^_\s]+)/i);
+      const setRaw = normalizeName(setMatch ? setMatch[1] : '').trim() || 'ไม่ระบุ';
+
+      // เลือกเลขปี 2–4 หลักตัวท้ายของชื่อไฟล์ (เลข สป1–สป4 และเลขชุด บ1 เป็น 1 หลัก จึงไม่ชนกัน)
+      const yearMatches = Array.from(stem.matchAll(/(?:^|[_\s])(\d{2,4})(?=\s*(?:_|\(|$))/g));
+      const yearMatch = yearMatches.length ? yearMatches[yearMatches.length - 1] : null;
+      const yearRaw = normalizeName(yearMatch ? yearMatch[1] : '').trim() || 'ไม่ระบุ';
+
+      let monthRaw = 'ไม่ระบุ';
+      if (yearMatch) {
+        const fullMatch = yearMatch[0] || '';
+        const yearOffset = fullMatch.lastIndexOf(yearMatch[1]);
+        const yearStart = Number(yearMatch.index || 0) + Math.max(0, yearOffset);
+        const beforeYear = stem.slice(0, yearStart).replace(/[_\s]+$/g, '');
+        let monthCandidate = (beforeYear.split('_').pop() || '').trim();
+        monthCandidate = monthCandidate
+          .replace(/(?:^|\s)(?:สป\.?|สัปดาห์(?:ที่)?|week)\s*\.?\s*[1-4](?=\s|$)/ig, ' ')
+          .replace(/\s+/g, ' ')
+          .trim();
+        if (monthCandidate) monthRaw = normalizeName(monthCandidate);
+      }
+
+      const numericYear = /^\d+$/.test(yearRaw) ? Number(yearRaw) : null;
+      let yearDisplay = yearRaw;
+      if (numericYear !== null && yearRaw.length <= 2) yearDisplay = String(2500 + numericYear);
+      else if (numericYear !== null && numericYear >= 1900 && numericYear < 2400) yearDisplay = String(numericYear + 543);
+      const setKey = setRaw.replace(/[.\s]/g, '');
+      const reportRequired = setKey === 'อ';
+      const weekNumber = reportRequired ? parseWeekNumber(stem) : null;
+      const weekLabel = weekNumber ? `สป${weekNumber}` : '';
+      return {
+        fileName: cleanName,
+        setRaw,
+        setKey,
+        monthRaw,
+        yearRaw,
+        yearDisplay,
+        reportRequired,
+        weekNumber,
+        weekLabel,
+        displayLabel: buildSourceDisplayLabel({ setRaw, monthRaw, yearDisplay, reportRequired, weekNumber })
+      };
+    }
+
+    function parseWeekNumber(value) {
+      const clean = normalizeName(value)
+        .replace(/[._-]+/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+      const patterns = [
+        /(?:^|\s)สป\s*([1-4])(?:\s|$)/i,
+        /(?:^|\s)สัปดาห์(?:ที่)?\s*([1-4])(?:\s|$)/i,
+        /(?:^|\s)week\s*([1-4])(?:\s|$)/i
+      ];
+      for (const pattern of patterns) {
+        const match = clean.match(pattern);
+        if (match) return Number(match[1]);
+      }
+      return null;
+    }
+
+    function buildSourceDisplayLabel(meta) {
+      const week = meta.reportRequired ? ` • ${meta.weekNumber ? `สป${meta.weekNumber}` : 'ยังไม่ระบุ สป.'}` : '';
+      return `ชุด ${meta.setRaw} • ${meta.monthRaw} • ${meta.yearDisplay}${meta.reportRequired ? ' • REPORT' : ''}${week}`;
+    }
+
+    function parseSheetIdentity(sheetName) {
+      const clean = normalizeName(sheetName).replace(/\s+/g, ' ').trim();
+      const match = clean.match(/^\s*(\d{5,7})\s*[_ ]+\s*(.+)$/);
+      if (!match) return { code: '', name: clean, label: clean };
+      const code = match[1];
+      const name = match[2].replace(/^_+/, '').trim();
+      return { code, name, label: `${code}_${name}` };
+    }
+
+    async function chooseFolder() {
+      if (state.busy) return;
+      if ('showDirectoryPicker' in window) {
+        try {
+          const handle = await window.showDirectoryPicker({ mode: 'read' });
+          const files = [];
+          for await (const entry of handle.values()) {
+            if (entry.kind !== 'file' || !isTargetExcelName(entry.name)) continue;
+            files.push(await entry.getFile());
+          }
+          await registerFileSources(files);
+          return;
+        } catch (error) {
+          if (error && error.name === 'AbortError') return;
+        }
+      }
+      el.folderInput.value = '';
+      el.folderInput.click();
+    }
+
+    async function handleFolderInput(event) {
+      const files = Array.from(event.target.files || []).filter(file => {
+        if (!file.webkitRelativePath) return true;
+        return file.webkitRelativePath.split('/').filter(Boolean).length <= 2;
+      });
+      await registerFileSources(files);
+    }
+
+    async function handleFileInput(event) { await registerFileSources(Array.from(event.target.files || [])); }
+
+    async function registerFileSources(files) {
+      const matches = files.filter(file => isTargetExcelName(file.name)).map((file, index) => ({
+        id: `file:${baseName(file.name)}:${Number(file.lastModified || 0)}:${file.size}:${index}`,
+        kind: 'file', name: baseName(file.name), file, size: Number(file.size || 0),
+        lastModified: Number(file.lastModified || 0), meta: parseFileMetadata(file.name)
+      }));
+      if (!matches.length) {
+        setStatus('error', `ไม่พบไฟล์ Excel ที่ชื่อขึ้นต้นด้วย “${FILE_PREFIX}”`);
+        return;
+      }
+      registerSources(matches);
+      await loadAllSources();
+    }
+
+    async function tryAutoDiscoverFromHttpFolder() {
+      if (!/^https?:$/.test(location.protocol)) {
+        setStatus('warning', `เปิดจากเครื่องโดยตรง: กด “เลือกโฟลเดอร์” เพื่ออ่านทุกไฟล์ที่ขึ้นต้นด้วย “${FILE_PREFIX}”`);
+        return;
+      }
+      setStatus('loading', 'กำลังตรวจหาไฟล์ราคากลางทั้งหมดในโฟลเดอร์เดียวกัน…');
+      try {
+        const baseUrl = new URL('.', location.href);
+        const response = await fetch(baseUrl.href, { cache: 'no-store' });
+        if (!response.ok) throw new Error('เปิดรายการไฟล์ในโฟลเดอร์ไม่ได้');
+        const listing = new DOMParser().parseFromString(await response.text(), 'text/html');
+        const found = [];
+        const seen = new Set();
+        for (const anchor of listing.querySelectorAll('a[href]')) {
+          const url = new URL(anchor.getAttribute('href'), baseUrl);
+          if (url.origin !== baseUrl.origin) continue;
+          const decodedPath = decodeURIComponent(url.pathname);
+          const decodedBase = decodeURIComponent(baseUrl.pathname);
+          if (!decodedPath.startsWith(decodedBase)) continue;
+          const relative = decodedPath.slice(decodedBase.length);
+          if (!relative || relative.includes('/')) continue;
+          const name = baseName(relative);
+          if (!isTargetExcelName(name) || seen.has(name)) continue;
+          seen.add(name);
+          found.push({ id: `url:${url.href}`, kind: 'url', name, url: url.href, size: 0, lastModified: 0, meta: parseFileMetadata(name) });
+        }
+        if (!found.length) {
+          setStatus('warning', `ไม่พบไฟล์ “${FILE_PREFIX}…” อัตโนมัติ กด “เลือกโฟลเดอร์”`);
+          return;
+        }
+        registerSources(found);
+        await loadAllSources();
+      } catch (error) {
+        setStatus('warning', `ยังตรวจโฟลเดอร์อัตโนมัติไม่ได้ กด “เลือกโฟลเดอร์” เพื่ออ่านหลายไฟล์`);
+      }
+    }
+
+    function registerSources(sources) {
+      const unique = [];
+      const seen = new Set();
+      for (const source of sources) {
+        const key = `${normalizeName(source.name)}|${source.size || 0}|${source.lastModified || 0}`;
+        if (seen.has(key)) continue;
+        seen.add(key);
+        unique.push(source);
+      }
+      unique.sort((a, b) => {
+        const sizeOrder = Number(b.size || 0) - Number(a.size || 0);
+        const ay = Number(a.meta.yearDisplay) || 0, by = Number(b.meta.yearDisplay) || 0;
+        return sizeOrder || (by - ay) || a.meta.setRaw.localeCompare(b.meta.setRaw, 'th') || a.name.localeCompare(b.name, 'th');
+      });
+      state.sources = unique;
+    }
+
+    async function loadAllSources() {
+      if (state.busy || !state.sources.length) return;
+      setBusy(true);
+      clearData();
+      try {
+        for (let sourceIndex = 0; sourceIndex < state.sources.length; sourceIndex += 1) {
+          const source = state.sources[sourceIndex];
+          setStatus('loading', `กำลังอ่านไฟล์ ${formatNumber(sourceIndex + 1)}/${formatNumber(state.sources.length)} — ${source.meta.displayLabel}`);
+          const buffer = source.kind === 'file' ? await source.file.arrayBuffer() : await fetchArrayBuffer(source.url);
+          source.sheetCount = 0;
+          source.recordCount = 0;
+          source.pricedCount = 0;
+          source.rawRowCount = 0;
+          await parseXlsxEachSheet(buffer, async (sheet) => {
+            const extracted = extractSheet(sheet);
+            const sheetInfo = parseSheetIdentity(sheet.name);
+            state.categories.push({ label: sheetInfo.label, code: sheetInfo.code, name: sheetInfo.name });
+            state.totalSheets += 1;
+            source.sheetCount += 1;
+            state.totalRawRows += extracted.rows.length;
+            source.rawRowCount += extracted.rows.length;
+            const rows = flattenSheetRecords(source, sheet, extracted);
+            source.recordCount += rows.length;
+            source.pricedCount += rows.filter(row => row.effectivePrice !== null).length;
+            state.records.push(...rows);
+          }, (done, total, sheetName) => {
+            setStatus('loading', `ไฟล์ ${formatNumber(sourceIndex + 1)}/${formatNumber(state.sources.length)} • ชีท ${formatNumber(done)}/${formatNumber(total)} — “${sheetName}”`);
+          });
+          await new Promise(resolve => setTimeout(resolve, 0));
+        }
+        finalizeLoadedData();
+      } catch (error) {
+        clearData();
+        setStatus('error', `อ่านไฟล์ไม่สำเร็จ: ${error && error.message ? error.message : 'ข้อผิดพลาดที่ไม่ทราบสาเหตุ'}`);
+      } finally {
+        setBusy(false);
+      }
+    }
+
+    function flattenSheetRecords(source, sheet, extracted) {
+      const matrix = extracted.matrix;
+      if (!matrix.length || !extracted.columnCount) return [];
+      const layout = detectPriceLayout(matrix, extracted.columnCount);
+      if (!layout) return [];
+      const identity = parseSheetIdentity(sheet.name);
+      const storeBlocks = [];
+      let currentTop = '';
+      let currentGroupId = 'group:0';
+      for (let c = 0; c < extracted.columnCount; c += 1) {
+        const topText = cellText(matrix, layout.storeRow, c);
+        if (topText) {
+          const normalizedTop = normalizeSearch(topText);
+          if (!currentTop || normalizedTop !== normalizeSearch(currentTop)) currentGroupId = `group:${c}:${normalizedTop}`;
+          currentTop = topText;
+        }
+        const subText = cellText(matrix, layout.subHeaderRow, c);
+        const subtype = classifySubHeader(subText);
+        if (!subtype) continue;
+        if (c === layout.codeColumn || c === layout.nameColumn) continue;
+
+        // ชุด อ. ใช้หัวกลุ่ม “สัปดาห์ 1–4” เป็นมิติสัปดาห์ ไม่ใช่ชื่อห้าง/ร้าน
+        const sheetWeek = source.meta.reportRequired ? parseWeekNumber(currentTop) : null;
+        const week = source.meta.reportRequired ? (sheetWeek || source.meta.weekNumber || null) : null;
+        const weekOrigin = sheetWeek ? 'sheet' : (source.meta.weekNumber ? 'filename' : 'unassigned');
+        // const store = source.meta.reportRequired && sheetWeek ? '' : (currentTop || `แหล่งข้อมูล ${c + 1}`);
+        const store = currentTop || `แหล่งข้อมูล ${c + 1}`;
+        
+        storeBlocks.push({ column: c, groupId: currentGroupId, store, week, weekOrigin, subtype });
+      }
+      if (!storeBlocks.length) return [];
+
+      const records = [];
+      for (let r = layout.dataStartRow; r < matrix.length; r += 1) {
+        const row = matrix[r] || [];
+        const itemName = (row[layout.nameColumn] && row[layout.nameColumn].text || '').trim();
+        if (!itemName) continue;
+        const itemCode = (row[layout.codeColumn] && row[layout.codeColumn].text || '').trim();
+        const grouped = new Map();
+        for (const block of storeBlocks) {
+          if (!grouped.has(block.groupId)) grouped.set(block.groupId, {
+            link: '', regular: null, promo: null, condition: '',
+            store: block.store, week: block.week, weekOrigin: block.weekOrigin
+          });
+          const target = grouped.get(block.groupId);
+          const cell = row[block.column] || EMPTY_CELL;
+          if (block.subtype === 'link') target.link = /^https?:\/\//i.test(cell.link || '') ? cell.link : (/^https?:\/\//i.test(cell.text || '') ? cell.text : '');
+          else if (block.subtype === 'regular') target.regular = parsePrice(cell.text);
+          else if (block.subtype === 'promo') target.promo = parsePrice(cell.text);
+          else if (block.subtype === 'condition') target.condition = String(cell.text || '').trim();
+        }
+        for (const detail of grouped.values()) {
+          const regular = detail.regular !== null && detail.regular > 0 ? detail.regular : null;
+          const promo = detail.promo !== null && detail.promo > 0 ? detail.promo : null;
+          const effectivePrice = promo !== null ? promo : regular;
+          const hasAny = Boolean(detail.link || regular !== null || promo !== null || detail.condition);
+          if (!hasAny) continue;
+          const record = {
+            sourceId: source.id,
+            sourceFile: source.name,
+            set: source.meta.setRaw,
+            setKey: source.meta.setKey,
+            month: source.meta.monthRaw,
+            year: source.meta.yearDisplay,
+            reportRequired: source.meta.reportRequired,
+            week: detail.week,
+            weekOrigin: detail.weekOrigin,
+            sheetCode: identity.code,
+            sheetName: identity.name,
+            categoryLabel: identity.label,
+            itemCode,
+            itemName,
+            store: detail.store,
+            regularPrice: regular,
+            promoPrice: promo,
+            effectivePrice,
+            condition: detail.condition,
+            link: detail.link,
+            excelRow: r + 1
+          };
+          record.searchText = normalizeSearch([
+            record.sourceFile, record.set, record.month, record.year, record.week ? `สป${record.week}` : '', record.categoryLabel,
+            record.itemCode, record.itemName, record.store, record.condition,
+            regular, promo, effectivePrice
+          ].join(' '));
+          records.push(record);
+        }
+      }
+      return records;
+    }
+
+    function getSourceReportWeekInfo(source) {
+      const rows = state.records.filter(row => row.sourceId === source.id && row.reportRequired && row.effectivePrice !== null);
+      const weeks = Array.from(new Set(rows.map(row => Number(row.week)).filter(week => [1,2,3,4].includes(week)))).sort((a,b) => a - b);
+      const sheetWeeks = Array.from(new Set(rows.filter(row => row.weekOrigin === 'sheet').map(row => Number(row.week)).filter(week => [1,2,3,4].includes(week)))).sort((a,b) => a - b);
+      const hasUnassigned = rows.some(row => ![1,2,3,4].includes(Number(row.week)));
+      return { weeks, sheetWeeks, hasUnassigned };
+    }
+
+    function formatReportWeekText(weeks) {
+      if (!weeks.length) return 'ยังไม่ระบุ สป.';
+      if (weeks.length === 4 && weeks.every((week, index) => week === index + 1)) return 'สป1–สป4';
+      return weeks.map(week => `สป${week}`).join(', ');
+    }
+
+    function detectPriceLayout(matrix, columnCount) {
+      let bestRow = -1;
+      let bestScore = 0;
+      const limit = Math.min(matrix.length, 8);
+      for (let r = 0; r < limit; r += 1) {
+        let score = 0;
+        for (let c = 0; c < columnCount; c += 1) {
+          if (classifySubHeader(cellText(matrix, r, c))) score += 1;
+        }
+        if (score > bestScore) { bestScore = score; bestRow = r; }
+      }
+      if (bestRow < 0 || bestScore < 2) return null;
+      let codeColumn = 0, nameColumn = 1;
+      for (let c = 0; c < columnCount; c += 1) {
+        const header = normalizeSearch(cellText(matrix, bestRow, c));
+        if (header.includes('commodity_code') || header.includes('รหัสรายการ')) codeColumn = c;
+        if (header.includes('ชื่อรายการ')) nameColumn = c;
+      }
+      return { storeRow: Math.max(0, bestRow - 1), subHeaderRow: bestRow, dataStartRow: bestRow + 1, codeColumn, nameColumn };
+    }
+
+    function classifySubHeader(value) {
+      const text = normalizeSearch(value).replace(/\s+/g, '');
+      if (!text) return '';
+      if (text.includes('link') || text.includes('ลิงก์')) return 'link';
+      if (text.includes('ราคาปกติ')) return 'regular';
+      if (text.includes('ราคาโปร')) return 'promo';
+      if (text.includes('ภาวะ')) return 'condition';
+      return '';
+    }
+
+    function cellText(matrix, r, c) {
+      return matrix[r] && matrix[r][c] ? String(matrix[r][c].text || '').replace(/\r?\n/g, ' ').trim() : '';
+    }
+
+    function parsePrice(value) {
+      if (value === null || value === undefined || value === '') return null;
+      const clean = String(value).replace(/[฿,\s]/g, '').replace(/[^0-9.+-]/g, '');
+      if (!clean || !/[0-9]/.test(clean)) return null;
+      const number = Number(clean);
+      return Number.isFinite(number) ? number : null;
+    }
+
+    async function fetchArrayBuffer(url) {
+      const response = await fetch(url, { cache: 'no-store' });
+      if (!response.ok) throw new Error(`เปิดไฟล์ไม่ได้ (HTTP ${response.status})`);
+      return response.arrayBuffer();
+    }
+
+    function finalizeLoadedData() {
+      const categoryMap = new Map();
+      for (const item of state.categories) if (!categoryMap.has(item.label)) categoryMap.set(item.label, item);
+      state.categories = Array.from(categoryMap.values()).sort((a, b) => (a.code || '9999999').localeCompare(b.code || '9999999') || a.label.localeCompare(b.label, 'th'));
+      state.stores = Array.from(new Set(state.records.map(row => row.store).filter(Boolean))).sort((a, b) => a.localeCompare(b, 'th'));
+      populateFilters();
+      renderSourceCards();
+      rebuildWeeklyReport();
+      updateStats();
+      resetFilters();
+      resetWeeklyReportFilters();
+      el.emptyState.classList.add('hidden');
+      el.dataArea.classList.remove('hidden');
+      const reportFiles = state.sources.filter(source => source.meta.reportRequired).length;
+      const priced = state.records.filter(row => row.effectivePrice !== null).length;
+      const unknownWeeks = state.sources.filter(source => source.meta.reportRequired && getSourceReportWeekInfo(source).hasUnassigned).length;
+      setStatus('success', `อ่านสำเร็จ ${formatNumber(state.sources.length)} ไฟล์ • ${formatNumber(state.totalSheets)} ชีท • ${formatNumber(state.records.length)} รายการราคา • มีราคา ${formatNumber(priced)} รายการ${reportFiles ? ` • ชุด อ. ${formatNumber(reportFiles)} ไฟล์${unknownWeeks ? ` (ยังจับสัปดาห์ไม่ได้บางส่วน ${formatNumber(unknownWeeks)} ไฟล์)` : ''}` : ''}`);
+    }
+
+    function populateFilters() {
+      fillSelect(el.fileSelect, state.sources.map(source => {
+        const weekInfo = source.meta.reportRequired ? getSourceReportWeekInfo(source) : { weeks: [], sheetWeeks: [] };
+        const displayLabel = source.meta.reportRequired
+          ? `ชุด ${source.meta.setRaw} • ${source.meta.monthRaw} • ${source.meta.yearDisplay} • REPORT • ${formatReportWeekText(weekInfo.weeks)}${weekInfo.sheetWeeks.length ? ' จากหัวคอลัมน์' : ''}`
+          : source.meta.displayLabel;
+        return { value: source.id, label: `${displayLabel} — ${source.name}` };
+      }), '-- ทุกไฟล์ --');
+      fillSelect(el.setSelect, uniqueSorted(state.sources.map(source => source.meta.setRaw)).map(value => ({ value, label: `ชุด ${value}` })), '-- ทุกชุด --');
+      fillSelect(el.monthSelect, uniqueSorted(state.sources.map(source => source.meta.monthRaw)).map(value => ({ value, label: value })), '-- ทุกเดือน --');
+      fillSelect(el.yearSelect, uniqueSorted(state.sources.map(source => source.meta.yearDisplay), true).map(value => ({ value, label: value })), '-- ทุกปี --');
+      fillSelect(el.catSelect, state.categories.map(item => ({ value: item.label, label: item.label })), '-- ทั้งหมด (ทุกชีท) --');
+      fillSelect(el.storeSelect, state.stores.map(value => ({ value, label: value })), '-- ทุกห้าง / ร้าน --');
+    }
+
+    function fillSelect(select, items, firstLabel) {
+      select.innerHTML = `<option value="">${escapeHtml(firstLabel)}</option>` + items.map(item => `<option value="${escapeAttribute(item.value)}">${escapeHtml(item.label)}</option>`).join('');
+    }
+
+    function uniqueSorted(values, numericDesc = false) {
+      const unique = Array.from(new Set(values.filter(Boolean)));
+      return unique.sort((a, b) => numericDesc ? (Number(b) - Number(a)) : String(a).localeCompare(String(b), 'th'));
+    }
+
+    function renderSourceCards() {
+      el.sourceCards.innerHTML = state.sources.map(source => {
+        const weekInfo = source.meta.reportRequired ? getSourceReportWeekInfo(source) : { weeks: [], sheetWeeks: [], hasUnassigned: false };
+        const reportBadge = source.meta.reportRequired
+          ? `<span class="mini-chip report">REPORT ${formatReportWeekText(weekInfo.weeks)}${weekInfo.sheetWeeks.length ? ' จากหัวคอลัมน์' : ''}</span>`
+          : '';
+        const showWeekPicker = source.meta.reportRequired && weekInfo.sheetWeeks.length === 0;
+        return `
+        <div class="source-card" data-source-id="${escapeAttribute(source.id)}" title="คลิกพื้นที่การ์ดเพื่อกรองเฉพาะไฟล์นี้">
+          <span class="source-name">${escapeHtml(source.name)}</span>
+          <span class="source-meta">
+            <span class="mini-chip">ชุด ${escapeHtml(source.meta.setRaw)}</span>
+            <span class="mini-chip">${escapeHtml(source.meta.monthRaw)}</span>
+            <span class="mini-chip">พ.ศ. ${escapeHtml(source.meta.yearDisplay)}</span>
+            ${reportBadge}
+          </span>
+          <span class="source-count">${formatNumber(source.sheetCount || 0)} ชีท • ${formatNumber(source.recordCount || 0)} รายการ • มีราคา ${formatNumber(source.pricedCount || 0)}</span>
+          ${showWeekPicker ? `
+            <span class="week-control">
+              <label for="week-${escapeAttribute(source.id)}">กำหนดสัปดาห์ (กรณีหัวคอลัมน์ไม่ระบุ)</label>
+              <select id="week-${escapeAttribute(source.id)}" class="week-picker" data-week-source-id="${escapeAttribute(source.id)}">
+                <option value=""${source.meta.weekNumber ? '' : ' selected'}>-- ไม่ระบุ --</option>
+                ${[1,2,3,4].map(week => `<option value="${week}"${source.meta.weekNumber === week ? ' selected' : ''}>สป${week}</option>`).join('')}
+              </select>
+            </span>` : ''}
+        </div>`;
+      }).join('');
+    }
+
+    function handleSourceCardClick(event) {
+      if (event.target.closest('.week-picker') || event.target.closest('.week-control')) return;
+      const card = event.target.closest('[data-source-id]');
+      if (!card) return;
+      const sourceId = card.getAttribute('data-source-id') || '';
+      el.fileSelect.value = el.fileSelect.value === sourceId ? '' : sourceId;
+      applyFiltersFromControls();
+    }
+
+    function handleWeekPickerChange(event) {
+      const select = event.target.closest('[data-week-source-id]');
+      if (!select) return;
+      const sourceId = select.getAttribute('data-week-source-id') || '';
+      const source = state.sources.find(item => item.id === sourceId);
+      if (!source || !source.meta.reportRequired) return;
+      const week = Number(select.value);
+      source.meta.weekNumber = [1,2,3,4].includes(week) ? week : null;
+      source.meta.weekLabel = source.meta.weekNumber ? `สป${source.meta.weekNumber}` : '';
+      source.meta.displayLabel = buildSourceDisplayLabel(source.meta);
+      for (const row of state.records) {
+        if (row.sourceId !== sourceId || row.weekOrigin === 'sheet') continue;
+        row.week = source.meta.weekNumber;
+        row.weekOrigin = source.meta.weekNumber ? 'manual' : 'unassigned';
+      }
+      populateFilters();
+      renderSourceCards();
+      rebuildWeeklyReport();
+      updateStats();
+      applyFiltersFromControls();
+      applyWeeklyReportFiltersFromControls();
+      const reportFileCount = state.sources.filter(item => item.meta.reportRequired).length;
+      const unknownWeekCount = state.sources.filter(item => item.meta.reportRequired && getSourceReportWeekInfo(item).hasUnassigned).length;
+      const pricedCount = state.records.filter(row => row.effectivePrice !== null).length;
+      setStatus('success', `อ่านสำเร็จ ${formatNumber(state.sources.length)} ไฟล์ • ${formatNumber(state.totalSheets)} ชีท • ${formatNumber(state.records.length)} รายการราคา • มีราคา ${formatNumber(pricedCount)} รายการ${reportFileCount ? ` • ชุด อ. ${formatNumber(reportFileCount)} ไฟล์${unknownWeekCount ? ` (ยังจับสัปดาห์ไม่ได้บางส่วน ${formatNumber(unknownWeekCount)} ไฟล์)` : ''}` : ''}`);
+    }
+
+    function updateSourceCardActiveState() {
+      for (const card of el.sourceCards.querySelectorAll('[data-source-id]')) {
+        card.classList.toggle('active', card.getAttribute('data-source-id') === state.filters.file);
+      }
+    }
+
+    function updateStats() {
+      const sets = new Set(state.sources.map(source => source.meta.setRaw));
+      const priced = state.records.filter(row => row.effectivePrice !== null).length;
+      const reportFiles = state.sources.filter(source => source.meta.reportRequired);
+      el.statFiles.textContent = formatNumber(state.sources.length);
+      el.statSets.textContent = Array.from(sets).sort((a,b) => a.localeCompare(b,'th')).join(', ') || '-';
+      el.statSheets.textContent = formatNumber(state.totalSheets);
+      el.statPriced.textContent = formatNumber(priced);
+      el.statRows.textContent = formatNumber(state.records.length);
+      el.exportBtn.disabled = state.records.length === 0;
+      el.reportBtn.disabled = reportFiles.length === 0;
+      el.reportExportInlineBtn.disabled = reportFiles.length === 0;
+      el.reportBtn.textContent = reportFiles.length ? `ส่งออก REPORT ชุด อ. (${formatNumber(reportFiles.length)} ไฟล์)` : 'ส่งออก REPORT ชุด อ. (.xlsx)';
+      el.reportStatFiles.textContent = formatNumber(reportFiles.length);
+      el.reportStatRows.textContent = formatNumber(state.weeklyReportRows.length);
+      const completeRows = state.weeklyReportRows.filter(row => row.complete).length;
+      const unknownFiles = reportFiles.filter(source => getSourceReportWeekInfo(source).hasUnassigned);
+      el.reportStatComplete.textContent = formatNumber(completeRows);
+      el.reportStatIncomplete.textContent = formatNumber(state.weeklyReportRows.length - completeRows);
+      if (reportFiles.length) {
+        const weeks = [1,2,3,4].map(week => reportFiles.filter(source => getSourceReportWeekInfo(source).weeks.includes(week)).length);
+        const unknownText = unknownFiles.length ? ` • ยังมีข้อมูลที่จับสัปดาห์ไม่ได้ ${formatNumber(unknownFiles.length)} ไฟล์` : '';
+        el.reportNotice.classList.remove('hidden');
+        el.weeklyReportPanel.classList.remove('hidden');
+        el.reportNoticeText.textContent = `พบชุด อ. ${formatNumber(reportFiles.length)} ไฟล์: มี สป1 ${formatNumber(weeks[0])} ไฟล์, สป2 ${formatNumber(weeks[1])} ไฟล์, สป3 ${formatNumber(weeks[2])} ไฟล์, สป4 ${formatNumber(weeks[3])} ไฟล์${unknownText}`;
+      } else {
+        el.reportNotice.classList.add('hidden');
+        el.weeklyReportPanel.classList.add('hidden');
+      }
+    }
+
+    function applyFiltersFromControls() {
+      state.filters = {
+        file: el.fileSelect.value,
+        set: el.setSelect.value,
+        month: el.monthSelect.value,
+        year: el.yearSelect.value,
+        category: el.catSelect.value,
+        store: el.storeSelect.value,
+        price: el.priceFilterSelect.value || PRICE_DEFAULT,
+        query: normalizeSearch(el.searchInput.value)
+      };
+      state.page = 1;
+      applyFilters();
+    }
+
+    function applyFilters() {
+      const f = state.filters;
+      state.filteredRecords = state.records.filter(row => {
+        if (f.file && row.sourceId !== f.file) return false;
+        if (f.set && row.set !== f.set) return false;
+        if (f.month && row.month !== f.month) return false;
+        if (f.year && row.year !== f.year) return false;
+        if (f.category && row.categoryLabel !== f.category) return false;
+        if (f.store && row.store !== f.store) return false;
+        if (f.price === 'has_price' && row.effectivePrice === null) return false;
+        if (f.price === 'promo_only' && row.promoPrice === null) return false;
+        if (f.price === 'no_price' && row.effectivePrice !== null) return false;
+        if (f.query && !row.searchText.includes(f.query)) return false;
+        return true;
+      });
+      updateSourceCardActiveState();
+      renderPage();
+    }
+
+    function resetFilters() {
+      el.fileSelect.value = '';
+      el.setSelect.value = '';
+      el.monthSelect.value = '';
+      el.yearSelect.value = '';
+      el.catSelect.value = '';
+      el.storeSelect.value = '';
+      el.priceFilterSelect.value = PRICE_DEFAULT;
+      el.searchInput.value = '';
+      state.filters = { file:'', set:'', month:'', year:'', category:'', store:'', price:PRICE_DEFAULT, query:'' };
+      state.page = 1;
+      applyFilters();
+    }
+
+    function renderPage() {
+      const pages = totalPages();
+      if (state.page > pages) state.page = pages;
+      const start = (state.page - 1) * state.pageSize;
+      const rows = state.filteredRecords.slice(start, start + state.pageSize);
+      if (!rows.length) {
+        el.tableBody.innerHTML = '<tr><td colspan="12" style="padding:42px;text-align:center;color:#7d8998">ไม่พบข้อมูลที่ตรงกับตัวกรอง</td></tr>';
+      } else {
+        el.tableBody.innerHTML = rows.map(renderRecordRow).join('');
+      }
+      const visibleStart = state.filteredRecords.length ? start + 1 : 0;
+      const visibleEnd = Math.min(start + state.pageSize, state.filteredRecords.length);
+      el.resultInfo.textContent = `แสดง ${formatNumber(visibleStart)}–${formatNumber(visibleEnd)} จาก ${formatNumber(state.filteredRecords.length)} รายการ (ข้อมูลทั้งหมด ${formatNumber(state.records.length)} รายการ)`;
+      el.pageIndicator.textContent = `หน้า ${formatNumber(state.page)} / ${formatNumber(pages)}`;
+      el.prevPageBtn.disabled = state.page <= 1;
+      el.nextPageBtn.disabled = state.page >= pages;
+      el.exportBtn.disabled = state.filteredRecords.length === 0;
+    }
+
+    function renderRecordRow(row) {
+      const rowClass = row.reportRequired ? ' class="report-row"' : '';
+      return `<tr${rowClass} title="${escapeAttribute(row.sourceFile)} • แถว Excel ${row.excelRow}">
+        <td class="set-cell"><span class="set-badge">${escapeHtml(row.set)}</span>${row.reportRequired ? '<span class="report-tag">REPORT</span>' : ''}</td>
+        <td class="meta-cell">${escapeHtml(row.month)}</td>
+        <td class="meta-cell">${escapeHtml(row.year)}</td>
+        <td class="category-cell">${escapeHtml(row.categoryLabel)}</td>
+        <td class="item-code">${escapeHtml(row.itemCode || '-')}</td>
+        <td class="item-name">${escapeHtml(row.itemName).replace(/\\/g, '<br>')}</td>
+        <td class="store-cell">${row.store ? escapeHtml(row.store) : '<span class="blank">-</span>'}</td>
+        <td class="price-cell">${formatPrice(row.regularPrice)}</td>
+        <td class="price-cell">${formatPrice(row.promoPrice)}</td>
+        <td class="price-cell effective">${formatPrice(row.effectivePrice)}</td>
+        <td class="condition-cell">${row.condition ? escapeHtml(row.condition) : '<span class="blank">-</span>'}</td>
+        <td class="link-cell">${row.link ? `<a class="cell-link" href="${escapeAttribute(row.link)}" target="_blank" rel="noopener noreferrer">เปิด ↗</a>` : '<span class="blank">-</span>'}</td>
+      </tr>`;
+    }
+
+    function formatPrice(value) {
+      if (value === null || !Number.isFinite(Number(value))) return '<span class="blank">-</span>';
+      return `฿${Number(value).toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    }
+
+    function totalPages() { return Math.max(1, Math.ceil(state.filteredRecords.length / state.pageSize)); }
+    function changePage(delta) {
+      state.page = Math.min(totalPages(), Math.max(1, state.page + delta));
+      renderPage();
+      document.getElementById('tableWrap').scrollTop = 0;
+    }
+
+    function rebuildWeeklyReport() {
+      const groups = new Map();
+      const reportRows = state.records.filter(row => row.reportRequired && row.effectivePrice !== null);
+      for (const row of reportRows) {
+        const codeText = String(row.itemCode || '').trim();
+        const nameText = normalizeSearch(row.itemName);
+        // ชุด อ. จับคู่ระดับรายการ ไม่ใช้ “ห้าง/ร้าน” เพราะหัวกลุ่มของไฟล์คือสัปดาห์
+        // const key = [row.month, row.year, row.categoryLabel, codeText, nameText].join('\u001f');
+        const key = [row.month, row.year, row.store, row.categoryLabel, codeText, nameText].join('\u001f');
+        if (!groups.has(key)) {
+          groups.set(key, {
+            month: row.month,
+            year: row.year,
+            categoryLabel: row.categoryLabel,
+            itemCode: codeText,
+            itemName: row.itemName,
+            weeks: { 1: [], 2: [], 3: [], 4: [] },
+            sourceFiles: new Set(),
+            unknownWeekPrices: []
+          });
+        }
+        const group = groups.get(key);
+        group.sourceFiles.add(row.sourceFile);
+        if ([1,2,3,4].includes(Number(row.week))) group.weeks[Number(row.week)].push(Number(row.effectivePrice));
+        else group.unknownWeekPrices.push(Number(row.effectivePrice));
+      }
+
+      state.weeklyReportRows = Array.from(groups.values()).map(group => {
+        const weekly = {};
+        for (const week of [1,2,3,4]) {
+          const values = group.weeks[week].filter(Number.isFinite);
+          weekly[week] = values.length ? values.reduce((sum, value) => sum + value, 0) / values.length : null;
+        }
+        const presentWeeks = [1,2,3,4].filter(week => weekly[week] !== null);
+        const complete = presentWeeks.length === 4;
+        const average4 = complete ? [1,2,3,4].reduce((sum, week) => sum + weekly[week], 0) / 4 : null;
+        const missingWeeks = [1,2,3,4].filter(week => weekly[week] === null);
+        const status = complete
+          ? 'ครบ 4 สัปดาห์'
+          : `${missingWeeks.length ? `ขาด ${missingWeeks.map(week => `สป${week}`).join(', ')}` : ''}${group.unknownWeekPrices.length ? `${missingWeeks.length ? ' • ' : ''}มีราคาที่ยังจับสัปดาห์ไม่ได้` : ''}`;
+        const searchText = normalizeSearch([
+          group.month, group.year, group.categoryLabel, group.itemCode, group.itemName, status
+        ].join(' '));
+        return {
+          ...group,
+          weekly,
+          presentWeeks: presentWeeks.length,
+          complete,
+          average4,
+          missingWeeks,
+          status,
+          sourceFiles: Array.from(group.sourceFiles).sort((a,b) => a.localeCompare(b,'th')),
+          unknownWeekCount: group.unknownWeekPrices.length,
+          searchText
+        };
+      }).sort((a, b) =>
+        Number(b.year) - Number(a.year) ||
+        a.month.localeCompare(b.month, 'th') ||
+        a.categoryLabel.localeCompare(b.categoryLabel, 'th') ||
+        a.itemCode.localeCompare(b.itemCode) ||
+        a.itemName.localeCompare(b.itemName, 'th')
+      );
+      populateWeeklyReportFilters();
+      applyWeeklyReportFilters();
+    }
+
+    function populateWeeklyReportFilters() {
+      const reportSources = state.sources.filter(source => source.meta.reportRequired);
+      fillSelect(el.reportMonthSelect, uniqueSorted(reportSources.map(source => source.meta.monthRaw)).map(value => ({ value, label: value })), '-- ทุกเดือน --');
+      fillSelect(el.reportYearSelect, uniqueSorted(reportSources.map(source => source.meta.yearDisplay), true).map(value => ({ value, label: value })), '-- ทุกปี --');
+      fillSelect(el.reportCatSelect, uniqueSorted(state.weeklyReportRows.map(row => row.categoryLabel)).map(value => ({ value, label: value })), '-- ทุกหมวด --');
+    }
+
+    function applyWeeklyReportFiltersFromControls() {
+      state.reportFilters = {
+        month: el.reportMonthSelect.value,
+        year: el.reportYearSelect.value,
+        category: el.reportCatSelect.value,
+        query: normalizeSearch(el.reportSearchInput.value)
+      };
+      applyWeeklyReportFilters();
+    }
+
+    function resetWeeklyReportFilters() {
+      el.reportMonthSelect.value = '';
+      el.reportYearSelect.value = '';
+      el.reportCatSelect.value = '';
+      el.reportSearchInput.value = '';
+      state.reportFilters = { month: '', year: '', category: '', query: '' };
+      applyWeeklyReportFilters();
+    }
+
+    function applyWeeklyReportFilters() {
+      const f = state.reportFilters;
+      state.filteredWeeklyRows = state.weeklyReportRows.filter(row => {
+        if (f.month && row.month !== f.month) return false;
+        if (f.year && row.year !== f.year) return false;
+        if (f.category && row.categoryLabel !== f.category) return false;
+        if (f.query && !row.searchText.includes(f.query)) return false;
+        return true;
+      });
+      renderWeeklyReport();
+    }
+
+    function renderWeeklyReport() {
+      const rows = state.filteredWeeklyRows;
+      if (!rows.length) {
+        el.weeklyReportBody.innerHTML = '<tr><td colspan="11" style="padding:38px;text-align:center;color:#7d8998">ยังไม่มีข้อมูล REPORT ชุด อ. ที่ตรงกับตัวกรอง</td></tr>';
+      } else {
+        el.weeklyReportBody.innerHTML = rows.map(row => `
+          <tr title="${escapeAttribute(row.sourceFiles.join(' • '))}">
+            <td class="meta-cell">${escapeHtml(row.month)}</td>
+            <td class="meta-cell">${escapeHtml(row.year)}</td>
+            <td class="category-cell">${escapeHtml(row.categoryLabel)}</td>
+            <td class="item-code text-code">${escapeHtml(row.itemCode || '-')}</td>
+            <td class="item-name">${escapeHtml(row.itemName).replace(/\\/g, '<br>')}</td>
+            ${[1,2,3,4].map(week => `<td class="week-price">${formatPrice(row.weekly[week])}</td>`).join('')}
+            <td class="average-price">${formatPrice(row.average4)}</td>
+            <td><span class="report-status ${row.complete ? 'complete' : 'incomplete'}">${escapeHtml(row.status || 'ยังไม่ครบ')}</span></td>
+          </tr>`).join('');
+      }
+      const complete = rows.filter(row => row.complete).length;
+      el.weeklyReportInfo.textContent = `แสดง ${formatNumber(rows.length)} รายการ • ครบ 4 สัปดาห์ ${formatNumber(complete)} • ยังไม่ครบ ${formatNumber(rows.length - complete)}`;
+      const unknownSources = state.sources.filter(source => source.meta.reportRequired && getSourceReportWeekInfo(source).hasUnassigned);
+      if (unknownSources.length) {
+        el.reportWeekWarning.classList.remove('hidden');
+        el.reportWeekWarning.textContent = `มีข้อมูลชุด อ. ที่หัวคอลัมน์และชื่อไฟล์ยังระบุสัปดาห์ไม่ได้ใน ${formatNumber(unknownSources.length)} ไฟล์: ${unknownSources.map(source => source.name).join(' • ')} — ใช้ตัวเลือกสัปดาห์บนการ์ดไฟล์เฉพาะกรณีที่ไฟล์ไม่ได้แบ่งหัวคอลัมน์เป็นสัปดาห์`;
+      } else {
+        el.reportWeekWarning.classList.add('hidden');
+        el.reportWeekWarning.textContent = '';
+      }
+      const noRows = rows.length === 0;
+      el.reportExportInlineBtn.disabled = noRows;
+      el.reportBtn.disabled = noRows;
+    }
+
+    function exportFilteredCsv() {
+      if (!state.filteredRecords.length) return;
+      const headers = ['ไฟล์ต้นทาง','ชุด','เดือน','ปี พ.ศ.','สัปดาห์','REPORT','หมวดหมู่ (รหัส_ชื่อ)','รหัสรายการ','ชื่อรายการสินค้า','ห้าง/ร้าน','ราคาปกติ','ราคาโปร','ราคาที่ใช้','ภาวะ','URL'];
+      const rows = state.filteredRecords.map(row => [
+        textXlsx(row.sourceFile), textXlsx(row.set), textXlsx(row.month), textXlsx(row.year), textXlsx(row.week ? `สป${row.week}` : ''),
+        textXlsx(row.reportRequired ? 'REPORT' : ''), textXlsx(row.categoryLabel), textXlsx(String(row.itemCode || '')),
+        textXlsx(row.itemName), textXlsx(row.store), numberXlsx(row.regularPrice), numberXlsx(row.promoPrice),
+        numberXlsx(row.effectivePrice), textXlsx(row.condition), textXlsx(row.link)
+      ]);
+      downloadXlsx(`ราคากลาง_ข้อมูลที่กรอง_${dateStamp()}.xlsx`, [{
+        name: 'ข้อมูลที่กรอง', headers, rows,
+        widths: [34,10,12,10,10,11,27,22,55,22,14,14,14,24,55]
+      }]);
+    }
+
+    function exportReportCsv() {
+      const reportRows = state.filteredWeeklyRows;
+      if (!reportRows.length) { alert('ไม่มีข้อมูล REPORT ชุด อ. ที่ตรงกับตัวกรอง'); return; }
+      const reportHeaders = ['ชุด','เดือน','ปี พ.ศ.','หมวดหมู่ (รหัส_ชื่อ)','รหัสรายการ','ชื่อรายการสินค้า','สป1','สป2','สป3','สป4','ราคาเฉลี่ย 4 สัปดาห์','จำนวนสัปดาห์ที่มีราคา','สถานะ','ไฟล์ต้นทาง'];
+      const reportData = reportRows.map(row => [
+        textXlsx('อ.'), textXlsx(row.month), textXlsx(row.year), textXlsx(row.categoryLabel), textXlsx(String(row.itemCode || '')),
+        textXlsx(row.itemName), numberXlsx(row.weekly[1]), numberXlsx(row.weekly[2]), numberXlsx(row.weekly[3]),
+        numberXlsx(row.weekly[4]), numberXlsx(row.average4), numberXlsx(row.presentWeeks, 0), textXlsx(row.status), textXlsx(row.sourceFiles.join(' | '))
+      ]);
+      const rawRows = state.records.filter(row => row.reportRequired).map(row => [
+        textXlsx(row.sourceFile), textXlsx(row.month), textXlsx(row.year), textXlsx(row.week ? `สป${row.week}` : ''),
+        textXlsx(row.categoryLabel), textXlsx(String(row.itemCode || '')), textXlsx(row.itemName),
+        numberXlsx(row.regularPrice), numberXlsx(row.promoPrice), numberXlsx(row.effectivePrice), textXlsx(row.condition), textXlsx(row.link)
+      ]);
+      downloadXlsx(`REPORT_ชุด_อ_${dateStamp()}.xlsx`, [
+        { name: 'REPORT_สป1-สป4', headers: reportHeaders, rows: reportData, widths: [9,12,10,27,22,55,14,14,14,14,20,18,28,55] },
+        { name: 'ข้อมูลดิบ_ชุด_อ', headers: ['ไฟล์ต้นทาง','เดือน','ปี พ.ศ.','สัปดาห์','หมวดหมู่ (รหัส_ชื่อ)','รหัสรายการ','ชื่อรายการสินค้า','ราคาปกติ','ราคาโปร','ราคาที่ใช้','ภาวะ','URL'], rows: rawRows, widths: [34,12,10,10,27,22,55,14,14,14,24,55] }
+      ]);
+    }
+
+    function textXlsx(value) { return { type: 's', value: String(value == null ? '' : value) }; }
+    function numberXlsx(value, decimals = 2) {
+      if (value === null || value === undefined || value === '') return { type: 'blank', value: '' };
+      const number = Number(value);
+      return Number.isFinite(number) ? { type: 'n', value: number, decimals } : { type: 'blank', value: '' };
+    }
+
+    function downloadXlsx(fileName, sheets) {
+      const files = buildXlsxParts(sheets);
+      const blob = buildStoredZip(files, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+      const url = URL.createObjectURL(blob);
+      const anchor = document.createElement('a');
+      anchor.href = url;
+      anchor.download = fileName;
+      document.body.appendChild(anchor);
+      anchor.click();
+      anchor.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1200);
+    }
+
+    function buildXlsxParts(sheets) {
+      const safeSheets = sheets.map((sheet, index) => ({
+        ...sheet,
+        name: sanitizeSheetName(sheet.name || `Sheet${index + 1}`),
+        rows: Array.isArray(sheet.rows) ? sheet.rows : [],
+        headers: Array.isArray(sheet.headers) ? sheet.headers : [],
+        widths: Array.isArray(sheet.widths) ? sheet.widths : []
+      }));
+      const parts = new Map();
+      const worksheetOverrides = safeSheets.map((_, index) => `<Override PartName="/xl/worksheets/sheet${index + 1}.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>`).join('');
+      parts.set('[Content_Types].xml', `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/>${worksheetOverrides}</Types>`);
+      parts.set('_rels/.rels', `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>`);
+      parts.set('xl/workbook.xml', `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><bookViews><workbookView/></bookViews><sheets>${safeSheets.map((sheet, index) => `<sheet name="${xmlEscape(sheet.name)}" sheetId="${index + 1}" r:id="rId${index + 1}"/>`).join('')}</sheets></workbook>`);
+      parts.set('xl/_rels/workbook.xml.rels', `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">${safeSheets.map((_, index) => `<Relationship Id="rId${index + 1}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet${index + 1}.xml"/>`).join('')}<Relationship Id="rId${safeSheets.length + 1}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>`);
+      parts.set('xl/styles.xml', buildStylesXml());
+      safeSheets.forEach((sheet, index) => parts.set(`xl/worksheets/sheet${index + 1}.xml`, buildWorksheetXml(sheet)));
+      return parts;
+    }
+
+    function buildStylesXml() {
+      return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><numFmts count="2"><numFmt numFmtId="164" formatCode="#\,##0.00"/><numFmt numFmtId="165" formatCode="0"/></numFmts><fonts count="2"><font><sz val="11"/><name val="Tahoma"/></font><font><b/><color rgb="FFFFFFFF"/><sz val="11"/><name val="Tahoma"/></font></fonts><fills count="3"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill><fill><patternFill patternType="solid"><fgColor rgb="FF1769E0"/><bgColor indexed="64"/></patternFill></fill></fills><borders count="2"><border><left/><right/><top/><bottom/><diagonal/></border><border><left style="thin"><color rgb="FFDCE5F0"/></left><right style="thin"><color rgb="FFDCE5F0"/></right><top style="thin"><color rgb="FFDCE5F0"/></top><bottom style="thin"><color rgb="FFDCE5F0"/></bottom><diagonal/></border></borders><cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs><cellXfs count="5"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/><xf numFmtId="0" fontId="1" fillId="2" borderId="1" xfId="0" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment horizontal="center" vertical="center" wrapText="1"/></xf><xf numFmtId="49" fontId="0" fillId="0" borderId="1" xfId="0" applyNumberFormat="1" applyBorder="1" applyAlignment="1"><alignment vertical="top" wrapText="1"/></xf><xf numFmtId="164" fontId="0" fillId="0" borderId="1" xfId="0" applyNumberFormat="1" applyBorder="1" applyAlignment="1"><alignment horizontal="right" vertical="top"/></xf><xf numFmtId="165" fontId="0" fillId="0" borderId="1" xfId="0" applyNumberFormat="1" applyBorder="1" applyAlignment="1"><alignment horizontal="right" vertical="top"/></xf></cellXfs><cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles></styleSheet>`;
+    }
+
+    function buildWorksheetXml(sheet) {
+      const allRows = [sheet.headers.map(value => textXlsx(value)), ...sheet.rows];
+      const maxCols = Math.max(sheet.headers.length, ...sheet.rows.map(row => row.length), 1);
+      const maxRows = Math.max(allRows.length, 1);
+      const cols = Array.from({ length: maxCols }, (_, index) => {
+        const width = Number(sheet.widths[index]) || 14;
+        return `<col min="${index + 1}" max="${index + 1}" width="${Math.min(80, Math.max(6, width))}" customWidth="1"/>`;
+      }).join('');
+      const rowsXml = allRows.map((row, rowIndex) => {
+        const cells = row.map((cell, colIndex) => buildXlsxCell(cell, rowIndex + 1, colIndex + 1, rowIndex === 0)).join('');
+        return `<row r="${rowIndex + 1}"${rowIndex === 0 ? ' ht="31" customHeight="1"' : ''}>${cells}</row>`;
+      }).join('');
+      const endRef = `${columnName(maxCols)}${maxRows}`;
+      return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><sheetViews><sheetView workbookViewId="0"><pane ySplit="1" topLeftCell="A2" activePane="bottomLeft" state="frozen"/><selection pane="bottomLeft" activeCell="A2" sqref="A2"/></sheetView></sheetViews><sheetFormatPr defaultRowHeight="18"/><cols>${cols}</cols><sheetData>${rowsXml}</sheetData><autoFilter ref="A1:${endRef}"/></worksheet>`;
+    }
+
+    function buildXlsxCell(cell, row, col, isHeader) {
+      const ref = `${columnName(col)}${row}`;
+      if (isHeader) return `<c r="${ref}" t="inlineStr" s="1"><is><t>${xmlEscape(cell && cell.value != null ? cell.value : '')}</t></is></c>`;
+      if (!cell || cell.type === 'blank' || cell.value === '') return `<c r="${ref}" s="2"/>`;
+      if (cell.type === 'n' && Number.isFinite(Number(cell.value))) {
+        const style = cell.decimals === 0 ? 4 : 3;
+        return `<c r="${ref}" t="n" s="${style}"><v>${Number(cell.value)}</v></c>`;
+      }
+      const value = String(cell.value == null ? '' : cell.value);
+      return `<c r="${ref}" t="inlineStr" s="2"><is><t xml:space="preserve">${xmlEscape(value)}</t></is></c>`;
+    }
+
+    function sanitizeSheetName(value) {
+      const clean = String(value || 'Sheet').replace(/[\\/*?:\[\]]/g, ' ').trim() || 'Sheet';
+      return clean.slice(0, 31);
+    }
+
+    function columnName(index) {
+      let value = Number(index), output = '';
+      while (value > 0) {
+        const mod = (value - 1) % 26;
+        output = String.fromCharCode(65 + mod) + output;
+        value = Math.floor((value - 1) / 26);
+      }
+      return output || 'A';
+    }
+
+    function xmlEscape(value) {
+      return String(value == null ? '' : value)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&apos;');
+    }
+
+    function buildStoredZip(files, mimeType) {
+      const encoder = new TextEncoder();
+      const entries = [];
+      let localOffset = 0;
+      for (const [name, content] of files.entries()) {
+        const nameBytes = encoder.encode(name);
+        const data = typeof content === 'string' ? encoder.encode(content) : content;
+        const crc = crc32(data);
+        const local = new Uint8Array(30 + nameBytes.length + data.length);
+        const view = new DataView(local.buffer);
+        view.setUint32(0, 0x04034b50, true);
+        view.setUint16(4, 20, true);
+        view.setUint16(6, 0x0800, true);
+        view.setUint16(8, 0, true);
+        view.setUint16(10, 0, true);
+        view.setUint16(12, 0, true);
+        view.setUint32(14, crc, true);
+        view.setUint32(18, data.length, true);
+        view.setUint32(22, data.length, true);
+        view.setUint16(26, nameBytes.length, true);
+        view.setUint16(28, 0, true);
+        local.set(nameBytes, 30);
+        local.set(data, 30 + nameBytes.length);
+        entries.push({ nameBytes, data, crc, local, offset: localOffset });
+        localOffset += local.length;
+      }
+
+      const centralParts = [];
+      let centralSize = 0;
+      for (const entry of entries) {
+        const central = new Uint8Array(46 + entry.nameBytes.length);
+        const view = new DataView(central.buffer);
+        view.setUint32(0, 0x02014b50, true);
+        view.setUint16(4, 20, true);
+        view.setUint16(6, 20, true);
+        view.setUint16(8, 0x0800, true);
+        view.setUint16(10, 0, true);
+        view.setUint16(12, 0, true);
+        view.setUint16(14, 0, true);
+        view.setUint32(16, entry.crc, true);
+        view.setUint32(20, entry.data.length, true);
+        view.setUint32(24, entry.data.length, true);
+        view.setUint16(28, entry.nameBytes.length, true);
+        view.setUint16(30, 0, true);
+        view.setUint16(32, 0, true);
+        view.setUint16(34, 0, true);
+        view.setUint16(36, 0, true);
+        view.setUint32(38, 0, true);
+        view.setUint32(42, entry.offset, true);
+        central.set(entry.nameBytes, 46);
+        centralParts.push(central);
+        centralSize += central.length;
+      }
+
+      const end = new Uint8Array(22);
+      const endView = new DataView(end.buffer);
+      endView.setUint32(0, 0x06054b50, true);
+      endView.setUint16(4, 0, true);
+      endView.setUint16(6, 0, true);
+      endView.setUint16(8, entries.length, true);
+      endView.setUint16(10, entries.length, true);
+      endView.setUint32(12, centralSize, true);
+      endView.setUint32(16, localOffset, true);
+      endView.setUint16(20, 0, true);
+      return new Blob([...entries.map(entry => entry.local), ...centralParts, end], { type: mimeType });
+    }
+
+    const CRC32_TABLE = (() => {
+      const table = new Uint32Array(256);
+      for (let n = 0; n < 256; n += 1) {
+        let c = n;
+        for (let k = 0; k < 8; k += 1) c = (c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1);
+        table[n] = c >>> 0;
+      }
+      return table;
+    })();
+
+    function crc32(bytes) {
+      let crc = 0xFFFFFFFF;
+      for (let index = 0; index < bytes.length; index += 1) crc = CRC32_TABLE[(crc ^ bytes[index]) & 0xFF] ^ (crc >>> 8);
+      return (crc ^ 0xFFFFFFFF) >>> 0;
+    }
+
+    function dateStamp() {
+      const now = new Date();
+      return `${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}`;
+    }
+
+    function clearData() {
+      state.records = [];
+      state.filteredRecords = [];
+      state.categories = [];
+      state.stores = [];
+      state.weeklyReportRows = [];
+      state.filteredWeeklyRows = [];
+      state.totalSheets = 0;
+      state.totalRawRows = 0;
+      state.page = 1;
+      el.dataArea.classList.add('hidden');
+      el.emptyState.classList.remove('hidden');
+      el.tableBody.innerHTML = '';
+      el.weeklyReportBody.innerHTML = '';
+      el.weeklyReportPanel.classList.add('hidden');
+      el.reportNotice.classList.add('hidden');
+    }
+
+    function setBusy(busy) {
+      state.busy = busy;
+      for (const button of [el.openFolderBtn, el.openFileBtn, el.emptyOpenFolderBtn, el.emptyOpenFileBtn]) button.disabled = busy;
+    }
+    function setStatus(type, message) { el.statusBox.className = `status ${type || ''}`.trim(); el.statusText.textContent = message; }
+
+    function setupDropHandlers() {
+      let depth = 0;
+      window.addEventListener('dragenter', event => { event.preventDefault(); depth += 1; document.body.classList.add('drop-active'); });
+      window.addEventListener('dragover', event => event.preventDefault());
+      window.addEventListener('dragleave', event => { event.preventDefault(); depth = Math.max(0, depth - 1); if (!depth) document.body.classList.remove('drop-active'); });
+      window.addEventListener('drop', async event => {
+        event.preventDefault(); depth = 0; document.body.classList.remove('drop-active');
+        await registerFileSources(Array.from(event.dataTransfer.files || []));
+      });
+    }
+
+    function normalizeSearch(value) { return normalizeName(value).toLocaleLowerCase('th-TH').replace(/\s+/g, ' ').trim(); }
+    function formatNumber(value) { return Number(value || 0).toLocaleString('th-TH'); }
+    function escapeHtml(value) {
+      return String(value == null ? '' : value).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');
+    }
+    function escapeAttribute(value) { return escapeHtml(value).replace(/`/g, '&#096;'); }
+
+    async function parseXlsxEachSheet(arrayBuffer, onSheet, onProgress) {
+      if (!(arrayBuffer instanceof ArrayBuffer)) throw new Error('รูปแบบข้อมูลไฟล์ไม่ถูกต้อง');
+      const zip = createZipReader(arrayBuffer);
+      const workbookPath = 'xl/workbook.xml';
+      const workbookDoc = parseXml(await zip.readText(workbookPath), workbookPath);
+      const sheetNodes = elementsByLocalName(workbookDoc, 'sheet');
+      if (!sheetNodes.length) throw new Error('ไฟล์นี้ไม่มีชีทที่อ่านได้');
+      const workbookRelsPath = 'xl/_rels/workbook.xml.rels';
+      const workbookRels = parseRelationships(parseXml(await zip.readText(workbookRelsPath), workbookRelsPath));
+      let sharedStrings = [];
+      const sharedRel = Array.from(workbookRels.values()).find(rel => /\/sharedStrings$/i.test(rel.type));
+      const sharedPath = sharedRel ? resolveZipPath(workbookPath, sharedRel.target) : 'xl/sharedStrings.xml';
+      if (zip.has(sharedPath)) sharedStrings = parseSharedStrings(parseXml(await zip.readText(sharedPath), sharedPath));
+      let styleFormats = [];
+      const stylesRel = Array.from(workbookRels.values()).find(rel => /\/styles$/i.test(rel.type));
+      const stylesPath = stylesRel ? resolveZipPath(workbookPath, stylesRel.target) : 'xl/styles.xml';
+      if (zip.has(stylesPath)) styleFormats = parseStyleFormats(parseXml(await zip.readText(stylesPath), stylesPath));
+      for (let index = 0; index < sheetNodes.length; index += 1) {
+        const node = sheetNodes[index];
+        const name = node.getAttribute('name') || `Sheet${index + 1}`;
+        const relId = node.getAttributeNS('http://schemas.openxmlformats.org/officeDocument/2006/relationships','id') || node.getAttribute('r:id');
+        if (!relId) throw new Error(`ไม่พบตำแหน่งของชีท “${name}”`);
+        const rel = workbookRels.get(relId);
+        if (!rel) throw new Error(`ไม่พบไฟล์ข้อมูลของชีท “${name}”`);
+        const path = resolveZipPath(workbookPath, rel.target);
+        const worksheetXml = compactWorksheetXml(await zip.readText(path));
+        const doc = parseXml(worksheetXml, path);
+        const hyperlinks = await parseWorksheetHyperlinks(zip, path, doc);
+        const sheet = {
+          name,
+          visibility: node.getAttribute('state') || 'visible',
+          cells: parseWorksheetCells(doc, sharedStrings, styleFormats, hyperlinks),
+          merges: parseWorksheetMerges(doc)
+        };
+        if (typeof onSheet === 'function') await onSheet(sheet, index + 1, sheetNodes.length);
+        if (typeof onProgress === 'function') onProgress(index + 1, sheetNodes.length, name);
+        sheet.cells.length = 0;
+        sheet.merges.length = 0;
+        if ((index + 1) % 2 === 0) await new Promise(resolve => setTimeout(resolve, 0));
+      }
+      return { sheetCount: sheetNodes.length };
+    }
+
+    async function parseXlsxAllSheets(arrayBuffer, onProgress) {
+      if (!(arrayBuffer instanceof ArrayBuffer)) throw new Error('รูปแบบข้อมูลไฟล์ไม่ถูกต้อง');
+      const zip = createZipReader(arrayBuffer);
+      const workbookPath = 'xl/workbook.xml';
+      const workbookDoc = parseXml(await zip.readText(workbookPath), workbookPath);
+      const sheetNodes = elementsByLocalName(workbookDoc, 'sheet');
+      if (!sheetNodes.length) throw new Error('ไฟล์นี้ไม่มีชีทที่อ่านได้');
+      const workbookRelsPath = 'xl/_rels/workbook.xml.rels';
+      const workbookRels = parseRelationships(parseXml(await zip.readText(workbookRelsPath), workbookRelsPath));
+      let sharedStrings = [];
+      const sharedRel = Array.from(workbookRels.values()).find(rel => /\/sharedStrings$/i.test(rel.type));
+      const sharedPath = sharedRel ? resolveZipPath(workbookPath, sharedRel.target) : 'xl/sharedStrings.xml';
+      if (zip.has(sharedPath)) sharedStrings = parseSharedStrings(parseXml(await zip.readText(sharedPath), sharedPath));
+      let styleFormats = [];
+      const stylesRel = Array.from(workbookRels.values()).find(rel => /\/styles$/i.test(rel.type));
+      const stylesPath = stylesRel ? resolveZipPath(workbookPath, stylesRel.target) : 'xl/styles.xml';
+      if (zip.has(stylesPath)) styleFormats = parseStyleFormats(parseXml(await zip.readText(stylesPath), stylesPath));
+      const sheets = [];
+      for (let index = 0; index < sheetNodes.length; index += 1) {
+        const node = sheetNodes[index];
+        const name = node.getAttribute('name') || `Sheet${index + 1}`;
+        const relId = node.getAttributeNS('http://schemas.openxmlformats.org/officeDocument/2006/relationships','id') || node.getAttribute('r:id');
+        if (!relId) throw new Error(`ไม่พบตำแหน่งของชีท “${name}”`);
+        const rel = workbookRels.get(relId);
+        if (!rel) throw new Error(`ไม่พบไฟล์ข้อมูลของชีท “${name}”`);
+        const path = resolveZipPath(workbookPath, rel.target);
+        const worksheetXml = compactWorksheetXml(await zip.readText(path));
+        const doc = parseXml(worksheetXml, path);
+        const hyperlinks = await parseWorksheetHyperlinks(zip, path, doc);
+        sheets.push({ name, visibility: node.getAttribute('state') || 'visible', cells: parseWorksheetCells(doc, sharedStrings, styleFormats, hyperlinks), merges: parseWorksheetMerges(doc) });
+        if (typeof onProgress === 'function') onProgress(index + 1, sheetNodes.length, name);
+        if ((index + 1) % 4 === 0) await new Promise(resolve => setTimeout(resolve, 0));
+      }
+      return { sheetCount: sheets.length, sheets };
+    }
+
+    function createZipReader(arrayBuffer) {
+      const bytes = new Uint8Array(arrayBuffer);
+      const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+      const utf8 = new TextDecoder('utf-8');
+      const entries = new Map();
+      const cache = new Map();
+      const eocdOffset = findZipEndOfCentralDirectory(view);
+
+      if (eocdOffset < 0) throw new Error('ไฟล์ไม่ใช่ XLSX ที่สมบูรณ์');
+
+      const totalEntries = view.getUint16(eocdOffset + 10, true);
+      const centralDirectoryOffset = view.getUint32(eocdOffset + 16, true);
+      let cursor = centralDirectoryOffset;
+
+      for (let index = 0; index < totalEntries; index += 1) {
+        if (view.getUint32(cursor, true) !== 0x02014b50) {
+          throw new Error('โครงสร้าง ZIP ภายในไฟล์ไม่ถูกต้อง');
+        }
+
+        const flags = view.getUint16(cursor + 8, true);
+        const method = view.getUint16(cursor + 10, true);
+        const compressedSize = view.getUint32(cursor + 20, true);
+        const uncompressedSize = view.getUint32(cursor + 24, true);
+        const nameLength = view.getUint16(cursor + 28, true);
+        const extraLength = view.getUint16(cursor + 30, true);
+        const commentLength = view.getUint16(cursor + 32, true);
+        const localHeaderOffset = view.getUint32(cursor + 42, true);
+        const nameBytes = bytes.subarray(cursor + 46, cursor + 46 + nameLength);
+        const name = utf8.decode(nameBytes).replace(/\\/g, '/');
+
+        if (flags & 0x0001) throw new Error('ไฟล์ Excel ถูกเข้ารหัสและไม่สามารถอ่านได้');
+        if (compressedSize === 0xffffffff || uncompressedSize === 0xffffffff || localHeaderOffset === 0xffffffff) {
+          throw new Error('ยังไม่รองรับไฟล์ XLSX แบบ ZIP64');
+        }
+
+        entries.set(name, {
+          name,
+          method,
+          compressedSize,
+          uncompressedSize,
+          localHeaderOffset
+        });
+
+        cursor += 46 + nameLength + extraLength + commentLength;
+      }
+
+      async function readBytes(name) {
+        const normalized = String(name || '').replace(/^\/+/, '').replace(/\\/g, '/');
+        if (cache.has(normalized)) return cache.get(normalized);
+
+        const entry = entries.get(normalized);
+        if (!entry) throw new Error(`ไม่พบส่วนประกอบ ${normalized} ภายในไฟล์ Excel`);
+
+        const offset = entry.localHeaderOffset;
+        if (view.getUint32(offset, true) !== 0x04034b50) {
+          throw new Error(`ส่วนประกอบ ${normalized} มีโครงสร้างไม่ถูกต้อง`);
+        }
+
+        const nameLength = view.getUint16(offset + 26, true);
+        const extraLength = view.getUint16(offset + 28, true);
+        const dataStart = offset + 30 + nameLength + extraLength;
+        const compressed = bytes.subarray(dataStart, dataStart + entry.compressedSize);
+        let output;
+
+        if (entry.method === 0) {
+          output = new Uint8Array(compressed);
+        } else if (entry.method === 8) {
+          output = await inflateRaw(compressed);
+        } else {
+          throw new Error(`ไม่รองรับวิธีบีบอัด ZIP หมายเลข ${entry.method}`);
+        }
+
+        cache.set(normalized, output);
+        return output;
+      }
+
+      return {
+        has(name) {
+          const normalized = String(name || '').replace(/^\/+/, '').replace(/\\/g, '/');
+          return entries.has(normalized);
+        },
+        async readText(name) {
+          return utf8.decode(await readBytes(name));
+        }
+      };
+    }
+
+    function findZipEndOfCentralDirectory(view) {
+      const minimum = Math.max(0, view.byteLength - 65557);
+      for (let offset = view.byteLength - 22; offset >= minimum; offset -= 1) {
+        if (view.getUint32(offset, true) === 0x06054b50) return offset;
+      }
+      return -1;
+    }
+
+    async function inflateRaw(compressedBytes) {
+      if (typeof DecompressionStream === 'undefined') {
+        throw new Error('เบราว์เซอร์นี้เก่าเกินไป กรุณาเปิดด้วย Chrome หรือ Edge รุ่นปัจจุบัน');
+      }
+
+      try {
+        const stream = new Blob([compressedBytes])
+          .stream()
+          .pipeThrough(new DecompressionStream('deflate-raw'));
+        return new Uint8Array(await new Response(stream).arrayBuffer());
+      } catch (error) {
+        throw new Error('คลายข้อมูลภายในไฟล์ XLSX ไม่สำเร็จ');
+      }
+    }
+
+    function compactWorksheetXml(xmlText) {
+      // Excel often stores hundreds of thousands of style-only cells such as
+      // <c r="B1" s="3"/>. They contain no value, formula or text and make
+      // browser XML parsing unnecessarily slow. Hyperlink-only cells are
+      // restored from the worksheet hyperlink map in parseWorksheetCells().
+      return String(xmlText || '')
+        .replace(/<c\b[^>]*\/>/g, '')
+        .replace(/<c\b[^>]*>\s*<\/c>/g, '');
+    }
+
+    function parseXml(xmlText, sourceName) {
+      const doc = new DOMParser().parseFromString(xmlText, 'application/xml');
+      const parserError = doc.getElementsByTagName('parsererror')[0];
+      if (parserError) throw new Error(`XML ภายใน ${sourceName} ไม่ถูกต้อง`);
+      return doc;
+    }
+
+    function elementsByLocalName(root, localName) {
+      return Array.from(root.getElementsByTagNameNS('*', localName));
+    }
+
+    function directChildrenByLocalName(parent, localName) {
+      return Array.from(parent.children || []).filter(node => node.localName === localName);
+    }
+
+    function firstElementByLocalName(root, localName) {
+      return root.getElementsByTagNameNS('*', localName)[0] || null;
+    }
+
+    function parseRelationships(doc) {
+      const relationships = new Map();
+      for (const node of elementsByLocalName(doc, 'Relationship')) {
+        const id = node.getAttribute('Id');
+        if (!id) continue;
+        relationships.set(id, {
+          target: node.getAttribute('Target') || '',
+          type: node.getAttribute('Type') || '',
+          targetMode: node.getAttribute('TargetMode') || ''
+        });
+      }
+      return relationships;
+    }
+
+    function resolveZipPath(baseFile, target) {
+      const cleanTarget = String(target || '').replace(/\\/g, '/');
+      if (cleanTarget.startsWith('/')) return cleanTarget.replace(/^\/+/, '');
+
+      const parts = String(baseFile || '').split('/');
+      parts.pop();
+      for (const segment of cleanTarget.split('/')) {
+        if (!segment || segment === '.') continue;
+        if (segment === '..') parts.pop();
+        else parts.push(segment);
+      }
+      return parts.join('/');
+    }
+
+    function worksheetRelsPath(sheetPath) {
+      const parts = sheetPath.split('/');
+      const fileName = parts.pop();
+      return [...parts, '_rels', `${fileName}.rels`].join('/');
+    }
+
+    function parseSharedStrings(doc) {
+      return elementsByLocalName(doc, 'si').map(item =>
+        elementsByLocalName(item, 't').map(node => node.textContent || '').join('')
+      );
+    }
+
+    function parseStyleFormats(doc) {
+      const builtIn = {
+        0: 'General', 1: '0', 2: '0.00', 3: '#,##0', 4: '#,##0.00',
+        9: '0%', 10: '0.00%', 14: 'm/d/yy', 15: 'd-mmm-yy',
+        16: 'd-mmm', 17: 'mmm-yy', 18: 'h:mm AM/PM', 19: 'h:mm:ss AM/PM',
+        20: 'h:mm', 21: 'h:mm:ss', 22: 'm/d/yy h:mm', 37: '#,##0;(#,##0)',
+        38: '#,##0;[Red](#,##0)', 39: '#,##0.00;(#,##0.00)', 40: '#,##0.00;[Red](#,##0.00)'
+      };
+      const custom = new Map();
+      const numFmts = firstElementByLocalName(doc, 'numFmts');
+      if (numFmts) {
+        for (const node of directChildrenByLocalName(numFmts, 'numFmt')) {
+          custom.set(Number(node.getAttribute('numFmtId')), node.getAttribute('formatCode') || '');
+        }
+      }
+
+      const cellXfs = firstElementByLocalName(doc, 'cellXfs');
+      if (!cellXfs) return [];
+
+      return directChildrenByLocalName(cellXfs, 'xf').map(node => {
+        const id = Number(node.getAttribute('numFmtId') || 0);
+        return custom.get(id) || builtIn[id] || 'General';
+      });
+    }
+
+    async function parseWorksheetHyperlinks(zip, sheetPath, sheetDoc) {
+      const hyperlinks = new Map();
+      const relsPath = worksheetRelsPath(sheetPath);
+      let relationships = new Map();
+
+      if (zip.has(relsPath)) {
+        const relsDoc = parseXml(await zip.readText(relsPath), relsPath);
+        relationships = parseRelationships(relsDoc);
+      }
+
+      for (const node of elementsByLocalName(sheetDoc, 'hyperlink')) {
+        const ref = node.getAttribute('ref');
+        if (!ref) continue;
+
+        const relId = node.getAttributeNS(
+          'http://schemas.openxmlformats.org/officeDocument/2006/relationships',
+          'id'
+        ) || node.getAttribute('r:id');
+        const relationship = relId ? relationships.get(relId) : null;
+        const location = node.getAttribute('location') || '';
+        const target = relationship && relationship.target ? relationship.target : location;
+        if (!target) continue;
+
+        const range = decodeRange(ref);
+        const cellCount = (range.e.r - range.s.r + 1) * (range.e.c - range.s.c + 1);
+        if (cellCount > 10000) continue;
+        for (let r = range.s.r; r <= range.e.r; r += 1) {
+          for (let c = range.s.c; c <= range.e.c; c += 1) {
+            hyperlinks.set(`${r}:${c}`, target);
+          }
+        }
+      }
+
+      return hyperlinks;
+    }
+
+    function parseWorksheetCells(doc, sharedStrings, styleFormats, hyperlinkMap) {
+      const cells = [];
+      const seen = new Set();
+
+      for (const node of elementsByLocalName(doc, 'c')) {
+        const ref = node.getAttribute('r');
+        if (!ref) continue;
+        const pos = decodeCell(ref);
+        const cellType = node.getAttribute('t') || 'n';
+        const styleIndex = Number(node.getAttribute('s') || 0);
+        const valueNode = firstElementByLocalName(node, 'v');
+        const formulaNode = firstElementByLocalName(node, 'f');
+        let text = '';
+        let outputType = cellType === 'n' ? 'n' : 's';
+
+        if (cellType === 's') {
+          const index = valueNode ? Number(valueNode.textContent || 0) : -1;
+          text = index >= 0 && index < sharedStrings.length ? sharedStrings[index] : '';
+        } else if (cellType === 'inlineStr') {
+          text = elementsByLocalName(node, 't').map(item => item.textContent || '').join('');
+        } else if (cellType === 'b') {
+          text = valueNode && valueNode.textContent === '1' ? 'TRUE' : 'FALSE';
+        } else if (cellType === 'e') {
+          text = valueNode ? String(valueNode.textContent || '') : '';
+        } else if (cellType === 'str') {
+          text = valueNode ? String(valueNode.textContent || '') : '';
+        } else if (valueNode && valueNode.textContent !== '') {
+          text = formatExcelNumber(valueNode.textContent, styleFormats[styleIndex] || 'General');
+          outputType = 'n';
+        } else if (formulaNode) {
+          text = `=${formulaNode.textContent || ''}`;
+          outputType = 's';
+        }
+
+        text = String(text || '').replace(/\u0000/g, '').trim();
+        const textLink = /^https?:\/\//i.test(text) ? text : '';
+        const link = hyperlinkMap.get(`${pos.r}:${pos.c}`) || textLink;
+        if (text === '' && link === '') continue;
+
+        cells.push({ r: pos.r, c: pos.c, text, link, type: outputType });
+        seen.add(`${pos.r}:${pos.c}`);
+      }
+
+      for (const [key, link] of hyperlinkMap.entries()) {
+        if (seen.has(key) || !link) continue;
+        const [r, c] = key.split(':').map(Number);
+        if (!Number.isInteger(r) || !Number.isInteger(c)) continue;
+        cells.push({ r, c, text: '', link, type: 's' });
+      }
+
+      return cells;
+    }
+
+    function parseWorksheetMerges(doc) {
+      const merges = [];
+      for (const node of elementsByLocalName(doc, 'mergeCell')) {
+        const ref = node.getAttribute('ref');
+        if (!ref) continue;
+        merges.push(decodeRange(ref));
+      }
+      return merges;
+    }
+
+    function formatExcelNumber(rawValue, formatCode) {
+      const rawText = String(rawValue == null ? '' : rawValue).trim();
+      if (/^-?\d{15,}$/.test(rawText)) return rawText;
+      const value = Number(rawText);
+      if (!Number.isFinite(value)) return String(rawValue || '');
+
+      const code = String(formatCode || 'General');
+      const normalizedCode = code
+        .replace(/"[^"]*"/g, '')
+        .replace(/\[[^\]]*\]/g, '')
+        .replace(/\\./g, '')
+        .toLowerCase();
+
+      if (isExcelDateFormat(normalizedCode)) {
+        const milliseconds = Date.UTC(1899, 11, 30) + value * 86400000;
+        const date = new Date(milliseconds);
+        if (!Number.isNaN(date.getTime())) {
+          const includesTime = /[hs]/.test(normalizedCode);
+          return new Intl.DateTimeFormat('th-TH', includesTime
+            ? { dateStyle: 'medium', timeStyle: 'short', timeZone: 'UTC' }
+            : { dateStyle: 'medium', timeZone: 'UTC' }
+          ).format(date);
+        }
+      }
+
+      if (normalizedCode.includes('%')) {
+        const decimals = decimalPlacesFromFormat(code);
+        return `${(value * 100).toLocaleString('th-TH', {
+          minimumFractionDigits: decimals,
+          maximumFractionDigits: decimals
+        })}%`;
+      }
+
+      const decimals = decimalPlacesFromFormat(code);
+      const useGrouping = code.includes(',');
+      const formatted = value.toLocaleString('th-TH', {
+        useGrouping,
+        minimumFractionDigits: decimals,
+        maximumFractionDigits: Math.max(decimals, Math.min(12, decimals || 12))
+      });
+
+      if (code.includes('฿')) return `฿${formatted}`;
+      if (/\$/.test(code)) return `$${formatted}`;
+      return formatted;
+    }
+
+    function isExcelDateFormat(code) {
+      if (!code || code === 'general') return false;
+      const stripped = code.replace(/am\/pm/g, '');
+      return /(^|[^a-z])[dmyhs]+([^a-z]|$)/i.test(stripped);
+    }
+
+    function decimalPlacesFromFormat(formatCode) {
+      const section = String(formatCode || '').split(';')[0];
+      const match = section.match(/\.([0#]+)/);
+      return match ? Math.min(12, match[1].length) : 0;
+    }
+
+    function decodeCell(reference) {
+      const match = /^\$?([A-Z]+)\$?(\d+)$/i.exec(String(reference || '').trim());
+      if (!match) throw new Error(`ตำแหน่งเซลล์ไม่ถูกต้อง: ${reference}`);
+      let column = 0;
+      for (const char of match[1].toUpperCase()) {
+        column = column * 26 + char.charCodeAt(0) - 64;
+      }
+      return { c: column - 1, r: Number(match[2]) - 1 };
+    }
+
+    function decodeRange(reference) {
+      const parts = String(reference || '').split(':');
+      const start = decodeCell(parts[0]);
+      const end = decodeCell(parts[1] || parts[0]);
+      return {
+        s: { r: Math.min(start.r, end.r), c: Math.min(start.c, end.c) },
+        e: { r: Math.max(start.r, end.r), c: Math.max(start.c, end.c) }
+      };
+    }
+
+    function encodeColumn(columnIndex) {
+      let value = Number(columnIndex) + 1;
+      let output = '';
+      while (value > 0) {
+        const remainder = (value - 1) % 26;
+        output = String.fromCharCode(65 + remainder) + output;
+        value = Math.floor((value - 1) / 26);
+      }
+      return output;
+    }
+
+    function extractSheet(sheet) {
+      const cells = Array.isArray(sheet.cells) ? sheet.cells : [];
+      const merges = Array.isArray(sheet.merges) ? sheet.merges : [];
+      let maxRow = -1, maxCol = -1;
+      for (const cell of cells) {
+        if (!cell || (cell.text === '' && cell.link === '')) continue;
+        maxRow = Math.max(maxRow, cell.r); maxCol = Math.max(maxCol, cell.c);
+      }
+      for (const merge of merges) { maxRow = Math.max(maxRow, merge.e.r); maxCol = Math.max(maxCol, merge.e.c); }
+      if (maxRow < 0 || maxCol < 0) return { matrix: [], rows: [], merges: [], headerRows: 1, columnCount: 0 };
+      if (maxRow > 250000 || maxCol > 500) throw new Error(`ชีท “${sheet.name}” มีขนาดเกินขอบเขตที่แสดงได้ (${formatNumber(maxRow + 1)} แถว × ${formatNumber(maxCol + 1)} คอลัมน์)`);
+      const matrix = Array.from({ length: maxRow + 1 }, () => Array(maxCol + 1).fill(EMPTY_CELL));
+      for (const cell of cells) matrix[cell.r][cell.c] = { text: String(cell.text || ''), link: String(cell.link || ''), type: cell.type || '' };
+      const headerRows = detectHeaderRows(matrix, merges);
+      const rows = [];
+      for (let r = headerRows; r < matrix.length; r += 1) {
+        const rowCells = matrix[r];
+        if (!rowCells.some(cell => cell.text !== '' || cell.link !== '')) continue;
+        rows.push({ excelRow: r + 1, cells: rowCells, searchText: normalizeSearch(rowCells.map(cell => `${cell.text} ${cell.link}`).join(' ')) });
+      }
+      return { matrix, rows, merges, headerRows, columnCount: maxCol + 1 };
+    }
+
+    function detectHeaderRows(matrix, merges) {
+      if (matrix.length < 2) return 1;
+
+      const mergedTopHeader = merges.some(merge =>
+        merge.s.r === 0 && merge.e.r === 0 && merge.e.c > merge.s.c
+      );
+      const firstCount = matrix[0].filter(cell => cell.text !== '').length;
+      const secondCount = matrix[1].filter(cell => cell.text !== '').length;
+
+      return mergedTopHeader || secondCount > firstCount ? 2 : 1;
+    }
+
+
+  </script>
+</body>
+</html>
