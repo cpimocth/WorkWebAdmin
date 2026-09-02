@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ระบบราคากลางหลายไฟล์ — ทุกชีท</title>
+  <title>ระบบราคากลางหลายไฟล์ — AUTO ทุกชีท</title>
   <meta name="color-scheme" content="light">
   <style>
     :root {
@@ -205,15 +205,46 @@
     .report-table-wrap { max-height:62vh; border-top:1px solid var(--line); }
     .weekly-report-table th:nth-child(3), .weekly-report-table td:nth-child(3) { min-width:210px; }
     .weekly-report-table th:nth-child(4), .weekly-report-table td:nth-child(4) { min-width:180px; }
-    .weekly-report-table th:nth-child(5), .weekly-report-table td:nth-child(5) { min-width:350px; }
-    .weekly-report-table th:nth-child(n+6):nth-child(-n+10), .weekly-report-table td:nth-child(n+6):nth-child(-n+10) { min-width:118px; text-align:right; }
-    .weekly-report-table th:nth-child(11), .weekly-report-table td:nth-child(11) { min-width:150px; }
+    .weekly-report-table th:nth-child(5), .weekly-report-table td:nth-child(5) { min-width:330px; }
+    .weekly-report-table th:nth-child(6), .weekly-report-table td:nth-child(6) { min-width:170px; }
+    .weekly-report-table th:nth-child(n+7):nth-child(-n+11), .weekly-report-table td:nth-child(n+7):nth-child(-n+11) { min-width:118px; text-align:right; }
+    .weekly-report-table th:nth-child(12), .weekly-report-table td:nth-child(12) { min-width:150px; }
+    .weekly-report-table .store-cell { font-weight:800; color:#334a68; white-space:nowrap; }
     .week-price { font-weight:800; color:#174f9f; }
     .average-price { font-weight:900; color:#087a59; background:#eefbf6 !important; }
     .report-status { display:inline-flex; padding:4px 7px; border-radius:999px; font-size:10px; font-weight:900; white-space:nowrap; }
     .report-status.complete { color:#087452; background:#ddf7ec; }
     .report-status.incomplete { color:#9a5a00; background:#fff0cc; }
     .text-code { font-family:Consolas,"Courier New",monospace; white-space:nowrap; }
+    .history-panel { margin-top:14px; border-color:#bdd8ef; }
+    .history-panel-head {
+      padding:15px; display:flex; align-items:center; justify-content:space-between; gap:14px;
+      border-bottom:1px solid #d6e7f5; background:linear-gradient(110deg,#edf7ff,#fff 76%);
+    }
+    .history-panel-head h2 { margin:0; color:#155b9f; font-size:16px; }
+    .history-panel-head p { margin:5px 0 0; color:#5e7187; font-size:11px; line-height:1.6; }
+    .history-kpi-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:9px; padding:14px 14px 0; }
+    .history-kpi { min-width:0; padding:12px 13px; border:1px solid var(--line); border-radius:13px; background:#fff; }
+    .history-kpi span { display:block; color:var(--muted); font-size:10px; font-weight:800; }
+    .history-kpi strong { display:block; margin-top:5px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; color:#155b9f; font-size:20px; }
+    .history-toolbar { grid-template-columns:minmax(220px,1fr) minmax(190px,.8fr) minmax(260px,1.25fr) 150px 180px; margin-top:14px; border-top:1px solid var(--line); }
+    .history-note { margin:0 14px 12px; padding:9px 11px; border:1px solid #cde1f3; border-radius:11px; background:#f4f9fe; color:#516a82; font-size:11px; line-height:1.55; }
+    .history-table-wrap { max-height:68vh; border-top:1px solid var(--line); }
+    .history-table th:nth-child(1), .history-table td:nth-child(1) { min-width:175px; }
+    .history-table th:nth-child(2), .history-table td:nth-child(2) { min-width:430px; }
+    .history-table th:nth-child(3), .history-table td:nth-child(3) { min-width:245px; }
+    .history-product-cell strong { display:block; color:#243a56; font-size:12px; line-height:1.45; }
+    .history-product-cell small { display:flex; align-items:center; gap:6px; margin-top:5px; color:#64758a; font-size:10px; }
+    .history-store-chip { display:inline-flex; padding:3px 7px; border:1px solid #cfe0f0; border-radius:999px; background:#f3f8fd; color:#365f87; font-weight:900; }
+    .history-period-head { min-width:118px; white-space:nowrap; }
+    .history-period-cell { min-width:118px; text-align:right; white-space:nowrap; font-variant-numeric:tabular-nums; }
+    .history-period-cell.has-price { color:#1559a4; font-weight:900; }
+    .history-period-cell.latest-period, .history-period-head.latest-period { background:#eaf8f2 !important; color:#087452; }
+    .history-sold-out { display:inline-flex; padding:3px 7px; border-radius:999px; background:#fff0df; color:#9a5a00; font-size:10px; font-weight:900; }
+    .history-incomplete { display:inline-flex; padding:3px 7px; border-radius:999px; background:#fff0cc; color:#9a5a00; font-size:10px; font-weight:900; }
+    .history-no-data { color:#c2cad4; }
+    @media (max-width:1150px) { .history-toolbar { grid-template-columns:repeat(3,minmax(170px,1fr)); } }
+    @media (max-width:760px) { .history-kpi-grid { grid-template-columns:1fr; } }
     @media (max-width:1150px) { .report-toolbar { grid-template-columns:repeat(3,minmax(170px,1fr)); } .report-kpi-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } }
     @media (max-width:1150px) { .stats-grid { grid-template-columns:repeat(3,minmax(0,1fr)); } }
     @media (max-width:760px) {
@@ -236,8 +267,8 @@
       <div class="brand">
         <div class="brand-icon">฿</div>
         <div>
-          <h1>ระบบราคากลางหลายไฟล์ — ทุกชีท</h1>
-          <p>แยกชุด เดือน ปีจากชื่อไฟล์ • รหัสรายการคงเป็นข้อความ • ชุด อ. แยก REPORT สป1–สป4 และค่าเฉลี่ย</p>
+          <h1>ระบบราคากลางหลายไฟล์ — AUTO ทุกชีท</h1>
+          <p>เปิดผ่านตัวเปิดอัตโนมัติแล้วอ่านทุกไฟล์ในโฟลเดอร์ทันที • เดือนแสดงเป็นเลข 1–12 และเรียงปีล่าสุดก่อน • มีประวัติสินค้า × ร้านจากอดีตถึงปัจจุบัน</p>
         </div>
       </div>
       <div class="header-actions">
@@ -254,24 +285,25 @@
       <div class="rule-main">
         <div class="rule-mark">1</div>
         <div>
-          <h2>อ่านทุกไฟล์ที่ชื่อขึ้นต้นด้วย <code>ไฟล์ราคากลาง</code> และอ่านทุกชีท</h2>
-          <p>ชื่อไฟล์ใช้แยก <strong>ชุด / เดือน / ปี</strong> อัตโนมัติ; ชุด อ. อ่าน <strong>สป1–สป4</strong> จากหัวกลุ่มสัปดาห์ในแต่ละชีทก่อน และใช้ชื่อไฟล์หรือตัวเลือกบนการ์ดเป็นทางสำรอง ส่วนรหัสรายการส่งออกเป็นข้อความเพื่อคงเลขทุกหลัก</p>
+          <h2>AUTO: อ่านทุกไฟล์ที่ชื่อขึ้นต้นด้วย <code>ไฟล์ราคากลาง</code> จากโฟลเดอร์เดียวกันทันที</h2>
+          <p>เมื่อเปิดด้วย <strong>เปิดระบบราคากลางอัตโนมัติ.cmd</strong> ระบบจะค้นหาและอ่านทุกไฟล์ในโฟลเดอร์เดียวกันโดยไม่ต้องกดเลือกไฟล์; เดือน ม.ค.–ธ.ค. แปลงเป็นเลข <strong>1–12</strong> และเรียง <strong>ปี/เดือนล่าสุดขึ้นก่อน</strong>; ด้านล่างมีตารางเชื่อม <strong>สินค้า × ร้าน</strong> จากอดีตถึงปัจจุบัน ชุด อ. ยังอ่านชื่อห้าง/ร้านจาก <strong>คอลัมน์ D</strong> และแยก <strong>สป1–สป4</strong></p>
         </div>
       </div>
       <div class="rule-badges">
-        <span class="badge badge-blue">หลายไฟล์พร้อมกัน</span>
+        <span class="badge badge-blue">AUTO เมื่อเปิดระบบ</span>
         <span class="badge badge-green">อ่านครบทุกชีท</span>
         <span class="badge badge-report">ชุด อ. = สป1–สป4 + เฉลี่ย</span>
+        <span class="badge badge-blue">ประวัติสินค้า × ร้าน</span>
       </div>
     </section>
 
-    <div class="status" id="statusBox" role="status" aria-live="polite"><span class="status-dot"></span><span id="statusText">กำลังตรวจหาไฟล์ในโฟลเดอร์เดียวกัน…</span></div>
+    <div class="status" id="statusBox" role="status" aria-live="polite"><span class="status-dot"></span><span id="statusText">กำลังตรวจหาไฟล์ราคากลางในโฟลเดอร์เดียวกันอัตโนมัติ…</span></div>
 
     <section class="empty-state" id="emptyState">
       <div>
         <div class="empty-icon">↗</div>
-        <h2>เลือกโฟลเดอร์หรือเลือกไฟล์ Excel หลายไฟล์</h2>
-        <p>ระบบจะรับเฉพาะไฟล์ที่ชื่อขึ้นต้นด้วย <strong>ไฟล์ราคากลาง</strong> แล้วอ่านทุกชีท โดยไม่ฝังข้อมูล Excel ไว้ใน HTML</p>
+        <h2>ระบบกำลังค้นหาไฟล์ Excel อัตโนมัติ</h2>
+        <p>เปิดด้วย <strong>เปิดระบบราคากลางอัตโนมัติ.cmd</strong> แล้วระบบจะรับทุกไฟล์ที่ชื่อขึ้นต้นด้วย <strong>ไฟล์ราคากลาง</strong> และอ่านทุกชีททันที ปุ่มด้านล่างเป็นทางสำรองสำหรับการเลือกเอง</p>
         <div class="empty-actions">
           <button type="button" class="btn btn-primary" id="emptyOpenFolderBtn">เลือกโฟลเดอร์</button>
           <button type="button" class="btn btn-secondary" id="emptyOpenFileBtn">เลือกหลายไฟล์</button>
@@ -305,11 +337,11 @@
         <div class="toolbar">
           <div class="control"><label for="fileSelect">ไฟล์ต้นทาง</label><select id="fileSelect" class="select"></select></div>
           <div class="control"><label for="setSelect">ชุด</label><select id="setSelect" class="select"></select></div>
-          <div class="control"><label for="monthSelect">เดือน</label><select id="monthSelect" class="select"></select></div>
+          <div class="control"><label for="monthSelect">เดือน (1–12)</label><select id="monthSelect" class="select"></select></div>
           <div class="control"><label for="yearSelect">ปี พ.ศ.</label><select id="yearSelect" class="select"></select></div>
           <div class="control"><label for="catSelect">หมวดหมู่ / ชีท (รหัส_ชื่อ)</label><select id="catSelect" class="select"><option value="">-- ทั้งหมด (ทุกชีท) --</option></select></div>
           <div class="control"><label for="storeSelect">ห้าง / แหล่งข้อมูล</label><select id="storeSelect" class="select"></select></div>
-          <div class="control"><label for="priceFilterSelect">สถานะราคา</label><select id="priceFilterSelect" class="select"><option value="has_price" selected>เฉพาะรายการที่มีราคาตัวเลข</option><option value="all">ทั้งหมด</option><option value="promo_only">เฉพาะรายการที่มีราคาโปร</option><option value="no_price">เฉพาะรายการที่ราคายังว่าง</option></select></div>
+          <div class="control"><label for="priceFilterSelect">สถานะราคา</label><select id="priceFilterSelect" class="select"><option value="has_price" selected>เฉพาะรายการที่มีราคาตัวเลข</option><option value="all">ทั้งหมด</option><option value="promo_only">เฉพาะรายการที่มีราคาโปร</option><option value="sold_out">เฉพาะสินค้าหมด</option><option value="no_price">เฉพาะรายการที่ราคายังว่าง</option></select></div>
           <div class="control"><label for="searchInput">ค้นหาด่วน</label><input id="searchInput" class="input" type="search" placeholder="ชื่อสินค้า รหัส ร้าน ภาวะ…" autocomplete="off"></div>
           <div class="control"><label for="pageSize">จำนวนต่อหน้า</label><select id="pageSize" class="select"><option value="25">25</option><option value="50" selected>50</option><option value="100">100</option><option value="200">200</option></select></div>
           <div class="control reset-wrap"><button type="button" class="btn btn-secondary" id="resetBtn">ล้างตัวกรอง</button></div>
@@ -318,7 +350,7 @@
         <div class="table-wrap" id="tableWrap">
           <table aria-label="ข้อมูลราคากลางจากทุกไฟล์ทุกชีท">
             <thead><tr>
-              <th>ชุด</th><th>เดือน</th><th>ปี</th><th>หมวดหมู่ (รหัส_ชื่อ)</th><th>รหัสรายการ</th><th>ชื่อรายการสินค้า</th><th>ห้าง/ร้าน</th><th>ราคาปกติ</th><th>ราคาโปร</th><th>ราคาที่ใช้</th><th>ภาวะ</th><th>ลิงก์</th>
+              <th>ชุด</th><th>เดือน (เลข)</th><th>ปี</th><th>หมวดหมู่ (รหัส_ชื่อ)</th><th>รหัสรายการ</th><th>ชื่อรายการสินค้า</th><th>ห้าง/ร้าน</th><th>ราคาปกติ</th><th>ราคาโปร</th><th>ราคาที่ใช้</th><th>ภาวะ</th><th>ลิงก์</th>
             </tr></thead>
             <tbody id="tableBody"></tbody>
           </table>
@@ -333,7 +365,7 @@
         <div class="report-panel-head">
           <div>
             <h2>REPORT ชุด อ. — ราคาแยกรายสัปดาห์</h2>
-            <p>จับคู่ตาม เดือน / ปี / หมวด / รหัสรายการ / ชื่อรายการ แล้วนำหัวกลุ่ม “สัปดาห์ 1–4” ในไฟล์ไปลงคอลัมน์ สป1–สป4 โดยไม่ถือเป็นห้าง/ร้าน; ค่าเฉลี่ยจะแสดงเมื่อมีราคาครบทั้ง 4 สัปดาห์</p>
+            <p>ชุด อ. อ่านชื่อห้าง/ร้านจากคอลัมน์ D ของแต่ละแถว แล้วจับคู่ตาม เดือน / ปี / หมวด / รหัสรายการ / ชื่อรายการ / ห้างหรือร้าน; หัวกลุ่ม “สัปดาห์ 1–4” ใช้ลงคอลัมน์ สป1–สป4 และค่าเฉลี่ยจะแสดงเมื่อมีราคาครบทั้ง 4 สัปดาห์</p>
           </div>
           <button type="button" class="btn btn-report" id="reportExportInlineBtn">ส่งออก REPORT (.xlsx)</button>
         </div>
@@ -346,10 +378,10 @@
         </div>
 
         <div class="toolbar report-toolbar">
-          <div class="control"><label for="reportMonthSelect">เดือน</label><select id="reportMonthSelect" class="select"></select></div>
+          <div class="control"><label for="reportMonthSelect">เดือน (1–12)</label><select id="reportMonthSelect" class="select"></select></div>
           <div class="control"><label for="reportYearSelect">ปี พ.ศ.</label><select id="reportYearSelect" class="select"></select></div>
           <div class="control"><label for="reportCatSelect">หมวดหมู่ / ชีท</label><select id="reportCatSelect" class="select"></select></div>
-          <div class="control report-search"><label for="reportSearchInput">ค้นหาใน REPORT</label><input id="reportSearchInput" class="input" type="search" placeholder="รหัสหรือชื่อรายการ…" autocomplete="off"></div>
+          <div class="control report-search"><label for="reportSearchInput">ค้นหาใน REPORT</label><input id="reportSearchInput" class="input" type="search" placeholder="รหัส ชื่อรายการ หรือห้าง/ร้าน…" autocomplete="off"></div>
           <div class="control reset-wrap"><button type="button" class="btn btn-secondary" id="reportResetBtn">ล้างตัวกรอง REPORT</button></div>
         </div>
 
@@ -357,7 +389,7 @@
         <div class="table-wrap report-table-wrap" id="weeklyReportTableWrap">
           <table class="weekly-report-table" aria-label="REPORT ชุด อ. แยกรายสัปดาห์">
             <thead><tr>
-              <th>เดือน</th><th>ปี</th><th>หมวดหมู่ (รหัส_ชื่อ)</th><th>รหัสรายการ (ข้อความ)</th><th>ชื่อรายการสินค้า</th>
+              <th>เดือน (เลข)</th><th>ปี</th><th>หมวดหมู่ (รหัส_ชื่อ)</th><th>รหัสรายการ (ข้อความ)</th><th>ชื่อรายการสินค้า</th><th>ห้าง / ร้าน</th>
               <th>สป1</th><th>สป2</th><th>สป3</th><th>สป4</th><th>ราคาเฉลี่ย 4 สัปดาห์</th><th>สถานะ</th>
             </tr></thead>
             <tbody id="weeklyReportBody"></tbody>
@@ -365,6 +397,43 @@
         </div>
         <div class="table-footer"><div class="result-info" id="weeklyReportInfo">-</div></div>
       </section>
+
+      <section class="panel history-panel" id="historyPanel">
+        <div class="history-panel-head">
+          <div>
+            <h2>ประวัติราคา — สินค้า × ร้าน (อดีต → ปัจจุบัน)</h2>
+            <p>เชื่อมรายการเดียวกันด้วยรหัสสินค้า (ถ้าไม่มีรหัสจะใช้ชื่อสินค้า) และห้าง/ร้านเดียวกัน แล้ววางราคาเป็นรายเดือนจากเก่าสุดทางซ้ายไปเดือนล่าสุดทางขวา; หากเดือนเดียวกันมีหลายราคา ระบบจะแสดงราคาเฉลี่ยของเดือนนั้น ส่วนชุด อ. จะแสดงค่าเฉลี่ยเมื่อครบ สป1–สป4</p>
+          </div>
+          <button type="button" class="btn btn-green" id="historyExportBtn" disabled>ส่งออกประวัติ (.xlsx)</button>
+        </div>
+
+        <div class="history-kpi-grid">
+          <article class="history-kpi"><span>คู่สินค้า × ร้าน</span><strong id="historyStatPairs">0</strong></article>
+          <article class="history-kpi"><span>จำนวนช่วงเวลา</span><strong id="historyStatPeriods">0</strong></article>
+          <article class="history-kpi"><span>ช่วงข้อมูล</span><strong id="historyStatRange">-</strong></article>
+        </div>
+
+        <div class="toolbar history-toolbar">
+          <div class="control"><label for="historyCatSelect">หมวดหมู่ / ชีท</label><select id="historyCatSelect" class="select"></select></div>
+          <div class="control"><label for="historyStoreSelect">ห้าง / ร้าน</label><select id="historyStoreSelect" class="select"></select></div>
+          <div class="control"><label for="historySearchInput">ค้นหาสินค้า × ร้าน</label><input id="historySearchInput" class="input" type="search" placeholder="รหัส ชื่อสินค้า หรือร้าน…" autocomplete="off"></div>
+          <div class="control"><label for="historyPageSize">จำนวนต่อหน้า</label><select id="historyPageSize" class="select"><option value="10">10</option><option value="25" selected>25</option><option value="50">50</option><option value="100">100</option></select></div>
+          <div class="control reset-wrap"><button type="button" class="btn btn-secondary" id="historyResetBtn">ล้างตัวกรองประวัติ</button></div>
+        </div>
+
+        <div class="history-note">คอลัมน์เวลาใช้รูปแบบ <strong>เดือน/ปี พ.ศ.</strong> เช่น <strong>8/2569</strong> • ตัวเลขคือ “ราคาที่ใช้” (ราคาโปรก่อนราคาปกติ) • ชุด อ. จะแสดงราคาเฉลี่ยเมื่อครบทั้ง <strong>4 สัปดาห์</strong> หากยังไม่ครบจะแสดงจำนวนสัปดาห์ที่มีข้อมูล • คำว่า <strong>หมด</strong> จะแสดงเฉพาะเมื่อไม่มีราคาตัวเลขและช่องภาวะเป็นคำว่า “หมด” เท่านั้น</div>
+        <div class="table-wrap history-table-wrap" id="historyTableWrap">
+          <table class="history-table" aria-label="ประวัติราคาสินค้าและร้านจากอดีตถึงปัจจุบัน">
+            <thead id="historyTableHead"></thead>
+            <tbody id="historyTableBody"></tbody>
+          </table>
+        </div>
+        <div class="table-footer">
+          <div class="result-info" id="historyInfo">-</div>
+          <div class="pagination"><button type="button" class="btn btn-secondary" id="historyPrevPageBtn">ก่อนหน้า</button><span class="page-indicator" id="historyPageIndicator">หน้า 1 / 1</span><button type="button" class="btn btn-secondary" id="historyNextPageBtn">ถัดไป</button></div>
+        </div>
+      </section>
+
     </section>
   </main>
 
@@ -379,6 +448,8 @@
     const EXCEL_EXTENSION = /\.(xlsx|xlsm)$/i;
     const EMPTY_CELL = Object.freeze({ text: '', link: '', type: '' });
     const PRICE_DEFAULT = 'has_price';
+    const REPORT_STORE_COLUMN_INDEX = 3; // ชุด อ. ใช้ห้าง/ร้านจากคอลัมน์ D เท่านั้น (A=0)
+    const AUTO_FOLDER_MODE_VERSION = '2026-08-20-numeric-month-history-matrix';
 
     const state = {
       sources: [],
@@ -390,13 +461,19 @@
       totalRawRows: 0,
       weeklyReportRows: [],
       filteredWeeklyRows: [],
+      historyPeriods: [],
+      historyRows: [],
+      filteredHistoryRows: [],
+      historyPage: 1,
+      historyPageSize: 25,
       page: 1,
       pageSize: 50,
       busy: false,
       filters: {
         file: '', set: '', month: '', year: '', category: '', store: '', price: PRICE_DEFAULT, query: ''
       },
-      reportFilters: { month: '', year: '', category: '', query: '' }
+      reportFilters: { month: '', year: '', category: '', query: '' },
+      historyFilters: { category: '', store: '', query: '' }
     };
 
     const el = {};
@@ -434,6 +511,22 @@
         reportStatRows: document.getElementById('reportStatRows'),
         reportStatComplete: document.getElementById('reportStatComplete'),
         reportStatIncomplete: document.getElementById('reportStatIncomplete'),
+        historyPanel: document.getElementById('historyPanel'),
+        historyExportBtn: document.getElementById('historyExportBtn'),
+        historyCatSelect: document.getElementById('historyCatSelect'),
+        historyStoreSelect: document.getElementById('historyStoreSelect'),
+        historySearchInput: document.getElementById('historySearchInput'),
+        historyPageSize: document.getElementById('historyPageSize'),
+        historyResetBtn: document.getElementById('historyResetBtn'),
+        historyTableHead: document.getElementById('historyTableHead'),
+        historyTableBody: document.getElementById('historyTableBody'),
+        historyInfo: document.getElementById('historyInfo'),
+        historyPrevPageBtn: document.getElementById('historyPrevPageBtn'),
+        historyNextPageBtn: document.getElementById('historyNextPageBtn'),
+        historyPageIndicator: document.getElementById('historyPageIndicator'),
+        historyStatPairs: document.getElementById('historyStatPairs'),
+        historyStatPeriods: document.getElementById('historyStatPeriods'),
+        historyStatRange: document.getElementById('historyStatRange'),
         statFiles: document.getElementById('statFiles'),
         statSets: document.getElementById('statSets'),
         statSheets: document.getElementById('statSheets'),
@@ -479,6 +572,13 @@
       for (const control of [el.reportMonthSelect, el.reportYearSelect, el.reportCatSelect]) control.addEventListener('change', applyWeeklyReportFiltersFromControls);
       el.reportSearchInput.addEventListener('input', applyWeeklyReportFiltersFromControls);
       el.reportResetBtn.addEventListener('click', resetWeeklyReportFilters);
+      for (const control of [el.historyCatSelect, el.historyStoreSelect]) control.addEventListener('change', applyHistoryFiltersFromControls);
+      el.historySearchInput.addEventListener('input', applyHistoryFiltersFromControls);
+      el.historyPageSize.addEventListener('change', () => { state.historyPageSize = Number(el.historyPageSize.value) || 25; state.historyPage = 1; renderHistoryPage(); });
+      el.historyResetBtn.addEventListener('click', resetHistoryFilters);
+      el.historyPrevPageBtn.addEventListener('click', () => changeHistoryPage(-1));
+      el.historyNextPageBtn.addEventListener('click', () => changeHistoryPage(1));
+      el.historyExportBtn.addEventListener('click', exportHistoryXlsx);
       el.sourceCards.addEventListener('click', handleSourceCardClick);
       el.sourceCards.addEventListener('change', handleWeekPickerChange);
       setupDropHandlers();
@@ -486,6 +586,46 @@
     }
 
     function normalizeName(value) { return String(value || '').normalize('NFC'); }
+
+    function normalizeMonthToken(value) {
+      return normalizeName(value)
+        .toLocaleLowerCase('th-TH')
+        .replace(/เดือน/g, '')
+        .replace(/[.\s_\/\\()–—_-]+/g, '')
+        .trim();
+    }
+
+    function parseMonthNumber(value) {
+      const token = normalizeMonthToken(value);
+      if (/^(?:0?[1-9]|1[0-2])$/.test(token)) return Number(token);
+      const aliases = {
+        'มค':1, 'มกราคม':1, 'มกรา':1, 'jan':1, 'january':1,
+        'กพ':2, 'กุมภาพันธ์':2, 'กุมภา':2, 'feb':2, 'february':2,
+        'มีค':3, 'มีนาคม':3, 'มีนา':3, 'mar':3, 'march':3,
+        'เมย':4, 'เมษายน':4, 'เมษา':4, 'apr':4, 'april':4,
+        'พค':5, 'พฤษภาคม':5, 'พฤษภา':5, 'may':5,
+        'มิย':6, 'มิถุนายน':6, 'มิถุนา':6, 'jun':6, 'june':6,
+        'กค':7, 'กรกฎาคม':7, 'กรกฎา':7, 'jul':7, 'july':7,
+        'สค':8, 'สิงหาคม':8, 'สิงหา':8, 'aug':8, 'august':8,
+        'กย':9, 'กันยายน':9, 'กันยา':9, 'sep':9, 'sept':9, 'september':9,
+        'ตค':10, 'ตุลาคม':10, 'ตุลา':10, 'oct':10, 'october':10,
+        'พย':11, 'พฤศจิกายน':11, 'พฤศจิกา':11, 'nov':11, 'november':11,
+        'ธค':12, 'ธันวาคม':12, 'ธันวา':12, 'dec':12, 'december':12
+      };
+      return aliases[token] || null;
+    }
+
+    function monthDisplayValue(monthNumber, rawValue) {
+      return Number.isInteger(monthNumber) && monthNumber >= 1 && monthNumber <= 12
+        ? String(monthNumber)
+        : (normalizeName(rawValue).trim() || 'ไม่ระบุ');
+    }
+
+    function periodSortValue(year, month) {
+      const y = Number(year);
+      const m = Number(month);
+      return Number.isFinite(y) && Number.isFinite(m) && m >= 1 && m <= 12 ? (y * 100 + m) : 0;
+    }
     function baseName(value) { return normalizeName(String(value || '').replace(/\\/g, '/').split('/').pop()); }
     function isTargetExcelName(name) {
       const clean = baseName(name);
@@ -523,6 +663,9 @@
       let yearDisplay = yearRaw;
       if (numericYear !== null && yearRaw.length <= 2) yearDisplay = String(2500 + numericYear);
       else if (numericYear !== null && numericYear >= 1900 && numericYear < 2400) yearDisplay = String(numericYear + 543);
+      const monthNumber = parseMonthNumber(monthRaw);
+      const monthDisplay = monthDisplayValue(monthNumber, monthRaw);
+      const yearNumber = Number(yearDisplay) || 0;
       const setKey = setRaw.replace(/[.\s]/g, '');
       const reportRequired = setKey === 'อ';
       const weekNumber = reportRequired ? parseWeekNumber(stem) : null;
@@ -532,12 +675,15 @@
         setRaw,
         setKey,
         monthRaw,
+        monthNumber,
+        monthDisplay,
         yearRaw,
         yearDisplay,
+        yearNumber,
         reportRequired,
         weekNumber,
         weekLabel,
-        displayLabel: buildSourceDisplayLabel({ setRaw, monthRaw, yearDisplay, reportRequired, weekNumber })
+        displayLabel: buildSourceDisplayLabel({ setRaw, monthRaw, monthNumber, monthDisplay, yearDisplay, yearNumber, reportRequired, weekNumber })
       };
     }
 
@@ -560,7 +706,7 @@
 
     function buildSourceDisplayLabel(meta) {
       const week = meta.reportRequired ? ` • ${meta.weekNumber ? `สป${meta.weekNumber}` : 'ยังไม่ระบุ สป.'}` : '';
-      return `ชุด ${meta.setRaw} • ${meta.monthRaw} • ${meta.yearDisplay}${meta.reportRequired ? ' • REPORT' : ''}${week}`;
+      return `ชุด ${meta.setRaw} • เดือน ${meta.monthDisplay || monthDisplayValue(meta.monthNumber, meta.monthRaw)} • ${meta.yearDisplay}${meta.reportRequired ? ' • REPORT' : ''}${week}`;
     }
 
     function parseSheetIdentity(sheetName) {
@@ -618,7 +764,7 @@
 
     async function tryAutoDiscoverFromHttpFolder() {
       if (!/^https?:$/.test(location.protocol)) {
-        setStatus('warning', `เปิดจากเครื่องโดยตรง: กด “เลือกโฟลเดอร์” เพื่ออ่านทุกไฟล์ที่ขึ้นต้นด้วย “${FILE_PREFIX}”`);
+        setStatus('warning', `เบราว์เซอร์ไม่อนุญาตให้ไฟล์ HTML อ่านรายชื่อไฟล์ข้างเคียงโดยตรง กรุณาเปิด “เปิดระบบราคากลางอัตโนมัติ.cmd” เพื่อ AUTO หรือกด “เลือกโฟลเดอร์”`);
         return;
       }
       setStatus('loading', 'กำลังตรวจหาไฟล์ราคากลางทั้งหมดในโฟลเดอร์เดียวกัน…');
@@ -643,13 +789,13 @@
           found.push({ id: `url:${url.href}`, kind: 'url', name, url: url.href, size: 0, lastModified: 0, meta: parseFileMetadata(name) });
         }
         if (!found.length) {
-          setStatus('warning', `ไม่พบไฟล์ “${FILE_PREFIX}…” อัตโนมัติ กด “เลือกโฟลเดอร์”`);
+          setStatus('warning', `ไม่พบไฟล์ “${FILE_PREFIX}…” ในโฟลเดอร์เดียวกับ Dashboard`);
           return;
         }
         registerSources(found);
         await loadAllSources();
       } catch (error) {
-        setStatus('warning', `ยังตรวจโฟลเดอร์อัตโนมัติไม่ได้ กด “เลือกโฟลเดอร์” เพื่ออ่านหลายไฟล์`);
+        setStatus('warning', `ตรวจโฟลเดอร์อัตโนมัติไม่สำเร็จ กรุณาเปิดใหม่ด้วย “เปิดระบบราคากลางอัตโนมัติ.cmd” หรือเลือกโฟลเดอร์เอง`);
       }
     }
 
@@ -663,9 +809,9 @@
         unique.push(source);
       }
       unique.sort((a, b) => {
-        const sizeOrder = Number(b.size || 0) - Number(a.size || 0);
-        const ay = Number(a.meta.yearDisplay) || 0, by = Number(b.meta.yearDisplay) || 0;
-        return sizeOrder || (by - ay) || a.meta.setRaw.localeCompare(b.meta.setRaw, 'th') || a.name.localeCompare(b.name, 'th');
+        const yearOrder = Number(b.meta.yearNumber || b.meta.yearDisplay || 0) - Number(a.meta.yearNumber || a.meta.yearDisplay || 0);
+        const monthOrder = Number(b.meta.monthNumber || 0) - Number(a.meta.monthNumber || 0);
+        return yearOrder || monthOrder || a.meta.setRaw.localeCompare(b.meta.setRaw, 'th') || a.name.localeCompare(b.name, 'th');
       });
       state.sources = unique;
     }
@@ -709,35 +855,212 @@
       }
     }
 
+    function forwardFilledHeaderRow(matrix, rowIndex, columnCount) {
+      const output = Array(columnCount).fill('');
+      if (!Number.isInteger(rowIndex) || rowIndex < 0) return output;
+      let current = '';
+      for (let c = 0; c < columnCount; c += 1) {
+        const value = cellText(matrix, rowIndex, c);
+        if (value) current = value;
+        output[c] = current;
+      }
+      return output;
+    }
+
+    function cleanReportStoreHeader(value) {
+      let text = normalizeName(value).replace(/\r?\n/g, ' ').trim();
+      if (!text) return '';
+      text = text
+        .replace(/(?:^|\s)(?:สป\.?|สัปดาห์(?:ที่)?|week)\s*\.?\s*[1-4](?=\s|$)/ig, ' ')
+        .replace(/(?:link|ลิงก์|ราคาปกติ|ราคาโปร|ภาวะ)/ig, ' ')
+        .replace(/[|:;,_/\\\-–—]+/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+      const normalized = normalizeSearch(text).replace(/\s+/g, '');
+      const generic = new Set([
+        'รหัส', 'รหัสรายการ', 'commoditycode', 'ชื่อ', 'ชื่อรายการ', 'ชื่อรายการสินค้า',
+        'สินค้า', 'รายการ', 'ห้าง', 'ร้าน', 'ห้างร้าน', 'แหล่งข้อมูล', 'store', 'source'
+      ]);
+      if (!text || generic.has(normalized) || parseWeekNumber(text)) return '';
+      return text;
+    }
+
+    function findReportWeekRow(matrix, subHeaderRow, columnCount) {
+      let bestRow = -1;
+      let bestScore = 0;
+      for (let r = 0; r < subHeaderRow; r += 1) {
+        let hits = 0;
+        const weeks = new Set();
+        for (let c = 0; c < columnCount; c += 1) {
+          const week = parseWeekNumber(cellText(matrix, r, c));
+          if (week) { hits += 1; weeks.add(week); }
+        }
+        const score = hits + (weeks.size * 5);
+        if (score > bestScore || (score === bestScore && score > 0 && r > bestRow)) {
+          bestScore = score;
+          bestRow = r;
+        }
+      }
+      return bestRow;
+    }
+
+    function findReportStoreRow(matrix, weekRow, subHeaderRow, columnCount, codeColumn, nameColumn) {
+      let bestRow = -1;
+      let bestScore = 0;
+      for (let r = 0; r < subHeaderRow; r += 1) {
+        if (r === weekRow) continue;
+        const values = forwardFilledHeaderRow(matrix, r, columnCount);
+        const stores = new Set();
+        let hits = 0;
+        for (let c = 0; c < columnCount; c += 1) {
+          if (c === codeColumn || c === nameColumn) continue;
+          const store = cleanReportStoreHeader(values[c]);
+          if (!store) continue;
+          hits += 1;
+          stores.add(normalizeSearch(store));
+        }
+        const score = hits + (stores.size * 4);
+        if (score > bestScore || (score === bestScore && score > 0 && r > bestRow)) {
+          bestScore = score;
+          bestRow = r;
+        }
+      }
+      return bestRow;
+    }
+
+    function findReportStoreDataColumn(matrix, layout, columnCount) {
+      // โครงสร้างชุด อ. แตกต่างจากชุดอื่น: ชื่อห้าง/ร้านอยู่ในคอลัมน์ D ของแต่ละแถวเสมอ
+      // จึงยึด D (index 3) เป็นแหล่งข้อมูลหลัก ไม่เดาจากหัวกลุ่มสัปดาห์
+      if (
+        REPORT_STORE_COLUMN_INDEX < columnCount &&
+        REPORT_STORE_COLUMN_INDEX !== layout.codeColumn &&
+        REPORT_STORE_COLUMN_INDEX !== layout.nameColumn
+      ) return REPORT_STORE_COLUMN_INDEX;
+
+      // fallback เฉพาะกรณีไฟล์ผิดโครงสร้างหรือมีคอลัมน์ไม่ถึง D
+      for (let c = 0; c < columnCount; c += 1) {
+        if (c === layout.codeColumn || c === layout.nameColumn) continue;
+        if (classifySubHeader(cellText(matrix, layout.subHeaderRow, c))) continue;
+        for (let r = 0; r <= layout.subHeaderRow; r += 1) {
+          const normalized = normalizeSearch(cellText(matrix, r, c)).replace(/[\s/_-]+/g, '');
+          if (normalized === 'ห้าง' || normalized === 'ร้าน' || normalized === 'ห้างร้าน' || normalized === 'แหล่งข้อมูล' || normalized === 'store') return c;
+        }
+      }
+      return -1;
+    }
+
+    function inferStoreFromLink(link) {
+      if (!/^https?:\/\//i.test(String(link || ''))) return '';
+      try {
+        const host = new URL(link).hostname.toLowerCase().replace(/^www\./, '');
+        const known = [
+          [/lotus/, "Lotus's"], [/bigc/, 'Big C'], [/tops/, 'Tops'], [/makro/, 'Makro'],
+          [/central/, 'Central'], [/gourmetmarket/, 'Gourmet Market'], [/foodland/, 'Foodland'],
+          [/villamarket/, 'Villa Market'], [/(?:7-eleven|7eleven|allonline)/, '7-Eleven'],
+          [/shopee/, 'Shopee'], [/lazada/, 'Lazada'], [/bata/, 'Bata'], [/baoji/, 'Baoji']
+        ];
+        for (const [pattern, label] of known) if (pattern.test(host)) return label;
+      } catch (error) {
+        return '';
+      }
+      return '';
+    }
+
+    function buildReportStoreBlocks(source, matrix, layout, columnCount) {
+      const weekRow = findReportWeekRow(matrix, layout.subHeaderRow, columnCount);
+      const storeRow = findReportStoreRow(matrix, weekRow, layout.subHeaderRow, columnCount, layout.codeColumn, layout.nameColumn);
+      const weekHeaders = forwardFilledHeaderRow(matrix, weekRow, columnCount);
+      const storeHeaders = forwardFilledHeaderRow(matrix, storeRow, columnCount);
+      const trackers = new Map();
+      const blocks = [];
+
+      for (let c = 0; c < columnCount; c += 1) {
+        if (c === layout.codeColumn || c === layout.nameColumn) continue;
+        const subText = cellText(matrix, layout.subHeaderRow, c);
+        const subtype = classifySubHeader(subText);
+        if (!subtype) continue;
+
+        const sheetWeek = parseWeekNumber(weekHeaders[c]);
+        const week = sheetWeek || source.meta.weekNumber || null;
+        const weekOrigin = sheetWeek ? 'sheet' : (source.meta.weekNumber ? 'filename' : 'unassigned');
+        let store = cleanReportStoreHeader(storeHeaders[c]);
+        if (!store) store = cleanReportStoreHeader(subText);
+
+        const trackerKey = String(week || 0);
+        if (!trackers.has(trackerKey)) trackers.set(trackerKey, { index: 0, current: null });
+        const tracker = trackers.get(trackerKey);
+        const storeKey = normalizeSearch(store);
+        const mustStart = !tracker.current || tracker.current.storeKey !== storeKey || tracker.current.seen.has(subtype);
+        if (mustStart) {
+          tracker.index += 1;
+          tracker.current = { storeKey, seen: new Set(), groupId: `report:${trackerKey}:${tracker.index}`, order: tracker.index };
+        }
+        tracker.current.seen.add(subtype);
+        blocks.push({
+          column: c,
+          groupId: tracker.current.groupId,
+          store,
+          storeOrder: tracker.current.order,
+          week,
+          weekOrigin,
+          subtype
+        });
+      }
+
+      const groupCounts = new Map();
+      const uniqueGroups = new Set();
+      for (const block of blocks) {
+        if (uniqueGroups.has(block.groupId)) continue;
+        uniqueGroups.add(block.groupId);
+        const key = String(block.week || 0);
+        groupCounts.set(key, (groupCounts.get(key) || 0) + 1);
+      }
+      for (const block of blocks) {
+        if (block.store) {
+          block.storeFallback = block.store;
+        } else {
+          const count = groupCounts.get(String(block.week || 0)) || 1;
+          block.storeFallback = count > 1 ? `ห้าง ${block.storeOrder}` : 'ไม่ระบุห้าง';
+        }
+      }
+      return blocks;
+    }
+
     function flattenSheetRecords(source, sheet, extracted) {
       const matrix = extracted.matrix;
       if (!matrix.length || !extracted.columnCount) return [];
       const layout = detectPriceLayout(matrix, extracted.columnCount);
       if (!layout) return [];
       const identity = parseSheetIdentity(sheet.name);
-      const storeBlocks = [];
-      let currentTop = '';
-      let currentGroupId = 'group:0';
-      for (let c = 0; c < extracted.columnCount; c += 1) {
-        const topText = cellText(matrix, layout.storeRow, c);
-        if (topText) {
-          const normalizedTop = normalizeSearch(topText);
-          if (!currentTop || normalizedTop !== normalizeSearch(currentTop)) currentGroupId = `group:${c}:${normalizedTop}`;
-          currentTop = topText;
-        }
-        const subText = cellText(matrix, layout.subHeaderRow, c);
-        const subtype = classifySubHeader(subText);
-        if (!subtype) continue;
-        if (c === layout.codeColumn || c === layout.nameColumn) continue;
+      const reportStoreDataColumn = source.meta.reportRequired ? findReportStoreDataColumn(matrix, layout, extracted.columnCount) : -1;
+      let storeBlocks = [];
 
-        // ชุด อ. ใช้หัวกลุ่ม “สัปดาห์ 1–4” เป็นมิติสัปดาห์ ไม่ใช่ชื่อห้าง/ร้าน
-        const sheetWeek = source.meta.reportRequired ? parseWeekNumber(currentTop) : null;
-        const week = source.meta.reportRequired ? (sheetWeek || source.meta.weekNumber || null) : null;
-        const weekOrigin = sheetWeek ? 'sheet' : (source.meta.weekNumber ? 'filename' : 'unassigned');
-        // const store = source.meta.reportRequired && sheetWeek ? '' : (currentTop || `แหล่งข้อมูล ${c + 1}`);
-        const store = currentTop || `แหล่งข้อมูล ${c + 1}`;
-        
-        storeBlocks.push({ column: c, groupId: currentGroupId, store, week, weekOrigin, subtype });
+      if (source.meta.reportRequired) {
+        storeBlocks = buildReportStoreBlocks(source, matrix, layout, extracted.columnCount);
+      } else {
+        let currentTop = '';
+        let currentGroupId = 'group:0';
+        for (let c = 0; c < extracted.columnCount; c += 1) {
+          const topText = cellText(matrix, layout.storeRow, c);
+          if (topText) {
+            const normalizedTop = normalizeSearch(topText);
+            if (!currentTop || normalizedTop !== normalizeSearch(currentTop)) currentGroupId = `group:${c}:${normalizedTop}`;
+            currentTop = topText;
+          }
+          const subText = cellText(matrix, layout.subHeaderRow, c);
+          const subtype = classifySubHeader(subText);
+          if (!subtype) continue;
+          if (c === layout.codeColumn || c === layout.nameColumn) continue;
+          storeBlocks.push({
+            column: c,
+            groupId: currentGroupId,
+            store: currentTop || `แหล่งข้อมูล ${c + 1}`,
+            storeFallback: currentTop || `แหล่งข้อมูล ${c + 1}`,
+            week: null,
+            weekOrigin: 'unassigned',
+            subtype
+          });
+        }
       }
       if (!storeBlocks.length) return [];
 
@@ -747,11 +1070,14 @@
         const itemName = (row[layout.nameColumn] && row[layout.nameColumn].text || '').trim();
         if (!itemName) continue;
         const itemCode = (row[layout.codeColumn] && row[layout.codeColumn].text || '').trim();
+        const rowStore = reportStoreDataColumn >= 0
+          ? normalizeName(row[reportStoreDataColumn] && row[reportStoreDataColumn].text || '').replace(/\r?\n/g, ' ').replace(/\s+/g, ' ').trim()
+          : '';
         const grouped = new Map();
         for (const block of storeBlocks) {
           if (!grouped.has(block.groupId)) grouped.set(block.groupId, {
             link: '', regular: null, promo: null, condition: '',
-            store: block.store, week: block.week, weekOrigin: block.weekOrigin
+            store: block.store, storeFallback: block.storeFallback, week: block.week, weekOrigin: block.weekOrigin
           });
           const target = grouped.get(block.groupId);
           const cell = row[block.column] || EMPTY_CELL;
@@ -766,13 +1092,20 @@
           const effectivePrice = promo !== null ? promo : regular;
           const hasAny = Boolean(detail.link || regular !== null || promo !== null || detail.condition);
           if (!hasAny) continue;
+          const reportStore = source.meta.reportRequired
+            // ชุด อ.: ใช้คอลัมน์ D เป็นแหล่งชื่อห้าง/ร้านเพียงจุดเดียว
+            ? (rowStore || 'ไม่ระบุห้าง')
+            : detail.store;
           const record = {
             sourceId: source.id,
             sourceFile: source.name,
             set: source.meta.setRaw,
             setKey: source.meta.setKey,
-            month: source.meta.monthRaw,
+            month: source.meta.monthDisplay,
+            monthRaw: source.meta.monthRaw,
+            monthNumber: source.meta.monthNumber || 0,
             year: source.meta.yearDisplay,
+            yearNumber: source.meta.yearNumber || Number(source.meta.yearDisplay) || 0,
             reportRequired: source.meta.reportRequired,
             week: detail.week,
             weekOrigin: detail.weekOrigin,
@@ -781,7 +1114,7 @@
             categoryLabel: identity.label,
             itemCode,
             itemName,
-            store: detail.store,
+            store: reportStore,
             regularPrice: regular,
             promoPrice: promo,
             effectivePrice,
@@ -790,7 +1123,7 @@
             excelRow: r + 1
           };
           record.searchText = normalizeSearch([
-            record.sourceFile, record.set, record.month, record.year, record.week ? `สป${record.week}` : '', record.categoryLabel,
+            record.sourceFile, record.set, record.month, record.monthRaw, record.year, record.week ? `สป${record.week}` : '', record.categoryLabel,
             record.itemCode, record.itemName, record.store, record.condition,
             regular, promo, effectivePrice
           ].join(' '));
@@ -868,12 +1201,23 @@
       for (const item of state.categories) if (!categoryMap.has(item.label)) categoryMap.set(item.label, item);
       state.categories = Array.from(categoryMap.values()).sort((a, b) => (a.code || '9999999').localeCompare(b.code || '9999999') || a.label.localeCompare(b.label, 'th'));
       state.stores = Array.from(new Set(state.records.map(row => row.store).filter(Boolean))).sort((a, b) => a.localeCompare(b, 'th'));
+      state.records.sort((a, b) =>
+        Number(b.yearNumber || b.year || 0) - Number(a.yearNumber || a.year || 0) ||
+        Number(b.monthNumber || b.month || 0) - Number(a.monthNumber || a.month || 0) ||
+        String(a.set).localeCompare(String(b.set), 'th') ||
+        String(a.categoryLabel).localeCompare(String(b.categoryLabel), 'th') ||
+        String(a.itemCode).localeCompare(String(b.itemCode)) ||
+        String(a.itemName).localeCompare(String(b.itemName), 'th') ||
+        String(a.store).localeCompare(String(b.store), 'th')
+      );
       populateFilters();
       renderSourceCards();
       rebuildWeeklyReport();
+      rebuildHistoryMatrix();
       updateStats();
       resetFilters();
       resetWeeklyReportFilters();
+      resetHistoryFilters();
       el.emptyState.classList.add('hidden');
       el.dataArea.classList.remove('hidden');
       const reportFiles = state.sources.filter(source => source.meta.reportRequired).length;
@@ -886,12 +1230,12 @@
       fillSelect(el.fileSelect, state.sources.map(source => {
         const weekInfo = source.meta.reportRequired ? getSourceReportWeekInfo(source) : { weeks: [], sheetWeeks: [] };
         const displayLabel = source.meta.reportRequired
-          ? `ชุด ${source.meta.setRaw} • ${source.meta.monthRaw} • ${source.meta.yearDisplay} • REPORT • ${formatReportWeekText(weekInfo.weeks)}${weekInfo.sheetWeeks.length ? ' จากหัวคอลัมน์' : ''}`
+          ? `ชุด ${source.meta.setRaw} • เดือน ${source.meta.monthDisplay} • ${source.meta.yearDisplay} • REPORT • ${formatReportWeekText(weekInfo.weeks)}${weekInfo.sheetWeeks.length ? ' จากหัวคอลัมน์' : ''}`
           : source.meta.displayLabel;
         return { value: source.id, label: `${displayLabel} — ${source.name}` };
       }), '-- ทุกไฟล์ --');
       fillSelect(el.setSelect, uniqueSorted(state.sources.map(source => source.meta.setRaw)).map(value => ({ value, label: `ชุด ${value}` })), '-- ทุกชุด --');
-      fillSelect(el.monthSelect, uniqueSorted(state.sources.map(source => source.meta.monthRaw)).map(value => ({ value, label: value })), '-- ทุกเดือน --');
+      fillSelect(el.monthSelect, uniqueSorted(state.sources.map(source => source.meta.monthDisplay), true).map(value => ({ value, label: `เดือน ${value}` })), '-- ทุกเดือน --');
       fillSelect(el.yearSelect, uniqueSorted(state.sources.map(source => source.meta.yearDisplay), true).map(value => ({ value, label: value })), '-- ทุกปี --');
       fillSelect(el.catSelect, state.categories.map(item => ({ value: item.label, label: item.label })), '-- ทั้งหมด (ทุกชีท) --');
       fillSelect(el.storeSelect, state.stores.map(value => ({ value, label: value })), '-- ทุกห้าง / ร้าน --');
@@ -903,7 +1247,15 @@
 
     function uniqueSorted(values, numericDesc = false) {
       const unique = Array.from(new Set(values.filter(Boolean)));
-      return unique.sort((a, b) => numericDesc ? (Number(b) - Number(a)) : String(a).localeCompare(String(b), 'th'));
+      return unique.sort((a, b) => {
+        if (numericDesc) {
+          const an = Number(a), bn = Number(b);
+          const aNumeric = Number.isFinite(an), bNumeric = Number.isFinite(bn);
+          if (aNumeric && bNumeric && an !== bn) return bn - an;
+          if (aNumeric !== bNumeric) return aNumeric ? -1 : 1;
+        }
+        return String(a).localeCompare(String(b), 'th');
+      });
     }
 
     function renderSourceCards() {
@@ -918,7 +1270,7 @@
           <span class="source-name">${escapeHtml(source.name)}</span>
           <span class="source-meta">
             <span class="mini-chip">ชุด ${escapeHtml(source.meta.setRaw)}</span>
-            <span class="mini-chip">${escapeHtml(source.meta.monthRaw)}</span>
+            <span class="mini-chip">เดือน ${escapeHtml(source.meta.monthDisplay)}</span>
             <span class="mini-chip">พ.ศ. ${escapeHtml(source.meta.yearDisplay)}</span>
             ${reportBadge}
           </span>
@@ -962,6 +1314,7 @@
       populateFilters();
       renderSourceCards();
       rebuildWeeklyReport();
+      rebuildHistoryMatrix();
       updateStats();
       applyFiltersFromControls();
       applyWeeklyReportFiltersFromControls();
@@ -1034,6 +1387,7 @@
         if (f.store && row.store !== f.store) return false;
         if (f.price === 'has_price' && row.effectivePrice === null) return false;
         if (f.price === 'promo_only' && row.promoPrice === null) return false;
+        if (f.price === 'sold_out' && !isExactSoldOut(row.condition)) return false;
         if (f.price === 'no_price' && row.effectivePrice !== null) return false;
         if (f.query && !row.searchText.includes(f.query)) return false;
         return true;
@@ -1111,9 +1465,10 @@
       for (const row of reportRows) {
         const codeText = String(row.itemCode || '').trim();
         const nameText = normalizeSearch(row.itemName);
-        // ชุด อ. จับคู่ระดับรายการ ไม่ใช้ “ห้าง/ร้าน” เพราะหัวกลุ่มของไฟล์คือสัปดาห์
-        // const key = [row.month, row.year, row.categoryLabel, codeText, nameText].join('\u001f');
-        const key = [row.month, row.year, row.store, row.categoryLabel, codeText, nameText].join('\u001f');
+        const storeText = String(row.store || '').trim() || 'ไม่ระบุห้าง';
+        const storeKey = normalizeSearch(storeText);
+        // ชุด อ. จับคู่รายห้าง/ร้าน โดยใช้สัปดาห์เป็นแกนคอลัมน์ ไม่ใช้ชื่อสัปดาห์แทนชื่อห้าง
+        const key = [row.month, row.year, row.categoryLabel, codeText, nameText, storeKey].join('\u001f');
         if (!groups.has(key)) {
           groups.set(key, {
             month: row.month,
@@ -1121,6 +1476,7 @@
             categoryLabel: row.categoryLabel,
             itemCode: codeText,
             itemName: row.itemName,
+            store: storeText,
             weeks: { 1: [], 2: [], 3: [], 4: [] },
             sourceFiles: new Set(),
             unknownWeekPrices: []
@@ -1146,7 +1502,7 @@
           ? 'ครบ 4 สัปดาห์'
           : `${missingWeeks.length ? `ขาด ${missingWeeks.map(week => `สป${week}`).join(', ')}` : ''}${group.unknownWeekPrices.length ? `${missingWeeks.length ? ' • ' : ''}มีราคาที่ยังจับสัปดาห์ไม่ได้` : ''}`;
         const searchText = normalizeSearch([
-          group.month, group.year, group.categoryLabel, group.itemCode, group.itemName, status
+          group.month, group.year, group.categoryLabel, group.itemCode, group.itemName, group.store, status
         ].join(' '));
         return {
           ...group,
@@ -1162,10 +1518,11 @@
         };
       }).sort((a, b) =>
         Number(b.year) - Number(a.year) ||
-        a.month.localeCompare(b.month, 'th') ||
+        Number(b.month) - Number(a.month) ||
         a.categoryLabel.localeCompare(b.categoryLabel, 'th') ||
         a.itemCode.localeCompare(b.itemCode) ||
-        a.itemName.localeCompare(b.itemName, 'th')
+        a.itemName.localeCompare(b.itemName, 'th') ||
+        a.store.localeCompare(b.store, 'th')
       );
       populateWeeklyReportFilters();
       applyWeeklyReportFilters();
@@ -1173,7 +1530,7 @@
 
     function populateWeeklyReportFilters() {
       const reportSources = state.sources.filter(source => source.meta.reportRequired);
-      fillSelect(el.reportMonthSelect, uniqueSorted(reportSources.map(source => source.meta.monthRaw)).map(value => ({ value, label: value })), '-- ทุกเดือน --');
+      fillSelect(el.reportMonthSelect, uniqueSorted(reportSources.map(source => source.meta.monthDisplay), true).map(value => ({ value, label: `เดือน ${value}` })), '-- ทุกเดือน --');
       fillSelect(el.reportYearSelect, uniqueSorted(reportSources.map(source => source.meta.yearDisplay), true).map(value => ({ value, label: value })), '-- ทุกปี --');
       fillSelect(el.reportCatSelect, uniqueSorted(state.weeklyReportRows.map(row => row.categoryLabel)).map(value => ({ value, label: value })), '-- ทุกหมวด --');
     }
@@ -1212,7 +1569,7 @@
     function renderWeeklyReport() {
       const rows = state.filteredWeeklyRows;
       if (!rows.length) {
-        el.weeklyReportBody.innerHTML = '<tr><td colspan="11" style="padding:38px;text-align:center;color:#7d8998">ยังไม่มีข้อมูล REPORT ชุด อ. ที่ตรงกับตัวกรอง</td></tr>';
+        el.weeklyReportBody.innerHTML = '<tr><td colspan="12" style="padding:38px;text-align:center;color:#7d8998">ยังไม่มีข้อมูล REPORT ชุด อ. ที่ตรงกับตัวกรอง</td></tr>';
       } else {
         el.weeklyReportBody.innerHTML = rows.map(row => `
           <tr title="${escapeAttribute(row.sourceFiles.join(' • '))}">
@@ -1221,6 +1578,7 @@
             <td class="category-cell">${escapeHtml(row.categoryLabel)}</td>
             <td class="item-code text-code">${escapeHtml(row.itemCode || '-')}</td>
             <td class="item-name">${escapeHtml(row.itemName).replace(/\\/g, '<br>')}</td>
+            <td class="store-cell">${escapeHtml(row.store || 'ไม่ระบุห้าง')}</td>
             ${[1,2,3,4].map(week => `<td class="week-price">${formatPrice(row.weekly[week])}</td>`).join('')}
             <td class="average-price">${formatPrice(row.average4)}</td>
             <td><span class="report-status ${row.complete ? 'complete' : 'incomplete'}">${escapeHtml(row.status || 'ยังไม่ครบ')}</span></td>
@@ -1241,6 +1599,268 @@
       el.reportBtn.disabled = noRows;
     }
 
+
+
+    function rebuildHistoryMatrix() {
+      const periodMap = new Map();
+      const groups = new Map();
+
+      for (const row of state.records) {
+        const year = Number(row.yearNumber || row.year || 0);
+        const month = Number(row.monthNumber || row.month || 0);
+        if (!Number.isFinite(year) || year <= 0 || !Number.isInteger(month) || month < 1 || month > 12) continue;
+
+        const periodKey = `${year}-${String(month).padStart(2, '0')}`;
+        if (!periodMap.has(periodKey)) periodMap.set(periodKey, {
+          key: periodKey,
+          year,
+          month,
+          label: `${month}/${year}`,
+          sortValue: periodSortValue(year, month)
+        });
+
+        const codeText = String(row.itemCode || '').trim();
+        const itemName = String(row.itemName || '').trim();
+        const storeText = String(row.store || '').trim() || 'ไม่ระบุห้าง';
+        const productKey = codeText ? `code:${codeText}` : `name:${normalizeSearch(itemName)}`;
+        const groupKey = [productKey, normalizeSearch(storeText)].join('\u001f');
+        const rowPeriodSort = periodSortValue(year, month);
+
+        if (!groups.has(groupKey)) {
+          groups.set(groupKey, {
+            itemCode: codeText,
+            itemName,
+            store: storeText,
+            categoryLabel: row.categoryLabel,
+            latestSort: rowPeriodSort,
+            categoryLabels: new Set([row.categoryLabel]),
+            periods: new Map()
+          });
+        }
+        const group = groups.get(groupKey);
+        group.categoryLabels.add(row.categoryLabel);
+        if (rowPeriodSort >= group.latestSort) {
+          group.latestSort = rowPeriodSort;
+          group.itemName = itemName || group.itemName;
+          group.categoryLabel = row.categoryLabel || group.categoryLabel;
+          if (!group.itemCode && codeText) group.itemCode = codeText;
+        }
+
+        if (!group.periods.has(periodKey)) group.periods.set(periodKey, {
+          values: [],
+          reportWeekValues: { 1: [], 2: [], 3: [], 4: [] },
+          reportUnassignedValues: [],
+          reportPriceCount: 0,
+          normalPriceCount: 0,
+          soldOut: false,
+          sourceFiles: new Set(),
+          rawCount: 0
+        });
+        const period = group.periods.get(periodKey);
+        if (row.effectivePrice !== null && Number.isFinite(Number(row.effectivePrice))) {
+          const price = Number(row.effectivePrice);
+          period.values.push(price);
+          if (row.reportRequired) {
+            period.reportPriceCount += 1;
+            const week = Number(row.week);
+            if ([1,2,3,4].includes(week)) period.reportWeekValues[week].push(price);
+            else period.reportUnassignedValues.push(price);
+          } else {
+            period.normalPriceCount += 1;
+          }
+        }
+        if (isExactSoldOut(row.condition)) period.soldOut = true;
+        period.sourceFiles.add(row.sourceFile);
+        period.rawCount += 1;
+      }
+
+      state.historyPeriods = Array.from(periodMap.values()).sort((a, b) => a.sortValue - b.sortValue);
+      state.historyRows = Array.from(groups.values()).map(group => {
+        const cells = {};
+        for (const period of state.historyPeriods) {
+          const source = group.periods.get(period.key);
+          if (!source) {
+            cells[period.key] = { price: null, soldOut: false, count: 0, sourceFiles: [] };
+            continue;
+          }
+          const values = source.values.filter(Number.isFinite);
+          const reportMode = source.reportPriceCount > 0 && source.normalPriceCount === 0;
+          let completeWeeks = 0;
+          let price = null;
+          if (reportMode) {
+            const weeklyAverages = [1,2,3,4].map(week => {
+              const weekValues = source.reportWeekValues[week].filter(Number.isFinite);
+              return weekValues.length ? weekValues.reduce((sum, value) => sum + value, 0) / weekValues.length : null;
+            });
+            completeWeeks = weeklyAverages.filter(value => value !== null).length;
+            if (completeWeeks === 4) price = weeklyAverages.reduce((sum, value) => sum + value, 0) / 4;
+          } else {
+            price = values.length ? values.reduce((sum, value) => sum + value, 0) / values.length : null;
+          }
+          cells[period.key] = {
+            price,
+            reportMode,
+            completeWeeks,
+            unassignedCount: source.reportUnassignedValues.length,
+            soldOut: price === null && values.length === 0 && source.soldOut,
+            count: values.length,
+            rawCount: source.rawCount,
+            sourceFiles: Array.from(source.sourceFiles).sort((a, b) => a.localeCompare(b, 'th'))
+          };
+        }
+        const categoryLabels = Array.from(group.categoryLabels).filter(Boolean).sort((a, b) => a.localeCompare(b, 'th'));
+        const searchText = normalizeSearch([group.itemCode, group.itemName, group.store, categoryLabels.join(' ')].join(' '));
+        return {
+          itemCode: group.itemCode,
+          itemName: group.itemName,
+          store: group.store,
+          categoryLabel: group.categoryLabel,
+          categoryLabels,
+          cells,
+          searchText
+        };
+      }).sort((a, b) =>
+        String(a.itemCode || '').localeCompare(String(b.itemCode || '')) ||
+        String(a.itemName || '').localeCompare(String(b.itemName || ''), 'th') ||
+        String(a.store || '').localeCompare(String(b.store || ''), 'th')
+      );
+
+      populateHistoryFilters();
+      applyHistoryFilters();
+      updateHistoryStats();
+    }
+
+    function populateHistoryFilters() {
+      fillSelect(el.historyCatSelect, uniqueSorted(state.historyRows.flatMap(row => row.categoryLabels)).map(value => ({ value, label: value })), '-- ทุกหมวด --');
+      fillSelect(el.historyStoreSelect, uniqueSorted(state.historyRows.map(row => row.store)).map(value => ({ value, label: value })), '-- ทุกห้าง / ร้าน --');
+    }
+
+    function applyHistoryFiltersFromControls() {
+      state.historyFilters = {
+        category: el.historyCatSelect.value,
+        store: el.historyStoreSelect.value,
+        query: normalizeSearch(el.historySearchInput.value)
+      };
+      state.historyPage = 1;
+      applyHistoryFilters();
+    }
+
+    function resetHistoryFilters() {
+      el.historyCatSelect.value = '';
+      el.historyStoreSelect.value = '';
+      el.historySearchInput.value = '';
+      state.historyFilters = { category: '', store: '', query: '' };
+      state.historyPage = 1;
+      applyHistoryFilters();
+    }
+
+    function applyHistoryFilters() {
+      const f = state.historyFilters;
+      state.filteredHistoryRows = state.historyRows.filter(row => {
+        if (f.category && !row.categoryLabels.includes(f.category)) return false;
+        if (f.store && row.store !== f.store) return false;
+        if (f.query && !row.searchText.includes(f.query)) return false;
+        return true;
+      });
+      renderHistoryPage();
+    }
+
+    function renderHistoryPage() {
+      const periods = state.historyPeriods;
+      const latestIndex = periods.length - 1;
+      el.historyTableHead.innerHTML = `<tr>
+        <th>รหัสรายการ (ข้อความ)</th>
+        <th>สินค้า × ร้าน</th>
+        <th>หมวดหมู่ล่าสุด</th>
+        ${periods.map((period, index) => `<th class="history-period-head${index === latestIndex ? ' latest-period' : ''}" title="เดือน ${period.month} ปี ${period.year}">${escapeHtml(period.label)}</th>`).join('')}
+      </tr>`;
+
+      const pages = totalHistoryPages();
+      if (state.historyPage > pages) state.historyPage = pages;
+      const start = (state.historyPage - 1) * state.historyPageSize;
+      const rows = state.filteredHistoryRows.slice(start, start + state.historyPageSize);
+      if (!rows.length) {
+        el.historyTableBody.innerHTML = `<tr><td colspan="${Math.max(3, periods.length + 3)}" style="padding:42px;text-align:center;color:#7d8998">ไม่พบประวัติสินค้า × ร้านที่ตรงกับตัวกรอง</td></tr>`;
+      } else {
+        el.historyTableBody.innerHTML = rows.map(row => {
+          const periodCells = periods.map((period, index) => {
+            const cell = row.cells[period.key] || { price: null, soldOut: false, count: 0, sourceFiles: [] };
+            const latestClass = index === latestIndex ? ' latest-period' : '';
+            if (cell.price !== null && Number.isFinite(Number(cell.price))) {
+              const title = `เฉลี่ยจาก ${cell.count} ราคา${cell.sourceFiles.length ? ` • ${cell.sourceFiles.join(' • ')}` : ''}`;
+              return `<td class="history-period-cell has-price${latestClass}" title="${escapeAttribute(title)}">${formatPrice(cell.price)}</td>`;
+            }
+            if (cell.reportMode && cell.completeWeeks < 4 && (cell.count > 0 || cell.unassignedCount > 0)) {
+              const detail = `ชุด อ. มีราคา ${cell.completeWeeks}/4 สัปดาห์${cell.unassignedCount ? ` • ยังไม่ระบุสัปดาห์ ${cell.unassignedCount} ค่า` : ''}${cell.sourceFiles.length ? ` • ${cell.sourceFiles.join(' • ')}` : ''}`;
+              return `<td class="history-period-cell${latestClass}" title="${escapeAttribute(detail)}"><span class="history-incomplete">${cell.completeWeeks}/4 สป.</span></td>`;
+            }
+            if (cell.soldOut) return `<td class="history-period-cell${latestClass}"><span class="history-sold-out">หมด</span></td>`;
+            return `<td class="history-period-cell${latestClass}"><span class="history-no-data">-</span></td>`;
+          }).join('');
+          return `<tr>
+            <td class="item-code text-code">${escapeHtml(row.itemCode || '-')}</td>
+            <td class="history-product-cell"><strong>${escapeHtml(row.itemName || '-').replace(/\\/g, '<br>')}</strong><small><span class="history-store-chip">${escapeHtml(row.store || 'ไม่ระบุห้าง')}</span></small></td>
+            <td class="category-cell" title="${escapeAttribute(row.categoryLabels.join(' • '))}">${escapeHtml(row.categoryLabel || '-')}</td>
+            ${periodCells}
+          </tr>`;
+        }).join('');
+      }
+
+      const visibleStart = state.filteredHistoryRows.length ? start + 1 : 0;
+      const visibleEnd = Math.min(start + state.historyPageSize, state.filteredHistoryRows.length);
+      el.historyInfo.textContent = `แสดง ${formatNumber(visibleStart)}–${formatNumber(visibleEnd)} จาก ${formatNumber(state.filteredHistoryRows.length)} คู่สินค้า × ร้าน • ช่วงเวลาเรียงจากเก่าสุดทางซ้ายไปล่าสุดทางขวา`;
+      el.historyPageIndicator.textContent = `หน้า ${formatNumber(state.historyPage)} / ${formatNumber(pages)}`;
+      el.historyPrevPageBtn.disabled = state.historyPage <= 1;
+      el.historyNextPageBtn.disabled = state.historyPage >= pages;
+      el.historyExportBtn.disabled = state.filteredHistoryRows.length === 0;
+    }
+
+    function totalHistoryPages() { return Math.max(1, Math.ceil(state.filteredHistoryRows.length / state.historyPageSize)); }
+
+    function changeHistoryPage(delta) {
+      state.historyPage = Math.min(totalHistoryPages(), Math.max(1, state.historyPage + delta));
+      renderHistoryPage();
+      document.getElementById('historyTableWrap').scrollTop = 0;
+    }
+
+    function updateHistoryStats() {
+      el.historyStatPairs.textContent = formatNumber(state.historyRows.length);
+      el.historyStatPeriods.textContent = formatNumber(state.historyPeriods.length);
+      if (!state.historyPeriods.length) {
+        el.historyStatRange.textContent = '-';
+      } else {
+        const first = state.historyPeriods[0];
+        const last = state.historyPeriods[state.historyPeriods.length - 1];
+        el.historyStatRange.textContent = first.key === last.key ? first.label : `${first.label} → ${last.label}`;
+      }
+    }
+
+
+    function exportHistoryXlsx() {
+      const rows = state.filteredHistoryRows;
+      if (!rows.length) { alert('ไม่มีประวัติสินค้า × ร้านที่ตรงกับตัวกรอง'); return; }
+      const headers = ['รหัสรายการ','ชื่อรายการสินค้า','ห้าง/ร้าน','หมวดหมู่ล่าสุด', ...state.historyPeriods.map(period => period.label)];
+      const exportRows = rows.map(row => [
+        textXlsx(String(row.itemCode || '')),
+        textXlsx(row.itemName),
+        textXlsx(row.store),
+        textXlsx(row.categoryLabel),
+        ...state.historyPeriods.map(period => {
+          const cell = row.cells[period.key];
+          if (cell && cell.price !== null && Number.isFinite(Number(cell.price))) return numberXlsx(cell.price);
+          if (cell && cell.reportMode && cell.completeWeeks < 4 && (cell.count > 0 || cell.unassignedCount > 0)) return textXlsx(`${cell.completeWeeks}/4 สป.`);
+          if (cell && cell.soldOut) return textXlsx('หมด');
+          return { type: 'blank', value: '' };
+        })
+      ]);
+      downloadXlsx(`ประวัติราคา_สินค้า-ร้าน_${dateStamp()}.xlsx`, [{
+        name: 'ประวัติ_สินค้า-ร้าน',
+        headers,
+        rows: exportRows,
+        widths: [22,52,22,30, ...state.historyPeriods.map(() => 14)]
+      }]);
+    }
+
     function exportFilteredCsv() {
       if (!state.filteredRecords.length) return;
       const headers = ['ไฟล์ต้นทาง','ชุด','เดือน','ปี พ.ศ.','สัปดาห์','REPORT','หมวดหมู่ (รหัส_ชื่อ)','รหัสรายการ','ชื่อรายการสินค้า','ห้าง/ร้าน','ราคาปกติ','ราคาโปร','ราคาที่ใช้','ภาวะ','URL'];
@@ -1259,20 +1879,20 @@
     function exportReportCsv() {
       const reportRows = state.filteredWeeklyRows;
       if (!reportRows.length) { alert('ไม่มีข้อมูล REPORT ชุด อ. ที่ตรงกับตัวกรอง'); return; }
-      const reportHeaders = ['ชุด','เดือน','ปี พ.ศ.','หมวดหมู่ (รหัส_ชื่อ)','รหัสรายการ','ชื่อรายการสินค้า','สป1','สป2','สป3','สป4','ราคาเฉลี่ย 4 สัปดาห์','จำนวนสัปดาห์ที่มีราคา','สถานะ','ไฟล์ต้นทาง'];
+      const reportHeaders = ['ชุด','เดือน','ปี พ.ศ.','หมวดหมู่ (รหัส_ชื่อ)','รหัสรายการ','ชื่อรายการสินค้า','ห้าง/ร้าน','สป1','สป2','สป3','สป4','ราคาเฉลี่ย 4 สัปดาห์','จำนวนสัปดาห์ที่มีราคา','สถานะ','ไฟล์ต้นทาง'];
       const reportData = reportRows.map(row => [
         textXlsx('อ.'), textXlsx(row.month), textXlsx(row.year), textXlsx(row.categoryLabel), textXlsx(String(row.itemCode || '')),
-        textXlsx(row.itemName), numberXlsx(row.weekly[1]), numberXlsx(row.weekly[2]), numberXlsx(row.weekly[3]),
+        textXlsx(row.itemName), textXlsx(row.store || 'ไม่ระบุห้าง'), numberXlsx(row.weekly[1]), numberXlsx(row.weekly[2]), numberXlsx(row.weekly[3]),
         numberXlsx(row.weekly[4]), numberXlsx(row.average4), numberXlsx(row.presentWeeks, 0), textXlsx(row.status), textXlsx(row.sourceFiles.join(' | '))
       ]);
       const rawRows = state.records.filter(row => row.reportRequired).map(row => [
         textXlsx(row.sourceFile), textXlsx(row.month), textXlsx(row.year), textXlsx(row.week ? `สป${row.week}` : ''),
-        textXlsx(row.categoryLabel), textXlsx(String(row.itemCode || '')), textXlsx(row.itemName),
+        textXlsx(row.categoryLabel), textXlsx(String(row.itemCode || '')), textXlsx(row.itemName), textXlsx(row.store || 'ไม่ระบุห้าง'),
         numberXlsx(row.regularPrice), numberXlsx(row.promoPrice), numberXlsx(row.effectivePrice), textXlsx(row.condition), textXlsx(row.link)
       ]);
       downloadXlsx(`REPORT_ชุด_อ_${dateStamp()}.xlsx`, [
-        { name: 'REPORT_สป1-สป4', headers: reportHeaders, rows: reportData, widths: [9,12,10,27,22,55,14,14,14,14,20,18,28,55] },
-        { name: 'ข้อมูลดิบ_ชุด_อ', headers: ['ไฟล์ต้นทาง','เดือน','ปี พ.ศ.','สัปดาห์','หมวดหมู่ (รหัส_ชื่อ)','รหัสรายการ','ชื่อรายการสินค้า','ราคาปกติ','ราคาโปร','ราคาที่ใช้','ภาวะ','URL'], rows: rawRows, widths: [34,12,10,10,27,22,55,14,14,14,24,55] }
+        { name: 'REPORT_สป1-สป4', headers: reportHeaders, rows: reportData, widths: [9,12,10,27,22,52,20,14,14,14,14,20,18,28,55] },
+        { name: 'ข้อมูลดิบ_ชุด_อ', headers: ['ไฟล์ต้นทาง','เดือน','ปี พ.ศ.','สัปดาห์','หมวดหมู่ (รหัส_ชื่อ)','รหัสรายการ','ชื่อรายการสินค้า','ห้าง/ร้าน','ราคาปกติ','ราคาโปร','ราคาที่ใช้','ภาวะ','URL'], rows: rawRows, widths: [34,12,10,10,27,22,52,20,14,14,14,24,55] }
       ]);
     }
 
@@ -1466,6 +2086,10 @@
       state.stores = [];
       state.weeklyReportRows = [];
       state.filteredWeeklyRows = [];
+      state.historyPeriods = [];
+      state.historyRows = [];
+      state.filteredHistoryRows = [];
+      state.historyPage = 1;
       state.totalSheets = 0;
       state.totalRawRows = 0;
       state.page = 1;
@@ -1473,6 +2097,12 @@
       el.emptyState.classList.remove('hidden');
       el.tableBody.innerHTML = '';
       el.weeklyReportBody.innerHTML = '';
+      el.historyTableHead.innerHTML = '';
+      el.historyTableBody.innerHTML = '';
+      el.historyInfo.textContent = '-';
+      el.historyStatPairs.textContent = '0';
+      el.historyStatPeriods.textContent = '0';
+      el.historyStatRange.textContent = '-';
       el.weeklyReportPanel.classList.add('hidden');
       el.reportNotice.classList.add('hidden');
     }
@@ -1492,6 +2122,14 @@
         event.preventDefault(); depth = 0; document.body.classList.remove('drop-active');
         await registerFileSources(Array.from(event.dataTransfer.files || []));
       });
+    }
+
+    function isExactSoldOut(value) {
+      return String(value ?? '')
+        .normalize('NFC')
+        .replace(/[\u200B-\u200D\uFEFF]/g, '')
+        .replace(/\s+/g, ' ')
+        .trim() === 'หมด';
     }
 
     function normalizeSearch(value) { return normalizeName(value).toLocaleLowerCase('th-TH').replace(/\s+/g, ' ').trim(); }
