@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CPI Analysis Report (Web App) - V15 Monthly + Weekly</title>
+    <!-- โหลด Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- โหลด SheetJS -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+    <style>
+        body { background-color: #f8f9fa; padding: 20px; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        .card { border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border: none; margin-bottom: 20px; }
+        .table-responsive { max-height: 500px; overflow-y: auto; }
+        thead th { position: sticky; top: 0; background-color: #0d6efd !important; color: white !important; z-index: 1; white-space: nowrap;}
+        .nav-tabs .nav-link.active { font-weight: bold; color: #0d6efd; border-bottom: 3px solid #0d6efd; }
+        .nav-tabs .nav-link { color: #495057; font-weight: 500; }
+        #loading { display: none; margin-top: 15px; }
+        .status-up { color: #198754; font-weight: bold; }
+        .status-down { color: #dc3545; font-weight: bold; }
+        .status-equal { color: #6c757d; font-weight: bold; }
+        td { white-space: nowrap; }
+        .header-title { color: #0d6efd; font-weight: 700; }
+        .form-check-input { cursor: pointer; }
+        .form-check-label { cursor: pointer; user-select: none; }
+        .toggle-container { background: #e9ecef; padding: 10px 15px; border-radius: 8px; display: inline-block; }
+    </style>
+</head>
+<body>
+    <div class="container-fluid mt-3">
+        <h2 class="text-center mb-4 header-title">
+            ระบบประมวลผล CPI Analysis Report
+        </h2>
+        
+        <div class="card p-4 mx-auto" style="max-width: 900px;">
+            <h4 class="card-title fw-bold text-dark mb-4">ส่วนที่ 1: นำเข้าข้อมูลและตั้งค่า</h4>
+            
+            <div class="mb-4">
+                <label class="form-label fw-bold text-primary fs-5">1. ไฟล์ข้อมูลหลัก : check_cpiu_month</label>
+                <input class="form-control form-control-lg border-primary" type="file" id="fileInput" accept=".xlsx, .xls, .csv">
+                <div class="form-text mt-2">รองรับ 2 แบบ: รายเดือน = ราคาเดือนก่อน / ราคาปัจจุบัน / ราคาเปรียบเทียบ / REL | รายสัปดาห์ = ราคาเฉลี่ยเดือนที่แล้ว / ราคาเฉลี่ยเดือนปัจจุบัน / ราคาเปรียบเทียบ / REL (ราคาเฉลี่ยตัวแรก = เดือนที่แล้ว, ตัวสุดท้าย = เดือนปัจจุบัน)</div>
+            </div>
+            
+            <div class="mb-4">
+                <label class="form-label fw-bold text-success fs-5">2. ไฟล์ Real_Master_CPI</label>
+                <input class="form-control form-control-lg border-success" type="file" id="masterFileInput" accept=".xlsx, .xls, .csv">
+                <div id="masterAutoStatus" class="form-text mt-2 text-muted">กำลังตรวจหา <b>Real_Master_CPI.xlsx</b> ในโฟลเดอร์เดียวกับ HTML...</div>
+                <div class="form-text">ถ้าระบบพบไฟล์อัตโนมัติ ไม่ต้องอัปโหลดช่องนี้ หากไม่พบสามารถเลือกไฟล์เองได้ตามปกติ</div>
+            </div>
+
+            <!-- ส่วนเลือกชุดข้อมูล -->
+            <div class="mb-4 p-3 border rounded bg-light">
+                <label class="form-label fw-bold text-dark fs-5">3. เลือกชุดข้อมูลที่จะใช้คำนวณ GeoMean</label>
+                <div class="d-flex flex-wrap gap-4 mt-2">
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="colType" id="colAuto" value="AUTO" checked>
+                        <label class="form-check-label fw-bold" for="colAuto">อัตโนมัติ</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="colType" id="colG" value="G">
+                        <label class="form-check-label text-primary fw-bold" for="colG">ติ๊ก G (ไฟล์ชุดG ทั่วไป)</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="colType" id="colL" value="L">
+                        <label class="form-check-label text-success fw-bold" for="colL">ติ๊ก L (ไฟล์ชุดL นอกเขต)</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="colType" id="colU" value="U">
+                        <label class="form-check-label text-danger fw-bold" for="colU">ติ๊ก U (ไฟล์ชุดU ชนบท)</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="colType" id="colN" value="N">
+                        <label class="form-check-label text-secondary fw-bold" for="colN">ไม่ติ๊ก G/L/U (ไฟล์ชุดNไม่คำนวณ)</label>
+                    </div>
+                </div>
+                <div class="form-text mt-2">* ระบบจะดึงเฉพาะแถวที่ Checked (หรือ 1) ในคอลัมน์ที่เลือกมาคำนวณ GeoMean</div>
+            </div>
+
+            <button id="processBtn" class="btn btn-primary btn-lg w-100 fw-bold fs-5 py-3 mt-2">เริ่มประมวลผลข้อมูล</button>
+            
+            <div id="loading" class="text-center text-primary fw-bold fs-5 mt-4">
+                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                กำลังประมวลผลและ Mapping ข้อมูล... โปรดรอสักครู่
+            </div>
+        </div>
+
+        <div id="resultSection" class="card p-4" style="display: none;">
+            
+            <!-- ป้ายแสดงผลชุดข้อมูล -->
+            <div class="alert alert-info d-flex align-items-center mb-4 border-info">
+                <i class="bi bi-info-circle-fill fs-4 me-3"></i>
+                <h4 class="m-0 fw-bold text-dark">📌 ข้อมูลที่กำลังแสดงผล: <span id="fileSetLabelDisplay" class="text-primary fs-3"></span></h4>
+            </div>
+
+            <div class="d-flex flex-wrap justify-content-between align-items-center mb-3">
+                <h4 class="card-title m-0 fw-bold">ส่วนที่ 2: ผลลัพธ์การประมวลผล</h4>
+                
+                <div class="d-flex align-items-center flex-wrap gap-4 mt-2 mt-md-0">
+                    <div class="form-check form-switch fs-6 mb-0">
+                        <input class="form-check-input" type="checkbox" id="decimalToggle">
+                        <label class="form-check-label fw-bold text-primary" for="decimalToggle">GeoMean: 5 ตำแหน่ง (เริ่มต้น 2)</label>
+                    </div>
+                    <div class="form-check form-switch fs-6 mb-0">
+                        <input class="form-check-input" type="checkbox" id="countToggle">
+                        <label class="form-check-label fw-bold text-danger" for="countToggle">นับจำนวน: เฉพาะตัวที่ Checked (เริ่มต้น: ทั้งหมด)</label>
+                    </div>
+                    <button id="exportBtn" class="btn btn-success fw-bold px-4 py-2 fs-6 shadow-sm">
+                        ดาวน์โหลดเป็นไฟล์ Excel
+                    </button>
+                </div>
+            </div>
+            
+            <ul class="nav nav-tabs mt-2 flex-wrap" id="reportTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#task1" type="button" role="tab">1. GeoMean (เฉพาะรายการที่ Checked)</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#task2" type="button" role="tab">2. จำนวนขึ้น/ลง/เท่าเดิม</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#task3" type="button" role="tab">3. แยกตามเขต/จังหวัด</button>
+                </li>
+            </ul>
+            
+            <div class="tab-content border border-top-0 p-3 bg-white shadow-sm" id="reportTabsContent">
+                <div class="tab-pane fade show active" id="task1" role="tabpanel">
+                    <div class="d-flex justify-content-between align-items-center mb-2 mt-1">
+                        <p class="text-muted mb-0">ตารางแสดงค่า GeoMean</p>
+                        <div class="toggle-container form-check form-switch fs-6 mb-0">
+                            <input class="form-check-input" type="checkbox" id="regionToggle" checked>
+                            <label class="form-check-label fw-bold text-dark" for="regionToggle" id="regionToggleLabel">
+                                มุมมอง: รายภาค (แยกตามภาค)
+                            </label>
+                        </div>
+                    </div>
+                    <div class="table-responsive border rounded mt-2">
+                        <table class="table table-striped table-hover mb-0" id="table1"></table>
+                    </div>
+                </div>
+                <div class="tab-pane fade" id="task2" role="tabpanel">
+                    <div class="table-responsive border rounded mt-2">
+                        <table class="table table-striped table-hover mb-0" id="table2"></table>
+                    </div>
+                </div>
+                <div class="tab-pane fade" id="task3" role="tabpanel">
+                    <div class="table-responsive border rounded mt-2">
+                        <table class="table table-striped table-hover mb-0" id="table3"></table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        let processedData = []; 
+        let task1_data = [], task2_data = [], task3_data = [], task4_data = [];
+        let currentFileSetLabel = ""; // เก็บชื่อไฟล์ชุดสำหรับตั้งชื่อตอนโหลด
+        let currentDataMode = ""; // MONTHLY / WEEKLY
+        let defaultMasterBuffer = null;
+        let defaultMasterFileName = "";
+
+        function geometricMean(arr) {
+            if(arr.length === 0) return 0;
+            let sumLog = 0, count = 0;
+            for(let val of arr) {
+                if(val > 0) {
+                    sumLog += Math.log(val);
+                    count++;
+                }
+            }
+            return count === 0 ? 0 : Math.exp(sumLog / count);
+        }
+
+        function readFileAsync(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = e => resolve(new Uint8Array(e.target.result));
+                reader.onerror = reject;
+                reader.readAsArrayBuffer(file);
+            });
+        }
+
+        // ----------------------------------------------------------
+        // Real_Master_CPI แบบ Default
+        // 1) ลองอ่าน Real_Master_CPI.xlsx / .xls จากโฟลเดอร์เดียวกับ HTML
+        // 2) ถ้าอ่านไม่ได้ ผู้ใช้ยังอัปโหลดเองได้ตามปกติ
+        // 3) ถ้ามีการอัปโหลดเอง จะให้ไฟล์ที่อัปโหลดมีสิทธิ์เหนือ Default
+        // ----------------------------------------------------------
+        function setMasterAutoStatus(message, type = 'muted') {
+            const el = document.getElementById('masterAutoStatus');
+            if (!el) return;
+            el.className = `form-text mt-2 text-${type}`;
+            el.innerHTML = message;
+        }
+
+        async function tryLoadDefaultMaster() {
+            const candidates = ['Real_Master_CPI.xlsx', 'Real_Master_CPI.xls'];
+            defaultMasterBuffer = null;
+            defaultMasterFileName = '';
+
+            for (const name of candidates) {
+                try {
+                    const url = new URL(name, window.location.href);
+                    const response = await fetch(url, { cache: 'no-store' });
+                    if (!response.ok) continue;
+
+                    const buffer = new Uint8Array(await response.arrayBuffer());
+                    if (!buffer.length) continue;
+
+                    // ตรวจเบื้องต้นว่าเป็น Excel ที่เปิดได้จริง
+                    const wb = XLSX.read(buffer, { type: 'array' });
+                    if (!wb.SheetNames || wb.SheetNames.length === 0) continue;
+
+                    defaultMasterBuffer = buffer;
+                    defaultMasterFileName = name;
+                    setMasterAutoStatus(`✅ พบ <b>${name}</b> อัตโนมัติ และพร้อมใช้งาน`, 'success');
+                    return;
+                } catch (err) {
+                    // ลองชื่อถัดไป หากไม่มีแล้วค่อยใช้ manual upload
+                }
+            }
+
+            const localFileNote = window.location.protocol === 'file:'
+                ? ' เบราว์เซอร์บางตัวไม่อนุญาตให้ HTML ที่เปิดด้วยการดับเบิลคลิกอ่านไฟล์ข้างเคียงอัตโนมัติ'
+                : '';
+            setMasterAutoStatus(`ไม่พบ Real_Master_CPI อัตโนมัติ — สามารถอัปโหลดไฟล์เองได้.${localFileNote}`, 'secondary');
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            tryLoadDefaultMaster();
+
+            const masterInput = document.getElementById('masterFileInput');
+            masterInput.addEventListener('change', () => {
+                if (masterInput.files.length) {
+                    setMasterAutoStatus(`📂 จะใช้ไฟล์ที่อัปโหลด: <b>${masterInput.files[0].name}</b>`, 'primary');
+                } else if (defaultMasterBuffer) {
+                    setMasterAutoStatus(`✅ ใช้ Default: <b>${defaultMasterFileName}</b>`, 'success');
+                } else {
+                    setMasterAutoStatus('ยังไม่มีไฟล์ Real_Master_CPI กรุณาอัปโหลดไฟล์', 'danger');
+                }
+            });
+        });
+
+        // ----------------------------------------------------------
+        // Helpers สำหรับอ่านไฟล์หลักที่อาจมีหัวตารางมากกว่า 1 แถว
+        // และจัดการชื่อคอลัมน์ซ้ำ เช่น ราคาเฉลี่ย / ราคาเฉลี่ย.1
+        // ----------------------------------------------------------
+        function cleanHeader(value) {
+            return String(value ?? '').replace(/\s+/g, ' ').trim();
+        }
+
+        function baseHeaderName(name) {
+            // ตัด suffix ที่เกิดจากคอลัมน์ชื่อซ้ำ เช่น .1, .2, _1, _2
+            return cleanHeader(name).replace(/(?:\.\d+|_\d+)$/, '').trim();
+        }
+
+        function makeUniqueHeaders(headerRow) {
+            const seen = {};
+            return headerRow.map((value, index) => {
+                let base = cleanHeader(value);
+                if(!base) return `__EMPTY_${index}`;
+
+                let count = seen[base] || 0;
+                seen[base] = count + 1;
+                return count === 0 ? base : `${base}.${count}`;
+            });
+        }
+
+        function parseMainSheet(sheet) {
+            // อ่านเป็น array ก่อน เพื่อหาแถวหัวจริงเอง
+            const matrix = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: '' });
+            if(matrix.length === 0) throw new Error('ไม่พบข้อมูลในไฟล์หลัก');
+
+            let bestIndex = -1;
+            let bestScore = -1;
+            const maxCheck = Math.min(matrix.length, 12);
+
+            for(let i = 0; i < maxCheck; i++) {
+                const h = matrix[i].map(cleanHeader);
+                let score = 0;
+
+                if(h.some(x => ['G','L','U','N'].includes(x.toUpperCase()))) score += 2;
+                if(h.some(x => x.includes('รหัส'))) score += 2;
+                if(h.some(x => x.includes('แหล่งจัดเก็บ'))) score += 2;
+                if(h.some(x => x.includes('จังหวัด'))) score += 3;
+                if(h.some(x => x.toUpperCase() === 'REL' || x.toUpperCase().includes('REL'))) score += 3;
+                if(h.some(x => x.includes('ราคาเปรียบเทียบ'))) score += 2;
+                if(h.some(x => x.includes('ราคาปัจจุบัน') || x.includes('ราคาเฉลี่ย'))) score += 2;
+
+                if(score > bestScore) {
+                    bestScore = score;
+                    bestIndex = i;
+                }
+            }
+
+            if(bestIndex < 0 || bestScore < 7) {
+                throw new Error('ไม่สามารถหาแถวหัวตารางของไฟล์หลักได้');
+            }
+
+            const headers = makeUniqueHeaders(matrix[bestIndex]);
+            const rows = matrix.slice(bestIndex + 1)
+                .filter(r => r.some(v => cleanHeader(v) !== ''))
+                .map(r => {
+                    const obj = {};
+                    headers.forEach((h, idx) => obj[h] = (idx < r.length ? r[idx] : ''));
+                    return obj;
+                });
+
+            return {
+                rows,
+                keys: headers,
+                headerRowNumber: bestIndex + 1
+            };
+        }
+
+        function findColumn(keys, predicate) {
+            return keys.find(k => predicate(baseHeaderName(k), k));
+        }
+
+        function findAllColumns(keys, predicate) {
+            return keys.filter(k => predicate(baseHeaderName(k), k));
+        }
+
+        function getFormattedData(data, forExport = false) {
+            let is5Decimals = document.getElementById('decimalToggle').checked;
+            let decimals = is5Decimals ? 5 : 2;
+            
+            return data.map(row => {
+                let newRow = {};
+                for(let key in row) {
+                    let isGeoMeanCol = ['ราคาปัจจุบัน', 'ราคาเฉลี่ย', 'ราคาเปรียบเทียบ', 'REL', 'ราคาเดือนที่แล้ว', 'ราคาเดือนก่อน'].includes(key);
+                    if(isGeoMeanCol && typeof row[key] === 'number') {
+                        if (forExport) {
+                            newRow[key] = Number(row[key].toFixed(decimals));
+                        } else {
+                            newRow[key] = row[key].toFixed(decimals);
+                        }
+                    } else {
+                        newRow[key] = row[key];
+                    }
+                }
+                return newRow;
+            });
+        }
+
+        function updateGeoMeanView() {
+            let isRegion = document.getElementById('regionToggle').checked;
+            let label = document.getElementById('regionToggleLabel');
+            label.textContent = isRegion ? "มุมมอง: รายภาค (แยกตามภาค)" : "มุมมอง: ภาพรวม (รวมทุกภาค)";
+            
+            let activeData = isRegion ? task4_data : task1_data;
+            renderTable('table1', getFormattedData(activeData, false));
+        }
+
+        function updateCountViews() {
+            let onlyChecked = document.getElementById('countToggle').checked;
+            let dataToCount = onlyChecked ? processedData.filter(p => p.isChecked) : processedData;
+
+            let task2_map = {};
+            dataToCount.forEach(p => {
+                if(!p.code7 || !p.status) return;
+                if(!task2_map[p.code7]) task2_map[p.code7] = { name: p.itemName, admin: p.itemAdmin, 'ขึ้น': 0, 'ลง': 0, 'เท่าเดิม': 0 };
+                task2_map[p.code7][p.status]++;
+            });
+            task2_data = Object.keys(task2_map).map(k => ({ 
+                'ผู้ดูแล': task2_map[k].admin, 
+                'CODE7': k, 
+                'รายการ': task2_map[k].name, 
+                'ขึ้น': task2_map[k]['ขึ้น'], 
+                'ลง': task2_map[k]['ลง'], 
+                'เท่าเดิม': task2_map[k]['เท่าเดิม'], 
+                'จำนวนรวม': task2_map[k]['ขึ้น'] + task2_map[k]['ลง'] + task2_map[k]['เท่าเดิม'] 
+            })).sort((a,b) => a.CODE7.localeCompare(b.CODE7));
+
+            let task3_map = {};
+            dataToCount.forEach(p => {
+                if(!p.code7 || !p.status || !p.prov_dist) return;
+                let key = p.code7 + "|||" + p.prov_dist;
+                if(!task3_map[key]) task3_map[key] = { c: p.code7, name: p.itemName, admin: p.itemAdmin, p: p.prov_dist, up: 0, down: 0, eq: 0 };
+                if(p.status === 'ขึ้น') task3_map[key].up++;
+                if(p.status === 'ลง') task3_map[key].down++;
+                if(p.status === 'เท่าเดิม') task3_map[key].eq++;
+            });
+            task3_data = Object.values(task3_map).map(v => ({ 
+                'ผู้ดูแล': v.admin, 
+                'CODE7': v.c, 
+                'รายการ': v.name, 
+                'จังหวัด/เขต': v.p, 
+                'ขึ้น': v.up, 
+                'ลง': v.down, 
+                'เท่าเดิม': v.eq, 
+                'จำนวนรวม': v.up + v.down + v.eq 
+            })).sort((a,b) => a.CODE7.localeCompare(b.CODE7) || a['จังหวัด/เขต'].localeCompare(b['จังหวัด/เขต']));
+
+            renderTable('table2', task2_data);
+            renderTable('table3', task3_data);
+        }
+
+        // Add Events
+        document.getElementById('decimalToggle').addEventListener('change', () => {
+            if(task1_data.length > 0 || task4_data.length > 0) updateGeoMeanView();
+        });
+
+        document.getElementById('regionToggle').addEventListener('change', () => {
+            if(task1_data.length > 0 || task4_data.length > 0) updateGeoMeanView();
+        });
+
+        document.getElementById('countToggle').addEventListener('change', () => {
+            if(processedData.length > 0) updateCountViews();
+        });
+
+        document.getElementById('processBtn').addEventListener('click', () => {
+            const fileInput = document.getElementById('fileInput');
+            const masterFileInput = document.getElementById('masterFileInput');
+
+            if(!fileInput.files.length) {
+                alert('กรุณาอัปโหลดไฟล์ข้อมูลหลักครับ');
+                return;
+            }
+
+            if(!masterFileInput.files.length && !defaultMasterBuffer) {
+                alert('ไม่พบ Real_Master_CPI อัตโนมัติ กรุณาอัปโหลดไฟล์ Real_Master_CPI ครับ');
+                return;
+            }
+
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('resultSection').style.display = 'none';
+
+            // ถ้าผู้ใช้อัปโหลด Master เอง ให้ใช้ไฟล์นั้นก่อน Default เสมอ
+            const masterPromise = masterFileInput.files.length
+                ? readFileAsync(masterFileInput.files[0])
+                : Promise.resolve(defaultMasterBuffer);
+
+            Promise.all([
+                readFileAsync(fileInput.files[0]),
+                masterPromise
+            ]).then(([dataBuffer, masterBuffer]) => {
+                
+                try {
+                    const masterWb = XLSX.read(masterBuffer, {type: 'array'});
+                    
+                    // ==========================================
+                    // Mapping Province -> Region
+                    // ==========================================
+                    let regionMap = {};
+                    const provSheetName = masterWb.SheetNames.find(s => s.includes('รหัสจังหวัด'));
+                    if (provSheetName) {
+                        const provRows = XLSX.utils.sheet_to_json(masterWb.Sheets[provSheetName]);
+                        provRows.forEach(row => {
+                            let keys = Object.keys(row);
+                            let provKey = keys.find(k => k.includes('จังหวัด') && !k.includes('รหัส'));
+                            let regionKey = keys.find(k => k.includes('ภาค') || k.includes('Unnamed')); 
+                            if (provKey && regionKey) {
+                                let pName = String(row[provKey]).trim();
+                                let rName = String(row[regionKey]).trim();
+                                regionMap[pName] = rName;
+                                regionMap[pName.replace(/\s+/g, '')] = rName;
+                            }
+                        });
+                        let bkkRegion = regionMap['กรุงเทพมหานคร'] || 'กรุงเทพมหานคร และปริมณฑล';
+                        regionMap['กทม.'] = bkkRegion;
+                        regionMap['กรุงเทพ'] = bkkRegion;
+                    }
+
+                    // ==========================================
+                    // Mapping Item Code -> Name / Admin
+                    // ==========================================
+                    let itemMap = {};
+                    const itemSheetName = masterWb.SheetNames.find(s => s.includes('ข้อมูล_รายการ_ผู้ดูแล'));
+                    if (itemSheetName) {
+                        const itemRows = XLSX.utils.sheet_to_json(masterWb.Sheets[itemSheetName], { defval: "" });
+                        if(itemRows.length > 0) {
+                            let keys = Object.keys(itemRows[0]);
+                            let codeCol = keys.find(k => k.trim() === 'รหัส' || k.includes('CODE7') || k.includes('รหัส'));
+                            let nameCol = keys.find(k => k.includes('รายการ'));
+                            let adminCol = keys.find(k => k.includes('ผู้ดูแล'));
+                            if(codeCol) {
+                                itemRows.forEach(row => {
+                                    let c = String(row[codeCol]).trim();
+                                    if(c.endsWith('.0')) c = c.slice(0, -2);
+                                    if(c) {
+                                        itemMap[c] = {
+                                            name: nameCol ? String(row[nameCol]).trim() : "",
+                                            admin: adminCol ? String(row[adminCol]).trim() : ""
+                                        };
+                                    }
+                                });
+                            }
+                        }
+                    }
+
+                    // ==========================================
+                    // Process Main File
+                    // ==========================================
+                    const dataWb = XLSX.read(dataBuffer, {type: 'array'});
+                    const parsedMain = parseMainSheet(dataWb.Sheets[dataWb.SheetNames[0]]);
+                    const dataRows = parsedMain.rows;
+                    const keys = parsedMain.keys;
+
+                    if(dataRows.length === 0) throw new Error("ไม่พบแถวข้อมูลในไฟล์หลัก");
+                    
+                    // Logic การหาคอลัมน์ที่จะใช้คำนวณตามที่ผู้ใช้เลือก (Radio Button)
+                    let colType = document.querySelector('input[name="colType"]:checked').value;
+                    let targetColName = "";
+                    let fileSetLabel = "";
+
+                    if(colType === 'AUTO') {
+                        let hasG = keys.find(k => k.trim().toUpperCase() === 'G');
+                        let hasL = keys.find(k => k.trim().toUpperCase() === 'L');
+                        let hasU = keys.find(k => k.trim().toUpperCase() === 'U');
+                        let hasN = keys.find(k => k.trim().toUpperCase() === 'N');
+
+                        if(hasG) { targetColName = hasG; fileSetLabel = "ไฟล์ชุดG ทั่วไป"; }
+                        else if(hasL) { targetColName = hasL; fileSetLabel = "ไฟล์ชุดL นอกเขต"; }
+                        else if(hasU) { targetColName = hasU; fileSetLabel = "ไฟล์ชุดU ชนบท"; }
+                        else if(hasN) { targetColName = hasN; fileSetLabel = "ไฟล์ชุดN ไม่คำนวณ"; }
+                        else { 
+                            // Fallback if none found
+                            targetColName = keys.find(k => k.trim().toUpperCase() === 'U' || k.includes('Checked')) || keys[0]; 
+                            fileSetLabel = "ไม่ระบุชุด (ประมวลผลด้วยคอลัมน์แรก)"; 
+                        }
+                    } else {
+                        targetColName = keys.find(k => k.trim().toUpperCase() === colType);
+                        if(!targetColName) {
+                            throw new Error(`ไม่พบคอลัมน์ "${colType}" ในไฟล์ข้อมูลหลัก! กรุณาตรวจสอบไฟล์ของคุณ หรือเลือกโหมด "อัตโนมัติ"`);
+                        }
+                        if(colType === 'G') fileSetLabel = "ไฟล์ชุดG ทั่วไป";
+                        if(colType === 'L') fileSetLabel = "ไฟล์ชุดL นอกเขต";
+                        if(colType === 'U') fileSetLabel = "ไฟล์ชุดU ชนบท";
+                        if(colType === 'N') fileSetLabel = "ไฟล์ชุดNไม่คำนวณ";
+                    }
+
+                    // ==========================================
+                    // ตรวจชนิดข้อมูล: รายเดือน / รายสัปดาห์
+                    // ==========================================
+                    let code16_col = findColumn(keys, (base) => base === 'รหัส' || base === 'COMMODITY_CODE');
+                    let rel_col = findColumn(keys, (base) => base.toUpperCase() === 'REL' || base.toUpperCase().includes('REL'));
+                    let prov_col = findColumn(keys, (base) => base.includes('จังหวัด'));
+                    let loc_col = findColumn(keys, (base) => base.includes('แหล่งจัดเก็บ'));
+                    let comp_col = findColumn(keys, (base) => base.includes('ราคาเปรียบเทียบ') || base.includes('เปรียบเทียบ'));
+
+                    // รายเดือน
+                    let monthlyPrevCol = findColumn(keys, (base) => base.includes('ราคาเดือนที่แล้ว') || base.includes('ราคาเดือนก่อน'));
+                    let monthlyCurrCol = findColumn(keys, (base) => base.includes('ราคาปัจจุบัน'));
+
+                    // รายสัปดาห์: ในไฟล์มี ราคาเฉลี่ย 2 ตัว
+                    // ตัวแรก = เดือนก่อน, ตัวสุดท้าย = เดือนปัจจุบัน
+                    // เช่น SheetJS/โปรแกรมอื่นอาจเรียกตัวหลังว่า ราคาเฉลี่ย.1
+                    const avgCols = findAllColumns(keys, (base) => base === 'ราคาเฉลี่ย');
+
+                    let dataMode = '';
+                    let prev_col = null;
+                    let curr_col = null;
+
+                    if(monthlyCurrCol) {
+                        dataMode = 'MONTHLY';
+                        prev_col = monthlyPrevCol;
+                        curr_col = monthlyCurrCol;
+                    } else if(avgCols.length > 0) {
+                        dataMode = 'WEEKLY';
+                        prev_col = avgCols.length >= 2 ? avgCols[0] : null;
+                        curr_col = avgCols[avgCols.length - 1]; // สำคัญ: ใช้ราคาเฉลี่ยของเดือนปัจจุบัน
+                    } else {
+                        throw new Error('ไม่พบคอลัมน์ราคาปัจจุบัน หรือ ราคาเฉลี่ย ในไฟล์หลัก');
+                    }
+
+                    if(!code16_col || !rel_col || !prov_col || !comp_col || !curr_col) {
+                        throw new Error('ไม่พบคอลัมน์ที่จำเป็น (รหัส, จังหวัด, ราคาปัจจุบัน/ราคาเฉลี่ย, ราคาเปรียบเทียบ หรือ REL)');
+                    }
+
+                    currentDataMode = dataMode;
+                    currentFileSetLabel = fileSetLabel;
+                    const modeLabel = dataMode === 'WEEKLY' ? 'ข้อมูลรายสัปดาห์' : 'ข้อมูลรายเดือน';
+                    const priceLabel = dataMode === 'WEEKLY'
+                        ? `ราคาเดือนที่แล้ว (จากราคาเฉลี่ยเดือนก่อน): ${prev_col || '-'} | ราคาเฉลี่ยเดือนปัจจุบัน: ${curr_col} | ราคาเปรียบเทียบ: ${comp_col} | REL: ${rel_col}`
+                        : `ราคาปัจจุบัน: ${curr_col} | ราคาเดือนก่อน: ${prev_col || '-'} | ราคาเปรียบเทียบ: ${comp_col} | REL: ${rel_col}`;
+
+                    const masterSourceLabel = masterFileInput.files.length
+                        ? `Master อัปโหลด: ${masterFileInput.files[0].name}`
+                        : `Master Default: ${defaultMasterFileName}`;
+
+                    document.getElementById('fileSetLabelDisplay').innerHTML =
+                        `${fileSetLabel} <span class="badge bg-warning text-dark fs-6 ms-2">${modeLabel}</span>` +
+                        `<span class="badge bg-secondary fs-6 ms-2">หัวตารางแถว ${parsedMain.headerRowNumber}</span>` +
+                        `<span class="badge bg-success fs-6 ms-2">${masterSourceLabel}</span>` +
+                        `<div class="small text-muted mt-2">คอลัมน์ Checked: ${targetColName} | ${priceLabel}</div>`;
+
+                    processedData = dataRows.map(row => {
+                        let u_val = String(row[targetColName] || '').trim().toLowerCase();
+                        let isChecked = (u_val === 'checked' || u_val === '1' || u_val === '1.0' || u_val === 'true');
+                        
+                        let c16 = String(row[code16_col] || '').trim();
+                        if(c16.endsWith('.0')) c16 = c16.slice(0,-2); 
+                        let code7 = c16.substring(0, 7);
+                        
+                        let itemName = itemMap[code7] ? itemMap[code7].name : "";
+                        let itemAdmin = itemMap[code7] ? itemMap[code7].admin : "";
+
+                        let prov = String(row[prov_col] || '').trim();
+                        let provClean = prov.replace(/\s+/g, '');
+                        let region = regionMap[provClean] || regionMap[prov] || `ไม่พบข้อมูลภาค (${prov})`;
+
+                        let rel = parseFloat(row[rel_col]);
+                        let comp_price = comp_col ? parseFloat(row[comp_col]) : NaN;
+                        let prev_price = prev_col ? parseFloat(row[prev_col]) : NaN;
+                        let curr_price = curr_col ? parseFloat(row[curr_col]) : NaN;
+
+                        let status = "";
+                        if(!isNaN(rel)) {
+                            if(rel > 100) status = "ขึ้น";
+                            else if(rel < 100) status = "ลง";
+                            else status = "เท่าเดิม";
+                        }
+                        
+                        let loc = String(row[loc_col] || '').trim();
+                        let prov_dist = prov;
+                        if(['กรุงเทพมหานคร', 'กทม.', 'กรุงเทพ'].includes(prov)) {
+                            let m1 = loc.match(/\((กลุ่ม.*?)\)/); 
+                            let m2 = loc.match(/(กลุ่ม[^\s\(\)]+)/); 
+                            if(m1) prov_dist = `กทม.${m1[1]}`;
+                            else if(m2) prov_dist = `กทม.${m2[1]}`;
+                            else prov_dist = "กทม.เขตอื่นๆ";
+                        }
+                        
+                        return { isChecked, code7, itemName, itemAdmin, region, rel, comp_price, prev_price, curr_price, status, prov_dist };
+                    });
+                    
+                    // Task 1: GeoMean ภาพรวม (Overall) - เสมอต้อง isChecked เท่านั้น
+                    let task1_map = {};
+                    processedData.forEach(p => {
+                        if(p.isChecked) {
+                            if(!task1_map[p.code7]) task1_map[p.code7] = { name: p.itemName, admin: p.itemAdmin, comp: [], prev: [], curr: [], rel: [] };
+                            if(!isNaN(p.comp_price) && p.comp_price > 0) task1_map[p.code7].comp.push(p.comp_price);
+                            if(!isNaN(p.prev_price) && p.prev_price > 0) task1_map[p.code7].prev.push(p.prev_price);
+                            if(!isNaN(p.curr_price) && p.curr_price > 0) task1_map[p.code7].curr.push(p.curr_price);
+                            if(!isNaN(p.rel) && p.rel > 0) task1_map[p.code7].rel.push(p.rel);
+                        }
+                    });
+                    
+                    task1_data = Object.keys(task1_map).map(k => {
+                        let rcp = geometricMean(task1_map[k].comp);
+                        let rp = geometricMean(task1_map[k].prev);
+                        let rc = geometricMean(task1_map[k].curr);
+                        let rr = geometricMean(task1_map[k].rel);
+
+                        if(dataMode === 'WEEKLY') {
+                            return {
+                                'ผู้ดูแล': task1_map[k].admin,
+                                'CODE7': k,
+                                'รายการ': task1_map[k].name,
+                                'ราคาเฉลี่ย': rc || 0,
+                                'ราคาเปรียบเทียบ': rcp || 0,
+                                'REL': rr || 0,
+                                'ราคาเดือนที่แล้ว': rp || 0
+                            };
+                        }
+
+                        return { 
+                            'ผู้ดูแล': task1_map[k].admin, 
+                            'CODE7': k, 
+                            'รายการ': task1_map[k].name, 
+                            'ราคาปัจจุบัน': rc || 0, 
+                            'ราคาเปรียบเทียบ': rcp || 0,
+                            'REL': rr || 0,
+                            'ราคาเดือนที่แล้ว': rp || 0 
+                        };
+                    }).sort((a,b) => a.CODE7.localeCompare(b.CODE7));
+
+                    // Task 4: GeoMean รายภาค (Region) - เสมอต้อง isChecked เท่านั้น
+                    let task4_map = {};
+                    processedData.forEach(p => {
+                        if(p.isChecked) {
+                            let key = p.code7 + "|||" + p.region;
+                            if(!task4_map[key]) task4_map[key] = { code7: p.code7, name: p.itemName, admin: p.itemAdmin, region: p.region, comp: [], prev: [], curr: [], rel: [] };
+                            if(!isNaN(p.comp_price) && p.comp_price > 0) task4_map[key].comp.push(p.comp_price);
+                            if(!isNaN(p.prev_price) && p.prev_price > 0) task4_map[key].prev.push(p.prev_price);
+                            if(!isNaN(p.curr_price) && p.curr_price > 0) task4_map[key].curr.push(p.curr_price);
+                            if(!isNaN(p.rel) && p.rel > 0) task4_map[key].rel.push(p.rel);
+                        }
+                    });
+
+                    task4_data = Object.values(task4_map).map(v => {
+                        let rcp = geometricMean(v.comp);
+                        let rp = geometricMean(v.prev);
+                        let rc = geometricMean(v.curr);
+                        let rr = geometricMean(v.rel);
+
+                        if(dataMode === 'WEEKLY') {
+                            return {
+                                'ผู้ดูแล': v.admin,
+                                'CODE7': v.code7,
+                                'รายการ': v.name,
+                                'ภาค': v.region,
+                                'ราคาเฉลี่ย': rc || 0,
+                                'ราคาเปรียบเทียบ': rcp || 0,
+                                'REL': rr || 0,
+                                'ราคาเดือนที่แล้ว': rp || 0
+                            };
+                        }
+
+                        return { 
+                            'ผู้ดูแล': v.admin, 
+                            'CODE7': v.code7, 
+                            'รายการ': v.name, 
+                            'ภาค': v.region, 
+                            'ราคาปัจจุบัน': rc || 0, 
+                            'ราคาเปรียบเทียบ': rcp || 0,
+                            'REL': rr || 0, 
+                            'ราคาเดือนที่แล้ว': rp || 0
+                        };
+                    }).sort((a,b) => a.CODE7.localeCompare(b.CODE7) || a.ภาค.localeCompare(b.ภาค));
+
+                    // Render View GeoMean
+                    updateGeoMeanView(); 
+
+                    // Render Count Tables (Tasks 2 & 3) based on current toggle state
+                    updateCountViews();
+
+                    document.getElementById('loading').style.display = 'none';
+                    document.getElementById('resultSection').style.display = 'block';
+
+                } catch (error) {
+                    console.error(error);
+                    alert('เกิดข้อผิดพลาด: ' + error.message);
+                    document.getElementById('loading').style.display = 'none';
+                }
+            }).catch(error => {
+                console.error(error);
+                alert('เกิดข้อผิดพลาดในการอ่านไฟล์: ' + error.message);
+                document.getElementById('loading').style.display = 'none';
+            });
+        });
+
+        function renderTable(tableId, data) {
+            const table = document.getElementById(tableId);
+            table.innerHTML = "";
+            if(data.length === 0) {
+                table.innerHTML = "<tr><td class='text-center py-4'>ไม่พบข้อมูลตามเงื่อนไข</td></tr>";
+                return;
+            }
+            
+            let thead = document.createElement('thead');
+            let hr = document.createElement('tr');
+            Object.keys(data[0]).forEach(key => {
+                let th = document.createElement('th');
+                th.textContent = key;
+                th.className = "py-3 text-center align-middle";
+                hr.appendChild(th);
+            });
+            thead.appendChild(hr);
+            table.appendChild(thead);
+            
+            let tbody = document.createElement('tbody');
+            data.forEach(row => {
+                let tr = document.createElement('tr');
+                Object.entries(row).forEach(([key, val]) => {
+                    let td = document.createElement('td');
+                    td.textContent = val;
+                    let isGeoMeanCol = ['ราคาปัจจุบัน', 'ราคาเฉลี่ย', 'ราคาเปรียบเทียบ', 'REL', 'ราคาเดือนที่แล้ว', 'ราคาเดือนก่อน'].includes(key);
+                    
+                    if(key === 'ขึ้น' && val > 0) td.classList.add('status-up', 'text-center');
+                    else if(key === 'ลง' && val > 0) td.classList.add('status-down', 'text-center');
+                    else if(key === 'เท่าเดิม' && val > 0) td.classList.add('status-equal', 'text-center');
+                    else if ((typeof val === 'number' && key !== 'CODE7') || (typeof val === 'string' && !isNaN(val) && isGeoMeanCol)) {
+                        td.classList.add('text-end');
+                    }
+                    tr.appendChild(td);
+                });
+                tbody.appendChild(tr);
+            });
+            table.appendChild(tbody);
+        }
+
+        document.getElementById('exportBtn').addEventListener('click', () => {
+            if(task1_data.length === 0 && task2_data.length === 0 && task3_data.length === 0 && task4_data.length === 0) {
+                alert("ไม่มีข้อมูลสำหรับดาวน์โหลด");
+                return;
+            }
+            
+            const wb = XLSX.utils.book_new();
+            
+            // ส่งออกข้อมูล GeoMean โดยยึดตามสิ่งที่แสดงผลบนหน้าจอขณะนั้น (ภาพรวม หรือ รายภาค)
+            let isRegion = document.getElementById('regionToggle').checked;
+            let activeGeoData = isRegion ? task4_data : task1_data;
+            let sheetName = isRegion ? "1.GeoMean_Region" : "1.GeoMean_Overall";
+
+            if(activeGeoData.length > 0) XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(getFormattedData(activeGeoData, true)), sheetName);
+            if(task2_data.length > 0) XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(task2_data), "2.Status_Count");
+            if(task3_data.length > 0) XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(task3_data), "3.Prov_Dist_Count");
+            
+            // ใช้ชื่อไฟล์ที่อิงตามชุดข้อมูล
+            let cleanFileLabel = currentFileSetLabel.replace(/\s+/g, '_');
+            let modeFileLabel = currentDataMode === 'WEEKLY' ? 'Weekly' : 'Monthly';
+            let filename = `CPI_Analysis_Report_${cleanFileLabel}_${modeFileLabel}.xlsx`;
+            XLSX.writeFile(wb, filename);
+        });
+    </script>
+</body>
+</html>
