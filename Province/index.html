@@ -95,22 +95,25 @@
     </div>
 
     <script>
-        // ชื่อไฟล์ Excel ที่วางไว้ในโฟลเดอร์เดียวกัน
+        // ชื่อไฟล์ต้องตรงเป๊ะๆ ทุกตัวอักษร (ตัวพิมพ์ใหญ่-เล็กมีผลบน GitHub)
         const EXCEL_FILE_URL = 'Database_CPI.xlsx'; 
 
         let usersDB = {};
         let tasksDB = {};
 
-        // โหลดข้อมูล Excel ทันทีที่เปิดเว็บ
         window.onload = async function() {
             try {
-                // ดึงไฟล์ Excel
-                const response = await fetch(EXCEL_FILE_URL);
-                if (!response.ok) throw new Error("ไม่พบไฟล์ Excel");
+                // เพิ่ม ?t=... เพื่อป้องกันปัญหาเบราว์เซอร์จำไฟล์เก่า (Cache)
+                const fetchUrl = EXCEL_FILE_URL + '?t=' + new Date().getTime();
+                
+                const response = await fetch(fetchUrl);
+                
+                // ถ้าระบบหาไฟล์ไม่เจอ ให้โยน Error แจ้งสถานะ
+                if (!response.ok) {
+                    throw new Error(`HTTP Error ${response.status}: หาไฟล์ชื่อ ${EXCEL_FILE_URL} ไม่พบในโฟลเดอร์เดียวกัน`);
+                }
                 
                 const arrayBuffer = await response.arrayBuffer();
-                
-                // ใช้ SheetJS อ่านข้อมูล
                 const workbook = XLSX.read(arrayBuffer, { type: 'array' });
                 
                 // 1. อ่าน Sheet "Users"
@@ -134,14 +137,19 @@
                     });
                 }
 
-                // โหลดเสร็จ ซ่อนหน้าโหลด แสดงหน้า Login
+                // ถ้าข้อมูลถูกโหลดสำเร็จ
                 document.getElementById('loading-screen').style.display = 'none';
                 document.getElementById('login-section').style.display = 'block';
 
             } catch (error) {
-                console.error("Error reading Excel:", error);
-                document.getElementById('loading-text').innerText = "ไม่สามารถอ่านไฟล์ Database_CPI.xlsx ได้\n(โปรดรันผ่าน Server/Live Server หรืออัปโหลดขึ้น Web Hosting)";
-                document.getElementById('loading-text').style.color = "red";
+                console.error("Error Detail:", error);
+                
+                // แสดง Error ที่ชัดเจนขึ้นบนหน้าเว็บ
+                const errorBox = document.getElementById('loading-text');
+                errorBox.style.color = "red";
+                errorBox.innerHTML = `<strong>เกิดข้อผิดพลาด:</strong><br>${error.message}<br><br>
+                <span style="font-size:0.85rem; color:#64748b;">*บน GitHub Pages ชื่อไฟล์ "Database_CPI.xlsx" กับ "database_cpi.xlsx" ถือเป็นคนละไฟล์กัน โปรดเช็คตัวพิมพ์เล็ก/ใหญ่ให้ตรงกันเป๊ะๆ ครับ</span>`;
+                
                 document.querySelector('.spinner').style.display = 'none';
             }
         };
@@ -152,7 +160,6 @@
             const errorMsg = document.getElementById('login-error');
 
             if (usersDB[userIn] && usersDB[userIn].Password === passIn) {
-                // Login Success
                 errorMsg.style.display = 'none';
                 document.getElementById('login-section').style.display = 'none';
                 document.getElementById('dashboard-section').style.display = 'block';
@@ -163,7 +170,6 @@
             }
         }
 
-        // กด Enter ตอนใส่รหัสผ่านได้
         document.getElementById('password').addEventListener('keypress', function (e) {
             if (e.key === 'Enter') handleLogin();
         });
@@ -172,23 +178,19 @@
             const user = usersDB[username];
             const userTasks = tasksDB[username];
             
-            // แสดงผลโปรไฟล์
             document.getElementById('display-profile').innerText = `ยินดีต้อนรับ, เจ้าหน้าที่รหัส ${username}`;
             let districtText = `จังหวัด: ${user.Province || '-'} | ภูมิภาค: ${user.Region || '-'}`;
             if (user.District) districtText += ` | พื้นที่/เขต: ${user.District}`;
             document.getElementById('display-district').innerText = districtText;
 
-            // ตั้งค่าเดือนปัจจุปัน
             const now = new Date();
             const monthNames = ["มกราคม","กุมภาพันธ์","มีนาคม","เมษายน","พฤษภาคม","มิถุนายน","กรกฎาคม","สิงหาคม","กันยายน","ตุลาคม","พฤศจิกายน","ธันวาคม"];
             document.getElementById('current-month').innerText = `${monthNames[now.getMonth()]} ${now.getFullYear() + 543}`;
 
-            // สร้างตารางงาน
             const taskList = document.getElementById('task-list');
             taskList.innerHTML = '';
 
             if (userTasks) {
-                // ค้นหาคอลัมน์ Task1 ถึง Task7 จาก Excel
                 for (let i = 1; i <= 7; i++) {
                     const taskName = userTasks[`Task${i}_Name`];
                     const taskLink = userTasks[`Task${i}_Link`];
@@ -206,7 +208,6 @@
                 }
             }
             
-            // ถ้าไม่มีงานเลย
             if (taskList.innerHTML === '') {
                 taskList.innerHTML = `<tr><td colspan="3" style="text-align:center; color:gray; padding: 30px;">ไม่มีภารกิจในเดือนนี้</td></tr>`;
             }
