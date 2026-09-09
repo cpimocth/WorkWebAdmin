@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TPSO - ระบบรับมอบหมายงานจัดเก็บราคา (CPI)</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Sarabun:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- นำเข้าไลบรารี PapaParse สำหรับอ่านไฟล์ CSV จาก Google Sheets -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
+    <style>
+      /* --- ใช้ CSS เดิมที่ออกแบบไว้ --- */
+      :root {
+        --primary: #0b4ea2; --primary-dark: #08356e; --primary-soft: #edf5ff;
+        --navy: #102f5d; --danger: #c62828; --success: #166534;
+        --success-bg: #dcfce7; --muted: #64748b; --line: #dbe7f3;
+        --card: rgba(255, 255, 255, 0.94); --bg: linear-gradient(180deg, #eef4fb 0%, #f8fbff 100%);
+        --shadow: 0 18px 40px rgba(16, 52, 92, 0.1); --radius: 22px;
+      }
+      * { box-sizing: border-box; }
+      body { margin: 0; padding: 20px; font-family: "Sarabun", sans-serif; color: #1f3550; background: var(--bg); min-height: 100vh; }
+      
+      #loading-screen { position: fixed; inset: 0; background: white; z-index: 9999; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+      .spinner { border: 4px solid var(--line); border-top: 4px solid var(--primary); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; }
+      @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+      .login-card { max-width: 450px; margin: 50px auto; background: var(--card); padding: 40px; border-radius: var(--radius); box-shadow: var(--shadow); text-align: center; }
+      .input-group input { width: 100%; padding: 14px; margin-top: 5px; margin-bottom: 15px; border: 2px solid var(--line); border-radius: 12px; font-family: "Sarabun"; font-size: 1rem; }
+      .login-btn { width: 100%; padding: 14px; background: var(--primary); color: white; border: none; border-radius: 12px; font-size: 1.1rem; font-weight: 700; cursor: pointer; }
+      
+      .dashboard { max-width: 1280px; margin: 0 auto; display: none; }
+      .header-combined { display: flex; justify-content: space-between; align-items: center; padding: 24px 32px; border-radius: 28px; color: #fff; background: var(--primary-dark); margin-bottom: 20px;}
+      .card { background: var(--card); border-radius: var(--radius); padding: 24px; margin-bottom: 20px; box-shadow: var(--shadow); }
+      table { width: 100%; border-collapse: collapse; }
+      th, td { padding: 12px; border-bottom: 1px solid var(--line); text-align: left; }
+      .btn-task { padding: 8px 16px; background: var(--primary-soft); color: var(--primary); text-decoration: none; border-radius: 8px; font-weight: 700; display: inline-block; }
+      .btn-task:hover { background: var(--primary); color: white; }
+    </style>
+</head>
+<body>
+
+    <!-- หน้าจอโหลดข้อมูล -->
+    <div id="loading-screen">
+        <div class="spinner"></div>
+        <h3 style="color: var(--primary); margin-top: 15px;">กำลังเชื่อมต่อฐานข้อมูลส่วนกลาง...</h3>
+    </div>
+
+    <!-- หน้า Login -->
+    <div id="login-section" style="display: none;">
+        <div class="login-card">
+            <h2 style="color: var(--primary);">ระบบจัดเก็บราคา (CPI)</h2>
+            <p>กรุณาลงชื่อเข้าใช้ด้วยรหัสของท่าน</p>
+            <div class="input-group">
+                <input type="text" id="username" placeholder="Username (เช่น index_bkk02)" autocomplete="off">
+            </div>
+            <div class="input-group">
+                <input type="password" id="password" placeholder="Password">
+            </div>
+            <div id="login-error" style="color: var(--danger); display: none; margin-bottom: 15px;">รหัสไม่ถูกต้อง หรือไม่มีข้อมูลในระบบ</div>
+            <button class="login-btn" onclick="handleLogin()">เข้าสู่ระบบ</button>
+        </div>
+    </div>
+
+    <!-- หน้า Dashboard -->
+    <div id="dashboard-section" class="dashboard">
+        <div class="header-combined">
+            <div>
+                <h1 style="margin: 0;">ระบบรายงานการปฏิบัติงานจัดเก็บราคา</h1>
+                <p style="margin: 5px 0 0; opacity: 0.9;">ประจำเดือน: <span id="current-month"></span></p>
+            </div>
+            <button onclick="location.reload()" style="padding: 10px 20px; border-radius: 10px; border:none; cursor:pointer;">ออกจากระบบ</button>
+        </div>
+
+        <div class="card">
+            <h3 style="color: var(--primary); margin-top: 0;" id="display-profile">ข้อมูลเจ้าหน้าที่</h3>
+            <p style="color: var(--muted);" id="display-district"></p>
+        </div>
+
+        <div class="card">
+            <h3 style="margin-top: 0;">📋 ภารกิจประจำเดือนของคุณ</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ชื่องาน / รายละเอียด</th>
+                        <th>กำหนดส่ง</th>
+                        <th>การดำเนินการ</th>
+                    </tr>
+                </thead>
+                <tbody id="task-list">
+                    <!-- จะดึงจาก Sheet 2 มาใส่ตรงนี้ -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // -------------------------------------------------------------
+        // ** ส่วนที่แอดมินต้องเอาลิงก์จาก Google Sheets มาใส่ **
+        // 1. ไปที่ Google Sheet ของคุณ > ไฟล์ (File) > แชร์ (Share) > เผยแพร่ทางเว็บ (Publish to web)
+        // 2. เลือกแท็บ Sheet 1 (Users) เป็น "ค่าที่คั่นด้วยจุลภาค (.csv)" แล้วเอาลิงก์มาวาง
+        const URL_USERS_CSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ.../pub?gid=0&single=true&output=csv'; 
+        
+        // 3. เลือกแท็บ Sheet 2 (Tasks) เป็น "ค่าที่คั่นด้วยจุลภาค (.csv)" แล้วเอาลิงก์มาวาง
+        const URL_TASKS_CSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ.../pub?gid=123456&single=true&output=csv';
+        // -------------------------------------------------------------
+
+        let usersDB = {};
+        let tasksDB = {};
+
+        // ฟังก์ชันเริ่มการทำงาน: โหลดข้อมูลจาก Google Sheet ทันทีที่เปิดเว็บ
+        window.onload = async function() {
+            try {
+                // รอโหลดข้อมูลทั้ง 2 Sheets พร้อมกัน (ใช้ Promise.all)
+                // *หมายเหตุ: หากตอนทดสอบยังไม่มีลิงก์จริง โค้ดนี้จะใช้ข้อมูลจำลอง (Mock Data) แทน
+                await mockFetchData(); 
+                
+                // หากมีลิงก์ Google Sheets จริงๆ ให้คอมเมนต์บรรทัด mockFetchData() 
+                // แล้วเปิดใช้บรรทัดด้านล่างแทน:
+                // await fetchRealData();
+
+                document.getElementById('loading-screen').style.display = 'none';
+                document.getElementById('login-section').style.display = 'block';
+            } catch (error) {
+                alert("เกิดข้อผิดพลาดในการเชื่อมต่อฐานข้อมูล กรุณารีเฟรชหน้าเว็บ");
+            }
+        };
+
+        function handleLogin() {
+            const userIn = document.getElementById('username').value.trim();
+            const passIn = document.getElementById('password').value.trim();
+            const errorMsg = document.getElementById('login-error');
+
+            if (usersDB[userIn] && usersDB[userIn].Password === passIn) {
+                // เข้าสู่ระบบสำเร็จ
+                errorMsg.style.display = 'none';
+                document.getElementById('login-section').style.display = 'none';
+                document.getElementById('dashboard-section').style.display = 'block';
+                
+                renderDashboard(userIn);
+            } else {
+                errorMsg.style.display = 'block';
+            }
+        }
+
+        function renderDashboard(username) {
+            const user = usersDB[username];
+            const userTasks = tasksDB[username];
+            
+            // แสดงข้อมูลโปรไฟล์
+            document.getElementById('display-profile').innerText = `ยินดีต้อนรับ, เจ้าหน้าที่ ${username}`;
+            let districtText = `จังหวัด: ${user.Province} | ภูมิภาค: ${user.Region}`;
+            if (user.District) districtText += ` | พื้นที่/เขต: ${user.District}`;
+            document.getElementById('display-district').innerText = districtText;
+
+            // ตั้งค่าเดือนปัจจุปัน
+            const now = new Date();
+            const monthNames = ["มกราคม","กุมภาพันธ์","มีนาคม","เมษายน","พฤษภาคม","มิถุนายน","กรกฎาคม","สิงหาคม","กันยายน","ตุลาคม","พฤศจิกายน","ธันวาคม"];
+            document.getElementById('current-month').innerText = `${monthNames[now.getMonth()]} ${now.getFullYear() + 543}`;
+
+            // สร้างตารางงาน
+            const taskList = document.getElementById('task-list');
+            taskList.innerHTML = '';
+
+            if (userTasks) {
+                // วนลูปอ่าน Task1, Task2, Task3 ... จากคอลัมน์ใน Sheet 2
+                for (let i = 1; i <= 7; i++) {
+                    const taskName = userTasks[`Task${i}_Name`];
+                    const taskLink = userTasks[`Task${i}_Link`];
+                    const taskDue = userTasks[`Task${i}_Due`];
+
+                    if (taskName && taskName !== "" && taskName !== "-") {
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+                            <td><strong style="color: var(--navy);">${taskName}</strong></td>
+                            <td><span style="background: #fef3c7; color: #d97706; padding: 4px 10px; border-radius: 12px; font-size: 0.85rem;">⏰ ${taskDue || 'ไม่ระบุ'}</span></td>
+                            <td><a href="${taskLink}" target="_blank" class="btn-task">เปิดไฟล์งาน (Sheet)</a></td>
+                        `;
+                        taskList.appendChild(tr);
+                    }
+                }
+            }
+            
+            if (taskList.innerHTML === '') {
+                taskList.innerHTML = `<tr><td colspan="3" style="text-align:center; color:gray;">ไม่มีภารกิจในเดือนนี้</td></tr>`;
+            }
+        }
+
+        // ==========================================
+        // ส่วนของการเชื่อมต่อ Google Sheets จริง
+        // ==========================================
+        function fetchRealData() {
+            return Promise.all([
+                new Promise((resolve) => {
+                    Papa.parse(URL_USERS_CSV, {
+                        download: true, header: true,
+                        complete: function(results) {
+                            results.data.forEach(row => {
+                                if (row.Username) usersDB[row.Username.trim()] = row;
+                            });
+                            resolve();
+                        }
+                    });
+                }),
+                new Promise((resolve) => {
+                    Papa.parse(URL_TASKS_CSV, {
+                        download: true, header: true,
+                        complete: function(results) {
+                            results.data.forEach(row => {
+                                if (row.Username) tasksDB[row.Username.trim()] = row;
+                            });
+                            resolve();
+                        }
+                    });
+                })
+            ]);
+        }
+
+        // ==========================================
+        // ข้อมูลจำลอง (Mock) สำหรับทดสอบก่อนเอาขึ้นจริง
+        // ==========================================
+        function mockFetchData() {
+            return new Promise((resolve) => {
+                setTimeout(() => {
+                    // จำลองข้อมูล Sheet 1 จากไฟล์ Excel: "Username_Password ใช้งานระบบ_CPI"
+                    usersDB = {
+                        "index_bkk02": { Username: "index_bkk02", Password: "Bkk02", Province: "กรุงเทพมหานคร", District: "กลุ่ม เทเวศร์", Region: "กทม.และปริมณฑล" },
+                        "index_bkk04": { Username: "index_bkk04", Password: "Bkk04", Province: "กรุงเทพมหานคร", District: "กลุ่ม รุ่งเจริญ", Region: "กทม.และปริมณฑล" },
+                        "index_001": { Username: "index_001", Password: "Index_001", Province: "สมุทรปราการ", District: "", Region: "กทม.และปริมณฑล" },
+                        "index_069": { Username: "index_069", Password: "Index_069", Province: "ภูเก็ต", District: "", Region: "ใต้" }
+                    };
+
+                    // จำลองข้อมูล Sheet 2
+                    tasksDB = {
+                        "index_bkk02": { 
+                            Task1_Name: "บันทึกราคา ชุดทั่วไป (เทเวศร์)", Task1_Link: "https://docs.google.com/spreadsheets/...", Task1_Due: "15 ต.ค. 69",
+                            Task2_Name: "ราคากลาง ชุด บ", Task2_Link: "https://docs.google.com/spreadsheets/...", Task2_Due: "20 ต.ค. 69" 
+                        },
+                        "index_069": { 
+                            Task1_Name: "บันทึกราคา ภูเก็ต", Task1_Link: "https://docs.google.com/spreadsheets/...", Task1_Due: "15 ต.ค. 69"
+                        }
+                    };
+                    resolve();
+                }, 800); // ดีเลย์ 0.8 วิ ให้เห็นหน้าโหลด
+            });
+        }
+    </script>
+</body>
+</html>

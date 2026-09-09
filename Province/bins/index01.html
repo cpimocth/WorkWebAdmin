@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TPSO - ระบบรับมอบหมายงานจัดเก็บราคา (CPI)</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Sarabun:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+      :root {
+        --primary: #0b4ea2;
+        --primary-dark: #08356e;
+        --primary-soft: #edf5ff;
+        --navy: #102f5d;
+        --gold: #f6c445;
+        --danger: #c62828;
+        --success: #166534;
+        --success-bg: #dcfce7;
+        --warning: #dd7153;
+        --warning-bg: #fff1f2;
+        --text: #1f3550;
+        --muted: #64748b;
+        --line: #dbe7f3;
+        --card: rgba(255, 255, 255, 0.94);
+        --bg: linear-gradient(180deg, #eef4fb 0%, #f8fbff 100%);
+        --shadow: 0 18px 40px rgba(16, 52, 92, 0.1);
+        --radius: 22px;
+      }
+
+      * { box-sizing: border-box; }
+      html { scroll-behavior: smooth; }
+      body {
+        margin: 0;
+        padding: 20px;
+        font-family: "Sarabun", sans-serif;
+        color: var(--text);
+        background: radial-gradient(circle at top right, rgba(96, 165, 250, 0.16), transparent 28%),
+                    radial-gradient(circle at top left, rgba(11, 78, 162, 0.1), transparent 24%),
+                    var(--bg);
+        min-height: 100vh;
+      }
+
+      /* --- Login UI --- */
+      #login-section {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 80vh;
+      }
+      .login-card {
+        background: var(--card);
+        padding: 40px;
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+        border: 1px solid rgba(219, 231, 243, 0.9);
+        width: 100%;
+        max-width: 450px;
+        text-align: center;
+        backdrop-filter: blur(10px);
+      }
+      .login-card h2 {
+        color: var(--primary);
+        margin-bottom: 5px;
+        font-size: 1.6rem;
+      }
+      .login-card p {
+        color: var(--muted);
+        margin-bottom: 25px;
+        font-size: 0.95rem;
+      }
+      .input-group {
+        margin-bottom: 15px;
+        text-align: left;
+      }
+      .input-group label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: 600;
+        font-size: 0.9rem;
+      }
+      .input-group input {
+        width: 100%;
+        padding: 14px;
+        border: 2px solid var(--line);
+        border-radius: 12px;
+        font-family: "Sarabun", sans-serif;
+        font-size: 1rem;
+        transition: all 0.3s;
+      }
+      .input-group input:focus {
+        border-color: var(--primary);
+        outline: none;
+        box-shadow: 0 0 10px rgba(11, 78, 162, 0.1);
+      }
+      .login-btn {
+        width: 100%;
+        padding: 14px;
+        background: linear-gradient(135deg, var(--primary) 0%, #2563eb 100%);
+        color: white;
+        border: none;
+        border-radius: 12px;
+        font-size: 1.1rem;
+        font-weight: 700;
+        font-family: "Sarabun", sans-serif;
+        cursor: pointer;
+        margin-top: 10px;
+        transition: transform 0.2s, box-shadow 0.2s;
+      }
+      .login-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(37, 99, 235, 0.3);
+      }
+      .error-msg {
+        color: var(--danger);
+        font-size: 0.85rem;
+        margin-top: 10px;
+        display: none;
+      }
+
+      /* --- Dashboard UI --- */
+      #dashboard-section {
+        display: none;
+      }
+      .dashboard {
+        max-width: 1280px;
+        margin: 0 auto;
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 20px;
+        align-items: start;
+      }
+      .card {
+        background: var(--card);
+        border: 1px solid rgba(219, 231, 243, 0.9);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+        padding: 24px;
+        transition: transform 0.24s ease;
+      }
+      .full-span { grid-column: 1 / -1; }
+      .col-2 { grid-column: span 2; }
+      .col-1 { grid-column: span 1; }
+
+      .header-combined {
+        grid-column: 1 / -1;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 24px 32px;
+        border-radius: 28px;
+        color: #fff;
+        background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 55%, #2d7df6 100%);
+        box-shadow: 0 14px 30px rgba(0, 0, 0, 0.12);
+      }
+      .header-title h1 {
+        margin: 0; font-size: 1.8rem; font-weight: 800;
+      }
+      .header-title p {
+        margin: 5px 0 0; opacity: 0.9;
+      }
+      .btn-logout {
+        background: rgba(255,255,255,0.2);
+        color: white;
+        border: 1px solid rgba(255,255,255,0.4);
+        padding: 8px 16px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-family: 'Sarabun';
+        font-weight: bold;
+        transition: 0.2s;
+      }
+      .btn-logout:hover {
+        background: white;
+        color: var(--danger);
+      }
+
+      /* Profile Box */
+      .profile-box {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        margin-bottom: 10px;
+      }
+      .avatar {
+        width: 70px; height: 70px;
+        background: var(--primary-soft);
+        color: var(--primary);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+        font-weight: bold;
+      }
+      .profile-info h3 { margin: 0; color: var(--primary); font-size: 1.4rem; }
+      .profile-info p { margin: 5px 0 0; color: var(--muted); }
+      .badge-region {
+        display: inline-block;
+        padding: 4px 12px;
+        background: #e0f2fe;
+        color: #0284c7;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 700;
+        margin-top: 8px;
+      }
+
+      /* Task Table */
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 15px;
+      }
+      th {
+        text-align: left;
+        padding: 12px;
+        color: var(--muted);
+        border-bottom: 2px solid var(--line);
+        font-size: 0.9rem;
+      }
+      td {
+        padding: 16px 12px;
+        border-bottom: 1px solid var(--line);
+        vertical-align: middle;
+      }
+      tr:hover { background: #f8fafc; }
+      .task-title { font-weight: 700; color: var(--navy); display: block; }
+      .task-desc { font-size: 0.85rem; color: var(--muted); }
+      
+      .btn-task {
+        display: inline-block;
+        padding: 8px 16px;
+        background: var(--primary-soft);
+        color: var(--primary);
+        text-decoration: none;
+        border-radius: 8px;
+        font-weight: 700;
+        font-size: 0.9rem;
+        transition: 0.2s;
+        border: 1px solid var(--line);
+      }
+      .btn-task:hover {
+        background: var(--primary);
+        color: white;
+      }
+
+      .status-badge {
+        padding: 4px 10px;
+        border-radius: 12px;
+        font-size: 0.8rem;
+        font-weight: bold;
+      }
+      .status-pending { background: #fef3c7; color: #d97706; }
+      .status-done { background: var(--success-bg); color: var(--success); }
+
+      @media (max-width: 900px) {
+        .dashboard { grid-template-columns: 1fr; }
+        .col-2, .col-1 { grid-column: 1 / -1; }
+        .header-combined { flex-direction: column; text-align: center; gap: 15px; }
+      }
+    </style>
+</head>
+<body>
+
+    <!-- 1. หน้า Login -->
+    <div id="login-section">
+        <div class="login-card">
+            <img src="https://via.placeholder.com/80x80.png?text=MOC" alt="Logo" style="border-radius:50%; margin-bottom:15px; display:none;">
+            <h2>ระบบจัดเก็บราคา (CPI)</h2>
+            <p>กองดัชนีราคาเศรษฐกิจการค้า กระทรวงพาณิชย์</p>
+            
+            <div class="input-group">
+                <label>รหัสเจ้าหน้าที่ (Username)</label>
+                <input type="text" id="username" placeholder="เช่น index_001" autocomplete="off">
+            </div>
+            <div class="input-group">
+                <label>รหัสผ่าน (Password)</label>
+                <input type="password" id="password" placeholder="พิมพ์รหัสผ่าน">
+            </div>
+            <div id="login-error" class="error-msg">รหัสผู้ใช้งานหรือรหัสผ่านไม่ถูกต้อง</div>
+            
+            <button class="login-btn" onclick="handleLogin()">เข้าสู่ระบบ</button>
+        </div>
+    </div>
+
+    <!-- 2. หน้า Dashboard (ซ่อนไว้ตอนแรก) -->
+    <div id="dashboard-section">
+        <div class="dashboard">
+            <!-- Header -->
+            <div class="header-combined">
+                <div class="header-title">
+                    <h1>ระบบรายงานการปฏิบัติงานจัดเก็บราคา (CPI)</h1>
+                    <p>ประจำเดือน: <span id="current-month"></span> | สนค. กระทรวงพาณิชย์</p>
+                </div>
+                <button class="btn-logout" onclick="handleLogout()">ออกจากระบบ</button>
+            </div>
+
+            <!-- Profile Info -->
+            <div class="card col-1">
+                <div class="profile-box">
+                    <div class="avatar" id="avatar-text">กท</div>
+                    <div class="profile-info">
+                        <h3 id="display-name">ชื่อ-สกุล</h3>
+                        <p id="display-province">จังหวัด</p>
+                        <span class="badge-region" id="display-region">ภาค</span>
+                    </div>
+                </div>
+                <hr style="border: 0; border-top: 1px solid var(--line); margin: 20px 0;">
+                <p style="font-size: 0.9rem; color: var(--muted); line-height: 1.6;">
+                    <strong>ข้อกำหนด:</strong> เจ้าหน้าที่ต้องตรวจสอบความถูกต้องของราคาสินค้าตามหมวดหมู่ที่ได้รับมอบหมายภายในสัปดาห์ที่ 3 ของเดือน
+                </p>
+            </div>
+
+            <!-- Task List -->
+            <div class="card col-2">
+                <h3>ภารกิจประจำเดือนของคุณ</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ชื่องาน / รายละเอียด</th>
+                            <th>สถานะเอกสาร</th>
+                            <th>การดำเนินการ</th>
+                        </tr>
+                    </thead>
+                    <tbody id="task-list">
+                        <!-- รายการงานจะถูกสร้างโดย Javascript -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- ประกาศจากส่วนกลาง -->
+            <div class="card full-span">
+                <h3 style="color: var(--primary);">📢 ประกาศและมาตรฐานการปฏิบัติงานจากส่วนกลาง</h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 15px; margin-top: 15px;">
+                    
+                    <div style="padding: 15px; border: 1px solid #e2e8f0; border-radius: 12px; background: #f8fafc;">
+                        <strong style="color: #0f172a; display: block; margin-bottom: 5px;">คู่มือการลงราคา ชุด บ และ ชุด อ</strong>
+                        <span style="font-size: 0.85rem; color: var(--muted); display: block; margin-bottom: 10px;">ปรับปรุงล่าสุดเมื่อ เดือนที่แล้ว</span>
+                        <a href="#" class="btn-task" style="font-size: 0.8rem;">อ่านคู่มือ</a>
+                    </div>
+                    
+                    <div style="padding: 15px; border: 1px solid #e2e8f0; border-radius: 12px; background: #f8fafc;">
+                        <strong style="color: #0f172a; display: block; margin-bottom: 5px;">การกรอกเหตุผลสินค้าขาด/เกิน</strong>
+                        <span style="font-size: 0.85rem; color: var(--muted); display: block; margin-bottom: 10px;">เน้นย้ำเรื่องการระบุ Remark ให้ชัดเจน</span>
+                        <a href="#" class="btn-task" style="font-size: 0.8rem;">ดูตัวอย่างการกรอก</a>
+                    </div>
+
+                    <div style="padding: 15px; border: 1px solid #e2e8f0; border-radius: 12px; background: #f8fafc;">
+                        <strong style="color: #0f172a; display: block; margin-bottom: 5px;">ช่องทางแจ้งปัญหา (Support)</strong>
+                        <span style="font-size: 0.85rem; color: var(--muted); display: block; margin-bottom: 10px;">ติดต่อทีม Data Admin ส่วนกลาง</span>
+                        <a href="https://docs.google.com/spreadsheets/d/1dEDKw2gGN2xYouJgyxvacbh7028KJQ23dQn8xK_yuwo/edit" target="_blank" class="btn-task" style="font-size: 0.8rem;">แจ้งงานด่วน/นอกตาราง</a>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        // 1. ฐานข้อมูลจำลอง (รายชื่อ 77 จังหวัดและภูมิภาค)
+        const rawProvinces = [
+            {name: "กรุงเทพมหานคร", region: "กรุงเทพมหานคร และปริมณฑล"}, {name: "สมุทรปราการ", region: "กรุงเทพมหานคร และปริมณฑล"}, {name: "นนทบุรี", region: "กรุงเทพมหานคร และปริมณฑล"}, {name: "ปทุมธานี", region: "กรุงเทพมหานคร และปริมณฑล"},
+            {name: "พระนครศรีอยุธยา", region: "กลาง"}, {name: "อ่างทอง", region: "กลาง"}, {name: "ลพบุรี", region: "กลาง"}, {name: "สิงห์บุรี", region: "กลาง"}, {name: "ชัยนาท", region: "กลาง"}, {name: "สระบุรี", region: "กลาง"},
+            {name: "ชลบุรี", region: "กลาง"}, {name: "ระยอง", region: "กลาง"}, {name: "จันทบุรี", region: "กลาง"}, {name: "ตราด", region: "กลาง"}, {name: "ฉะเชิงเทรา", region: "กลาง"}, {name: "ปราจีนบุรี", region: "กลาง"},
+            {name: "นครนายก", region: "กลาง"}, {name: "สระแก้ว", region: "กลาง"}, {name: "ราชบุรี", region: "กลาง"}, {name: "กาญจนบุรี", region: "กลาง"}, {name: "สุพรรณบุรี", region: "กลาง"}, {name: "นครปฐม", region: "กลาง"},
+            {name: "สมุทรสาคร", region: "กลาง"}, {name: "สมุทรสงคราม", region: "กลาง"}, {name: "เพชรบุรี", region: "กลาง"}, {name: "ประจวบคีรีขันธ์", region: "กลาง"},
+            {name: "นครราชสีมา", region: "อีสาน"}, {name: "บุรีรัมย์", region: "อีสาน"}, {name: "สุรินทร์", region: "อีสาน"}, {name: "ศรีสะเกษ", region: "อีสาน"}, {name: "อุบลราชธานี", region: "อีสาน"}, {name: "ยโสธร", region: "อีสาน"}, {name: "ชัยภูมิ", region: "อีสาน"},
+            {name: "อำนาจเจริญ", region: "อีสาน"}, {name: "บึงกาฬ", region: "อีสาน"}, {name: "หนองบัวลำภู", region: "อีสาน"}, {name: "ขอนแก่น", region: "อีสาน"}, {name: "อุดรธานี", region: "อีสาน"}, {name: "เลย", region: "อีสาน"}, {name: "หนองคาย", region: "อีสาน"},
+            {name: "มหาสารคาม", region: "อีสาน"}, {name: "ร้อยเอ็ด", region: "อีสาน"}, {name: "กาฬสินธุ์", region: "อีสาน"}, {name: "สกลนคร", region: "อีสาน"}, {name: "นครพนม", region: "อีสาน"}, {name: "มุกดาหาร", region: "อีสาน"},
+            {name: "เชียงใหม่", region: "เหนือ"}, {name: "ลำพูน", region: "เหนือ"}, {name: "ลำปาง", region: "เหนือ"}, {name: "อุตรดิตถ์", region: "เหนือ"}, {name: "แพร่", region: "เหนือ"}, {name: "น่าน", region: "เหนือ"}, {name: "พะเยา", region: "เหนือ"},
+            {name: "เชียงราย", region: "เหนือ"}, {name: "แม่ฮ่องสอน", region: "เหนือ"}, {name: "นครสวรรค์", region: "เหนือ"}, {name: "อุทัยธานี", region: "เหนือ"}, {name: "กำแพงเพชร", region: "เหนือ"}, {name: "ตาก", region: "เหนือ"}, {name: "สุโขทัย", region: "เหนือ"},
+            {name: "พิษณุโลก", region: "เหนือ"}, {name: "พิจิตร", region: "เหนือ"}, {name: "เพชรบูรณ์", region: "เหนือ"},
+            {name: "นครศรีธรรมราช", region: "ใต้"}, {name: "กระบี่", region: "ใต้"}, {name: "พังงา", region: "ใต้"}, {name: "ภูเก็ต", region: "ใต้"}, {name: "สุราษฎร์ธานี", region: "ใต้"}, {name: "ระนอง", region: "ใต้"},
+            {name: "ชุมพร", region: "ใต้"}, {name: "สงขลา", region: "ใต้"}, {name: "สตูล", region: "ใต้"}, {name: "ตรัง", region: "ใต้"}, {name: "พัทลุง", region: "ใต้"}, {name: "ปัตตานี", region: "ใต้"}, {name: "ยะลา", region: "ใต้"}, {name: "นราธิวาส", region: "ใต้"}
+        ];
+
+        // สร้าง Object Users โดยอัตโนมัติจาก Array ด้านบน
+        const usersDB = {};
+        rawProvinces.forEach((prov, index) => {
+            let num = (index + 1).toString().padStart(3, '0');
+            let username = `index_${num}`;
+            let password = `Index_${num}`;
+            usersDB[username] = {
+                password: password,
+                province: prov.name,
+                region: prov.region
+            };
+        });
+
+        // 2. ฟังก์ชัน Login
+        function handleLogin() {
+            const userIn = document.getElementById('username').value.trim();
+            const passIn = document.getElementById('password').value.trim();
+            const errorMsg = document.getElementById('login-error');
+
+            if (usersDB[userIn] && usersDB[userIn].password === passIn) {
+                // Login Success
+                errorMsg.style.display = 'none';
+                document.getElementById('login-section').style.display = 'none';
+                document.getElementById('dashboard-section').style.display = 'block';
+                
+                // โหลดข้อมูลผู้ใช้เข้า Dashboard
+                loadDashboardData(userIn, usersDB[userIn]);
+            } else {
+                // Login Failed
+                errorMsg.style.display = 'block';
+            }
+        }
+
+        // อนุญาตให้กด Enter เพื่อ Login ได้
+        document.getElementById('password').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') handleLogin();
+        });
+
+        // 3. โหลดข้อมูล Dashboard
+        function loadDashboardData(username, userData) {
+            // เซ็ตวันที่ปัจจุปัน
+            const now = new Date();
+            const monthNames = ["มกราคม","กุมภาพันธ์","มีนาคม","เมษายน","พฤษภาคม","มิถุนายน","กรกฎาคม","สิงหาคม","กันยายน","ตุลาคม","พฤศจิกายน","ธันวาคม"];
+            const currentMonthYear = `${monthNames[now.getMonth()]} ${now.getFullYear() + 543}`;
+            document.getElementById('current-month').innerText = currentMonthYear;
+
+            // ข้อมูล Profile
+            document.getElementById('display-name').innerText = `เจ้าหน้าที่ ${username}`;
+            document.getElementById('display-province').innerText = `ประจำจังหวัด: ${userData.province}`;
+            document.getElementById('display-region').innerText = `ภาค${userData.region}`;
+            document.getElementById('avatar-text').innerText = userData.province.substring(0,2); // เอาตัวอักษร 2 ตัวแรก
+
+            // สร้าง Task อัตโนมัติตามภูมิภาคและจังหวัด
+            generateTasks(userData, currentMonthYear);
+        }
+
+        // 4. ระบบสร้าง Task (แจก Google Sheet แบบ Dynamic)
+        function generateTasks(userData, monthText) {
+            const taskList = document.getElementById('task-list');
+            taskList.innerHTML = ''; // ล้างค่าเดิม
+
+            // โครงสร้างงานจำลอง (สามารถเปลี่ยน Link Google Sheet ให้เป็นของจริงได้)
+            // เราสามารถแนบพารามิเตอร์เพื่อส่งไป Google Sheet ได้ เช่น ?sheet=ชื่อจังหวัด
+            const tasks = [
+                {
+                    title: `ตรวจราคา ชุดทั่วไป (${userData.province})`,
+                    desc: `บันทึกข้อมูลราคาสินค้าชุดทั่วไป ประจำเดือน ${monthText}`,
+                    status: 'pending',
+                    link: `https://docs.google.com/spreadsheets/d/1Bm7he119oZyREMlluvL9bwWl73scTu5h/edit` // ใส่ Link จริงของส่วนกลาง
+                },
+                {
+                    title: `ตรวจราคา ชุดนอกเขต (${userData.province})`,
+                    desc: `บันทึกข้อมูลราคาสินค้าชุดนอกเขต ประจำเดือน ${monthText}`,
+                    status: 'pending',
+                    link: `https://docs.google.com/spreadsheets/d/1bCgIH38W8BZ2xmKri88th0U7UlpE_5F5/edit`
+                },
+                {
+                    title: `ราคากลาง ชุด อ (เฉพาะภาค${userData.region})`,
+                    desc: `ตรวจสอบและอัปเดตข้อมูลราคากลางระดับภูมิภาค`,
+                    status: 'done',
+                    link: `https://docs.google.com/spreadsheets/d/12FFvErJvWw1JmqayED9zwf43yMFBpESmxgzw_LZTjOY/edit`
+                }
+            ];
+
+            tasks.forEach(task => {
+                const tr = document.createElement('tr');
+                
+                const statusHtml = task.status === 'done' 
+                    ? `<span class="status-badge status-done">ดำเนินการแล้ว</span>` 
+                    : `<span class="status-badge status-pending">รอการบันทึก</span>`;
+
+                const btnText = task.status === 'done' ? 'ตรวจสอบข้อมูล' : 'กรอกข้อมูล (Google Sheet)';
+                
+                tr.innerHTML = `
+                    <td>
+                        <span class="task-title">${task.title}</span>
+                        <span class="task-desc">${task.desc}</span>
+                    </td>
+                    <td>${statusHtml}</td>
+                    <td>
+                        <a href="${task.link}" target="_blank" class="btn-task">${btnText}</a>
+                    </td>
+                `;
+                taskList.appendChild(tr);
+            });
+        }
+
+        // 5. ออกจากระบบ
+        function handleLogout() {
+            document.getElementById('username').value = '';
+            document.getElementById('password').value = '';
+            document.getElementById('dashboard-section').style.display = 'none';
+            document.getElementById('login-section').style.display = 'flex';
+        }
+    </script>
+</body>
+</html>

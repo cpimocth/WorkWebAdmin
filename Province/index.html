@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TPSO - ระบบรับมอบหมายงานจัดเก็บราคา (CPI)</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Sarabun:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- นำเข้าไลบรารี SheetJS สำหรับอ่านไฟล์ Excel (.xlsx) -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+    
+    <style>
+      :root {
+        --primary: #0b4ea2; --primary-dark: #08356e; --primary-soft: #edf5ff;
+        --navy: #102f5d; --danger: #c62828; --success: #166534;
+        --success-bg: #dcfce7; --muted: #64748b; --line: #dbe7f3;
+        --card: rgba(255, 255, 255, 0.94); --bg: linear-gradient(180deg, #eef4fb 0%, #f8fbff 100%);
+        --shadow: 0 18px 40px rgba(16, 52, 92, 0.1); --radius: 22px;
+      }
+      * { box-sizing: border-box; }
+      body { margin: 0; padding: 20px; font-family: "Sarabun", sans-serif; color: #1f3550; background: var(--bg); min-height: 100vh; }
+      
+      #loading-screen { position: fixed; inset: 0; background: white; z-index: 9999; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+      .spinner { border: 4px solid var(--line); border-top: 4px solid var(--primary); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin-bottom: 15px;}
+      @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+      .login-card { max-width: 450px; margin: 50px auto; background: var(--card); padding: 40px; border-radius: var(--radius); box-shadow: var(--shadow); text-align: center; }
+      .input-group input { width: 100%; padding: 14px; margin-top: 5px; margin-bottom: 15px; border: 2px solid var(--line); border-radius: 12px; font-family: "Sarabun"; font-size: 1rem; }
+      .login-btn { width: 100%; padding: 14px; background: var(--primary); color: white; border: none; border-radius: 12px; font-size: 1.1rem; font-weight: 700; cursor: pointer; }
+      
+      .dashboard { max-width: 1280px; margin: 0 auto; display: none; }
+      .header-combined { display: flex; justify-content: space-between; align-items: center; padding: 24px 32px; border-radius: 28px; color: #fff; background: var(--primary-dark); margin-bottom: 20px;}
+      .card { background: var(--card); border-radius: var(--radius); padding: 24px; margin-bottom: 20px; box-shadow: var(--shadow); }
+      table { width: 100%; border-collapse: collapse; }
+      th, td { padding: 12px; border-bottom: 1px solid var(--line); text-align: left; }
+      .btn-task { padding: 8px 16px; background: var(--primary-soft); color: var(--primary); text-decoration: none; border-radius: 8px; font-weight: 700; display: inline-block; }
+      .btn-task:hover { background: var(--primary); color: white; }
+    </style>
+</head>
+<body>
+
+    <!-- หน้าจอโหลดข้อมูล -->
+    <div id="loading-screen">
+        <div class="spinner"></div>
+        <h3 style="color: var(--primary); margin: 0;">กำลังโหลดข้อมูลจากฐานข้อมูล Excel...</h3>
+        <p style="color: var(--muted); font-size: 0.9rem; margin-top: 5px;" id="loading-text">รอสักครู่</p>
+    </div>
+
+    <!-- หน้า Login -->
+    <div id="login-section" style="display: none;">
+        <div class="login-card">
+            <h2 style="color: var(--primary);">ระบบจัดเก็บราคา (CPI)</h2>
+            <p>กรุณาลงชื่อเข้าใช้ด้วยรหัสของท่าน</p>
+            <div class="input-group">
+                <input type="text" id="username" placeholder="Username (เช่น index_bkk02)" autocomplete="off">
+            </div>
+            <div class="input-group">
+                <input type="password" id="password" placeholder="Password">
+            </div>
+            <div id="login-error" style="color: var(--danger); display: none; margin-bottom: 15px;">รหัสไม่ถูกต้อง หรือไม่มีข้อมูลในระบบ</div>
+            <button class="login-btn" onclick="handleLogin()">เข้าสู่ระบบ</button>
+        </div>
+    </div>
+
+    <!-- หน้า Dashboard -->
+    <div id="dashboard-section" class="dashboard">
+        <div class="header-combined">
+            <div>
+                <h1 style="margin: 0;">ระบบรายงานการปฏิบัติงานจัดเก็บราคา</h1>
+                <p style="margin: 5px 0 0; opacity: 0.9;">ประจำเดือน: <span id="current-month"></span></p>
+            </div>
+            <button onclick="location.reload()" style="padding: 10px 20px; border-radius: 10px; border:none; cursor:pointer; font-weight: bold;">ออกจากระบบ</button>
+        </div>
+
+        <div class="card">
+            <h3 style="color: var(--primary); margin-top: 0;" id="display-profile">ข้อมูลเจ้าหน้าที่</h3>
+            <p style="color: var(--muted); margin-bottom: 0;" id="display-district"></p>
+        </div>
+
+        <div class="card">
+            <h3 style="margin-top: 0;">📋 ภารกิจประจำเดือนของคุณ</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ชื่องาน / รายละเอียด</th>
+                        <th>กำหนดส่ง</th>
+                        <th>การดำเนินการ</th>
+                    </tr>
+                </thead>
+                <tbody id="task-list">
+                    <!-- จะดึงจาก Sheet Tasks มาใส่ตรงนี้ -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // ชื่อไฟล์ Excel ที่วางไว้ในโฟลเดอร์เดียวกัน
+        const EXCEL_FILE_URL = 'Database_CPI.xlsx'; 
+
+        let usersDB = {};
+        let tasksDB = {};
+
+        // โหลดข้อมูล Excel ทันทีที่เปิดเว็บ
+        window.onload = async function() {
+            try {
+                // ดึงไฟล์ Excel
+                const response = await fetch(EXCEL_FILE_URL);
+                if (!response.ok) throw new Error("ไม่พบไฟล์ Excel");
+                
+                const arrayBuffer = await response.arrayBuffer();
+                
+                // ใช้ SheetJS อ่านข้อมูล
+                const workbook = XLSX.read(arrayBuffer, { type: 'array' });
+                
+                // 1. อ่าน Sheet "Users"
+                const sheetUsersName = workbook.SheetNames.find(n => n.includes("Users")) || workbook.SheetNames[0];
+                const usersData = XLSX.utils.sheet_to_json(workbook.Sheets[sheetUsersName]);
+                
+                usersData.forEach(row => {
+                    if (row.Username) {
+                        usersDB[row.Username.toString().trim()] = row;
+                    }
+                });
+
+                // 2. อ่าน Sheet "Tasks"
+                const sheetTasksName = workbook.SheetNames.find(n => n.includes("Tasks")) || workbook.SheetNames[1];
+                if (sheetTasksName) {
+                    const tasksData = XLSX.utils.sheet_to_json(workbook.Sheets[sheetTasksName]);
+                    tasksData.forEach(row => {
+                        if (row.Username) {
+                            tasksDB[row.Username.toString().trim()] = row;
+                        }
+                    });
+                }
+
+                // โหลดเสร็จ ซ่อนหน้าโหลด แสดงหน้า Login
+                document.getElementById('loading-screen').style.display = 'none';
+                document.getElementById('login-section').style.display = 'block';
+
+            } catch (error) {
+                console.error("Error reading Excel:", error);
+                document.getElementById('loading-text').innerText = "ไม่สามารถอ่านไฟล์ Database_CPI.xlsx ได้\n(โปรดรันผ่าน Server/Live Server หรืออัปโหลดขึ้น Web Hosting)";
+                document.getElementById('loading-text').style.color = "red";
+                document.querySelector('.spinner').style.display = 'none';
+            }
+        };
+
+        function handleLogin() {
+            const userIn = document.getElementById('username').value.trim();
+            const passIn = document.getElementById('password').value.trim();
+            const errorMsg = document.getElementById('login-error');
+
+            if (usersDB[userIn] && usersDB[userIn].Password === passIn) {
+                // Login Success
+                errorMsg.style.display = 'none';
+                document.getElementById('login-section').style.display = 'none';
+                document.getElementById('dashboard-section').style.display = 'block';
+                
+                renderDashboard(userIn);
+            } else {
+                errorMsg.style.display = 'block';
+            }
+        }
+
+        // กด Enter ตอนใส่รหัสผ่านได้
+        document.getElementById('password').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') handleLogin();
+        });
+
+        function renderDashboard(username) {
+            const user = usersDB[username];
+            const userTasks = tasksDB[username];
+            
+            // แสดงผลโปรไฟล์
+            document.getElementById('display-profile').innerText = `ยินดีต้อนรับ, เจ้าหน้าที่รหัส ${username}`;
+            let districtText = `จังหวัด: ${user.Province || '-'} | ภูมิภาค: ${user.Region || '-'}`;
+            if (user.District) districtText += ` | พื้นที่/เขต: ${user.District}`;
+            document.getElementById('display-district').innerText = districtText;
+
+            // ตั้งค่าเดือนปัจจุปัน
+            const now = new Date();
+            const monthNames = ["มกราคม","กุมภาพันธ์","มีนาคม","เมษายน","พฤษภาคม","มิถุนายน","กรกฎาคม","สิงหาคม","กันยายน","ตุลาคม","พฤศจิกายน","ธันวาคม"];
+            document.getElementById('current-month').innerText = `${monthNames[now.getMonth()]} ${now.getFullYear() + 543}`;
+
+            // สร้างตารางงาน
+            const taskList = document.getElementById('task-list');
+            taskList.innerHTML = '';
+
+            if (userTasks) {
+                // ค้นหาคอลัมน์ Task1 ถึง Task7 จาก Excel
+                for (let i = 1; i <= 7; i++) {
+                    const taskName = userTasks[`Task${i}_Name`];
+                    const taskLink = userTasks[`Task${i}_Link`];
+                    const taskDue = userTasks[`Task${i}_Due`];
+
+                    if (taskName && taskName !== "" && taskName !== "-") {
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+                            <td><strong style="color: var(--navy);">${taskName}</strong></td>
+                            <td><span style="background: #fef3c7; color: #d97706; padding: 4px 10px; border-radius: 12px; font-size: 0.85rem;">⏰ ${taskDue || 'ไม่ระบุ'}</span></td>
+                            <td><a href="${taskLink}" target="_blank" class="btn-task">เปิดไฟล์งาน (Sheet) ↗</a></td>
+                        `;
+                        taskList.appendChild(tr);
+                    }
+                }
+            }
+            
+            // ถ้าไม่มีงานเลย
+            if (taskList.innerHTML === '') {
+                taskList.innerHTML = `<tr><td colspan="3" style="text-align:center; color:gray; padding: 30px;">ไม่มีภารกิจในเดือนนี้</td></tr>`;
+            }
+        }
+    </script>
+</body>
+</html>
