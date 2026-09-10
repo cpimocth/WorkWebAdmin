@@ -1,0 +1,238 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>ทดสอบอ่าน Database_CPI.xlsx</title>
+  <style>
+    :root{--blue:#0b4ea2;--navy:#12345b;--line:#dce6f2;--muted:#64748b;--ok:#166534;--bad:#b91c1c;--bg:#f3f7fb}
+    *{box-sizing:border-box} body{margin:0;background:var(--bg);font-family:Tahoma,"Noto Sans Thai",sans-serif;color:#20364f}
+    .wrap{max-width:1180px;margin:32px auto;padding:0 18px}.card{background:#fff;border:1px solid var(--line);border-radius:18px;padding:22px;margin-bottom:16px;box-shadow:0 8px 28px rgba(19,52,91,.06)}
+    h1{margin:0 0 6px;color:var(--navy);font-size:28px}.sub{color:var(--muted);margin:0}.status{margin-top:18px;border-radius:12px;padding:14px 16px;font-weight:700;background:#eef4fb;color:var(--blue);white-space:pre-wrap;word-break:break-word}
+    .status.ok{background:#ecfdf5;color:var(--ok)}.status.bad{background:#fef2f2;color:var(--bad)}
+    .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}button,.file-label{border:0;border-radius:10px;padding:10px 14px;font-weight:700;cursor:pointer;font-size:14px}.primary{background:var(--blue);color:white}.secondary,.file-label{background:#eef4fb;color:var(--blue)}
+    .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.metric{padding:16px;border:1px solid var(--line);border-radius:14px}.metric b{font-size:26px;color:var(--navy);display:block}.metric span{color:var(--muted)}
+    .url{font-family:Consolas,monospace;font-size:12px;background:#f8fafc;padding:10px;border-radius:9px;word-break:break-all;margin-top:12px;color:#475569}
+    .table-wrap{overflow:auto;max-height:440px;border:1px solid var(--line);border-radius:12px}table{border-collapse:collapse;width:100%;font-size:13px;background:#fff}th,td{padding:9px 10px;border-bottom:1px solid #edf2f7;text-align:left;white-space:nowrap}th{position:sticky;top:0;background:#f8fbff;color:var(--navy);z-index:1}.sheet-name{font-weight:800;color:var(--navy)}
+    input[type=file]{display:none}.note{font-size:13px;color:var(--muted);line-height:1.65;margin-top:12px}
+    @media(max-width:760px){.grid{grid-template-columns:1fr}.wrap{margin-top:16px}}
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card">
+    <h1>ทดสอบอ่าน Database_CPI.xlsx</h1>
+    <p class="sub">หน้าเดียวสำหรับพิสูจน์ว่า GitHub Pages อ่าน Excel ได้จริงก่อนนำไปต่อระบบ Login</p>
+    <div id="status" class="status">กำลังเริ่มต้น...</div>
+    <div id="targetUrl" class="url"></div>
+    <div class="actions">
+      <button class="primary" id="reloadBtn">อ่าน Database_CPI.xlsx ใหม่</button>
+      <label class="file-label" for="fileInput">เลือก Excel จากเครื่องเพื่อทดสอบ</label>
+      <input id="fileInput" type="file" accept=".xlsx,.xlsm,.xlsb,.xls">
+    </div>
+    <div class="note">สำหรับ GitHub Pages ให้วาง <b>index.html</b>, <b>Database_CPI.xlsx</b> และ <b>jszip.min.js</b> ในโฟลเดอร์เดียวกัน ระบบไม่ใช้ CDN และไม่ต้องเปิด CMD</div>
+  </div>
+
+  <div class="card">
+    <div class="grid">
+      <div class="metric"><b id="sheetCount">-</b><span>จำนวนชีท</span></div>
+      <div class="metric"><b id="userCount">-</b><span>แถวข้อมูล Users</span></div>
+      <div class="metric"><b id="taskCount">-</b><span>แถวข้อมูล Tasks</span></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="sheet-name" id="sheetNames">ยังไม่มีข้อมูล</div>
+  </div>
+
+  <div class="card">
+    <h3 style="margin-top:0;color:var(--navy)">ตัวอย่างข้อมูลจากชีท Tasks</h3>
+    <div class="table-wrap"><table id="preview"><thead></thead><tbody></tbody></table></div>
+  </div>
+</div>
+<script src="./jszip.min.js"></script>
+<script>
+'use strict';
+
+const DB_FILE = 'Database_CPI.xlsx';
+const statusEl = document.getElementById('status');
+const targetUrlEl = document.getElementById('targetUrl');
+
+function setStatus(message, type=''){
+  statusEl.textContent = message;
+  statusEl.className = 'status' + (type ? ' ' + type : '');
+}
+
+function xml(text){
+  const doc = new DOMParser().parseFromString(text, 'application/xml');
+  const err = doc.getElementsByTagName('parsererror')[0];
+  if(err) throw new Error('XML parse error: ' + err.textContent.slice(0,180));
+  return doc;
+}
+
+function textOf(node){
+  if(!node) return '';
+  const ts = node.getElementsByTagName('t');
+  if(ts.length) return Array.from(ts).map(x => x.textContent || '').join('');
+  return node.textContent || '';
+}
+
+function colIndex(cellRef){
+  const m = /^([A-Z]+)/i.exec(cellRef || '');
+  if(!m) return 0;
+  let n = 0;
+  for(const ch of m[1].toUpperCase()) n = n * 26 + (ch.charCodeAt(0) - 64);
+  return n - 1;
+}
+
+function normalizeTarget(target){
+  let t = String(target || '').replace(/\\/g,'/');
+  if(t.startsWith('/')) return t.slice(1);
+  while(t.startsWith('../')) t = t.slice(3);
+  if(t.startsWith('xl/')) return t;
+  return 'xl/' + t;
+}
+
+async function parseXlsx(arrayBuffer){
+  if(!window.JSZip) throw new Error('ไม่พบ jszip.min.js');
+  const zip = await JSZip.loadAsync(arrayBuffer);
+  const readText = async path => {
+    const f = zip.file(path);
+    if(!f) throw new Error('ไม่พบไฟล์ภายใน Excel: ' + path);
+    return f.async('text');
+  };
+
+  const workbookDoc = xml(await readText('xl/workbook.xml'));
+  const relDoc = xml(await readText('xl/_rels/workbook.xml.rels'));
+
+  const rels = {};
+  for(const rel of Array.from(relDoc.getElementsByTagName('Relationship'))){
+    rels[rel.getAttribute('Id')] = rel.getAttribute('Target');
+  }
+
+  const shared = [];
+  const sharedFile = zip.file('xl/sharedStrings.xml');
+  if(sharedFile){
+    const sharedDoc = xml(await sharedFile.async('text'));
+    for(const si of Array.from(sharedDoc.getElementsByTagName('si'))) shared.push(textOf(si));
+  }
+
+  const sheets = {};
+  const sheetOrder = [];
+  const sheetNodes = Array.from(workbookDoc.getElementsByTagName('sheet'));
+
+  for(const sheetNode of sheetNodes){
+    const name = sheetNode.getAttribute('name') || 'Sheet';
+    const rid = sheetNode.getAttribute('r:id') || sheetNode.getAttributeNS('http://schemas.openxmlformats.org/officeDocument/2006/relationships','id');
+    const target = rels[rid];
+    if(!target) continue;
+    const path = normalizeTarget(target);
+    const wsDoc = xml(await readText(path));
+    const rows = [];
+
+    for(const rowNode of Array.from(wsDoc.getElementsByTagName('row'))){
+      const row = [];
+      for(const c of Array.from(rowNode.getElementsByTagName('c'))){
+        const idx = colIndex(c.getAttribute('r'));
+        const type = c.getAttribute('t') || '';
+        let value = '';
+        if(type === 'inlineStr'){
+          value = textOf(c);
+        }else{
+          const v = c.getElementsByTagName('v')[0];
+          const raw = v ? v.textContent : '';
+          if(type === 's') value = shared[Number(raw)] ?? '';
+          else if(type === 'b') value = raw === '1' ? 'TRUE' : 'FALSE';
+          else value = raw ?? '';
+        }
+        row[idx] = value;
+      }
+      rows.push(row);
+    }
+    sheets[name] = rows;
+    sheetOrder.push(name);
+  }
+  return {sheets, sheetOrder};
+}
+
+function rowsToObjects(rows){
+  if(!rows || !rows.length) return [];
+  const headers = (rows[0] || []).map(v => String(v ?? '').trim());
+  return rows.slice(1).filter(r => r.some(v => String(v ?? '').trim() !== '')).map(r => {
+    const o = {};
+    headers.forEach((h,i) => { if(h) o[h] = r[i] ?? ''; });
+    return o;
+  });
+}
+
+function render(result, sourceLabel){
+  const names = result.sheetOrder;
+  const users = rowsToObjects(result.sheets.Users || []);
+  const tasks = rowsToObjects(result.sheets.Tasks || []);
+
+  document.getElementById('sheetCount').textContent = names.length;
+  document.getElementById('userCount').textContent = users.length;
+  document.getElementById('taskCount').textContent = tasks.length;
+  document.getElementById('sheetNames').textContent = 'ชีทที่อ่านได้: ' + names.join(' • ');
+
+  const preferred = ['Username','Default_Assignment','System_URL','Task1_Name','Task1_Link','Task1_Due','Task2_Name','Task2_Link','Task2_Due'];
+  const cols = preferred.filter(c => tasks.some(r => Object.prototype.hasOwnProperty.call(r,c)));
+  const table = document.getElementById('preview');
+  const thead = table.querySelector('thead');
+  const tbody = table.querySelector('tbody');
+  thead.innerHTML = '<tr>' + cols.map(c => `<th>${escapeHtml(c)}</th>`).join('') + '</tr>';
+  tbody.innerHTML = tasks.slice(0,12).map(r => '<tr>' + cols.map(c => `<td>${escapeHtml(r[c])}</td>`).join('') + '</tr>').join('');
+
+  if(!result.sheets.Users) throw new Error('อ่านไฟล์ได้ แต่ไม่พบชีท Users');
+  if(!result.sheets.Tasks) throw new Error('อ่านไฟล์ได้ แต่ไม่พบชีท Tasks');
+  setStatus(`สำเร็จ: อ่าน Excel ได้แล้ว\n${sourceLabel}\nUsers ${users.length} แถว • Tasks ${tasks.length} แถว • ${names.length} ชีท`, 'ok');
+}
+
+function escapeHtml(v){
+  return String(v ?? '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+}
+
+async function loadFromRepo(){
+  if(location.protocol !== 'http:' && location.protocol !== 'https:'){
+    setStatus('หน้านี้ถูกเปิดแบบ ' + location.protocol + ' จึงไม่สามารถอ่านไฟล์ข้างเคียงอัตโนมัติได้\nให้อัป 3 ไฟล์ขึ้น GitHub Pages หรือใช้ปุ่มเลือก Excel เพื่อทดสอบ', 'bad');
+    return;
+  }
+
+  const url = new URL('./' + DB_FILE, document.baseURI);
+  url.searchParams.set('_', Date.now());
+  targetUrlEl.textContent = 'กำลังอ่าน: ' + url.href;
+  setStatus('กำลังดาวน์โหลด Database_CPI.xlsx จากโฟลเดอร์เดียวกับหน้าเว็บ...');
+
+  try{
+    const response = await fetch(url.href, {cache:'no-store', credentials:'same-origin'});
+    if(!response.ok) throw new Error(`HTTP ${response.status} ${response.statusText}`);
+    const type = response.headers.get('content-type') || '';
+    const buffer = await response.arrayBuffer();
+    if(buffer.byteLength < 1000) throw new Error('ไฟล์ที่ได้รับมีขนาดเล็กผิดปกติ (' + buffer.byteLength + ' bytes)');
+    const result = await parseXlsx(buffer);
+    render(result, 'URL: ' + url.href.split('?')[0] + (type ? '\nContent-Type: ' + type : ''));
+  }catch(err){
+    console.error(err);
+    setStatus('อ่านจาก GitHub Pages ไม่สำเร็จ: ' + (err.message || err) + '\n\nURL ที่ลองอ่าน:\n' + url.href.split('?')[0] + '\n\nตรวจว่า 3 ไฟล์อยู่โฟลเดอร์เดียวกันจริง หรือกด “เลือก Excel จากเครื่อง” เพื่อยืนยันว่าตัวอ่าน Excel ทำงาน', 'bad');
+  }
+}
+
+async function loadSelected(file){
+  if(!file) return;
+  targetUrlEl.textContent = 'ไฟล์จากเครื่อง: ' + file.name + ' (' + file.size.toLocaleString() + ' bytes)';
+  setStatus('กำลังอ่านไฟล์จากเครื่อง...');
+  try{
+    const result = await parseXlsx(await file.arrayBuffer());
+    render(result, 'ไฟล์จากเครื่อง: ' + file.name);
+  }catch(err){
+    console.error(err);
+    setStatus('อ่านไฟล์จากเครื่องไม่สำเร็จ: ' + (err.message || err), 'bad');
+  }
+}
+
+document.getElementById('reloadBtn').addEventListener('click', loadFromRepo);
+document.getElementById('fileInput').addEventListener('change', e => loadSelected(e.target.files[0]));
+window.addEventListener('DOMContentLoaded', loadFromRepo);
+</script>
+</body>
+</html>
