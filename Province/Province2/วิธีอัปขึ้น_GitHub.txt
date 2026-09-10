@@ -1,0 +1,19 @@
+ชุดสำหรับ GitHub Pages
+
+ไฟล์ที่จำเป็นต่อการทำงาน:
+1) index.html
+2) Database_CPI.xlsx
+
+ให้อัปโหลด 2 ไฟล์นี้ไว้ในโฟลเดอร์เดียวกัน (root ของ repo ที่ใช้ GitHub Pages)
+ชื่อ Database ต้องเป็น Database_CPI.xlsx ตรงตัว
+
+สิ่งที่แก้ใน index.html:
+- เริ่ม fetch Database_CPI.xlsx ทันที พร้อมกับโหลดตัวอ่าน Excel
+- ใช้ SheetJS 0.20.3 จาก CDN ทางการ
+- แสดง error จริง เช่น HTTP 404 หรือโหลด SheetJS ไม่สำเร็จ
+- Refresh/F5 แล้วจำ session เดิม โดยไม่เก็บ Password
+- ถ้าฐานโหลดสะดุดชั่วคราว จะไม่ล้าง session
+- ปุ่มอ่าน Database_CPI.xlsx ใหม่ยังใช้งานได้
+
+GitHub Pages:
+Settings > Pages > Deploy from a branch > main > /root

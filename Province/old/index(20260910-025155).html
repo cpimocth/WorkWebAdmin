@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TPSO - ระบบรับมอบหมายงานจัดเก็บราคา (CPI)</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Sarabun:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary:#0b4ea2; --primary-dark:#08356e; --primary-soft:#edf5ff;
+      --navy:#102f5d; --danger:#c62828; --success:#166534; --warning:#a16207;
+      --success-bg:#dcfce7; --muted:#64748b; --line:#dbe7f3;
+      --card:rgba(255,255,255,.96); --bg:linear-gradient(180deg,#eef4fb 0%,#f8fbff 100%);
+      --shadow:0 18px 40px rgba(16,52,92,.10); --radius:22px;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;padding:20px;font-family:"Sarabun",sans-serif;color:#1f3550;background:var(--bg);min-height:100vh}
+    button,input{font-family:"Sarabun",sans-serif}
+    #loading-screen{position:fixed;inset:0;background:white;z-index:9999;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:24px;text-align:center}
+    .spinner{border:4px solid var(--line);border-top:4px solid var(--primary);border-radius:50%;width:40px;height:40px;animation:spin 1s linear infinite;margin-bottom:15px}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .login-card{max-width:470px;margin:50px auto;background:var(--card);padding:40px;border-radius:var(--radius);box-shadow:var(--shadow);text-align:center}
+    .input-group input{width:100%;padding:14px;margin-top:5px;margin-bottom:15px;border:2px solid var(--line);border-radius:12px;font-size:1rem;outline:none}
+    .input-group input:focus{border-color:#8bb8ee;box-shadow:0 0 0 4px #edf5ff}
+    .login-btn{width:100%;padding:14px;background:var(--primary);color:white;border:none;border-radius:12px;font-size:1.1rem;font-weight:700;cursor:pointer}
+    .login-btn:hover{background:var(--primary-dark)}
+    .dashboard{max-width:1280px;margin:0 auto;display:none}
+    .header-combined{display:flex;justify-content:space-between;gap:18px;align-items:center;padding:24px 32px;border-radius:28px;color:#fff;background:var(--primary-dark);margin-bottom:20px}
+    .card{background:var(--card);border-radius:var(--radius);padding:24px;margin-bottom:20px;box-shadow:var(--shadow)}
+    table{width:100%;border-collapse:collapse}
+    th,td{padding:12px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+    th{color:var(--navy);background:#f8fbff}
+    .btn-task{padding:8px 16px;background:var(--primary-soft);color:var(--primary);text-decoration:none;border-radius:8px;font-weight:700;display:inline-block;white-space:nowrap}
+    .btn-task:hover{background:var(--primary);color:white}
+    .btn-disabled{padding:8px 16px;background:#f1f5f9;color:#94a3b8;border-radius:8px;font-weight:700;display:inline-block;white-space:nowrap}
+    .db-status{display:inline-flex;align-items:center;gap:6px;margin-top:12px;padding:7px 10px;border-radius:999px;background:#eff6ff;color:#1d4ed8;font-size:.88rem;font-weight:600}
+    .secondary-btn{border:1px solid var(--line);background:#fff;color:var(--primary);border-radius:10px;padding:9px 13px;font-weight:700;cursor:pointer}
+    .secondary-btn:hover{background:var(--primary-soft)}
+    .header-actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+    .header-actions button{padding:10px 16px;border-radius:10px;border:none;cursor:pointer;font-weight:700}
+    .due{background:#fef3c7;color:#d97706;padding:4px 10px;border-radius:12px;font-size:.85rem;display:inline-block}
+    .hint{font-size:.84rem;color:var(--muted);margin-top:10px;line-height:1.55}
+    .error{color:var(--danger);display:none;margin-bottom:15px;font-weight:600}
+    @media(max-width:760px){body{padding:10px}.login-card{padding:26px;margin:20px auto}.header-combined{padding:20px;align-items:flex-start;flex-direction:column}.header-actions{justify-content:flex-start}.card{padding:16px;overflow-x:auto}th,td{min-width:140px}}
+  </style>
+</head>
+<body>
+  <div id="loading-screen">
+    <div class="spinner"></div>
+    <h3 style="color:var(--primary);margin:0">กำลังเตรียมฐานข้อมูล...</h3>
+    <p style="color:var(--muted);font-size:.92rem;margin:7px 0 0" id="loading-text">กำลังเริ่มระบบ</p>
+  </div>
+
+  <input id="excel-file-input" type="file" accept=".xlsx,.xls" hidden>
+
+  <div id="login-section" style="display:none">
+    <div class="login-card">
+      <h2 style="color:var(--primary);margin-bottom:6px">ระบบจัดเก็บราคา (CPI)</h2>
+      <p style="margin-top:0">กรุณาลงชื่อเข้าใช้ด้วยรหัสของท่าน</p>
+      <div class="input-group"><input type="text" id="username" placeholder="Username (เช่น index_bkk02)" autocomplete="username"></div>
+      <div class="input-group"><input type="password" id="password" placeholder="Password" autocomplete="current-password"></div>
+      <div id="login-error" class="error">รหัสไม่ถูกต้อง หรือไม่มีข้อมูลในระบบ</div>
+      <button class="login-btn" id="login-btn" type="button">เข้าสู่ระบบ</button>
+      <div><span id="db-status" class="db-status">ฐานข้อมูลพร้อมใช้งาน</span></div>
+      <div style="margin-top:12px"><button class="secondary-btn" id="change-db-btn" type="button">เลือกไฟล์ Excel เอง</button></div>
+      <div class="hint">โหมด GitHub Pages: ระบบจะอ่าน Database_CPI.xlsx จากโฟลเดอร์เดียวกับ index.html อัตโนมัติทุกครั้งที่เปิดหน้าเว็บ หากอ่านไม่สำเร็จ สามารถเลือกไฟล์ Excel ด้วยตนเองได้</div>
+    </div>
+  </div>
+
+  <div id="dashboard-section" class="dashboard">
+    <div class="header-combined">
+      <div>
+        <h1 style="margin:0">ระบบรายงานการปฏิบัติงานจัดเก็บราคา</h1>
+        <p style="margin:5px 0 0;opacity:.9">ประจำเดือน: <span id="current-month"></span></p>
+      </div>
+      <div class="header-actions">
+        <button id="dashboard-db-btn" type="button" style="background:#dbeafe;color:#0b4ea2">อ่าน Database_CPI.xlsx ใหม่</button>
+        <button id="logout-btn" type="button">ออกจากระบบ</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3 style="color:var(--primary);margin-top:0" id="display-profile">ข้อมูลเจ้าหน้าที่</h3>
+      <p style="color:var(--muted);margin-bottom:0" id="display-district"></p>
+    </div>
+
+    <div class="card">
+      <h3 style="margin-top:0">📋 ภารกิจประจำเดือนของคุณ</h3>
+      <table>
+        <thead><tr><th>ชื่องาน / รายละเอียด</th><th>กำหนดส่ง</th><th>การดำเนินการ</th></tr></thead>
+        <tbody id="task-list"></tbody>
+      </table>
+    </div>
+  </div>
+
+<script>
+'use strict';
+
+// ฐานข้อมูลสำรองจากไฟล์ที่ผู้ใช้ให้มา เพื่อให้หน้าเว็บเปิดแบบ file:// ได้ทันที
+const EMBEDDED_DB = {users:[],tasks:[]};
+const EXCEL_FILE_URL = './Database_CPI.xlsx';
+const SHEETJS_URLS = ['xlsx.full.min.js','https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js'];
+const SESSION_KEY = 'cpi_current_username';
+
+let usersDB = Object.create(null);
+let tasksDB = Object.create(null);
+let currentUsername = '';
+let sheetJsPromise = null;
+
+function s(v){ return v === null || v === undefined ? '' : String(v).trim(); }
+function userKey(v){ return s(v).toLowerCase(); }
+function esc(v){ return s(v).replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch])); }
+function safeHref(v){
+  const x=s(v);
+  if(!x || x==='-') return '';
+  try{ const u=new URL(x, location.href); return ['http:','https:'].includes(u.protocol) ? u.href : ''; }catch(_){ return ''; }
+}
+
+function installDatabase(usersRows, taskRows, label){
+  const nextUsers=Object.create(null), nextTasks=Object.create(null);
+  for(const row of (usersRows || [])){
+    const k=userKey(row.Username);
+    if(k) nextUsers[k]=row;
+  }
+  for(const row of (taskRows || [])){
+    const k=userKey(row.Username);
+    if(!k) continue;
+    if(!nextTasks[k]) nextTasks[k]=[];
+    nextTasks[k].push(row);
+  }
+  if(!Object.keys(nextUsers).length) throw new Error('ไม่พบข้อมูลผู้ใช้: ต้องมีคอลัมน์ Username และ Password');
+  usersDB=nextUsers; tasksDB=nextTasks;
+  const status=document.getElementById('db-status');
+  if(status) status.textContent=`ฐานข้อมูล: ${label} • ผู้ใช้ ${Object.keys(usersDB).length} ราย`;
+}
+
+function useEmbeddedDatabase(){
+  usersDB=Object.create(null);
+  tasksDB=Object.create(null);
+}
+
+function showLogin(){
+  document.getElementById('loading-screen').style.display='none';
+  document.getElementById('login-section').style.display='block';
+  document.getElementById('dashboard-section').style.display='none';
+  setTimeout(()=>document.getElementById('username').focus(),0);
+}
+
+function saveSession(username){
+  try{ sessionStorage.setItem(SESSION_KEY, username); }catch(_){ }
+}
+
+function clearSession(){
+  try{ sessionStorage.removeItem(SESSION_KEY); }catch(_){ }
+}
+
+function getSavedSession(){
+  try{ return userKey(sessionStorage.getItem(SESSION_KEY)); }catch(_){ return ''; }
+}
+
+function restoreSession(){
+  const saved=getSavedSession();
+  if(!saved || !usersDB[saved]){
+    if(saved) clearSession();
+    return false;
+  }
+  currentUsername=saved;
+  document.getElementById('loading-screen').style.display='none';
+  document.getElementById('login-section').style.display='none';
+  document.getElementById('dashboard-section').style.display='block';
+  renderDashboard(saved);
+  return true;
+}
+
+function ensureSheetJS(){
+  if(window.XLSX) return Promise.resolve(window.XLSX);
+  if(sheetJsPromise) return sheetJsPromise;
+  sheetJsPromise=new Promise((resolve,reject)=>{
+    let i=0;
+    const tryNext=()=>{
+      if(i>=SHEETJS_URLS.length){ reject(new Error('โหลดตัวอ่าน Excel ไม่สำเร็จ')); return; }
+      const script=document.createElement('script');
+      script.src=SHEETJS_URLS[i++];
+      script.async=true;
+      script.onload=()=>window.XLSX ? resolve(window.XLSX) : tryNext();
+      script.onerror=tryNext;
+      document.head.appendChild(script);
+    };
+    tryNext();
+  });
+  return sheetJsPromise;
+}
+
+function headersOf(ws){
+  const a=XLSX.utils.sheet_to_json(ws,{header:1,defval:'',raw:false});
+  return (a[0]||[]).map(v=>s(v));
+}
+
+function findSheet(workbook, predicate){
+  for(const name of workbook.SheetNames){
+    const ws=workbook.Sheets[name];
+    const headers=headersOf(ws);
+    if(predicate(headers,name)) return ws;
+  }
+  return null;
+}
+
+function parseWorkbook(arrayBuffer, label){
+  const workbook=XLSX.read(arrayBuffer,{type:'array',cellDates:false});
+  const usersWs=findSheet(workbook,h=>h.includes('Username') && h.includes('Password'));
+  const tasksWs=findSheet(workbook,h=>h.includes('Username') && h.some(x=>/^Task\d+_Name$/i.test(x)));
+  if(!usersWs) throw new Error('หา Sheet ผู้ใช้ไม่พบ (ต้องมี Username และ Password)');
+  const usersRows=XLSX.utils.sheet_to_json(usersWs,{defval:'',raw:false});
+  const taskRows=tasksWs ? XLSX.utils.sheet_to_json(tasksWs,{defval:'',raw:false}) : [];
+  installDatabase(usersRows,taskRows,label);
+}
+
+async function loadExcelFile(file){
+  if(!file) return;
+  const status=document.getElementById('db-status');
+  try{
+    if(status) status.textContent='กำลังอ่าน '+file.name+'...';
+    await ensureSheetJS();
+    const buffer=await file.arrayBuffer();
+    parseWorkbook(buffer,file.name);
+    localStorage.setItem('cpi_db_label',file.name);
+    showLogin();
+  }catch(err){
+    console.error(err);
+    alert('เปิดฐานข้อมูล Excel ไม่สำเร็จ\n\n'+err.message);
+    useEmbeddedDatabase();
+    showLogin();
+  }
+}
+
+
+async function tryAutoLoadApi(){
+  return false;
+}
+
+async function tryAutoLoadExcel(){
+  try{
+    await ensureSheetJS();
+    const url = new URL(EXCEL_FILE_URL, location.href);
+    url.searchParams.set('t', Date.now());
+    const response = await fetch(url.href, {cache:'no-store'});
+    if(!response.ok) throw new Error(`HTTP ${response.status}`);
+    const buffer = await response.arrayBuffer();
+    parseWorkbook(buffer,'Database_CPI.xlsx (GitHub Pages)');
+    return true;
+  }catch(err){
+    console.warn('โหลด Database_CPI.xlsx จาก GitHub Pages ไม่สำเร็จ',err);
+    return false;
+  }
+}
+
+async function reloadRepoDatabase(){
+  const status=document.getElementById('db-status');
+  if(status) status.textContent='กำลังอ่าน Database_CPI.xlsx ล่าสุด...';
+  const loaded=await tryAutoLoadExcel();
+  if(loaded){
+    if(currentUsername && usersDB[currentUsername]) renderDashboard(currentUsername);
+    alert('อัปเดตฐานข้อมูลล่าสุดแล้ว');
+  }else{
+    if(status) status.textContent='อ่าน Database_CPI.xlsx ไม่สำเร็จ — ตรวจชื่อไฟล์และตำแหน่งใน GitHub';
+    alert('อ่าน Database_CPI.xlsx ไม่สำเร็จ\n\nให้ตรวจว่า index.html และ Database_CPI.xlsx อยู่ในโฟลเดอร์เดียวกันบน GitHub');
+  }
+}
+
+function handleLogin(){
+  const k=userKey(document.getElementById('username').value);
+  const pass=s(document.getElementById('password').value);
+  const errorMsg=document.getElementById('login-error');
+  const row=usersDB[k];
+  if(row && s(row.Password)===pass){
+    errorMsg.style.display='none';
+    saveSession(k);
+    currentUsername=k;
+    document.getElementById('login-section').style.display='none';
+    document.getElementById('dashboard-section').style.display='block';
+    renderDashboard(k);
+  }else{
+    errorMsg.style.display='block';
+  }
+}
+
+function taskIndices(row){
+  const nums=new Set();
+  for(const key of Object.keys(row||{})){
+    const m=/^Task(\d+)_Name$/i.exec(key);
+    if(m) nums.add(Number(m[1]));
+  }
+  return [...nums].sort((a,b)=>a-b);
+}
+
+function renderDashboard(username){
+  const user=usersDB[username];
+  document.getElementById('display-profile').textContent=`ยินดีต้อนรับ, เจ้าหน้าที่รหัส ${s(user.Username)||username}`;
+  let districtText=`จังหวัด: ${s(user.Province)||'-'} | ภูมิภาค: ${s(user.Region)||'-'}`;
+  if(s(user.District)) districtText+=` | พื้นที่/เขต: ${s(user.District)}`;
+  document.getElementById('display-district').textContent=districtText;
+
+  const now=new Date();
+  const monthNames=['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
+  document.getElementById('current-month').textContent=`${monthNames[now.getMonth()]} ${now.getFullYear()+543}`;
+
+  const taskList=document.getElementById('task-list');
+  taskList.innerHTML='';
+  let count=0;
+  for(const row of (tasksDB[username]||[])){
+    for(const i of taskIndices(row)){
+      const taskName=s(row[`Task${i}_Name`]);
+      if(!taskName || taskName==='-') continue;
+      const due=s(row[`Task${i}_Due`]) || 'ไม่ระบุ';
+      const link=safeHref(row[`Task${i}_Link`]);
+      const tr=document.createElement('tr');
+      tr.innerHTML=`
+        <td><strong style="color:var(--navy)">${esc(taskName)}</strong></td>
+        <td><span class="due">⏰ ${esc(due)}</span></td>
+        <td>${link ? `<a href="${esc(link)}" target="_blank" rel="noopener noreferrer" class="btn-task">เปิดไฟล์งาน (Sheet) ↗</a>` : '<span class="btn-disabled">ไม่มีลิงก์</span>'}</td>`;
+      taskList.appendChild(tr); count++;
+    }
+  }
+  if(!count){ taskList.innerHTML='<tr><td colspan="3" style="text-align:center;color:gray;padding:30px">ไม่มีภารกิจในเดือนนี้</td></tr>'; }
+}
+
+function logout(){
+  clearSession();
+  currentUsername='';
+  document.getElementById('password').value='';
+  document.getElementById('dashboard-section').style.display='none';
+  document.getElementById('login-section').style.display='block';
+  document.getElementById('username').focus();
+}
+
+window.addEventListener('DOMContentLoaded',async()=>{
+  document.getElementById('login-btn').addEventListener('click',handleLogin);
+  document.getElementById('password').addEventListener('keydown',e=>{if(e.key==='Enter') handleLogin();});
+  document.getElementById('username').addEventListener('keydown',e=>{if(e.key==='Enter') document.getElementById('password').focus();});
+  document.getElementById('change-db-btn').addEventListener('click',()=>document.getElementById('excel-file-input').click());
+  document.getElementById('dashboard-db-btn').addEventListener('click',reloadRepoDatabase);
+  document.getElementById('excel-file-input').addEventListener('change',e=>{loadExcelFile(e.target.files[0]); e.target.value='';});
+  document.getElementById('logout-btn').addEventListener('click',logout);
+
+  try{
+    useEmbeddedDatabase();
+    document.getElementById('loading-text').textContent='กำลังอ่าน Database_CPI.xlsx จาก GitHub...';
+    const loaded=await tryAutoLoadExcel();
+    if(!loaded){
+      document.getElementById('db-status').textContent='ไม่พบ Database_CPI.xlsx — กรุณาวางไว้โฟลเดอร์เดียวกับ index.html';
+    }
+  }catch(err){
+    console.error(err);
+    document.getElementById('loading-text').textContent='เกิดข้อผิดพลาด: '+err.message;
+  }
+  if(!restoreSession()) showLogin();
+});
+</script>
+</body>
+</html>

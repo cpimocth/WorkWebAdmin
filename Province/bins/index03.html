@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TPSO - ระบบรับมอบหมายงานจัดเก็บราคา (CPI)</title>
+  <style>
+    :root{
+      --primary:#0b4ea2;--primary-dark:#08356e;--primary-soft:#edf5ff;
+      --navy:#102f5d;--danger:#c62828;--success:#166534;--warning:#a16207;
+      --muted:#64748b;--line:#dbe7f3;--card:rgba(255,255,255,.97);
+      --bg:linear-gradient(180deg,#eef4fb 0%,#f8fbff 100%);--shadow:0 18px 40px rgba(16,52,92,.10);--radius:22px;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;padding:20px;font-family:"Sarabun","Tahoma",sans-serif;color:#1f3550;background:var(--bg);min-height:100vh}
+    button,input{font:inherit}
+    #loading-screen{position:fixed;inset:0;background:white;z-index:9999;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:24px;text-align:center}
+    .spinner{border:4px solid var(--line);border-top:4px solid var(--primary);border-radius:50%;width:42px;height:42px;animation:spin 1s linear infinite;margin-bottom:15px}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .login-card{max-width:500px;margin:50px auto;background:var(--card);padding:40px;border-radius:var(--radius);box-shadow:var(--shadow);text-align:center}
+    .input-group input{width:100%;padding:14px;margin-top:5px;margin-bottom:15px;border:2px solid var(--line);border-radius:12px;font-size:1rem;outline:none}
+    .input-group input:focus{border-color:#8bb8ee;box-shadow:0 0 0 4px #edf5ff}
+    .login-btn{width:100%;padding:14px;background:var(--primary);color:white;border:none;border-radius:12px;font-size:1.08rem;font-weight:700;cursor:pointer}
+    .login-btn:hover{background:var(--primary-dark)}
+    .dashboard{max-width:1280px;margin:0 auto;display:none}
+    .header-combined{display:flex;justify-content:space-between;gap:18px;align-items:center;padding:24px 32px;border-radius:28px;color:#fff;background:var(--primary-dark);margin-bottom:20px}
+    .card{background:var(--card);border-radius:var(--radius);padding:24px;margin-bottom:20px;box-shadow:var(--shadow)}
+    table{width:100%;border-collapse:collapse}
+    th,td{padding:12px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+    th{color:var(--navy);background:#f8fbff}
+    .btn-task{padding:8px 16px;background:var(--primary-soft);color:var(--primary);text-decoration:none;border-radius:8px;font-weight:700;display:inline-block;white-space:nowrap}
+    .btn-task:hover{background:var(--primary);color:white}
+    .btn-disabled{padding:8px 16px;background:#f1f5f9;color:#94a3b8;border-radius:8px;font-weight:700;display:inline-block;white-space:nowrap}
+    .db-status{display:inline-flex;align-items:center;gap:6px;margin-top:12px;padding:7px 11px;border-radius:999px;background:#eff6ff;color:#1d4ed8;font-size:.88rem;font-weight:600}
+    .db-status.error{background:#fef2f2;color:#b91c1c}
+    .secondary-btn{border:1px solid var(--line);background:#fff;color:var(--primary);border-radius:10px;padding:9px 13px;font-weight:700;cursor:pointer}
+    .secondary-btn:hover{background:var(--primary-soft)}
+    .header-actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+    .header-actions button{padding:10px 16px;border-radius:10px;border:none;cursor:pointer;font-weight:700}
+    .due{background:#fef3c7;color:#b45309;padding:4px 10px;border-radius:12px;font-size:.88rem;display:inline-block}
+    .hint{font-size:.86rem;color:var(--muted);margin-top:12px;line-height:1.6}
+    .login-error{color:var(--danger);display:none;margin-bottom:15px;font-weight:600}
+    .server-error{max-width:640px;color:#991b1b;background:#fef2f2;border:1px solid #fecaca;border-radius:14px;padding:14px 16px;line-height:1.55;margin-top:14px;display:none}
+    .meta{font-size:.82rem;color:var(--muted);margin-top:8px}
+    @media(max-width:760px){body{padding:10px}.login-card{padding:26px;margin:20px auto}.header-combined{padding:20px;align-items:flex-start;flex-direction:column}.header-actions{justify-content:flex-start}.card{padding:16px;overflow-x:auto}th,td{min-width:140px}}
+  </style>
+</head>
+<body>
+  <div id="loading-screen">
+    <div class="spinner"></div>
+    <h3 style="color:var(--primary);margin:0">กำลังอ่าน Database_CPI.xlsx...</h3>
+    <p style="color:var(--muted);font-size:.92rem;margin:7px 0 0" id="loading-text">กำลังเชื่อมต่อฐานข้อมูลล่าสุด</p>
+    <div id="server-error" class="server-error"></div>
+  </div>
+
+  <div id="login-section" style="display:none">
+    <div class="login-card">
+      <h2 style="color:var(--primary);margin-bottom:6px">ระบบจัดเก็บราคา (CPI)</h2>
+      <p style="margin-top:0">กรุณาลงชื่อเข้าใช้ด้วยรหัสของท่าน</p>
+      <div class="input-group"><input type="text" id="username" placeholder="Username (เช่น index_bkk02)" autocomplete="username"></div>
+      <div class="input-group"><input type="password" id="password" placeholder="Password" autocomplete="current-password"></div>
+      <div id="login-error" class="login-error">รหัสไม่ถูกต้อง หรือไม่มีข้อมูลในระบบ</div>
+      <button class="login-btn" id="login-btn" type="button">เข้าสู่ระบบ</button>
+      <div><span id="db-status" class="db-status">กำลังอ่านฐานข้อมูล...</span></div>
+      <div id="db-meta" class="meta"></div>
+      <div style="margin-top:12px"><button class="secondary-btn" id="reload-db-btn" type="button">↻ โหลด Database_CPI.xlsx ล่าสุด</button></div>
+      <div class="hint">ให้เปิดระบบด้วยไฟล์ <b>เปิดระบบ_CPI.bat</b> ทุกครั้ง จากนั้นแก้ไขงาน/วัน/ลิงก์ใน <b>Database_CPI.xlsx</b> ได้ตามปกติ แล้วกดปุ่มโหลดฐานข้อมูลล่าสุดหรือ Refresh หน้าเว็บ</div>
+    </div>
+  </div>
+
+  <div id="dashboard-section" class="dashboard">
+    <div class="header-combined">
+      <div>
+        <h1 style="margin:0">ระบบรายงานการปฏิบัติงานจัดเก็บราคา</h1>
+        <p style="margin:5px 0 0;opacity:.9">ประจำเดือน: <span id="current-month"></span></p>
+      </div>
+      <div class="header-actions">
+        <button id="dashboard-reload-btn" type="button" style="background:#dbeafe;color:#0b4ea2">↻ อัปเดตงานล่าสุด</button>
+        <button id="logout-btn" type="button">ออกจากระบบ</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3 style="color:var(--primary);margin-top:0" id="display-profile">ข้อมูลเจ้าหน้าที่</h3>
+      <p style="color:var(--muted);margin-bottom:0" id="display-district"></p>
+      <div id="dashboard-db-meta" class="meta"></div>
+    </div>
+
+    <div class="card">
+      <h3 style="margin-top:0">📋 ภารกิจประจำเดือนของคุณ</h3>
+      <table>
+        <thead><tr><th>ชื่องาน / รายละเอียด</th><th>กำหนดส่ง</th><th>การดำเนินการ</th></tr></thead>
+        <tbody id="task-list"></tbody>
+      </table>
+    </div>
+  </div>
+
+<script>
+'use strict';
+let usersDB=Object.create(null), tasksDB=Object.create(null), currentUsername='', dbMeta={};
+function s(v){return v===null||v===undefined?'':String(v).trim();}
+function userKey(v){return s(v).toLowerCase();}
+function esc(v){return s(v).replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));}
+function safeHref(v){const x=s(v);if(!x||x==='-')return'';try{const u=new URL(x,location.href);return ['http:','https:'].includes(u.protocol)?u.href:'';}catch(_){return'';}}
+
+function installDatabase(data){
+  const nextUsers=Object.create(null), nextTasks=Object.create(null);
+  for(const row of (data.users||[])){const k=userKey(row.Username);if(k)nextUsers[k]=row;}
+  for(const row of (data.tasks||[])){const k=userKey(row.Username);if(!k)continue;if(!nextTasks[k])nextTasks[k]=[];nextTasks[k].push(row);}
+  if(!Object.keys(nextUsers).length)throw new Error('ไม่พบข้อมูลผู้ใช้ในชีท Users');
+  usersDB=nextUsers;tasksDB=nextTasks;dbMeta=data.meta||{};
+  const status=document.getElementById('db-status');
+  status.classList.remove('error');
+  status.textContent=`ฐานข้อมูล: ${dbMeta.file||'Database_CPI.xlsx'} • ผู้ใช้ ${Object.keys(usersDB).length} ราย`;
+  const meta=`แก้ไขล่าสุด: ${dbMeta.modified||'-'} • ภารกิจที่กรอก: ${dbMeta.task_items??'-'} รายการ`;
+  document.getElementById('db-meta').textContent=meta;
+  document.getElementById('dashboard-db-meta').textContent=meta;
+}
+
+async function loadDatabase({stayOnDashboard=false}={}){
+  const status=document.getElementById('db-status');
+  if(status){status.classList.remove('error');status.textContent='กำลังอ่าน Database_CPI.xlsx ล่าสุด...';}
+  const response=await fetch('/api/db?t='+Date.now(),{cache:'no-store'});
+  const data=await response.json().catch(()=>({}));
+  if(!response.ok)throw new Error(data.error||`HTTP ${response.status}`);
+  installDatabase(data);
+  if(stayOnDashboard&&currentUsername){
+    if(!usersDB[currentUsername]){alert('บัญชีนี้ไม่มีอยู่ในฐานข้อมูลล่าสุด กรุณาเข้าสู่ระบบใหม่');logout();return;}
+    renderDashboard(currentUsername);
+  }
+}
+
+function taskIndices(row){
+  const nums=new Set();
+  for(const key of Object.keys(row||{})){const m=/^Task(\d+)_Name$/i.exec(key);if(m)nums.add(Number(m[1]));}
+  return [...nums].sort((a,b)=>a-b);
+}
+
+function handleLogin(){
+  const k=userKey(document.getElementById('username').value), pass=s(document.getElementById('password').value);
+  const errorMsg=document.getElementById('login-error'), row=usersDB[k];
+  if(row&&s(row.Password)===pass){
+    errorMsg.style.display='none';currentUsername=k;
+    document.getElementById('login-section').style.display='none';document.getElementById('dashboard-section').style.display='block';renderDashboard(k);
+  }else errorMsg.style.display='block';
+}
+
+function renderDashboard(username){
+  const user=usersDB[username];if(!user)return;
+  document.getElementById('display-profile').textContent=`ยินดีต้อนรับ, เจ้าหน้าที่รหัส ${s(user.Username)||username}`;
+  let districtText=`จังหวัด: ${s(user.Province)||'-'} | ภูมิภาค: ${s(user.Region)||'-'}`;
+  if(s(user.District))districtText+=` | พื้นที่/เขต: ${s(user.District)}`;
+  document.getElementById('display-district').textContent=districtText;
+  const now=new Date(), monthNames=['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
+  document.getElementById('current-month').textContent=`${monthNames[now.getMonth()]} ${now.getFullYear()+543}`;
+  const taskList=document.getElementById('task-list');taskList.innerHTML='';let count=0;
+  for(const row of (tasksDB[username]||[])){
+    for(const i of taskIndices(row)){
+      const taskName=s(row[`Task${i}_Name`]);if(!taskName||taskName==='-')continue;
+      const due=s(row[`Task${i}_Due`])||'ไม่ระบุ', link=safeHref(row[`Task${i}_Link`]);
+      const tr=document.createElement('tr');
+      tr.innerHTML=`<td><strong style="color:var(--navy)">${esc(taskName)}</strong></td><td><span class="due">⏰ ${esc(due)}</span></td><td>${link?`<a href="${esc(link)}" target="_blank" rel="noopener noreferrer" class="btn-task">เปิดไฟล์งาน ↗</a>`:'<span class="btn-disabled">ไม่มีลิงก์</span>'}</td>`;
+      taskList.appendChild(tr);count++;
+    }
+  }
+  if(!count)taskList.innerHTML='<tr><td colspan="3" style="text-align:center;color:gray;padding:30px">ไม่มีภารกิจในเดือนนี้</td></tr>';
+}
+
+function logout(){currentUsername='';document.getElementById('password').value='';document.getElementById('dashboard-section').style.display='none';document.getElementById('login-section').style.display='block';document.getElementById('username').focus();}
+
+window.addEventListener('DOMContentLoaded',async()=>{
+  document.getElementById('login-btn').addEventListener('click',handleLogin);
+  document.getElementById('password').addEventListener('keydown',e=>{if(e.key==='Enter')handleLogin();});
+  document.getElementById('username').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('password').focus();});
+  document.getElementById('reload-db-btn').addEventListener('click',async()=>{try{await loadDatabase();}catch(e){alert('อ่านฐานข้อมูลไม่สำเร็จ\n'+e.message);}});
+  document.getElementById('dashboard-reload-btn').addEventListener('click',async()=>{try{await loadDatabase({stayOnDashboard:true});}catch(e){alert('อ่านฐานข้อมูลไม่สำเร็จ\n'+e.message);}});
+  document.getElementById('logout-btn').addEventListener('click',logout);
+  try{
+    await loadDatabase();
+    document.getElementById('loading-screen').style.display='none';document.getElementById('login-section').style.display='block';setTimeout(()=>document.getElementById('username').focus(),0);
+  }catch(err){
+    console.error(err);
+    document.querySelector('#loading-screen .spinner').style.display='none';
+    document.getElementById('loading-text').textContent='เปิดฐานข้อมูลไม่สำเร็จ';
+    const box=document.getElementById('server-error');box.style.display='block';
+    box.innerHTML=`${esc(err.message)}<br><br>กรุณาปิดหน้านี้ แล้วเปิดระบบด้วยไฟล์ <b>เปิดระบบ_CPI.bat</b> และตรวจว่ามีไฟล์ <b>Database_CPI.xlsx</b> อยู่ในโฟลเดอร์เดียวกัน`;
+  }
+});
+</script>
+</body>
+</html>
