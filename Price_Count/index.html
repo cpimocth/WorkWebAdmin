@@ -324,19 +324,33 @@
             return keys.filter(k => predicate(baseHeaderName(k), k));
         }
 
+        // ----------------------------------------------------------
+        // การปัดทศนิยม GeoMean
+        // ROUND 5 : ปัดจากค่า Raw ที่คำนวณได้โดยตรง
+        // ROUND 2 : ใช้ค่าที่ ROUND 5 แล้ว เป็นวัตถุดิบ แล้วจึงปัดต่อเหลือ 2 ตำแหน่ง
+        // ----------------------------------------------------------
         function getFormattedData(data, forExport = false) {
-            let is5Decimals = document.getElementById('decimalToggle').checked;
-            let decimals = is5Decimals ? 5 : 2;
+            const is5Decimals = document.getElementById('decimalToggle').checked;
             
             return data.map(row => {
                 let newRow = {};
                 for(let key in row) {
-                    let isGeoMeanCol = ['ราคาปัจจุบัน', 'ราคาเฉลี่ย', 'ราคาเปรียบเทียบ', 'REL', 'ราคาเดือนที่แล้ว', 'ราคาเดือนก่อน'].includes(key);
+                    const isGeoMeanCol = ['ราคาปัจจุบัน', 'ราคาเฉลี่ย', 'ราคาเปรียบเทียบ', 'REL', 'ราคาเดือนที่แล้ว', 'ราคาเดือนก่อน'].includes(key);
+
                     if(isGeoMeanCol && typeof row[key] === 'number') {
-                        if (forExport) {
-                            newRow[key] = Number(row[key].toFixed(decimals));
+                        // ขั้นที่ 1: ROUND 5 จากค่า RAW โดยตรง
+                        const rounded5 = Number(row[key].toFixed(5));
+
+                        if (is5Decimals) {
+                            newRow[key] = forExport
+                                ? rounded5
+                                : rounded5.toFixed(5);
                         } else {
-                            newRow[key] = row[key].toFixed(decimals);
+                            // ขั้นที่ 2: ROUND 2 ใช้ค่า ROUND 5 เป็นวัตถุดิบ
+                            const rounded2 = Number(rounded5.toFixed(2));
+                            newRow[key] = forExport
+                                ? rounded2
+                                : rounded2.toFixed(2);
                         }
                     } else {
                         newRow[key] = row[key];
