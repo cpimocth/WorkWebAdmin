@@ -1,0 +1,2 @@
+This project contains original HTML, CSS and JavaScript created for the Shop Name Classifier request.
+No third-party JavaScript library is bundled.

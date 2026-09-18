@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="จำแนก SHOP_NAME ตามเงื่อนไขใน shop.xlsx และส่งออก Excel" />
+  <title>Shop Name Classifier</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="hero">
+    <div class="hero__inner">
+      <div>
+        <p class="eyebrow">Excel → Match → Excel</p>
+        <h1>Shop Name Classifier</h1>
+        <p class="hero__subtitle">วางรายชื่อร้าน หรือนำเข้าไฟล์ <strong>.xlsx / .csv / .txt</strong> แล้วจำแนกตามกติกาใน <strong>shop.xlsx</strong></p>
+      </div>
+      <div class="hero__badge" aria-label="ทำงานในเบราว์เซอร์">
+        <span class="hero__badge-dot"></span>
+        ประมวลผลบนเครื่องของคุณ
+      </div>
+    </div>
+  </header>
+
+  <main class="page">
+    <section class="steps" aria-label="ขั้นตอนใช้งาน">
+      <div class="step"><span>1</span><strong>ใส่ข้อมูล</strong><small>วางหรือเลือกไฟล์</small></div>
+      <div class="step"><span>2</span><strong>เลือก SHOP_NAME</strong><small>กำหนดคอลัมน์ร้าน</small></div>
+      <div class="step"><span>3</span><strong>ประมวลผล</strong><small>จับคู่ตามกติกา</small></div>
+      <div class="step"><span>4</span><strong>Export Excel</strong><small>ดาวน์โหลดผลลัพธ์</small></div>
+    </section>
+
+    <section class="grid grid--two">
+      <article class="card">
+        <div class="card__header">
+          <div>
+            <p class="section-kicker">ข้อมูลร้าน</p>
+            <h2>1. นำเข้ารายชื่อ SHOP_NAME</h2>
+          </div>
+          <span id="sourceStatus" class="status status--muted">ยังไม่มีข้อมูล</span>
+        </div>
+
+        <div class="tabs" role="tablist" aria-label="วิธีนำเข้าข้อมูล">
+          <button class="tab is-active" type="button" data-tab="pastePanel" role="tab" aria-selected="true">วางข้อมูล</button>
+          <button class="tab" type="button" data-tab="filePanel" role="tab" aria-selected="false">นำเข้าไฟล์</button>
+        </div>
+
+        <div id="pastePanel" class="tab-panel is-active" role="tabpanel">
+          <label class="field-label" for="pasteInput">วางชื่อร้าน 1 รายการต่อบรรทัด หรือคัดลอกตารางจาก Excel</label>
+          <textarea id="pasteInput" rows="11" placeholder="SHOP_NAME&#10;ห้างโลตัสไฮเปอร์มาร์เก็ต สาขาพระโขนง&#10;ห้างท็อปส์ สาขารังสิต&#10;โลตัส โกเฟรช&#10;บิ๊กซี มินิ"></textarea>
+          <div class="button-row">
+            <button id="loadPasteButton" class="button button--primary" type="button">ใช้ข้อมูลที่วาง</button>
+            <button id="sampleButton" class="button button--secondary" type="button">ใส่ข้อมูลตัวอย่าง</button>
+            <button id="clearPasteButton" class="button button--ghost" type="button">ล้าง</button>
+          </div>
+        </div>
+
+        <div id="filePanel" class="tab-panel" role="tabpanel" hidden>
+          <label id="dataDropZone" class="drop-zone" for="dataFileInput">
+            <input id="dataFileInput" type="file" accept=".xlsx,.csv,.tsv,.txt" />
+            <span class="drop-zone__icon">⇧</span>
+            <strong>เลือกหรือลากไฟล์มาวาง</strong>
+            <small>รองรับ .xlsx, .csv, .tsv และ .txt — ไฟล์ .xls ให้ Save As เป็น .xlsx ก่อน</small>
+          </label>
+        </div>
+
+        <div id="sourceOptions" class="source-options" hidden>
+          <div class="form-grid form-grid--three">
+            <label>
+              <span>Worksheet</span>
+              <select id="sheetSelect"></select>
+            </label>
+            <label>
+              <span>แถวหัวตาราง <small>(0 = ไม่มี)</small></span>
+              <input id="headerRowInput" type="number" min="0" step="1" value="1" />
+            </label>
+            <label>
+              <span>คอลัมน์ SHOP_NAME</span>
+              <select id="shopColumnSelect"></select>
+            </label>
+          </div>
+          <p id="sourceMeta" class="helper"></p>
+        </div>
+      </article>
+
+      <article class="card">
+        <div class="card__header">
+          <div>
+            <p class="section-kicker">กติกาการแปลง</p>
+            <h2>2. เงื่อนไขจาก shop.xlsx</h2>
+          </div>
+          <span id="rulesStatus" class="status status--success">ค่าเริ่มต้น 23 กติกา</span>
+        </div>
+
+        <p class="body-copy">แอปฝังกติกาจากไฟล์ที่ให้มาไว้แล้ว และสามารถอัปโหลด <strong>shop.xlsx</strong> ฉบับใหม่เพื่อแทนที่ได้ โดยใช้คอลัมน์ <code>Result</code>, <code>Primary Keywords</code> และ <code>Sub Keywords</code></p>
+
+        <label class="compact-upload" for="rulesFileInput">
+          <input id="rulesFileInput" type="file" accept=".xlsx,.csv,.tsv,.txt" />
+          <span>อัปโหลดไฟล์กติกาใหม่</span>
+        </label>
+
+        <div class="button-row">
+          <button id="resetRulesButton" class="button button--secondary" type="button">กลับไปใช้กติกาเริ่มต้น</button>
+          <button id="exportRulesButton" class="button button--ghost" type="button">Export กติกาปัจจุบัน</button>
+        </div>
+
+        <div class="rule-metrics">
+          <div><span id="ruleCount">23</span><small>กติกา</small></div>
+          <div><span id="subRuleCount">3</span><small>กติกาที่มีคำย่อย</small></div>
+          <div><span id="overlapCount">0</span><small>คู่กติกาที่ซ้อนกัน</small></div>
+        </div>
+
+        <details class="details">
+          <summary>ดูตัวอย่างกติกา</summary>
+          <div class="table-wrap table-wrap--small">
+            <table>
+              <thead><tr><th>Result</th><th>Primary Keywords</th><th>Sub Keywords</th></tr></thead>
+              <tbody id="rulesPreviewBody"></tbody>
+            </table>
+          </div>
+        </details>
+      </article>
+    </section>
+
+    <section class="card">
+      <div class="card__header">
+        <div>
+          <p class="section-kicker">ตั้งค่า</p>
+          <h2>3. วิธีจับคู่และรูปแบบผลลัพธ์</h2>
+        </div>
+      </div>
+
+      <div class="form-grid form-grid--four">
+        <label>
+          <span>วิธีเลือกเมื่อหลายกติกาตรงกัน</span>
+          <select id="matchModeSelect">
+            <option value="smart">เฉพาะที่สุด / ชื่อแบรนด์ที่ปรากฏก่อน (แนะนำ)</option>
+            <option value="row-order">กติกาแถวแรกที่ตรงใน shop.xlsx</option>
+          </select>
+        </label>
+        <label>
+          <span>ชื่อคอลัมน์ผลลัพธ์</span>
+          <input id="outputColumnInput" type="text" value="SHOP_RESULT" />
+        </label>
+        <label>
+          <span>ค่าเมื่อไม่พบเงื่อนไข</span>
+          <input id="unmatchedInput" type="text" value="ไม่พบเงื่อนไข" />
+        </label>
+        <label class="checkbox-field">
+          <input id="detailsCheckbox" type="checkbox" checked />
+          <span><strong>เพิ่มรายละเอียดการจับคู่</strong><small>Keyword, แถวกติกา และสถานะ</small></span>
+        </label>
+      </div>
+
+      <div class="inline-options">
+        <label class="checkbox-inline"><input id="skipBlankCheckbox" type="checkbox" checked /> ข้ามแถวที่ SHOP_NAME ว่าง</label>
+      </div>
+
+      <div class="action-bar">
+        <div>
+          <button id="processButton" class="button button--primary button--large" type="button">ประมวลผลข้อมูล</button>
+          <span id="processMessage" class="helper"></span>
+        </div>
+        <button id="exportButton" class="button button--success button--large" type="button" disabled>Export Excel</button>
+      </div>
+    </section>
+
+    <section id="resultsSection" class="results" hidden>
+      <div class="summary-grid">
+        <article class="metric-card"><small>รายการทั้งหมด</small><strong id="totalMetric">0</strong></article>
+        <article class="metric-card"><small>จับคู่สำเร็จ</small><strong id="matchedMetric">0</strong></article>
+        <article class="metric-card"><small>ไม่พบเงื่อนไข</small><strong id="unmatchedMetric">0</strong></article>
+        <article class="metric-card"><small>อัตราจับคู่</small><strong id="rateMetric">0%</strong></article>
+      </div>
+
+      <div class="grid grid--results">
+        <article class="card">
+          <div class="card__header">
+            <div>
+              <p class="section-kicker">สรุป</p>
+              <h2>จำนวนตาม Result</h2>
+            </div>
+          </div>
+          <div id="categorySummary" class="category-list"></div>
+        </article>
+
+        <article class="card card--wide">
+          <div class="card__header">
+            <div>
+              <p class="section-kicker">Preview</p>
+              <h2>ตัวอย่างผลลัพธ์</h2>
+            </div>
+            <span id="previewNote" class="status status--muted"></span>
+          </div>
+          <div class="table-wrap">
+            <table id="resultTable">
+              <thead id="resultTableHead"></thead>
+              <tbody id="resultTableBody"></tbody>
+            </table>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  </main>
+
+  <footer>
+    <p>ไฟล์และรายชื่อร้านถูกอ่านและประมวลผลภายในเบราว์เซอร์ ไม่ส่งข้อมูลไปยังเซิร์ฟเวอร์</p>
+  </footer>
+
+  <script src="mini-xlsx.js"></script>
+  <script src="classifier.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

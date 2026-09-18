@@ -1,0 +1,1007 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>CPI Price Entry - Monthly V6.5</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <style>
+    :root { --tpso:#0b57d0; --ink:#152238; --soft:#f4f7fb; }
+    body { background:var(--soft); color:var(--ink); font-family:"Segoe UI",Tahoma,sans-serif; }
+    .navbar-brand { font-weight:800; letter-spacing:.1px; }
+    .card { border:0; border-radius:14px; box-shadow:0 3px 14px rgba(27,48,85,.07); }
+    .filters label { font-size:.78rem; color:#667085; font-weight:700; margin-bottom:.25rem; }
+    .table-wrap { max-height:62vh; overflow:auto; border:1px solid #e4e7ec; border-radius:12px; }
+    table { font-size:.88rem; width:max-content; min-width:100%; }
+    thead th { position:sticky; top:0; z-index:3; background:#eef4ff!important; color:#173b75!important; white-space:nowrap; position:sticky; }
+    #priceTable th { position:sticky; }
+    #priceTable th .col-resizer { position:absolute; right:-3px; top:0; width:7px; height:100%; cursor:col-resize; user-select:none; z-index:8; }
+    #priceTable th .col-resizer:hover { background:rgba(13,110,253,.25); }
+    #priceTable [data-col].col-hidden { display:none!important; }
+    #priceTable th[data-col], #priceTable td[data-col] { overflow:hidden; text-overflow:ellipsis; }
+    .column-list { max-height:60vh; overflow:auto; }
+    .column-list .form-check { padding-top:.28rem; padding-bottom:.28rem; border-bottom:1px solid #f0f2f5; }
+    .meta-cell { min-width:150px; max-width:220px; white-space:normal; }
+    .status-input { min-width:180px; }
+    td,th { vertical-align:middle; white-space:nowrap; }
+    td.desc { min-width:300px; white-space:normal; }
+    td.shop { min-width:230px; white-space:normal; }
+    .price-input { width:112px; text-align:right; }
+    .link-select { width:72px; min-width:72px; font-weight:700; text-align:center; }
+    .flag-col { min-width:42px; text-align:center; }
+    .row-action-btn { width:34px; height:30px; padding:0; font-size:1.1rem; line-height:1; }
+    .row-action-menu { position:fixed; z-index:2000; min-width:235px; background:#fff; border:1px solid #d0d5dd; border-radius:10px; box-shadow:0 10px 28px rgba(16,24,40,.18); padding:6px; display:none; }
+    .row-action-menu button { width:100%; border:0; background:transparent; text-align:left; padding:9px 10px; border-radius:7px; color:#1d2939; }
+    .row-action-menu button:hover { background:#f2f4f7; }
+    .row-action-menu .danger { color:#b42318; }
+    .new-item-note { background:#f8f9fc; border:1px solid #e4e7ec; border-radius:8px; padding:10px 12px; font-size:.82rem; color:#475467; }
+    .rel-high, .rel-eq { background:#ffffff!important; color:#111827!important; font-weight:800; }
+    .rel-low { background:#dc3545!important; color:#ffffff!important; font-weight:800; }
+    .status-up { color:#067647; font-weight:800; }
+    .status-down { color:#b42318; font-weight:800; }
+    .status-eq { color:#475467; font-weight:800; }
+    .badge-soft { background:#eef4ff; color:#1849a9; }
+    .metric { min-height:86px; }
+    .metric .num { font-size:1.55rem; font-weight:800; }
+    #app, #loginCard { display:none; }
+    .sticky-actions { position:sticky; top:0; z-index:10; }
+    .changed-row { background:#fff7e6!important; }
+    .invalid-row { background:#fff1f0!important; }
+    .small-note { font-size:.78rem; color:#667085; }
+    .report-table { font-size:.82rem; }
+    .analysis-card { border-left:4px solid #0d6efd; }
+    .analysis-set-row { display:grid; grid-template-columns:165px 1fr; gap:12px; align-items:start; padding:12px 0; border-bottom:1px solid #eef2f6; }
+    .analysis-set-row:last-child { border-bottom:0; }
+    .analysis-set-name { font-weight:800; padding-top:7px; }
+    .analysis-grid { display:grid; grid-template-columns:repeat(5,minmax(145px,1fr)); gap:10px; }
+    .analysis-box { border:1px dashed #d0d5dd; border-radius:8px; padding:8px 10px; background:#fff; min-height:61px; }
+    .analysis-box .k { font-size:.72rem; color:#667085; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .analysis-box .v { font-weight:800; margin-top:2px; }
+    .analysis-summary { display:grid; grid-template-columns:repeat(5,minmax(130px,1fr)); gap:12px; }
+    .analysis-summary .sum-box { background:#303030; color:#fff; border-radius:8px; padding:11px 13px; }
+    .analysis-summary .sum-box .k { font-size:.76rem; color:#d0d5dd; }
+    .analysis-summary .sum-box .v { font-size:1.08rem; font-weight:800; }
+    @media(max-width:1200px){ .analysis-grid{grid-template-columns:repeat(3,minmax(145px,1fr));}.analysis-summary{grid-template-columns:repeat(3,minmax(130px,1fr));} }
+    @media(max-width:760px){ .analysis-set-row{grid-template-columns:1fr}.analysis-grid{grid-template-columns:repeat(2,minmax(135px,1fr));}.analysis-summary{grid-template-columns:repeat(2,minmax(120px,1fr));} }
+    .modal-xl { --bs-modal-width: 1280px; }
+    @media(max-width:900px){ .desktop-only{display:none!important;} }
+  </style>
+</head>
+<body>
+<nav class="navbar navbar-dark bg-primary px-3 py-2">
+  <div class="container-fluid px-0">
+    <span class="navbar-brand">CPI Price Entry · รายเดือน V6.5</span>
+    <div class="d-flex gap-2 align-items-center">
+      <span id="connBadge" class="badge bg-secondary">ยังไม่เชื่อมต่อ</span>
+      <span id="userBadge" class="badge text-bg-light d-none"></span>
+      <button class="btn btn-sm btn-outline-light" data-bs-toggle="modal" data-bs-target="#configModal">ตั้งค่า Supabase</button>
+      <button id="logoutBtn" class="btn btn-sm btn-light d-none">ออกจากระบบ</button>
+    </div>
+  </div>
+</nav>
+
+<div class="container-fluid py-4">
+  <div id="loginCard" class="card p-4 mx-auto" style="max-width:480px">
+    <h4 class="fw-bold mb-1">เข้าสู่ระบบ</h4>
+    <p class="text-muted">ใช้บัญชีที่สร้างไว้ใน Supabase Auth</p>
+    <div class="mb-3"><label class="form-label">Email</label><input id="loginEmail" type="email" class="form-control"></div>
+    <div class="mb-3"><label class="form-label">Password</label><input id="loginPassword" type="password" class="form-control"></div>
+    <button id="loginBtn" class="btn btn-primary w-100">เข้าสู่ระบบ</button>
+    <div id="loginMsg" class="small mt-3"></div>
+  </div>
+
+  <div id="app">
+    <div class="card p-3 mb-3 filters">
+      <div class="row g-2 align-items-end">
+        <div class="col-6 col-md-2 col-xl-1"><label>ปี พ.ศ.</label><select id="yearSel" class="form-select"></select></div>
+        <div class="col-6 col-md-2 col-xl-1"><label>เดือน</label><select id="monthSel" class="form-select"></select></div>
+        <div class="col-6 col-md-2 col-xl-1"><label>ชุด</label><select id="setSel" class="form-select"><option value="ALL">ทั้งหมด</option><option>G</option><option>L</option><option>U</option><option>N</option></select></div>
+        <div class="col-6 col-md-3 col-xl-2"><label>รหัสรายการ</label><select id="code7Sel" class="form-select"><option value="">ทั้งหมด</option></select></div>
+        <div class="col-6 col-md-3 col-xl-2"><label>พื้นที่ประมวลผล</label><select id="analysisRegionSel" class="form-select"><option value="">ทั้งประเทศ</option></select></div>
+        <div class="col-6 col-md-3 col-xl-2"><label>จังหวัด</label><select id="provinceSel" class="form-select"><option value="">ทั้งหมด</option></select></div>
+        <div class="col-6 col-md-3 col-xl-2"><label>อำเภอ/เขต</label><select id="districtSel" class="form-select"><option value="">ทั้งหมด</option></select></div>
+        <div class="col-6 col-md-3 col-xl-2"><label>ชุดงาน/กลุ่ม</label><select id="groupSel" class="form-select"><option value="">ทั้งหมด</option></select></div>
+        <div class="col-12 col-md-5 col-xl-2"><label>แหล่งจัดเก็บ</label><select id="shopSel" class="form-select"><option value="">ทั้งหมด</option></select></div>
+        <div class="col-12 col-md-4 col-xl-1 d-grid"><button id="loadBtn" class="btn btn-primary">ค้นหา</button></div>
+      </div>
+      <div class="row g-2 mt-1 align-items-end">
+        <div class="col-12 col-md-4"><label>ค้นหาในตาราง</label><input id="searchInput" class="form-control" placeholder="รหัส / รายการ / ร้าน / จังหวัด"></div>
+        <div class="col-12 col-md-8 d-flex flex-wrap gap-2 justify-content-md-end">
+          <button id="prepareBtn" class="btn btn-outline-primary">เตรียมข้อมูลเดือนนี้</button>
+          <button id="saveBtn" class="btn btn-success">บันทึกทั้งหมด</button>
+          <button id="reportBtn" class="btn btn-outline-dark" data-bs-toggle="modal" data-bs-target="#reportModal">คำนวณ / รายงาน</button>
+          <button id="exportBtn" class="btn btn-outline-success">Export Excel</button>
+          <button id="importBtn" class="btn btn-outline-secondary">Import Master</button>
+          <input id="importFile" type="file" accept=".xlsx,.xls,.csv" hidden>
+        </div>
+      </div>
+    </div>
+
+    <div class="row g-3 mb-3">
+      <div class="col-12 col-md-4"><div class="card metric p-3"><div class="small text-muted">รายการที่มีราคาเดือนก่อน</div><div id="mPrev" class="num">0</div></div></div>
+      <div class="col-12 col-md-4"><div class="card metric p-3"><div class="small text-muted">รายการที่มีราคาปัจจุบัน</div><div id="mCurrent" class="num">0</div></div></div>
+      <div class="col-12 col-md-4"><div class="card metric p-3"><div class="small text-muted">รายการที่มี REL สำหรับคำนวณ</div><div id="mValidRel" class="num">0</div></div></div>
+    </div>
+
+    <div class="card p-3">
+      <div class="d-flex flex-wrap justify-content-between gap-2 align-items-center mb-2">
+        <div><b id="periodTitle">ข้อมูลราคา</b><div id="tableInfo" class="small-note"></div></div>
+        <div class="d-flex flex-wrap gap-2 align-items-center">
+          <button id="addItemBtn" class="btn btn-sm btn-primary">＋ เพิ่มสินค้า</button>
+          <button id="copyPrevBtn" class="btn btn-sm btn-outline-primary">คัดลอกราคาเดือนก่อน → ราคาเปรียบเทียบ</button>
+          <button id="columnBtn" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#columnModal">คอลัมน์</button>
+          <div class="form-check form-switch mb-0"><input class="form-check-input" type="checkbox" id="decimalToggle" checked><label class="form-check-label" for="decimalToggle">REL แสดง 5 ตำแหน่ง</label></div>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table class="table table-hover table-sm mb-0" id="priceTable">
+          <thead><tr>
+            <th data-col="flag_g">G</th><th data-col="flag_l">L</th><th data-col="flag_u">U</th><th data-col="flag_n">N</th><th data-col="row_action">Action</th>
+            <th data-col="commodity_code">รหัสสินค้า</th><th data-col="code7">รหัสรายการ</th><th data-col="description">ลักษณะจำเพาะ</th><th data-col="unit_code">หน่วย</th>
+            <th data-col="shop_code">รหัสแหล่ง</th><th data-col="shop_name">แหล่งจัดเก็บ</th><th data-col="province_name">จังหวัด</th><th data-col="district_name">อำเภอ/เขต</th>
+            <th data-col="prev_price">ราคาเดือนก่อน</th><th data-col="current_price">ราคาปัจจุบัน</th><th data-col="link_mode">Link</th><th data-col="compare_price">ราคาเปรียบเทียบ</th><th data-col="rel">REL</th>
+            <th data-col="product_status">ภาวะ (ผู้บันทึก)</th><th data-col="reviewer_status">ภาวะ (ผู้ตรวจ)</th><th data-col="updated_by_email">แก้ไขโดย</th><th data-col="updated_at">แก้ไขล่าสุด</th>
+          </tr></thead>
+          <tbody id="priceBody"><tr><td colspan="22" class="text-center py-5 text-muted">ยังไม่ได้โหลดข้อมูล</td></tr></tbody>
+        </table>
+      </div>
+      <div class="small-note mt-2"><b>Link:</b> N = ปกติ (เปรียบเทียบเดือนนี้กับราคาเดือนก่อน) · 1/2 = ราคาเปรียบเทียบเท่ากับราคาปัจจุบันอัตโนมัติ · 3 = แก้ราคาเปรียบเทียบได้อิสระ · N ไม่ใช้ร่วมกับ G/L/U · รายการไม่มีราคาปัจจุบันไม่นำไปนับรายงาน · REL &lt; 100 พื้นสีแดง, REL ≥ 100 พื้นสีขาว · GeoMean/REL 5 ตำแหน่ง</div>
+    </div>
+
+    <div id="bottomAnalysisCard" class="card analysis-card p-3 mt-3" style="display:none">
+      <div class="d-flex flex-wrap justify-content-between align-items-start gap-2 mb-2">
+        <div>
+          <h5 class="fw-bold mb-1">ประมวลผลรหัสรายการ</h5>
+          <div id="analysisTitle" class="text-muted small"></div>
+        </div>
+        <div id="analysisPeriodInfo" class="badge text-bg-light border"></div>
+      </div>
+      <div id="analysisLoading" class="text-center text-primary py-4" style="display:none"><span class="spinner-border spinner-border-sm me-2"></span>กำลังประมวลผล...</div>
+      <div id="analysisContent">
+        <div class="border rounded-3 overflow-hidden mb-3">
+          <div class="px-3 py-2 fw-bold bg-light border-bottom">ราคาเฉลี่ย</div>
+          <div id="analysisAverage" class="px-3"></div>
+        </div>
+        <div class="border rounded-3 overflow-hidden mb-3">
+          <div class="px-3 py-2 fw-bold bg-light border-bottom">สถิติ</div>
+          <div id="analysisStats" class="px-3"></div>
+        </div>
+        <div id="analysisCounts" class="analysis-summary"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Row Action Menu -->
+<div id="rowActionMenu" class="row-action-menu" role="menu" aria-label="Row actions">
+  <button type="button" data-row-action="add">＋ &nbsp;เพิ่มสินค้าใหม่</button>
+  <button type="button" data-row-action="duplicate">⧉ &nbsp;Duplicate เป็นสินค้าใหม่</button>
+  <hr class="my-1">
+  <button type="button" class="danger" data-row-action="delete">🗑 &nbsp;ลบสินค้าออก</button>
+</div>
+
+<!-- Add / Duplicate Product Modal -->
+<div class="modal fade" id="itemModal" tabindex="-1"><div class="modal-dialog modal-lg"><div class="modal-content">
+  <div class="modal-header"><h5 id="itemModalTitle" class="modal-title">เพิ่มสินค้าใหม่</h5><button class="btn-close" data-bs-dismiss="modal"></button></div>
+  <div class="modal-body">
+    <div id="duplicateNote" class="new-item-note mb-3 d-none"><b>Duplicate = สินค้าใหม่</b> · คัดลอกเฉพาะรายละเอียดสินค้า/ร้าน/พื้นที่/G-L-U-N และ <b>ไม่คัดลอกราคา REL ภาวะ หรือประวัติ</b></div>
+    <div class="row g-3">
+      <div class="col-md-4"><label class="form-label fw-bold">รหัสรายการ (7 หลัก) *</label><input id="itemCode7" class="form-control" inputmode="numeric" maxlength="7"></div>
+      <div class="col-md-4"><label class="form-label">รหัสสินค้า (ไม่บังคับ)</label><input id="itemCommodity" class="form-control" inputmode="numeric" maxlength="16"></div>
+      <div class="col-md-4"><label class="form-label">หน่วย</label><input id="itemUnit" class="form-control"></div>
+      <div class="col-md-8"><label class="form-label">ลักษณะจำเพาะ</label><input id="itemDescription" class="form-control"></div>
+      <div class="col-md-4"><label class="form-label">ชื่อรายการ</label><input id="itemName" class="form-control"></div>
+      <div class="col-md-4"><label class="form-label">รหัสแหล่ง (ไม่บังคับ)</label><input id="itemShopCode" class="form-control" inputmode="numeric" maxlength="10"></div>
+      <div class="col-md-8"><label class="form-label">แหล่งจัดเก็บ</label><input id="itemShopName" class="form-control"></div>
+      <div class="col-md-3"><label class="form-label">รหัสจังหวัด</label><input id="itemProvinceCode" class="form-control"></div>
+      <div class="col-md-3"><label class="form-label">จังหวัด</label><input id="itemProvince" class="form-control"></div>
+      <div class="col-md-3"><label class="form-label">อำเภอ/เขต</label><input id="itemDistrict" class="form-control"></div>
+      <div class="col-md-3"><label class="form-label">ภาค</label><input id="itemRegion" class="form-control"></div>
+      <div class="col-md-6"><label class="form-label">ชุดงาน/กลุ่ม</label><input id="itemGroup" class="form-control"></div>
+      <div class="col-md-6"><label class="form-label">ผู้ดูแล</label><input id="itemAdmin" class="form-control"></div>
+      <div class="col-12"><div class="d-flex flex-wrap gap-4 border rounded-3 p-3">
+        <div class="form-check"><input id="itemG" class="form-check-input item-flag" type="checkbox" data-set="G"><label class="form-check-label fw-bold" for="itemG">G</label></div>
+        <div class="form-check"><input id="itemL" class="form-check-input item-flag" type="checkbox" data-set="L"><label class="form-check-label fw-bold" for="itemL">L</label></div>
+        <div class="form-check"><input id="itemU" class="form-check-input item-flag" type="checkbox" data-set="U"><label class="form-check-label fw-bold" for="itemU">U</label></div>
+        <div class="form-check"><input id="itemN" class="form-check-input item-flag" type="checkbox" data-set="N"><label class="form-check-label fw-bold" for="itemN">N</label></div>
+      </div></div>
+    </div>
+    <div id="itemModalMsg" class="small mt-3"></div>
+  </div>
+  <div class="modal-footer"><button class="btn btn-outline-secondary" data-bs-dismiss="modal">ยกเลิก</button><button id="saveNewItemBtn" class="btn btn-primary">บันทึกสินค้าใหม่</button></div>
+</div></div></div>
+
+<!-- Config Modal -->
+<div class="modal fade" id="configModal" tabindex="-1"><div class="modal-dialog"><div class="modal-content">
+  <div class="modal-header"><h5 class="modal-title">ตั้งค่า Supabase (ตั้งค่าเริ่มต้นไว้แล้ว)</h5><button class="btn-close" data-bs-dismiss="modal"></button></div>
+  <div class="modal-body">
+    <div class="mb-3"><label class="form-label">Project URL</label><input id="cfgUrl" class="form-control" placeholder="https://xxxxx.supabase.co"></div>
+    <div class="mb-3"><label class="form-label">Publishable / anon key</label><textarea id="cfgKey" class="form-control" rows="4"></textarea></div>
+    <div class="alert alert-info small mb-2">เว็บนี้ใส่ Project URL และ Publishable Key เริ่มต้นไว้แล้ว สามารถเปิดใช้ได้ทันที</div><div class="alert alert-warning small mb-0"><b>ห้าม</b> ใส่ Secret key หรือ service_role key ในหน้าเว็บนี้</div>
+  </div>
+  <div class="modal-footer"><button id="saveConfigBtn" class="btn btn-primary" data-bs-dismiss="modal">บันทึกและเชื่อมต่อ</button></div>
+</div></div></div>
+
+
+<!-- Column Manager Modal -->
+<div class="modal fade" id="columnModal" tabindex="-1"><div class="modal-dialog"><div class="modal-content">
+  <div class="modal-header"><h5 class="modal-title">แสดง / ซ่อนคอลัมน์</h5><button class="btn-close" data-bs-dismiss="modal"></button></div>
+  <div class="modal-body">
+    <div class="small text-muted mb-2">ติ๊กเพื่อแสดงคอลัมน์ · สามารถลากเส้นขอบด้านขวาของหัวคอลัมน์เพื่อหด/ขยายได้</div>
+    <div id="columnList" class="column-list"></div>
+  </div>
+  <div class="modal-footer"><button id="showAllColumnsBtn" class="btn btn-outline-secondary">แสดงทั้งหมด</button><button class="btn btn-primary" data-bs-dismiss="modal">เสร็จ</button></div>
+</div></div></div>
+
+<!-- Report Modal -->
+<div class="modal fade" id="reportModal" tabindex="-1"><div class="modal-dialog modal-xl"><div class="modal-content">
+  <div class="modal-header"><h5 class="modal-title">คำนวณ / รายงาน</h5><button class="btn-close" data-bs-dismiss="modal"></button></div>
+  <div class="modal-body">
+    <ul class="nav nav-tabs" role="tablist">
+      <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#geoTab">GeoMean</button></li>
+      <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#countTab">จำนวนขึ้น/ลง/เท่าเดิม</button></li>
+      <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#regionTab">GeoMean รายภาค</button></li>
+    </ul>
+    <div class="tab-content pt-3">
+      <div id="geoTab" class="tab-pane fade show active"><div class="table-responsive"><table class="table table-sm table-striped report-table" id="geoTable"></table></div></div>
+      <div id="countTab" class="tab-pane fade"><div class="table-responsive"><table class="table table-sm table-striped report-table" id="countTable"></table></div></div>
+      <div id="regionTab" class="tab-pane fade"><div class="table-responsive"><table class="table table-sm table-striped report-table" id="regionTable"></table></div></div>
+    </div>
+  </div>
+</div></div></div>
+
+<div class="toast-container position-fixed bottom-0 end-0 p-3"><div id="toast" class="toast"><div class="toast-header"><strong class="me-auto">CPI</strong><button class="btn-close" data-bs-dismiss="toast"></button></div><div id="toastBody" class="toast-body"></div></div></div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+'use strict';
+
+const DEFAULT_SUPABASE_URL = 'https://fabksofdrmyedaqpkmxr.supabase.co';
+const DEFAULT_SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_KFz5B8nu_y_0xkHyYFvLcQ_nTjdEhzG';
+
+const APP = {
+  sb: null,
+  master: [],
+  rows: [],
+  visibleRows: [],
+  dirty: new Set(),
+  flagDirty: new Set(),
+  userEmail: '',
+  reports: { geo: [], count: [], region: [] },
+  analysisPrevCache: { key:'', rows:[] },
+  analysisToken: 0,
+  analysisTimer: null,
+  rowActionId: null,
+  itemModalMode: 'add',
+  itemModalSourceId: null
+};
+
+const MONTHS = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+
+function toast(message) {
+  document.getElementById('toastBody').textContent = message;
+  bootstrap.Toast.getOrCreateInstance(document.getElementById('toast'), {delay:3500}).show();
+}
+function esc(v){ return String(v ?? '').replace(/[&<>'"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c])); }
+function asNum(v){ const n = Number(v); return Number.isFinite(n) ? n : null; }
+function priceText(v){ return v == null || v === '' ? '' : Number(v).toFixed(2); }
+
+function formatUpdatedAt(v){
+  if(!v) return '';
+  const d=new Date(v); if(Number.isNaN(d.getTime())) return String(v);
+  return new Intl.DateTimeFormat('th-TH',{year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false}).format(d);
+}
+const COLUMN_DEFAULTS = {
+  flag_g:54, flag_l:54, flag_u:54, flag_n:54, row_action:70,
+  commodity_code:150, code7:90, description:300, unit_code:80,
+  shop_code:110, shop_name:230, province_name:120, district_name:120,
+  prev_price:115, current_price:120, link_mode:72, compare_price:125, rel:95,
+  product_status:190, reviewer_status:190, updated_by_email:190, updated_at:175
+};
+const COLUMN_DEFAULT_HIDDEN = new Set(['district_name']);
+function columnPrefs(){
+  try{return JSON.parse(localStorage.getItem('cpi_column_prefs_v6')||'{}');}catch(_){return {};}
+}
+function columnWidths(){
+  try{return JSON.parse(localStorage.getItem('cpi_column_widths_v6')||'{}');}catch(_){return {};}
+}
+function saveColumnPrefs(p){localStorage.setItem('cpi_column_prefs_v6',JSON.stringify(p));}
+function saveColumnWidths(p){localStorage.setItem('cpi_column_widths_v6',JSON.stringify(p));}
+function applyColumnVisibility(){
+  const prefs=columnPrefs();
+  document.querySelectorAll('#priceTable [data-col]').forEach(el=>{
+    const key=el.dataset.col;
+    const visible = key in prefs ? !!prefs[key] : !COLUMN_DEFAULT_HIDDEN.has(key);
+    el.classList.toggle('col-hidden',!visible);
+  });
+}
+function applyColumnWidths(){
+  const widths=columnWidths();
+  document.querySelectorAll('#priceTable [data-col]').forEach(el=>{
+    const key=el.dataset.col, w=widths[key]||COLUMN_DEFAULTS[key];
+    if(w){el.style.width=w+'px';el.style.minWidth=w+'px';el.style.maxWidth=w+'px';}
+  });
+}
+function initColumnManager(){
+  const headers=[...document.querySelectorAll('#priceTable thead th[data-col]')];
+  const list=document.getElementById('columnList');
+  const prefs=columnPrefs();
+  list.innerHTML=headers.map(th=>{const key=th.dataset.col; const visible=key in prefs?!!prefs[key]:!COLUMN_DEFAULT_HIDDEN.has(key); return `<div class="form-check"><input class="form-check-input col-toggle" type="checkbox" data-col-key="${esc(key)}" id="col_${esc(key)}" ${visible?'checked':''}><label class="form-check-label" for="col_${esc(key)}">${esc(th.textContent.trim())}</label></div>`;}).join('');
+  list.querySelectorAll('.col-toggle').forEach(ch=>ch.addEventListener('change',()=>{const p=columnPrefs();p[ch.dataset.colKey]=ch.checked;saveColumnPrefs(p);applyColumnVisibility();}));
+  document.getElementById('showAllColumnsBtn').onclick=()=>{const p={};headers.forEach(th=>p[th.dataset.col]=true);saveColumnPrefs(p);list.querySelectorAll('.col-toggle').forEach(x=>x.checked=true);applyColumnVisibility();};
+  headers.forEach(th=>{
+    if(th.querySelector('.col-resizer')) return;
+    const h=document.createElement('span');h.className='col-resizer';th.appendChild(h);
+    h.addEventListener('mousedown',ev=>{
+      ev.preventDefault();ev.stopPropagation();
+      const key=th.dataset.col,startX=ev.clientX,startW=th.getBoundingClientRect().width;
+      const move=e=>{const w=Math.max(45,Math.round(startW+(e.clientX-startX))); document.querySelectorAll(`#priceTable [data-col="${CSS.escape(key)}"]`).forEach(x=>{x.style.width=w+'px';x.style.minWidth=w+'px';x.style.maxWidth=w+'px';});};
+      const up=e=>{const w=Math.max(45,Math.round(startW+(e.clientX-startX)));const ws=columnWidths();ws[key]=w;saveColumnWidths(ws);document.removeEventListener('mousemove',move);document.removeEventListener('mouseup',up);};
+      document.addEventListener('mousemove',move);document.addEventListener('mouseup',up);
+    });
+  });
+  applyColumnVisibility();applyColumnWidths();
+}
+
+// Same rounding chain used in the prior analysis page:
+// RAW -> ROUND 5 -> (when 2 decimals are requested) ROUND HALF UP from the 5-decimal string.
+function round5Number(value) {
+  if (!Number.isFinite(value)) return null;
+  return Math.round((value + Number.EPSILON) * 100000) / 100000;
+}
+function roundFixedStringHalfUp(valueStr, decimals) {
+  let s = String(valueStr).trim(), negative = false;
+  if (s.startsWith('-')) { negative = true; s = s.slice(1); }
+  else if (s.startsWith('+')) s = s.slice(1);
+  let [intPart, fracPart=''] = s.split('.');
+  intPart = intPart || '0'; fracPart = fracPart.replace(/\D/g,'');
+  while (fracPart.length < decimals + 1) fracPart += '0';
+  const kept = fracPart.slice(0,decimals);
+  const next = Number(fracPart.charAt(decimals)||'0');
+  let scaled = BigInt(intPart) * (10n ** BigInt(decimals));
+  if (decimals > 0) scaled += BigInt(kept || '0');
+  if (next >= 5) scaled += 1n;
+  const factor = 10n ** BigInt(decimals);
+  const outInt = scaled / factor;
+  const outFrac = decimals ? (scaled % factor).toString().padStart(decimals,'0') : '';
+  const sign = negative && scaled !== 0n ? '-' : '';
+  return decimals ? `${sign}${outInt}.${outFrac}` : `${sign}${outInt}`;
+}
+function formatRel(v) {
+  if (v == null || !Number.isFinite(Number(v))) return '';
+  const s5 = round5Number(Number(v)).toFixed(5);
+  return document.getElementById('decimalToggle').checked ? s5 : roundFixedStringHalfUp(s5, 2);
+}
+function calcRel(current, compare) {
+  const c = asNum(current), b = asNum(compare);
+  if (c == null || b == null || c <= 0 || b <= 0) return null;
+  return round5Number((c / b) * 100);
+}
+function geometricMean(values) {
+  const arr = values.map(Number).filter(v => Number.isFinite(v) && v > 0);
+  if (!arr.length) return 0;
+  return Math.exp(arr.reduce((s,v)=>s+Math.log(v),0) / arr.length);
+}
+function arithmeticMean(values){
+  const arr=values.map(Number).filter(v=>Number.isFinite(v) && v>0);
+  return arr.length ? arr.reduce((a,b)=>a+b,0)/arr.length : 0;
+}
+function coefficientVariation(values){
+  const arr=values.map(Number).filter(v=>Number.isFinite(v) && v>0);
+  if(arr.length<2) return 0;
+  const mean=arithmeticMean(arr); if(!mean) return 0;
+  const variance=arr.reduce((s,v)=>s+((v-mean)**2),0)/(arr.length-1);
+  return (Math.sqrt(variance)/mean)*100;
+}
+function fmt5(v){ return Number.isFinite(Number(v)) && Number(v)!==0 ? round5Number(Number(v)).toFixed(5) : '0.00000'; }
+function fmt2(v){ return Number.isFinite(Number(v)) ? Number(v).toFixed(2) : '0.00'; }
+function setFlag(row, setCode) {
+  if (setCode === 'ALL') return true;
+  const m = row.price_master || {};
+  const val = key => row[key] == null ? !!m[key] : !!row[key];
+  if (setCode === 'G') return val('flag_g');
+  if (setCode === 'L') return val('flag_l');
+  if (setCode === 'U') return val('flag_u');
+  if (setCode === 'N') return val('flag_n');
+  return true;
+}
+function prevPeriod(y,m){ return m === 1 ? [y-1,12] : [y,m-1]; }
+
+function initPeriodOptions(){
+  const y = new Date().getFullYear() + 543;
+  document.getElementById('yearSel').innerHTML = Array.from({length:8},(_,i)=>`<option ${i===0?'selected':''}>${y-i}</option>`).join('');
+  document.getElementById('monthSel').innerHTML = MONTHS.map((n,i)=>`<option value="${i+1}" ${(i+1)===(new Date().getMonth()+1)?'selected':''}>${i+1} - ${n}</option>`).join('');
+}
+
+function config(){
+  const saved = JSON.parse(localStorage.getItem('cpi_supabase_config') || '{}');
+  return {
+    url: saved.url || DEFAULT_SUPABASE_URL,
+    key: saved.key || DEFAULT_SUPABASE_PUBLISHABLE_KEY
+  };
+}
+function saveConfig(){
+  const cfg = { url:document.getElementById('cfgUrl').value.trim(), key:document.getElementById('cfgKey').value.trim() };
+  localStorage.setItem('cpi_supabase_config', JSON.stringify(cfg));
+  connect();
+}
+async function connect(){
+  const cfg = config();
+  document.getElementById('cfgUrl').value = cfg.url || '';
+  document.getElementById('cfgKey').value = cfg.key || '';
+  if (!cfg.url || !cfg.key) {
+    document.getElementById('connBadge').textContent='กรุณาตั้งค่า Supabase';
+    document.getElementById('loginCard').style.display='block';
+    return;
+  }
+  try {
+    APP.sb = window.supabase.createClient(cfg.url, cfg.key, {auth:{persistSession:true,autoRefreshToken:true}});
+    const {data:{session}} = await APP.sb.auth.getSession();
+    document.getElementById('connBadge').className='badge bg-success';
+    document.getElementById('connBadge').textContent='เชื่อมต่อ Supabase';
+    if(session) await enterApp(session.user);
+    else showLogin();
+    APP.sb.auth.onAuthStateChange((_e,s)=> s ? enterApp(s.user) : showLogin());
+  } catch(e) { showLogin(); document.getElementById('connBadge').textContent='เชื่อมต่อไม่สำเร็จ'; toast(e.message); }
+}
+function showLogin(){
+  APP.userEmail='';
+  document.getElementById('app').style.display='none';
+  document.getElementById('loginCard').style.display='block';
+  document.getElementById('logoutBtn').classList.add('d-none');
+  document.getElementById('userBadge').classList.add('d-none');
+}
+async function enterApp(user){
+  document.getElementById('loginCard').style.display='none';
+  document.getElementById('app').style.display='block';
+  document.getElementById('logoutBtn').classList.remove('d-none');
+  document.getElementById('userBadge').classList.remove('d-none');
+  APP.userEmail=user.email || 'authenticated';
+  document.getElementById('userBadge').textContent=APP.userEmail;
+  initColumnManager();
+  await loadMaster();
+  await loadRows();
+}
+
+async function fetchAll(buildQuery) {
+  const pageSize = 1000, out = [];
+  for (let from=0;;from+=pageSize) {
+    const {data,error} = await buildQuery().range(from,from+pageSize-1);
+    if(error) throw error;
+    out.push(...(data||[]));
+    if(!data || data.length < pageSize) break;
+  }
+  return out;
+}
+async function loadMaster(){
+  if(!APP.sb) return;
+  APP.master = await fetchAll(()=>APP.sb.from('price_master').select('*').eq('is_active',true).order('commodity_code').order('shop_code'));
+  fillMasterFilters();
+}
+function fillSelect(id, values){
+  const el=document.getElementById(id), old=el.value;
+  el.innerHTML='<option value="">ทั้งหมด</option>'+[...new Set(values.filter(Boolean))].sort((a,b)=>String(a).localeCompare(String(b),'th')).map(v=>`<option value="${esc(v)}">${esc(v)}</option>`).join('');
+  if([...el.options].some(o=>o.value===old)) el.value=old;
+}
+function fillMasterFilters(){
+  const code7El=document.getElementById('code7Sel'), oldCode7=code7El.value;
+  const code7Map=new Map();
+  APP.master.forEach(x=>{
+    const code7=String(x.code7||x.commodity_code||'').replace(/\D/g,'').slice(0,7).padStart(7,'0');
+    if(!/^\d{7}$/.test(code7)) return;
+    const label=x.item_name||x.description||'';
+    if(!code7Map.has(code7) || (!code7Map.get(code7) && label)) code7Map.set(code7,label);
+  });
+  code7El.innerHTML='<option value="">ทั้งหมด</option>'+[...code7Map.entries()].sort((a,b)=>a[0].localeCompare(b[0])).map(([code,name])=>`<option value="${esc(code)}">${esc(code)}${name?` · ${esc(name)}`:''}</option>`).join('');
+  if([...code7El.options].some(o=>o.value===oldCode7)) code7El.value=oldCode7;
+  fillSelect('analysisRegionSel', APP.master.map(x=>x.region_name));
+  document.querySelector('#analysisRegionSel option[value=""]').textContent='ทั้งประเทศ';
+  fillSelect('provinceSel', APP.master.map(x=>x.province_name));
+  fillSelect('districtSel', APP.master.map(x=>x.district_name));
+  fillSelect('groupSel', APP.master.map(x=>x.group_type));
+  const shopEl=document.getElementById('shopSel'), old=shopEl.value;
+  const shops=[...new Map(APP.master.filter(x=>x.shop_code).map(x=>[x.shop_code,`${x.shop_code} · ${x.shop_name}`])).entries()];
+  shopEl.innerHTML='<option value="">ทั้งหมด</option>'+shops.sort((a,b)=>a[1].localeCompare(b[1],'th')).map(([v,t])=>`<option value="${esc(v)}">${esc(t)}</option>`).join('');
+  if([...shopEl.options].some(o=>o.value===old)) shopEl.value=old;
+}
+function refreshDistricts(){
+  const p=document.getElementById('provinceSel').value;
+  fillSelect('districtSel', APP.master.filter(x=>!p||x.province_name===p).map(x=>x.district_name));
+}
+
+async function prepareMonth(){
+  const year=+document.getElementById('yearSel').value, month=+document.getElementById('monthSel').value;
+  const {data,error}=await APP.sb.rpc('prepare_month',{p_year_be:year,p_month:month});
+  if(error) return toast('เตรียมเดือนไม่สำเร็จ: '+error.message);
+  toast(`เตรียม/อัปเดตเดือนสำเร็จ ${data ?? 0} รายการ · ราคา ภาวะ และ G/L/U/N รับต่อจากเดือนก่อนอัตโนมัติ`);
+  await loadRows();
+}
+async function loadRows(){
+  if(!APP.sb) return;
+  const year=+document.getElementById('yearSel').value, month=+document.getElementById('monthSel').value;
+  document.getElementById('periodTitle').textContent=`ข้อมูลราคา ${MONTHS[month-1]} ${year}`;
+  try {
+    APP.rows = await fetchAll(()=>APP.sb.from('monthly_prices').select(`id,master_id,year_be,month,prev_price,current_price,link_mode,compare_price,rel,flag_g,flag_l,flag_u,flag_n,flags_manual,product_status,reviewer_status,updated_by,updated_by_email,updated_at,price_master!inner(*)`).eq('year_be',year).eq('month',month).order('master_id'));
+    APP.dirty.clear();
+    APP.flagDirty.clear();
+    applyFilters();
+  } catch(e){ toast('โหลดข้อมูลไม่สำเร็จ: '+e.message); }
+}
+function applyFilters(){
+  const setCode=document.getElementById('setSel').value;
+  const code7Filter=document.getElementById('code7Sel').value;
+  const p=document.getElementById('provinceSel').value;
+  const d=document.getElementById('districtSel').value;
+  const g=document.getElementById('groupSel').value;
+  const shop=document.getElementById('shopSel').value;
+  const q=document.getElementById('searchInput').value.trim().toLowerCase();
+  APP.visibleRows = APP.rows.filter(r=>{
+    const m=r.price_master||{};
+    if(!setFlag(r,setCode)) return false;
+    const rowCode7=String(m.code7||m.commodity_code||'').replace(/\D/g,'').slice(0,7).padStart(7,'0');
+    if(code7Filter && rowCode7!==code7Filter) return false;
+    if(p && m.province_name!==p) return false;
+    if(d && m.district_name!==d) return false;
+    if(g && m.group_type!==g) return false;
+    if(shop && m.shop_code!==shop) return false;
+    if(q){ const hay=[m.commodity_code,m.code7,m.description,m.item_name,m.shop_code,m.shop_name,m.province_name,m.district_name].join(' ').toLowerCase(); if(!hay.includes(q)) return false; }
+    return true;
+  }).sort((a,b)=>{
+    const am=a.price_master||{}, bm=b.price_master||{};
+    const ac=String(am.code7||am.commodity_code||'').slice(0,7).padStart(7,'0');
+    const bc=String(bm.code7||bm.commodity_code||'').slice(0,7).padStart(7,'0');
+    return ac.localeCompare(bc) || String(am.commodity_code||'').localeCompare(String(bm.commodity_code||'')) || String(am.shop_code||'').localeCompare(String(bm.shop_code||''));
+  });
+  renderRows(); updateMetrics(); scheduleBottomAnalysis();
+}
+function relCellClass(rel){
+  if(rel==null || !Number.isFinite(Number(rel))) return '';
+  return Number(rel) < 100 ? 'rel-low' : (Number(rel) > 100 ? 'rel-high' : 'rel-eq');
+}
+function normalizeLinkMode(v){
+  const x=String(v??'N').trim().toUpperCase();
+  return ['N','1','2','3'].includes(x) ? x : 'N';
+}
+function applyLinkRule(row){
+  row.link_mode=normalizeLinkMode(row.link_mode);
+  if(row.link_mode==='N') row.compare_price=asNum(row.prev_price);
+  else if(row.link_mode==='1' || row.link_mode==='2') row.compare_price=asNum(row.current_price);
+  // Link 3 keeps compare_price as entered by the user.
+  row.rel=calcRel(row.current_price,row.compare_price);
+}
+function renderRows(){
+  const body=document.getElementById('priceBody');
+  if(!APP.visibleRows.length){ body.innerHTML='<tr><td colspan="22" class="text-center py-5 text-muted">ไม่พบข้อมูล — หากเป็นเดือนใหม่ให้กด “เตรียมข้อมูลเดือนนี้”</td></tr>'; applyColumnVisibility(); applyColumnWidths(); return; }
+  body.innerHTML=APP.visibleRows.map((r)=>{
+    const m=r.price_master||{};
+    const code7=String(m.code7||m.commodity_code||'').slice(0,7).padStart(7,'0');
+    r.link_mode=normalizeLinkMode(r.link_mode);
+    applyLinkRule(r);
+    const rel=r.rel;
+    const invalid=(r.current_price!=null && (!r.compare_price || +r.compare_price<=0));
+    const compareReadonly=r.link_mode!=='3';
+    return `<tr data-id="${r.id}" class="${APP.dirty.has(r.id)?'changed-row ':''}${invalid?'invalid-row':''}">
+      <td data-col="flag_g" class="text-center"><input class="form-check-input" type="checkbox" data-f="flag_g" ${r.flag_g?'checked':''} title="ใช้ในชุด G"></td>
+      <td data-col="flag_l" class="text-center"><input class="form-check-input" type="checkbox" data-f="flag_l" ${r.flag_l?'checked':''} title="ใช้ในชุด L"></td>
+      <td data-col="flag_u" class="text-center"><input class="form-check-input" type="checkbox" data-f="flag_u" ${r.flag_u?'checked':''} title="ใช้ในชุด U"></td>
+      <td data-col="flag_n" class="text-center"><input class="form-check-input" type="checkbox" data-f="flag_n" ${r.flag_n?'checked':''} title="ใช้ในชุด N (ยกเลิก G/L/U)"></td>
+      <td data-col="row_action" class="text-center"><button type="button" class="btn btn-sm btn-outline-secondary row-action-btn" data-row-menu="${r.id}" title="Row Action">⋮</button></td>
+      <td data-col="commodity_code">${esc(m.commodity_code)}</td><td data-col="code7"><b>${esc(code7)}</b></td><td data-col="description" class="desc">${esc(m.description)}</td><td data-col="unit_code">${esc(m.unit_code)}</td>
+      <td data-col="shop_code">${esc(m.shop_code)}</td><td data-col="shop_name" class="shop">${esc(m.shop_name)}</td><td data-col="province_name">${esc(m.province_name)}</td><td data-col="district_name">${esc(m.district_name)}</td>
+      <td data-col="prev_price" class="text-end">${priceText(r.prev_price)}</td>
+      <td data-col="current_price"><input class="form-control form-control-sm price-input" data-f="current_price" value="${r.current_price??''}" inputmode="decimal"></td>
+      <td data-col="link_mode"><select class="form-select form-select-sm link-select" data-f="link_mode" title="N=ปกติ, 1/2=ราคาเปรียบเทียบเท่าปัจจุบัน, 3=แก้เอง">${['N','1','2','3'].map(v=>`<option value="${v}" ${r.link_mode===v?'selected':''}>${v}</option>`).join('')}</select></td>
+      <td data-col="compare_price"><input class="form-control form-control-sm price-input" data-f="compare_price" value="${r.compare_price??''}" inputmode="decimal" ${compareReadonly?'readonly':''} title="${compareReadonly?'กำหนดอัตโนมัติตาม Link':'Link 3: แก้ไขได้อิสระ'}"></td>
+      <td data-col="rel" class="text-end ${relCellClass(rel)}" data-rel>${formatRel(rel)}</td>
+      <td data-col="product_status"><input class="form-control form-control-sm status-input" data-f="product_status" value="${esc(r.product_status)}"></td>
+      <td data-col="reviewer_status"><input class="form-control form-control-sm status-input" data-f="reviewer_status" value="${esc(r.reviewer_status)}"></td>
+      <td data-col="updated_by_email" class="meta-cell" data-meta="updated_by_email">${esc(r.updated_by_email||'')}</td>
+      <td data-col="updated_at" class="meta-cell" data-meta="updated_at">${esc(formatUpdatedAt(r.updated_at))}</td>
+    </tr>`;
+  }).join('');
+  body.querySelectorAll('[data-f]').forEach(el=>{
+    const evt=(el.type==='checkbox' || el.tagName==='SELECT')?'change':'input';
+    el.addEventListener(evt,onCellEdit);
+  });
+  body.querySelectorAll('[data-row-menu]').forEach(btn=>btn.addEventListener('click',openRowActionMenu));
+  applyColumnVisibility(); applyColumnWidths();
+  document.getElementById('tableInfo').textContent=`แสดง ${APP.visibleRows.length.toLocaleString()} จาก ${APP.rows.length.toLocaleString()} รายการในเดือนนี้`;
+}
+function closeRowActionMenu(){
+  const menu=document.getElementById('rowActionMenu');
+  menu.style.display='none'; APP.rowActionId=null;
+}
+function openRowActionMenu(e){
+  e.preventDefault(); e.stopPropagation();
+  const btn=e.currentTarget, menu=document.getElementById('rowActionMenu');
+  APP.rowActionId=Number(btn.dataset.rowMenu);
+  const rect=btn.getBoundingClientRect();
+  menu.style.display='block';
+  const mw=235, mh=155, pad=8;
+  const left=Math.min(window.innerWidth-mw-pad,Math.max(pad,rect.left));
+  const top=(rect.bottom+mh+pad<=window.innerHeight)?rect.bottom+4:Math.max(pad,rect.top-mh-4);
+  menu.style.left=left+'px'; menu.style.top=top+'px';
+}
+function itemModal(){return bootstrap.Modal.getOrCreateInstance(document.getElementById('itemModal'));}
+function setItemFlagRules(changed){
+  const g=document.getElementById('itemG'),l=document.getElementById('itemL'),u=document.getElementById('itemU'),n=document.getElementById('itemN');
+  if(changed==='N' && n.checked){g.checked=false;l.checked=false;u.checked=false;}
+  if(['G','L','U'].includes(changed) && document.getElementById('item'+changed).checked)n.checked=false;
+}
+function clearItemForm(){
+  ['itemCode7','itemCommodity','itemUnit','itemDescription','itemName','itemShopCode','itemShopName','itemProvinceCode','itemProvince','itemDistrict','itemRegion','itemGroup','itemAdmin'].forEach(id=>document.getElementById(id).value='');
+  ['itemG','itemL','itemU','itemN'].forEach(id=>document.getElementById(id).checked=false);
+  document.getElementById('itemModalMsg').textContent='';
+}
+function openAddItemModal(sourceRow=null){
+  closeRowActionMenu(); clearItemForm(); APP.itemModalMode='add'; APP.itemModalSourceId=sourceRow?.id||null;
+  document.getElementById('itemModalTitle').textContent='เพิ่มสินค้าใหม่'; document.getElementById('duplicateNote').classList.add('d-none');
+  const selectedCode=document.getElementById('code7Sel').value;
+  if(selectedCode) document.getElementById('itemCode7').value=selectedCode;
+  itemModal().show();
+}
+function openDuplicateItemModal(row){
+  closeRowActionMenu(); clearItemForm(); APP.itemModalMode='duplicate'; APP.itemModalSourceId=row.id;
+  const m=row.price_master||{}, stamp=new Date().toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false}).replace(/:/g,'');
+  document.getElementById('itemModalTitle').textContent='Duplicate เป็นสินค้าใหม่'; document.getElementById('duplicateNote').classList.remove('d-none');
+  document.getElementById('itemCode7').value=rowCode7(row);
+  document.getElementById('itemCommodity').value=''; // สินค้าใหม่: ไม่คัดลอกรหัสสินค้าเดิม
+  document.getElementById('itemUnit').value=m.unit_code||'';
+  document.getElementById('itemDescription').value=((m.description||m.item_name||'สินค้า')+' - สำเนา '+stamp).trim();
+  document.getElementById('itemName').value=m.item_name||'';
+  document.getElementById('itemShopCode').value=m.shop_code||'';
+  document.getElementById('itemShopName').value=m.shop_name||'';
+  document.getElementById('itemProvinceCode').value=m.province_code||'';
+  document.getElementById('itemProvince').value=m.province_name||'';
+  document.getElementById('itemDistrict').value=m.district_name||'';
+  document.getElementById('itemRegion').value=m.region_name||'';
+  document.getElementById('itemGroup').value=m.group_type||'';
+  document.getElementById('itemAdmin').value=m.item_admin||'';
+  document.getElementById('itemG').checked=!!row.flag_g; document.getElementById('itemL').checked=!!row.flag_l; document.getElementById('itemU').checked=!!row.flag_u; document.getElementById('itemN').checked=!!row.flag_n;
+  itemModal().show();
+}
+function itemFormPayload(){
+  const d=id=>String(document.getElementById(id).value||'').trim();
+  const code7=d('itemCode7').replace(/\D/g,''), commodity=d('itemCommodity').replace(/\D/g,''), shopCode=d('itemShopCode').replace(/\D/g,'');
+  if(!/^\d{7}$/.test(code7)) throw new Error('รหัสรายการต้องมี 7 หลัก');
+  if(commodity && !/^\d{16}$/.test(commodity)) throw new Error('รหัสสินค้า ถ้ากรอก ต้องมี 16 หลัก');
+  if(commodity && commodity.slice(0,7)!==code7) throw new Error('7 ตัวแรกของรหัสสินค้าต้องตรงกับรหัสรายการ');
+  if(shopCode && !/^\d{10}$/.test(shopCode)) throw new Error('รหัสแหล่ง ถ้ากรอก ต้องมี 10 หลัก');
+  let fg=document.getElementById('itemG').checked,fl=document.getElementById('itemL').checked,fu=document.getElementById('itemU').checked,fn=document.getElementById('itemN').checked;
+  if(fn){fg=false;fl=false;fu=false;}
+  return {commodity_code:commodity||null,code7,description:d('itemDescription'),item_name:d('itemName'),item_admin:d('itemAdmin'),unit_code:d('itemUnit'),shop_code:shopCode||null,shop_name:d('itemShopName'),province_code:d('itemProvinceCode'),province_name:d('itemProvince'),district_name:d('itemDistrict'),region_name:d('itemRegion'),group_type:d('itemGroup'),flag_g:fg,flag_l:fl,flag_u:fu,flag_n:fn,is_active:true};
+}
+async function saveNewItem(){
+  const msg=document.getElementById('itemModalMsg'); msg.className='small mt-3 text-muted'; msg.textContent='กำลังบันทึก...';
+  try{
+    const masterPayload=itemFormPayload();
+    const {data:master,error:me}=await APP.sb.from('price_master').insert(masterPayload).select('*').single();
+    if(me) throw me;
+    const year=+document.getElementById('yearSel').value,month=+document.getElementById('monthSel').value;
+    const monthlyPayload={master_id:master.id,year_be:year,month,prev_price:null,current_price:null,link_mode:'N',compare_price:null,flag_g:!!masterPayload.flag_g,flag_l:!!masterPayload.flag_l,flag_u:!!masterPayload.flag_u,flag_n:!!masterPayload.flag_n,flags_manual:true,product_status:'',reviewer_status:''};
+    const {error:pe}=await APP.sb.from('monthly_prices').insert(monthlyPayload); if(pe) throw pe;
+    itemModal().hide();
+    toast(APP.itemModalMode==='duplicate'?'Duplicate เป็นสินค้าใหม่แล้ว — ไม่คัดลอกราคา/ประวัติ':'เพิ่มสินค้าใหม่แล้ว');
+    await loadMaster(); await loadRows();
+  }catch(e){msg.className='small mt-3 text-danger';msg.textContent='บันทึกไม่สำเร็จ: '+e.message;}
+}
+async function deactivateRow(row){
+  const m=row.price_master||{};
+  const label=[rowCode7(row),m.description||m.item_name||'',m.shop_name||''].filter(Boolean).join(' · ');
+  const ok=window.confirm(`ลบสินค้าออกตั้งแต่เดือนนี้เป็นต้นไป?\n${label}\n\nประวัติเดือนก่อนหน้าจะยังคงอยู่`);
+  if(!ok) return;
+  try{
+    const year=+document.getElementById('yearSel').value,month=+document.getElementById('monthSel').value;
+    const {error}=await APP.sb.rpc('deactivate_price_item',{p_master_id:row.master_id,p_year_be:year,p_month:month});
+    if(error) throw error;
+    closeRowActionMenu(); toast('ลบสินค้าออกจากเดือนนี้และเดือนถัดไปแล้ว · ประวัติเดิมยังอยู่'); await loadMaster(); await loadRows();
+  }catch(e){toast('ลบไม่สำเร็จ: '+e.message);}
+}
+async function handleRowAction(action){
+  const row=APP.rows.find(r=>r.id===APP.rowActionId);
+  if(action==='add') return openAddItemModal(row||null);
+  if(!row) return closeRowActionMenu();
+  if(action==='duplicate') return openDuplicateItemModal(row);
+  if(action==='delete') return deactivateRow(row);
+}
+
+function onCellEdit(e){
+  const tr=e.target.closest('tr'), id=Number(tr.dataset.id), row=APP.rows.find(x=>x.id===id), field=e.target.dataset.f;
+  if(!row) return;
+
+  if(e.target.type==='checkbox') row[field]=e.target.checked;
+  else if(['current_price','compare_price'].includes(field)) row[field]=e.target.value.trim()===''?null:asNum(e.target.value);
+  else if(field==='link_mode') row[field]=normalizeLinkMode(e.target.value);
+  else row[field]=e.target.value;
+
+  // N is exclusive from G/L/U. Choosing G/L/U while N is on turns N off.
+  if(field==='flag_n' && row.flag_n){ row.flag_g=false; row.flag_l=false; row.flag_u=false; }
+  if(['flag_g','flag_l','flag_u'].includes(field) && row[field] && row.flag_n){ row.flag_n=false; }
+  if(['flag_g','flag_l','flag_u','flag_n'].includes(field)){
+    APP.flagDirty.add(id);
+    row.flags_manual=true;
+  }
+
+  applyLinkRule(row);
+  APP.dirty.add(id);
+  row.updated_by_email=APP.userEmail||row.updated_by_email||'';
+  row.updated_at=new Date().toISOString();
+  tr.classList.add('changed-row');
+
+  if(['flag_g','flag_l','flag_u','flag_n','link_mode'].includes(field)){
+    renderRows(); updateMetrics(); return;
+  }
+
+  if(field==='current_price' && ['1','2'].includes(normalizeLinkMode(row.link_mode))){
+    const compareInput=tr.querySelector('[data-f="compare_price"]'); if(compareInput) compareInput.value=row.compare_price??'';
+  }
+  if(field==='current_price' && normalizeLinkMode(row.link_mode)==='N'){
+    const compareInput=tr.querySelector('[data-f="compare_price"]'); if(compareInput) compareInput.value=row.compare_price??'';
+  }
+  const relTd=tr.querySelector('[data-rel]');
+  if(relTd){ relTd.textContent=formatRel(row.rel); relTd.classList.remove('rel-low','rel-high','rel-eq'); const rc=relCellClass(row.rel); if(rc) relTd.classList.add(rc); relTd.classList.add('text-end'); }
+  const by=tr.querySelector('[data-meta="updated_by_email"]'); if(by) by.textContent=row.updated_by_email||'';
+  const at=tr.querySelector('[data-meta="updated_at"]'); if(at) at.textContent=formatUpdatedAt(row.updated_at);
+  tr.classList.toggle('invalid-row', row.current_price!=null && (!row.compare_price || +row.compare_price<=0));
+  updateMetrics(); scheduleBottomAnalysis();
+}
+function copyPreviousToCompare(){
+  if(!APP.visibleRows.length) return toast('ไม่มีรายการที่กำลังแสดง');
+  const ok=window.confirm(`คัดลอกราคาเดือนก่อนเป็นราคาเปรียบเทียบให้ ${APP.visibleRows.length.toLocaleString()} รายการที่กำลังแสดง และตั้ง Link = N ใช่หรือไม่?`);
+  if(!ok) return;
+  let changed=0;
+  for(const row of APP.visibleRows){
+    row.link_mode='N';
+    row.compare_price=asNum(row.prev_price);
+    row.rel=calcRel(row.current_price,row.compare_price);
+    APP.dirty.add(row.id);
+    changed++;
+  }
+  renderRows(); updateMetrics(); scheduleBottomAnalysis();
+  toast(`คัดลอกราคาเดือนก่อนแล้ว ${changed.toLocaleString()} รายการ — กด “บันทึกทั้งหมด” เพื่อบันทึกลง Supabase`);
+}
+async function saveAll(){
+  const dirtyRows=APP.rows.filter(r=>APP.dirty.has(r.id));
+  if(!dirtyRows.length) return toast('ไม่มีรายการที่แก้ไข');
+  dirtyRows.forEach(applyLinkRule);
+  const invalid=dirtyRows.find(r=>r.current_price!=null && (!r.compare_price || +r.compare_price<=0));
+  if(invalid) return toast('มีรายการที่ใส่ราคาปัจจุบัน แต่ราคาเปรียบเทียบว่าง/ไม่ถูกต้อง');
+  const payload=dirtyRows.map(r=>({
+    master_id:r.master_id, year_be:r.year_be, month:r.month,
+    prev_price:r.prev_price, current_price:r.current_price, link_mode:normalizeLinkMode(r.link_mode), compare_price:r.compare_price,
+    flag_g:!!r.flag_g, flag_l:!!r.flag_l, flag_u:!!r.flag_u, flag_n:!!r.flag_n,
+    flags_manual:!!r.flags_manual || APP.flagDirty.has(r.id),
+    product_status:r.product_status||'', reviewer_status:r.reviewer_status||''
+  }));
+  try{
+    for(let i=0;i<payload.length;i+=400){
+      const {error}=await APP.sb.from('monthly_prices').upsert(payload.slice(i,i+400),{onConflict:'master_id,year_be,month'});
+      if(error) throw error;
+    }
+    toast(`บันทึก ${payload.length} รายการแล้ว · G/L/U/N ที่เปลี่ยนจะเป็นค่าหลักของเดือนนี้และส่งต่อไปเดือนถัดไป พร้อมราคาและภาวะ`); await loadRows();
+  }catch(e){ toast('บันทึกไม่สำเร็จ: '+e.message); }
+}
+function updateMetrics(){
+  const rows=APP.visibleRows;
+  document.getElementById('mPrev').textContent=rows.filter(r=>asNum(r.prev_price)>0).length.toLocaleString();
+  document.getElementById('mCurrent').textContent=rows.filter(r=>asNum(r.current_price)>0).length.toLocaleString();
+  document.getElementById('mValidRel').textContent=rows.filter(r=>asNum(r.current_price)>0 && asNum(calcRel(r.current_price,r.compare_price) ?? r.rel)>0).length.toLocaleString();
+}
+
+function rowCode7(r){
+  const m=r.price_master||{};
+  return String(m.code7||m.commodity_code||'').replace(/\D/g,'').slice(0,7).padStart(7,'0');
+}
+function rowSetFlag(r,setCode){
+  const m=r.price_master||{};
+  const val=k=>r[k]==null?!!m[k]:!!r[k];
+  return setCode==='G'?val('flag_g'):setCode==='L'?val('flag_l'):setCode==='U'?val('flag_u'):setCode==='N'?val('flag_n'):false;
+}
+function analysisScope(rows,code7,region){
+  return rows.filter(r=>{
+    const m=r.price_master||{};
+    if(rowCode7(r)!==code7) return false;
+    if(region && String(m.region_name||'')!==region) return false;
+    return true;
+  });
+}
+async function getPreviousRowsForAnalysis(){
+  const y=+document.getElementById('yearSel').value, m=+document.getElementById('monthSel').value;
+  const [py,pm]=prevPeriod(y,m), key=`${py}-${pm}`;
+  if(APP.analysisPrevCache.key===key) return APP.analysisPrevCache.rows;
+  const rows=await fetchAll(()=>APP.sb.from('monthly_prices').select(`id,master_id,year_be,month,prev_price,current_price,link_mode,compare_price,rel,flag_g,flag_l,flag_u,flag_n,product_status,reviewer_status,price_master!inner(*)`).eq('year_be',py).eq('month',pm).order('master_id'));
+  APP.analysisPrevCache={key,rows};
+  return rows;
+}
+function setAnalysisMetrics(rows, prevRows, setCode){
+  // N is the non-calculation set: keep it visible but return zero metrics.
+  if(setCode==='N') return {gmCurr:0,gmComp:0,gmRel:0,gmPrevComp:0,gmPrevRel:0,arCurr:0,arComp:0,arRel:0,arPrevComp:0,arPrevRel:0,max:0,min:0,cv:0,count:0,prevCount:0};
+  const cur=rows.filter(r=>rowSetFlag(r,setCode) && asNum(r.current_price)>0);
+  const prv=prevRows.filter(r=>rowSetFlag(r,setCode) && asNum(r.current_price)>0);
+  const currVals=cur.map(r=>+r.current_price);
+  const compVals=cur.map(r=>asNum(r.compare_price)).filter(v=>v>0);
+  const relVals=cur.map(r=>calcRel(r.current_price,r.compare_price) ?? asNum(r.rel)).filter(v=>v>0);
+  const prevCompVals=prv.map(r=>asNum(r.compare_price)).filter(v=>v>0);
+  const prevRelVals=prv.map(r=>calcRel(r.current_price,r.compare_price) ?? asNum(r.rel)).filter(v=>v>0);
+  return {
+    gmCurr:geometricMean(currVals), gmComp:geometricMean(compVals), gmRel:geometricMean(relVals), gmPrevComp:geometricMean(prevCompVals), gmPrevRel:geometricMean(prevRelVals),
+    arCurr:arithmeticMean(currVals), arComp:arithmeticMean(compVals), arRel:arithmeticMean(relVals), arPrevComp:arithmeticMean(prevCompVals), arPrevRel:arithmeticMean(prevRelVals),
+    max:currVals.length?Math.max(...currVals):0, min:currVals.length?Math.min(...currVals):0, cv:coefficientVariation(currVals), count:currVals.length, prevCount:prv.length
+  };
+}
+function metricBox(label,value){return `<div class="analysis-box"><div class="k" title="${esc(label)}">${esc(label)}</div><div class="v">${esc(value)}</div></div>`;}
+function analysisSetName(setCode){return ({G:'ชุดทั่วไป (G)',L:'ชุดรายได้น้อย (L)',U:'ชุดนอกเขต (U)',N:'ชุดไม่คำนวณ (N)'})[setCode]||setCode;}
+function renderBottomAnalysis(currentRows,previousRows,code7,region){
+  const sets=['G','L','U','N'];
+  const metrics=Object.fromEntries(sets.map(s=>[s,setAnalysisMetrics(currentRows,previousRows,s)]));
+  document.getElementById('analysisAverage').innerHTML=sets.map(s=>{const x=metrics[s];return `<div class="analysis-set-row"><div class="analysis-set-name">${analysisSetName(s)}</div><div class="analysis-grid">${[
+    ['GM: ราคาเฉลี่ย',fmt5(x.gmCurr)],['GM: เปรียบเทียบ',fmt5(x.gmComp)],['GM: REL',fmt5(x.gmRel)],['GM: เปรียบเทียบ (เดือนก่อนหน้า)',fmt5(x.gmPrevComp)],['GM: REL (เดือนก่อนหน้า)',fmt5(x.gmPrevRel)],
+    ['AR: ราคาเฉลี่ย',fmt5(x.arCurr)],['AR: เปรียบเทียบ',fmt5(x.arComp)],['AR: REL',fmt5(x.arRel)],['AR: เปรียบเทียบ (เดือนก่อนหน้า)',fmt5(x.arPrevComp)],['AR: REL (เดือนก่อนหน้า)',fmt5(x.arPrevRel)]
+  ].map(([k,v])=>metricBox(k,v)).join('')}</div></div>`;}).join('');
+  document.getElementById('analysisStats').innerHTML=sets.map(s=>{const x=metrics[s];return `<div class="analysis-set-row"><div class="analysis-set-name">${analysisSetName(s)}</div><div class="analysis-grid">${[
+    ['ราคาสูงสุด',fmt2(x.max)],['ราคาต่ำสุด',fmt2(x.min)],['CV',fmt2(x.cv)],['จำนวนข้อมูล',String(x.count)]
+  ].map(([k,v])=>metricBox(k,v)).join('')}</div></div>`;}).join('');
+  const currentPriced=currentRows.filter(r=>asNum(r.current_price)>0 && !r.flag_n);
+  const previousPriced=previousRows.filter(r=>asNum(r.current_price)>0 && !r.flag_n);
+  const boxes=[['จำนวนทั้งหมด',currentPriced.length],['จำนวนชุด G',metrics.G.count],['จำนวนชุด L',metrics.L.count],['จำนวนชุด U',metrics.U.count],['จำนวนชุด N',0],['จำนวนทั้งหมดเดือนก่อน',previousPriced.length],['เดือนก่อนชุด G',metrics.G.prevCount],['เดือนก่อนชุด L',metrics.L.prevCount],['เดือนก่อนชุด U',metrics.U.prevCount],['เดือนก่อนชุด N',0]];
+  document.getElementById('analysisCounts').innerHTML=boxes.map(([k,v])=>`<div class="sum-box"><div class="k">${esc(k)}</div><div class="v">${Number(v).toLocaleString()}</div></div>`).join('');
+}
+function scheduleBottomAnalysis(){
+  clearTimeout(APP.analysisTimer);
+  APP.analysisTimer=setTimeout(()=>updateBottomAnalysis(),180);
+}
+async function updateBottomAnalysis(){
+  const card=document.getElementById('bottomAnalysisCard');
+  const code7=document.getElementById('code7Sel').value;
+  const region=document.getElementById('analysisRegionSel').value;
+  if(!code7){card.style.display='none';return;}
+  card.style.display='block';
+  const token=++APP.analysisToken;
+  const label=(document.getElementById('code7Sel').selectedOptions[0]?.textContent||code7).trim();
+  const y=+document.getElementById('yearSel').value,m=+document.getElementById('monthSel').value,[py,pm]=prevPeriod(y,m);
+  document.getElementById('analysisTitle').textContent=`${label} · ${region||'ทั้งประเทศ'}`;
+  document.getElementById('analysisPeriodInfo').textContent=`ปัจจุบัน ${String(m).padStart(2,'0')}/${y} · เดือนก่อน ${String(pm).padStart(2,'0')}/${py}`;
+  document.getElementById('analysisLoading').style.display='block';
+  document.getElementById('analysisContent').style.opacity='.45';
+  try{
+    const previousAll=await getPreviousRowsForAnalysis();
+    if(token!==APP.analysisToken) return;
+    const cur=analysisScope(APP.rows,code7,region), prv=analysisScope(previousAll,code7,region);
+    renderBottomAnalysis(cur,prv,code7,region);
+  }catch(e){
+    if(token===APP.analysisToken) toast('ประมวลผลส่วนล่างไม่สำเร็จ: '+e.message);
+  }finally{
+    if(token===APP.analysisToken){document.getElementById('analysisLoading').style.display='none';document.getElementById('analysisContent').style.opacity='1';}
+  }
+}
+
+function buildReports(){
+  const setCode=document.getElementById('setSel').value;
+  const src=APP.visibleRows.filter(r=> (setCode==='N' ? false : (setCode==='ALL' ? (!!r.flag_g || !!r.flag_l || !!r.flag_u) : true)) && asNum(r.current_price)>0);
+  const overall=new Map(), byRegion=new Map(), counts=new Map();
+  for(const r of src){
+    const m=r.price_master||{}, code=m.code7||String(m.commodity_code||'').slice(0,7), name=m.item_name||m.description||'', admin=m.item_admin||'';
+    if(!code) continue;
+    if(!overall.has(code)) overall.set(code,{code,name,admin,curr:[],comp:[],prev:[],rel:[]});
+    const o=overall.get(code), rel=calcRel(r.current_price,r.compare_price) ?? asNum(r.rel);
+    if(asNum(r.current_price)>0)o.curr.push(+r.current_price); if(asNum(r.compare_price)>0)o.comp.push(+r.compare_price); if(asNum(r.prev_price)>0)o.prev.push(+r.prev_price); if(rel>0)o.rel.push(rel);
+    const region=m.region_name||'ไม่ระบุภาค', rk=code+'|||'+region;
+    if(!byRegion.has(rk))byRegion.set(rk,{code,name,admin,region,curr:[],comp:[],prev:[],rel:[]});
+    const rr=byRegion.get(rk); if(asNum(r.current_price)>0)rr.curr.push(+r.current_price); if(asNum(r.compare_price)>0)rr.comp.push(+r.compare_price); if(asNum(r.prev_price)>0)rr.prev.push(+r.prev_price); if(rel>0)rr.rel.push(rel);
+    if(rel!=null){ if(!counts.has(code))counts.set(code,{code,name,admin,up:0,down:0,eq:0}); if(rel>100)counts.get(code).up++; else if(rel<100)counts.get(code).down++; else counts.get(code).eq++; }
+  }
+  const rowGeo=x=>({'ผู้ดูแล':x.admin,'รหัสรายการ':x.code,'รายการ':x.name,'ราคาปัจจุบัน':geometricMean(x.curr),'ราคาเปรียบเทียบ':geometricMean(x.comp),'REL':geometricMean(x.rel),'ราคาเดือนที่แล้ว':geometricMean(x.prev)});
+  APP.reports.geo=[...overall.values()].map(rowGeo).sort((a,b)=>a['รหัสรายการ'].localeCompare(b['รหัสรายการ']));
+  APP.reports.region=[...byRegion.values()].map(x=>({...rowGeo(x),'ภาค':x.region})).sort((a,b)=>a['รหัสรายการ'].localeCompare(b['รหัสรายการ'])||a.ภาค.localeCompare(b.ภาค,'th'));
+  APP.reports.count=[...counts.values()].map(x=>({'ผู้ดูแล':x.admin,'รหัสรายการ':x.code,'รายการ':x.name,'ขึ้น':x.up,'ลง':x.down,'เท่าเดิม':x.eq,'จำนวนรวม':x.up+x.down+x.eq})).sort((a,b)=>a['รหัสรายการ'].localeCompare(b['รหัสรายการ']));
+  renderReportTable('geoTable',APP.reports.geo,true); renderReportTable('countTable',APP.reports.count,false); renderReportTable('regionTable',APP.reports.region,true);
+}
+function renderReportTable(id,data,roundGeo){
+  const t=document.getElementById(id); if(!data.length){t.innerHTML='<tbody><tr><td class="text-center text-muted">ไม่มีข้อมูล</td></tr></tbody>';return;}
+  const keys=Object.keys(data[0]);
+  t.innerHTML='<thead><tr>'+keys.map(k=>`<th>${esc(k)}</th>`).join('')+'</tr></thead><tbody>'+data.map(r=>'<tr>'+keys.map(k=>{
+    let v=r[k]; if(roundGeo && typeof v==='number' && ['ราคาปัจจุบัน','ราคาเปรียบเทียบ','REL','ราคาเดือนที่แล้ว'].includes(k)){ v=round5Number(v).toFixed(5); }
+    return `<td class="${typeof r[k]==='number'?'text-end':''}">${esc(v)}</td>`;
+  }).join('')+'</tr>').join('')+'</tbody>';
+}
+
+async function exportExcel(){
+  buildReports();
+  const wb=XLSX.utils.book_new();
+  const detail=APP.visibleRows.map(r=>{const m=r.price_master||{};return {
+    'G':r.flag_g?'Checked':'','L':r.flag_l?'Checked':'','U':r.flag_u?'Checked':'','N':r.flag_n?'Checked':'',
+    'รหัสสินค้า':m.commodity_code,'รหัสรายการ':m.code7,'ลักษณะจำเพาะ':m.description,'หน่วย':m.unit_code,'รหัสแหล่ง':m.shop_code,'แหล่งจัดเก็บ':m.shop_name,'จังหวัด':m.province_name,'อำเภอ/เขต':m.district_name,
+    'ราคาเดือนก่อน':r.prev_price,'ราคาปัจจุบัน':r.current_price,'Link':normalizeLinkMode(r.link_mode),'ราคาเปรียบเทียบ':r.compare_price,'REL':calcRel(r.current_price,r.compare_price)??r.rel,'ภาวะ (ผู้บันทึก)':r.product_status,'ภาวะ (ผู้ตรวจ)':r.reviewer_status,'แก้ไขโดย':r.updated_by_email||'','แก้ไขล่าสุด':formatUpdatedAt(r.updated_at)
+  }});
+  XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(detail),'Monthly_Detail');
+  const geo5 = rows => rows.map(r=>Object.fromEntries(Object.entries(r).map(([k,v])=>[k, (typeof v==='number' && ['ราคาปัจจุบัน','ราคาเปรียบเทียบ','REL','ราคาเดือนที่แล้ว'].includes(k)) ? Number(round5Number(v).toFixed(5)) : v])));
+  if(APP.reports.geo.length)XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(geo5(APP.reports.geo)),'GeoMean_Overall');
+  if(APP.reports.region.length)XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(geo5(APP.reports.region)),'GeoMean_Region');
+  if(APP.reports.count.length)XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(APP.reports.count),'Status_Count');
+  const y=document.getElementById('yearSel').value,m=String(document.getElementById('monthSel').value).padStart(2,'0');
+  XLSX.writeFile(wb,`CPI_Price_${y}${m}.xlsx`);
+}
+
+function cleanHeader(v){return String(v??'').replace(/\s+/g,' ').trim();}
+function makeUniqueHeaders(row){const seen={};return row.map((v,i)=>{let b=cleanHeader(v)||`__EMPTY_${i}`,n=seen[b]||0;seen[b]=n+1;return n?`${b}.${n}`:b;});}
+function truthy(v){return ['checked','1','1.0','true','yes','y','✓'].includes(String(v??'').trim().toLowerCase());}
+function digits(v){let s=String(v??'').trim().replace(/\.0$/,'').replace(/\D/g,'');return s;}
+function detectHeader(matrix){
+  let best={i:-1,score:-1}; for(let i=0;i<Math.min(15,matrix.length);i++){const h=matrix[i].map(cleanHeader);let s=0;
+    if(h.some(x=>x.includes('รหัส')))s+=2;if(h.some(x=>x.includes('แหล่งจัดเก็บ')))s+=3;if(h.some(x=>x.includes('ลักษณะจำเพาะ')||x==='DESCRIPTION'))s+=2;if(h.some(x=>['G','L','U','N'].includes(x.toUpperCase())))s+=2;
+    if(s>best.score)best={i,score:s};} if(best.i<0||best.score<4)throw new Error('หาแถวหัวตารางไม่พบ'); return best.i;
+}
+function detectCodeColumn(headers,rows,targetLen,preferred){
+  let p=headers.find(h=>preferred.some(x=>h.toUpperCase().includes(x.toUpperCase()))); if(p)return p;
+  let best=null,bestScore=0;
+  for(const h of headers){
+    let score=0;
+    for(const r of rows.slice(0,50)){if(digits(r[h]).length===targetLen)score++;}
+    if(score>bestScore){best=h;bestScore=score;}
+  }
+  return bestScore>0?best:null;
+}
+async function importMaster(file){
+  try{
+    const buf=new Uint8Array(await file.arrayBuffer()), wb=XLSX.read(buf,{type:'array'}), sh=wb.Sheets[wb.SheetNames[0]], matrix=XLSX.utils.sheet_to_json(sh,{header:1,defval:''});
+    const hi=detectHeader(matrix), headers=makeUniqueHeaders(matrix[hi]), rows=matrix.slice(hi+1).filter(r=>r.some(v=>cleanHeader(v)!=='')).map(a=>Object.fromEntries(headers.map((h,i)=>[h,a[i]??''])));
+    const commodityCol=detectCodeColumn(headers,rows,16,['COMMODITY_CODE','รหัสสินค้า']);
+    const code7Col=headers.find(h=>['CODE7','CODE_7','รหัส7','รหัส 7','รหัสรายการ','รหัสหมวด'].some(x=>h.toUpperCase().includes(x.toUpperCase())));
+    const shopCodeCol=detectCodeColumn(headers,rows,10,['DILLER_CODE','DEALER_CODE','SHOP_CODE','รหัสแหล่ง','รหัสร้านค้า']);
+    const find=(terms)=>headers.find(h=>terms.some(t=>h.toUpperCase().includes(t.toUpperCase())));
+    const descCol=find(['ลักษณะจำเพาะ','DESCRIPTION']); const unitCol=find(['หน่วย','UNIT']); const shopNameCol=find(['แหล่งจัดเก็บ','SHOP_NAME']);
+    const provCodeCol=find(['PROVINCE_CODE','รหัสจังหวัด']); const provCol=find(['จังหวัด']); const distCol=find(['อำเภอ','เขต']); const regionCol=find(['ภาค','REGION']); const groupCol=find(['ชุด','GROUP_TYPE']);
+    const nameCol=find(['ชื่อรายการ','รายการ']); const adminCol=find(['ผู้ดูแล']);
+    const gCol=headers.find(h=>h.trim().toUpperCase()==='G'),lCol=headers.find(h=>h.trim().toUpperCase()==='L'),uCol=headers.find(h=>h.trim().toUpperCase()==='U'),nCol=headers.find(h=>h.trim().toUpperCase()==='N');
+    if(!code7Col)throw new Error('ไม่พบคอลัมน์รหัสรายการ/รหัสหมวด (CODE7) ซึ่งเป็นข้อมูลบังคับ');
+    const payload=[]; let skipped=0;
+    for(const r of rows){
+      const importedCode7=digits(r[code7Col]);
+      const c=commodityCol?digits(r[commodityCol]):'';
+      const s=shopCodeCol?digits(r[shopCodeCol]):'';
+      // รหัสรายการ/CODE7 ต้องมี 7 หลักเสมอ ส่วนรหัสสินค้าและรหัสแหล่งเป็นข้อมูลเสริม
+      if(importedCode7.length!==7){skipped++;continue;}
+      if(c && c.length!==16){skipped++;continue;}
+      if(s && s.length!==10){skipped++;continue;}
+      if(c && c.slice(0,7)!==importedCode7){skipped++;continue;}
+      let fg=gCol?truthy(r[gCol]):false, fl=lCol?truthy(r[lCol]):false, fu=uCol?truthy(r[uCol]):false, fn=nCol?truthy(r[nCol]):false;
+      if(fn){fg=false;fl=false;fu=false;}
+      payload.push({commodity_code:c||null,code7:importedCode7,description:descCol?String(r[descCol]??'').trim():'',item_name:nameCol?String(r[nameCol]??'').trim():'',item_admin:adminCol?String(r[adminCol]??'').trim():'',unit_code:unitCol?String(r[unitCol]??'').trim():'',shop_code:s||null,shop_name:shopNameCol?String(r[shopNameCol]??'').trim():'',province_code:provCodeCol?String(r[provCodeCol]??'').trim().replace(/\.0$/,''):'',province_name:provCol?String(r[provCol]??'').trim():'',district_name:distCol?String(r[distCol]??'').trim():'',region_name:regionCol?String(r[regionCol]??'').trim():'',group_type:groupCol?String(r[groupCol]??'').trim():'',flag_g:fg,flag_l:fl,flag_u:fu,flag_n:fn,is_active:true});
+    }
+    for(let i=0;i<payload.length;i+=400){const {error}=await APP.sb.from('price_master').upsert(payload.slice(i,i+400),{onConflict:'master_key'});if(error)throw error;}
+    toast(`Import Master สำเร็จ ${payload.length} รายการ${skipped?` · ข้าม ${skipped} รายการ (รหัสรายการต้องมี 7 หลัก; รหัสสินค้า/รหัสแหล่งถ้ามีต้องถูกต้อง)`:''}`); await loadMaster();
+  }catch(e){toast('Import ไม่สำเร็จ: '+e.message);}
+}
+
+// Events
+initPeriodOptions();
+document.getElementById('saveConfigBtn').addEventListener('click',saveConfig);
+document.getElementById('loginBtn').addEventListener('click',async()=>{const email=document.getElementById('loginEmail').value.trim(),password=document.getElementById('loginPassword').value;document.getElementById('loginMsg').textContent='';if(!APP.sb)return document.getElementById('loginMsg').textContent='กรุณาตั้งค่า Supabase ก่อน';const {error}=await APP.sb.auth.signInWithPassword({email,password});if(error)document.getElementById('loginMsg').textContent=error.message;});
+document.getElementById('logoutBtn').addEventListener('click',()=>APP.sb?.auth.signOut());
+document.getElementById('prepareBtn').addEventListener('click',prepareMonth);
+document.getElementById('loadBtn').addEventListener('click',loadRows);
+document.getElementById('saveBtn').addEventListener('click',saveAll);
+document.getElementById('addItemBtn').addEventListener('click',()=>openAddItemModal());
+document.getElementById('copyPrevBtn').addEventListener('click',copyPreviousToCompare);
+document.getElementById('reportBtn').addEventListener('click',buildReports);
+document.getElementById('exportBtn').addEventListener('click',exportExcel);
+document.getElementById('importBtn').addEventListener('click',()=>document.getElementById('importFile').click());
+document.getElementById('importFile').addEventListener('change',e=>{if(e.target.files[0])importMaster(e.target.files[0]);e.target.value='';});
+document.getElementById('searchInput').addEventListener('input',applyFilters);
+['setSel','code7Sel','provinceSel','districtSel','groupSel','shopSel'].forEach(id=>document.getElementById(id).addEventListener('change',()=>{if(id==='provinceSel')refreshDistricts();applyFilters();}));
+document.getElementById('analysisRegionSel').addEventListener('change',scheduleBottomAnalysis);
+['yearSel','monthSel'].forEach(id=>document.getElementById(id).addEventListener('change',()=>{APP.analysisPrevCache={key:'',rows:[]};document.getElementById('bottomAnalysisCard').style.display='none';}));
+document.getElementById('decimalToggle').addEventListener('change',()=>{renderRows();buildReports();scheduleBottomAnalysis();});
+document.getElementById('saveNewItemBtn').addEventListener('click',saveNewItem);
+document.querySelectorAll('.item-flag').forEach(x=>x.addEventListener('change',()=>setItemFlagRules(x.dataset.set)));
+document.getElementById('rowActionMenu').querySelectorAll('[data-row-action]').forEach(b=>b.addEventListener('click',()=>handleRowAction(b.dataset.rowAction)));
+document.addEventListener('click',e=>{if(!e.target.closest('#rowActionMenu')&&!e.target.closest('[data-row-menu]'))closeRowActionMenu();});
+window.addEventListener('resize',closeRowActionMenu);
+window.addEventListener('scroll',closeRowActionMenu,true);
+window.addEventListener('beforeunload',e=>{if(APP.dirty.size){e.preventDefault();e.returnValue='';}});
+connect();
+</script>
+</body>
+</html>
