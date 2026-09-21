@@ -1,0 +1,599 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>CPI Price Validation — Web App</title>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <style>
+    :root{
+      --bg:#f5f7fb; --card:#fff; --ink:#172033; --muted:#667085; --line:#e4e7ec;
+      --primary:#1f4e78; --primary2:#2b6da6; --ok:#087443; --warn:#b54708; --danger:#b42318;
+      --shadow:0 8px 26px rgba(16,24,40,.07); --radius:16px;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--bg);color:var(--ink);font-family:"Noto Sans Thai","Leelawadee UI",Tahoma,Arial,sans-serif}
+    .wrap{max-width:1500px;margin:0 auto;padding:22px}
+    .hero{background:linear-gradient(135deg,#173f62,#286b9f);color:#fff;border-radius:20px;padding:24px 28px;box-shadow:var(--shadow);display:flex;gap:24px;align-items:center;justify-content:space-between}
+    .hero h1{font-size:26px;margin:0 0 5px;font-weight:800}.hero p{margin:0;color:#d9e9f6;font-size:14px}
+    .badge{white-space:nowrap;border:1px solid rgba(255,255,255,.35);background:rgba(255,255,255,.11);padding:8px 12px;border-radius:999px;font-size:12px}
+    .grid{display:grid;grid-template-columns:1.15fr .85fr;gap:18px;margin-top:18px}
+    @media(max-width:980px){.grid{grid-template-columns:1fr}.hero{align-items:flex-start;flex-direction:column}.badge{white-space:normal}}
+    .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px}
+    .card h2{font-size:17px;margin:0 0 4px}.sub{font-size:12.5px;color:var(--muted);margin-bottom:14px}
+    .drop{border:2px dashed #a8bed1;border-radius:15px;padding:24px;text-align:center;background:#f9fbfd;transition:.15s;cursor:pointer}
+    .drop.drag{border-color:var(--primary2);background:#eef6fc}.drop strong{display:block;font-size:16px;margin-bottom:4px}.drop span{font-size:12px;color:var(--muted)}
+    input[type=file]{display:none}
+    .file-list{margin-top:12px;display:grid;gap:8px;max-height:360px;overflow:auto}
+    .file-row{display:grid;grid-template-columns:1fr 190px 32px;gap:8px;align-items:center;border:1px solid var(--line);border-radius:11px;padding:9px 10px;background:#fff}
+    .file-name{font-size:12.5px;font-weight:650;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.file-meta{font-size:10.5px;color:var(--muted);margin-top:2px}
+    select,.search{width:100%;height:36px;border:1px solid #d0d5dd;border-radius:9px;background:#fff;padding:0 9px;color:var(--ink)}
+    .xbtn{border:0;background:#f2f4f7;border-radius:8px;height:31px;cursor:pointer;color:#667085}.xbtn:hover{background:#fee4e2;color:#b42318}
+    .actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:14px}.btn{border:0;border-radius:10px;padding:10px 14px;font-weight:700;cursor:pointer;font-family:inherit}.btn.primary{background:var(--primary);color:#fff}.btn.primary:hover{background:#173f62}.btn.secondary{background:#eef4f8;color:var(--primary)}.btn:disabled{opacity:.45;cursor:not-allowed}
+    .steps{display:grid;gap:9px}.step{display:flex;gap:10px;padding:10px;border-radius:11px;background:#f8fafc;border:1px solid #eef2f6}.n{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;background:#e8f2f9;color:var(--primary);font-weight:800;font-size:12px;flex:0 0 auto}.step b{font-size:12.5px}.step div div{font-size:11.5px;color:var(--muted);margin-top:2px}
+    .notice{margin-top:12px;padding:10px 12px;border-radius:10px;background:#fff7ed;border:1px solid #fed7aa;color:#9a3412;font-size:11.5px;line-height:1.45}
+    .status{margin-top:12px;font-size:12px;min-height:18px}.status.ok{color:var(--ok)}.status.err{color:var(--danger)}.status.warn{color:var(--warn)}
+    .results{margin-top:18px}.kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:12px}@media(max-width:1000px){.kpis{grid-template-columns:repeat(2,1fr)}}
+    .kpi{background:#fff;border:1px solid var(--line);border-radius:13px;padding:13px 14px}.kpi .v{font-size:24px;font-weight:850;color:var(--primary)}.kpi .l{font-size:11.5px;color:var(--muted);margin-top:2px}
+    .results-card{background:#fff;border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
+    .toolbar{display:flex;gap:10px;padding:12px;border-bottom:1px solid var(--line);align-items:center;flex-wrap:wrap}.tabs{display:flex;gap:6px;flex-wrap:wrap;flex:1}.tab{border:1px solid #d0d5dd;background:#fff;border-radius:999px;padding:7px 10px;font-size:11.5px;cursor:pointer}.tab.active{background:var(--primary);border-color:var(--primary);color:#fff}.search-wrap{width:280px;max-width:100%}
+    .table-wrap{overflow:auto;max-height:620px}.data-table{border-collapse:separate;border-spacing:0;width:max-content;min-width:100%;font-size:11.5px}.data-table th{position:sticky;top:0;z-index:2;background:#1f4e78;color:#fff;padding:9px 10px;text-align:left;white-space:nowrap;border-right:1px solid rgba(255,255,255,.12)}.data-table td{padding:7px 10px;border-bottom:1px solid #eef0f3;border-right:1px solid #f1f3f5;vertical-align:top;max-width:360px;white-space:pre-wrap}.data-table tr:nth-child(even) td{background:#fbfcfe}.empty{padding:42px;text-align:center;color:var(--muted)}
+    .footer-note{font-size:10.5px;color:var(--muted);padding:9px 12px;border-top:1px solid var(--line)}
+    .log{font-size:11px;color:#475467;max-height:130px;overflow:auto;margin-top:10px;padding-top:8px;border-top:1px solid var(--line)}.log div{padding:2px 0}.dot{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:6px;background:#98a2b3}.dot.ok{background:#12b76a}.dot.warn{background:#f79009}.dot.err{background:#f04438}
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <section class="hero">
+    <div>
+      <h1>CPI Price Validation</h1>
+      <p>ลากไฟล์ Excel เข้ามา → ตรวจตาม logic จาก Analysic_03.ipynb → ดูผลและ Export กลับเป็น Excel</p>
+    </div>
+    <div class="badge">5 Conditions + Import_Monthly</div>
+  </section>
+
+  <div class="grid">
+    <section class="card">
+      <h2>1) ใส่ไฟล์</h2>
+      <div class="sub">รองรับหลายไฟล์พร้อมกัน และเดาประเภทไฟล์ให้อัตโนมัติ</div>
+      <div class="drop" id="dropZone">
+        <strong>วางไฟล์ .xlsx / .xls ที่นี่</strong>
+        <span>หรือคลิกเพื่อเลือกไฟล์ — สามารถใส่ G/L, U รายเดือน, U รายสัปดาห์, Real_Master_CPI และราคากลางพร้อมกัน</span>
+      </div>
+      <input id="fileInput" type="file" accept=".xlsx,.xls,.xlsm" multiple />
+      <div class="file-list" id="fileList"></div>
+      <div class="actions">
+        <button class="btn primary" id="processBtn" disabled>ประมวลผล Condition</button>
+        <button class="btn secondary" id="clearBtn">ล้างไฟล์ทั้งหมด</button>
+      </div>
+      <div id="status" class="status"></div>
+      <div id="log" class="log" hidden></div>
+    </section>
+
+    <section class="card">
+      <h2>Logic ที่ใช้</h2>
+      <div class="sub">ถอดจาก Python เดิม โดยเน้นให้ผลลัพธ์และชื่อ Sheet สอดคล้องกัน</div>
+      <div class="steps">
+        <div class="step"><div class="n">1</div><div><b>REL ไม่ตรง</b><div>คำนวณ RELN = ราคาปัจจุบัน ÷ ราคาเปรียบเทียบ × 100 และตรวจ diffREL &gt; 0</div></div></div>
+        <div class="step"><div class="n">2</div><div><b>ช่องคำนวณว่าง</b><div>ตรวจราคา / ราคาเปรียบเทียบ / REL ที่เป็น 0, ว่าง หรือ NaN ตามชุดเงื่อนไขเดิม</div></div></div>
+        <div class="step"><div class="n">3</div><div><b>ราคากลาง</b><div>Map ด้วย “รหัส + ประเภทร้านค้า” แล้วหาแถวที่ราคาปัจจุบันไม่เท่าราคากลาง</div></div></div>
+        <div class="step"><div class="n">4</div><div><b>ราคาที่สงสัย</b><div>Z-score รายการ 16 หลัก / หมวด 7 หลัก + REL + เหตุผลจากผู้บันทึก/ผู้ตรวจ</div></div></div>
+        <div class="step"><div class="n">5</div><div><b>ตรวจตัวซ้ำ</b><div>ตรวจคู่ “รหัส + รหัสแหล่ง” ซ้ำ และแสดงทุกแถวที่เกี่ยวข้อง</div></div></div>
+      </div>
+      <div class="notice"><b>หมายเหตุ:</b> การ map ร้านใช้ตาราง <code>shop_manual_cleansing</code> ใน Real_Master_CPI และจับ keyword แบบ case-sensitive ตามพฤติกรรมที่เทียบกับผล Python ตัวอย่างได้ใกล้ที่สุด</div>
+    </section>
+  </div>
+
+  <section class="results" id="results" hidden>
+    <div class="kpis" id="kpis"></div>
+    <div class="results-card">
+      <div class="toolbar">
+        <div class="tabs" id="tabs"></div>
+        <div class="search-wrap"><input id="searchBox" class="search" placeholder="ค้นหาในผลลัพธ์..." /></div>
+        <button class="btn primary" id="exportAllBtn">ดาวน์โหลดผลตรวจสอบ 5 ชีต</button>
+        <button class="btn secondary" id="exportImportBtn">ดาวน์โหลด Import_Monthly</button>
+      </div>
+      <div class="table-wrap" id="tableWrap"></div>
+      <div class="footer-note" id="footerNote"></div>
+    </div>
+  </section>
+</div>
+
+<script>
+(() => {
+  'use strict';
+
+  const ROLE_LABELS = {
+    data: 'ข้อมูลราคา (นำมาตรวจ)',
+    master: 'Real_Master_CPI',
+    central: 'ราคากลาง',
+    ignore: 'ไม่ใช้ / ไฟล์ผลลัพธ์'
+  };
+
+  const state = {
+    files: [], results: null, activeKey: '01_RELไม่ตรง', logs: []
+  };
+
+  const $ = id => document.getElementById(id);
+  const dropZone = $('dropZone');
+  const fileInput = $('fileInput');
+  const fileList = $('fileList');
+  const processBtn = $('processBtn');
+  const statusEl = $('status');
+  const logEl = $('log');
+
+  function setStatus(msg, type='') {
+    statusEl.textContent = msg || '';
+    statusEl.className = 'status ' + type;
+  }
+  function log(msg, type='ok') {
+    state.logs.push({msg,type});
+    logEl.hidden = false;
+    logEl.innerHTML = state.logs.map(x => `<div><span class="dot ${x.type}"></span>${escapeHtml(x.msg)}</div>`).join('');
+    logEl.scrollTop = logEl.scrollHeight;
+  }
+  function escapeHtml(v) {
+    return String(v ?? '').replace(/[&<>'"]/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[ch]));
+  }
+  function cleanText(v) { return v == null ? '' : String(v).trim(); }
+  function cleanCode(v) { return cleanText(v).replace(/\.0$/, ''); }
+  function toNum(v) {
+    if (v == null) return null;
+    if (typeof v === 'number') return Number.isFinite(v) ? v : null;
+    const s = String(v).trim().replace(/,/g,'');
+    if (!s || s === '-' || s.toLowerCase() === 'nan') return null;
+    const n = Number(s.replace(/%$/,''));
+    return Number.isFinite(n) ? n : null;
+  }
+  function isMissingZero(v) { const n = toNum(v); return n == null || n === 0; }
+  function roundHalfEven(value, decimals=2) {
+    if (!Number.isFinite(value)) return null;
+    const sign = value < 0 ? -1 : 1;
+    const factor = 10 ** decimals;
+    const x = Math.abs(value) * factor;
+    const floor = Math.floor(x);
+    const frac = x - floor;
+    let rounded;
+    if (Math.abs(frac - 0.5) < 1e-10) rounded = (floor % 2 === 0) ? floor : floor + 1;
+    else rounded = Math.round(x);
+    return sign * rounded / factor;
+  }
+  function isClose(a,b) {
+    if (!Number.isFinite(a) || !Number.isFinite(b)) return false;
+    return Math.abs(a-b) <= (1e-8 + 1e-5 * Math.abs(b));
+  }
+
+  function makeUniqueHeaders(row) {
+    const seen = new Map();
+    return row.map((v,i) => {
+      let name = cleanText(v) || `_col${i+1}`;
+      const n = seen.get(name) || 0;
+      seen.set(name, n+1);
+      return n === 0 ? name : `${name}.${n}`;
+    });
+  }
+
+  function sheetRows(ws) {
+    return XLSX.utils.sheet_to_json(ws, {header:1, defval:null, raw:false, blankrows:false});
+  }
+
+  function findHeaderRow(ws, mode='data') {
+    const arr = sheetRows(ws).slice(0, 25);
+    let best = {idx:-1, score:-1};
+    arr.forEach((row,idx) => {
+      const vals = row.map(cleanText);
+      const set = new Set(vals);
+      let score = 0;
+      if (mode === 'central') {
+        ['รหัสรายการ','ห้าง/ร้าน','ราคาที่ใช้'].forEach(k => { if(set.has(k)) score += 4; });
+      } else {
+        ['รหัส','ลักษณะจำเพาะ','แหล่งจัดเก็บ','ราคาปัจจุบัน','REL','เปรียบเทียบ','ราคาเปรียบเทียบ','ราคาเฉลี่ย'].forEach(k => { if(set.has(k)) score += 2; });
+        if (vals.filter(x => x === 'รหัส').length >= 2) score += 4;
+        if (set.has('G') || set.has('L') || set.has('U') || set.has('N')) score += 2;
+      }
+      if (score > best.score) best = {idx,score};
+    });
+    const threshold = mode === 'central' ? 10 : 7;
+    return best.score >= threshold ? best.idx : -1;
+  }
+
+  function objectsFromSheet(ws, headerIdx) {
+    const arr = sheetRows(ws);
+    if (headerIdx < 0 || headerIdx >= arr.length) return [];
+    const headers = makeUniqueHeaders(arr[headerIdx]);
+    const out = [];
+    for (let i=headerIdx+1; i<arr.length; i++) {
+      const row = arr[i];
+      if (!row || row.every(v => cleanText(v)==='')) continue;
+      const obj = {};
+      headers.forEach((h,j) => obj[h] = row[j] ?? null);
+      out.push(obj);
+    }
+    return out;
+  }
+
+  function inspectWorkbook(wb, filename) {
+    const sheets = wb.SheetNames || [];
+    if (sheets.includes('shop_manual_cleansing') && sheets.includes('ข้อมูล_รายการ_ผู้ดูแล')) {
+      return {role:'master', info:`${sheets.length} sheets`};
+    }
+    if (sheets.some(s => ['01_RELไม่ตรง','02_ช่องคำนวณว่าง','03_ราคากลาง','04_ราคาที่สงสัย','05_ตรวจตัวซ้ำ','Monthly_Report'].includes(s))) {
+      return {role:'ignore', info:'ตรวจพบว่าเป็นไฟล์ผลลัพธ์'};
+    }
+    for (const s of sheets) {
+      const ws = wb.Sheets[s];
+      if (findHeaderRow(ws,'central') >= 0) return {role:'central', info:`ราคากลาง • ${s}`};
+    }
+    for (const s of sheets) {
+      const ws = wb.Sheets[s];
+      const h = findHeaderRow(ws,'data');
+      if (h >= 0) return {role:'data', info:`ข้อมูลราคา • ${s} • header แถว ${h+1}`};
+    }
+    if (/Real_Master_CPI/i.test(filename)) return {role:'master', info:'เดาจากชื่อไฟล์'};
+    if (/ราคากลาง/i.test(filename)) return {role:'central', info:'เดาจากชื่อไฟล์'};
+    return {role:'ignore', info:'ไม่พบโครงสร้างที่รู้จัก'};
+  }
+
+  async function addFiles(files) {
+    if (!window.XLSX) {
+      setStatus('โหลดตัวอ่าน Excel ไม่สำเร็จ กรุณาเชื่อมต่ออินเทอร์เน็ตแล้วเปิดไฟล์ HTML ใหม่', 'err');
+      return;
+    }
+    setStatus('กำลังอ่านไฟล์...', 'warn');
+    for (const file of files) {
+      try {
+        const buf = await file.arrayBuffer();
+        const wb = XLSX.read(buf, {type:'array', cellDates:false, dense:false});
+        const guess = inspectWorkbook(wb, file.name);
+        state.files.push({id:crypto.randomUUID ? crypto.randomUUID() : String(Date.now()+Math.random()), file, wb, role:guess.role, info:guess.info});
+        log(`${file.name} → ${ROLE_LABELS[guess.role]}`, 'ok');
+      } catch (e) {
+        log(`${file.name} อ่านไม่ได้: ${e.message || e}`, 'err');
+      }
+    }
+    renderFiles();
+    setStatus(state.files.length ? `พร้อมแล้ว ${state.files.length} ไฟล์` : '', state.files.length ? 'ok' : '');
+  }
+
+  function renderFiles() {
+    fileList.innerHTML = '';
+    state.files.forEach(rec => {
+      const row = document.createElement('div'); row.className='file-row';
+      const info = document.createElement('div');
+      info.innerHTML = `<div class="file-name" title="${escapeHtml(rec.file.name)}">${escapeHtml(rec.file.name)}</div><div class="file-meta">${escapeHtml(rec.info)}</div>`;
+      const sel = document.createElement('select');
+      Object.entries(ROLE_LABELS).forEach(([v,l]) => { const o=document.createElement('option'); o.value=v; o.textContent=l; if(rec.role===v)o.selected=true; sel.appendChild(o); });
+      sel.addEventListener('change',()=>{rec.role=sel.value;});
+      const del = document.createElement('button'); del.className='xbtn'; del.textContent='×'; del.title='เอาไฟล์ออก';
+      del.addEventListener('click',()=>{state.files=state.files.filter(x=>x.id!==rec.id); renderFiles();});
+      row.append(info,sel,del); fileList.appendChild(row);
+    });
+    processBtn.disabled = state.files.filter(x=>x.role==='data').length===0;
+  }
+
+  function parseMaster(rec) {
+    if (!rec) return {shopRules:[], userMap:new Map()};
+    const wb = rec.wb;
+    const shopRules = [];
+    if (wb.Sheets['shop_manual_cleansing']) {
+      const rows = objectsFromSheet(wb.Sheets['shop_manual_cleansing'],0);
+      rows.forEach(r => {
+        const result = cleanText(r['Result']);
+        const primary = cleanText(r['Primary Keywords']).split(',').map(x=>x.trim()).filter(Boolean);
+        const sub = cleanText(r['Sub Keywords']).split(',').map(x=>x.trim()).filter(Boolean);
+        if (result && primary.length) shopRules.push({result, primary, sub});
+      });
+    }
+    const userMap = new Map();
+    if (wb.Sheets['ข้อมูล_รายการ_ผู้ดูแล']) {
+      const rows = objectsFromSheet(wb.Sheets['ข้อมูล_รายการ_ผู้ดูแล'],0);
+      rows.forEach(r => {
+        const code = cleanCode(r['รหัส']);
+        if (!code) return;
+        userMap.set(code.slice(0,7), r['ผู้ดูแล'] ?? null); // keep last เหมือน pandas keep='last'
+      });
+    }
+    return {shopRules,userMap};
+  }
+
+  function parseCentral(rec) {
+    const map = new Map();
+    if (!rec) return map;
+    for (const s of rec.wb.SheetNames) {
+      const ws = rec.wb.Sheets[s];
+      const h = findHeaderRow(ws,'central');
+      if (h < 0) continue;
+      const rows = objectsFromSheet(ws,h);
+      rows.forEach(r => {
+        const code = cleanCode(r['รหัสรายการ']);
+        const shop = cleanText(r['ห้าง/ร้าน']);
+        if (!code || !shop) return;
+        map.set(code+'\u001f'+shop, toNum(r['ราคาที่ใช้'])); // keep last
+      });
+    }
+    return map;
+  }
+
+  function mapShop(name, rules) {
+    const s = cleanText(name);
+    for (const rule of rules) {
+      const primaryMatch = rule.primary.some(k => s.includes(k)); // case-sensitive ตาม Python ที่เทียบผลได้ตรง
+      if (!primaryMatch) continue;
+      if (rule.sub.length) {
+        if (rule.sub.some(k => s.includes(k))) return rule.result;
+      } else return rule.result;
+    }
+    return 'ร้านอื่นๆ';
+  }
+
+  function normalizeDataRow(r, shopRules, userMap, meta) {
+    const code = cleanCode(r['รหัส']);
+    const sourceCode = cleanCode(r['รหัส.1'] ?? r['รหัสแหล่ง']);
+    const sourceOriginal = cleanText(r['แหล่งจัดเก็บ']);
+    let province = '';
+    const m = sourceOriginal.match(/.*\((.*?)\)/); // greedy เหมือน Python: จับวงเล็บชุดท้ายที่ match ได้
+    if (m) province = cleanText(m[1]);
+    const sourceClean = sourceOriginal.replace(/\([^)]*\)(?=[^)]*$)/, '').trim();
+
+    let prev = r['ราคาเดือนก่อน'];
+    if (prev == null || cleanText(prev)==='') prev = r['ราคาเดือนที่แล้ว'];
+    let current = r['ราคาปัจจุบัน'];
+    if ((current == null || cleanText(current)==='') && r['ราคาเฉลี่ย.1'] != null) current = r['ราคาเฉลี่ย.1'];
+    if ((prev == null || cleanText(prev)==='') && r['ราคาเฉลี่ย'] != null) prev = r['ราคาเฉลี่ย'];
+
+    const compare = r['ราคาเปรียบเทียบ'] ?? r['เปรียบเทียบ'];
+    const code7 = code.slice(0,7);
+    return {
+      G:r['G'] ?? null, L:r['L'] ?? null, U:r['U'] ?? null, N:r['N'] ?? null,
+      'ผู้ดูแล': userMap.get(code7) ?? null,
+      CODE7:code7,
+      'รหัส':code,
+      'ลักษณะจำเพาะ':r['ลักษณะจำเพาะ'] ?? null,
+      'รหัสแหล่ง':sourceCode,
+      'แหล่งจัดเก็บ':sourceClean,
+      'ประเภทร้านค้า':mapShop(sourceClean,shopRules),
+      'เขต/จังหวัด':province || null,
+      'ราคาเดือนก่อน':toNum(prev),
+      'ราคาปัจจุบัน':toNum(current),
+      'Link':r['Link'] ?? null,
+      'ราคาเปรียบเทียบ':toNum(compare),
+      'REL':toNum(r['REL']),
+      'ภาวะ (ผู้บันทึก)':r['ภาวะ (ผู้บันทึก)'] ?? null,
+      'ภาวะ (ผู้ตรวจ)':r['ภาวะ (ผู้ตรวจ)'] ?? null,
+      _file:meta.file, _sheet:meta.sheet
+    };
+  }
+
+  function parseDataFiles(recs, shopRules, userMap) {
+    const out=[];
+    recs.forEach(rec => {
+      rec.wb.SheetNames.forEach(s => {
+        const ws=rec.wb.Sheets[s]; const h=findHeaderRow(ws,'data');
+        if(h<0) return;
+        const rows=objectsFromSheet(ws,h);
+        const normalized=rows.map(r=>normalizeDataRow(r,shopRules,userMap,{file:rec.file.name,sheet:s})).filter(r=>r['รหัส']);
+        if(normalized.length){ out.push(...normalized); log(`${rec.file.name} / ${s}: ${normalized.length.toLocaleString()} แถว`, 'ok'); }
+      });
+    });
+    return out;
+  }
+
+  const baseCols = ['ผู้ดูแล','CODE7','รหัส','ลักษณะจำเพาะ','รหัสแหล่ง','แหล่งจัดเก็บ','ประเภทร้านค้า','เขต/จังหวัด','ราคาเดือนก่อน','ราคาปัจจุบัน','Link','ราคาเปรียบเทียบ','REL','ภาวะ (ผู้บันทึก)','ภาวะ (ผู้ตรวจ)'];
+  const sheetCols = {
+    '01_RELไม่ตรง':[...baseCols,'RELN','diffREL'],
+    '02_ช่องคำนวณว่าง':['Status','N',...baseCols],
+    '03_ราคากลาง':['ผู้ดูแล','CODE7','รหัส','ลักษณะจำเพาะ','รหัสแหล่ง','แหล่งจัดเก็บ','ประเภทร้านค้า','เขต/จังหวัด','ราคาเดือนก่อน','ราคากลาง','ราคาปัจจุบัน','Link','ราคาเปรียบเทียบ','REL','ภาวะ (ผู้บันทึก)','ภาวะ (ผู้ตรวจ)'],
+    '04_ราคาที่สงสัย':['ผู้ดูแล','CODE7','รหัส','ลักษณะจำเพาะ','รหัสแหล่ง','แหล่งจัดเก็บ','ประเภทร้านค้า','เขต/จังหวัด','ราคาเดือนก่อน','ราคากลาง','ราคาปัจจุบัน','Link','ราคาเปรียบเทียบ','REL','ภาวะ (ผู้บันทึก)','ภาวะ (ผู้ตรวจ)','ตรวจสอบ'],
+    '05_ตรวจตัวซ้ำ':baseCols
+  };
+
+  function pickCols(row, cols) { const o={}; cols.forEach(c=>o[c]=row[c] ?? null); return o; }
+  function key2(r) { return cleanCode(r['รหัส'])+'\u001f'+cleanCode(r['รหัสแหล่ง']); }
+
+  function conditionREL(rows) {
+    const out=[];
+    rows.forEach(r=>{
+      const cur=r['ราคาปัจจุบัน'], cmp=r['ราคาเปรียบเทียบ'], rel=r['REL'];
+      const reln=(Number.isFinite(cur)&&Number.isFinite(cmp)&&cmp!==0)?(cur/cmp*100):null;
+      const diff=(reln!=null && Number.isFinite(rel))?roundHalfEven(reln-rel,2):null;
+      if(diff!=null && diff>0) out.push({...pickCols(r,baseCols), RELN:reln, diffREL:diff});
+    });
+    return out;
+  }
+
+  function conditionMissing(rows) {
+    const a=[],b=[],c=[],d=[];
+    rows.forEach(r=>{
+      const miss=isMissingZero(r['ราคาปัจจุบัน'])||isMissingZero(r['ราคาเปรียบเทียบ'])||isMissingZero(r['REL']);
+      if(!miss) return;
+      const hasGL = r.G != null || r.L != null;
+      const checked = cleanText(r.G)==='Checked' || cleanText(r.L)==='Checked' || (!hasGL && cleanText(r.U)==='Checked');
+      if(checked) a.push({...r,Status:'Checked'});
+      if(Number.isFinite(r['ราคาเปรียบเทียบ']) && r['ราคาเปรียบเทียบ']>0) b.push({...r});
+      if(Number.isFinite(r['ราคาปัจจุบัน']) && r['ราคาปัจจุบัน']>0 && Number.isFinite(r['ราคาเดือนก่อน']) && r['ราคาเดือนก่อน']>0) c.push({...r});
+      if(Number.isFinite(r['ราคาเดือนก่อน']) && r['ราคาเดือนก่อน']>0) d.push({...r});
+    });
+    const map=new Map();
+    [...a,...b,...c,...d].forEach(r=>map.set(key2(r),r)); // keep last เหมือน drop_duplicates keep='last'
+    return [...map.values()].map(r=>pickCols(r,sheetCols['02_ช่องคำนวณว่าง']));
+  }
+
+  function attachCentral(rows, centralMap) {
+    return rows.map(r=>({...r,'ราคากลาง':centralMap.get(cleanCode(r['รหัส'])+'\u001f'+cleanText(r['ประเภทร้านค้า'])) ?? null}));
+  }
+
+  function conditionCentral(rowsWithCentral) {
+    return rowsWithCentral.filter(r=>{
+      const cp=r['ราคากลาง'];
+      if(!Number.isFinite(cp)) return false;
+      const cur=r['ราคาปัจจุบัน'];
+      return !Number.isFinite(cur) || (cur-cp)!==0;
+    }).map(r=>pickCols(r,sheetCols['03_ราคากลาง']));
+  }
+
+  function sampleStats(values) {
+    const a=values.filter(Number.isFinite); if(a.length<2) return {mean:null,std:null};
+    const mean=a.reduce((s,x)=>s+x,0)/a.length;
+    const ss=a.reduce((s,x)=>s+(x-mean)**2,0);
+    const std=Math.sqrt(ss/(a.length-1));
+    return {mean,std:std===0?null:std};
+  }
+
+  function zscoreMap(rows, keyFn) {
+    const groups=new Map();
+    rows.forEach((r,i)=>{ const k=keyFn(r); if(!groups.has(k))groups.set(k,[]); groups.get(k).push({i,v:r['ราคาปัจจุบัน']}); });
+    const result=new Array(rows.length).fill(null);
+    groups.forEach(items=>{
+      const st=sampleStats(items.map(x=>x.v));
+      if(!Number.isFinite(st.mean)||!Number.isFinite(st.std)) return;
+      items.forEach(x=>{ if(Number.isFinite(x.v)) result[x.i]=Math.abs(roundHalfEven((x.v-st.mean)/st.std,2)); });
+    });
+    return result;
+  }
+
+  function conditionSuspicious(rowsWithCentral) {
+    const rows=rowsWithCentral.map(r=>({...r}));
+    const z16=zscoreMap(rows,r=>cleanCode(r['รหัส']));
+    const z7=zscoreMap(rows,r=>cleanCode(r['รหัส']).slice(0,7));
+    const relCounts=new Map();
+    rows.forEach(r=>{ if(!Number.isFinite(r.REL))return; const k=cleanCode(r['รหัส']).slice(0,7)+'\u001f'+String(r.REL); relCounts.set(k,(relCounts.get(k)||0)+1); });
+
+    const out=[];
+    rows.forEach((r,i)=>{
+      const fail=(Number.isFinite(z16[i])&&z16[i]>2)||(Number.isFinite(z7[i])&&z7[i]>2);
+      const rk=cleanCode(r['รหัส']).slice(0,7)+'\u001f'+String(r.REL);
+      const same=Number.isFinite(r.REL)&&(relCounts.get(rk)||0)>1;
+      let check = fail ? (same?'ถือว่าผ่าน':'ตรวจสอบ') : '';
+      if(cleanText(r['ประเภทร้านค้า'])!=='ร้านอื่นๆ') check='';
+      const cur=r['ราคาปัจจุบัน'], cp=r['ราคากลาง'];
+      if(check==='ตรวจสอบ' && isClose(cur,cp)) check='';
+      const rec=cleanText(r['ภาวะ (ผู้บันทึก)']); const ins=cleanText(r['ภาวะ (ผู้ตรวจ)']);
+      if(check==='ตรวจสอบ' && (/โปร|ส่วนลด/i.test(rec) || /โปร|ส่วนลด/i.test(ins))) check='';
+      const recorderOK=/โปร|โปรโมชั่น|ส่วนลด|ลดราคา/i.test(rec);
+      const inspectorOK=ins!=='';
+      if(check==='ตรวจสอบ' && (recorderOK||inspectorOK)) check='';
+      if(check==='ตรวจสอบ' && Number.isFinite(r.REL) && (r.REL>120 || r.REL<80)) out.push(pickCols({...r,'ตรวจสอบ':'ตรวจสอบ'},sheetCols['04_ราคาที่สงสัย']));
+    });
+    return out;
+  }
+
+  function conditionDuplicates(rows) {
+    const counts=new Map(); rows.forEach(r=>counts.set(key2(r),(counts.get(key2(r))||0)+1));
+    return rows.filter(r=>(counts.get(key2(r))||0)>1).sort((a,b)=>key2(a).localeCompare(key2(b),'th')).map(r=>pickCols(r,baseCols));
+  }
+
+  function buildResults(rows, centralMap) {
+    const withCentral=attachCentral(rows,centralMap);
+    return {
+      '01_RELไม่ตรง':conditionREL(rows),
+      '02_ช่องคำนวณว่าง':conditionMissing(rows),
+      '03_ราคากลาง':conditionCentral(withCentral),
+      '04_ราคาที่สงสัย':conditionSuspicious(withCentral),
+      '05_ตรวจตัวซ้ำ':conditionDuplicates(rows)
+    };
+  }
+
+  function renderResults() {
+    const results=state.results; $('results').hidden=false;
+    const order=Object.keys(sheetCols);
+    const labels={'01_RELไม่ตรง':'REL ไม่ตรง','02_ช่องคำนวณว่าง':'ช่องคำนวณว่าง','03_ราคากลาง':'ราคากลางไม่ตรง','04_ราคาที่สงสัย':'ราคาที่สงสัย','05_ตรวจตัวซ้ำ':'ข้อมูลซ้ำ'};
+    $('kpis').innerHTML=order.map(k=>`<div class="kpi"><div class="v">${results[k].length.toLocaleString()}</div><div class="l">${labels[k]}</div></div>`).join('');
+    $('tabs').innerHTML='';
+    order.forEach(k=>{ const b=document.createElement('button'); b.className='tab'+(state.activeKey===k?' active':''); b.textContent=`${k} (${results[k].length.toLocaleString()})`; b.onclick=()=>{state.activeKey=k; $('searchBox').value=''; renderResults();}; $('tabs').appendChild(b); });
+    renderTable();
+  }
+
+  function formatCell(v,col) {
+    if(v==null || v==='') return '';
+    if(['ราคาปัจจุบัน','ราคาเปรียบเทียบ','ราคาเดือนก่อน','ราคากลาง','REL','RELN','diffREL'].includes(col) && typeof v==='number') return Number.isInteger(v)?v.toLocaleString('th-TH'):v.toLocaleString('th-TH',{maximumFractionDigits:4});
+    return String(v);
+  }
+
+  function renderTable() {
+    const key=state.activeKey, rows=state.results[key]||[], cols=sheetCols[key]; const q=cleanText($('searchBox').value).toLowerCase();
+    const filtered=q?rows.filter(r=>cols.some(c=>String(r[c]??'').toLowerCase().includes(q))):rows;
+    const max=500, view=filtered.slice(0,max);
+    if(!view.length){ $('tableWrap').innerHTML='<div class="empty">ไม่พบรายการใน Condition นี้</div>'; $('footerNote').textContent=`ทั้งหมด ${filtered.length.toLocaleString()} รายการ`; return; }
+    const head='<thead><tr>'+cols.map(c=>`<th>${escapeHtml(c)}</th>`).join('')+'</tr></thead>';
+    const body='<tbody>'+view.map(r=>'<tr>'+cols.map(c=>`<td>${escapeHtml(formatCell(r[c],c))}</td>`).join('')+'</tr>').join('')+'</tbody>';
+    $('tableWrap').innerHTML=`<table class="data-table">${head}${body}</table>`;
+    $('footerNote').textContent=`แสดง ${view.length.toLocaleString()} จาก ${filtered.length.toLocaleString()} รายการ${filtered.length>max?' (จำกัด preview 500 แถว; export ได้ครบทั้งหมด)':''}`;
+  }
+
+  function aoaSheet(rows, cols) {
+    const data=[cols, ...rows.map(r=>cols.map(c=>{
+      const v=r[c]; if(['CODE7','รหัส','รหัสแหล่ง'].includes(c)) return v==null?'':String(v); return v==null?'':v;
+    }))];
+    const ws=XLSX.utils.aoa_to_sheet(data);
+    ws['!autofilter']={ref:`A1:${XLSX.utils.encode_col(cols.length-1)}${Math.max(1,data.length)}`};
+    ws['!cols']=cols.map((c,ci)=>{
+      let max=Math.max(10,String(c).length+2);
+      for(let i=1;i<Math.min(data.length,302);i++) max=Math.max(max,String(data[i][ci]??'').length+2);
+      return {wch:Math.min(max,45)};
+    });
+    const linkIdx=cols.indexOf('Link');
+    if(linkIdx>=0){
+      for(let r=1;r<data.length;r++){
+        const val=data[r][linkIdx];
+        if(typeof val==='string' && /^https?:\/\//i.test(val)){
+          const addr=XLSX.utils.encode_cell({r,c:linkIdx}); if(ws[addr]) ws[addr].l={Target:val};
+        }
+      }
+    }
+    return ws;
+  }
+
+  function exportAll() {
+    if(!state.results)return;
+    const wb=XLSX.utils.book_new();
+    Object.keys(sheetCols).forEach(k=>XLSX.utils.book_append_sheet(wb,aoaSheet(state.results[k],sheetCols[k]),k));
+    XLSX.writeFile(wb,'ผลตรวจสอบราคา_วิเคราะห์.xlsx',{compression:true});
+  }
+
+  function exportImport() {
+    if(!state.results)return;
+    const cols=['รหัส','ลักษณะจำเพาะ','รหัสแหล่ง','แหล่งจัดเก็บ','ราคาปัจจุบัน','Link','ราคาเปรียบเทียบ','ภาวะ (ผู้บันทึก)','ภาวะ (ผู้ตรวจ)'];
+    const rows=state.results['03_ราคากลาง'].filter(r=>toNum(r.Link)===0).map(r=>({...r,'ราคาปัจจุบัน':r['ราคากลาง']}));
+    const wb=XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb,aoaSheet(rows,cols),'Monthly_Report');
+    XLSX.writeFile(wb,'Import_Monthly.xlsx',{compression:true});
+  }
+
+  async function process() {
+    try{
+      state.logs=[]; logEl.innerHTML=''; logEl.hidden=false;
+      setStatus('กำลังประมวลผล...', 'warn');
+      const dataFiles=state.files.filter(x=>x.role==='data');
+      const masterRec=state.files.find(x=>x.role==='master');
+      const centralRec=state.files.find(x=>x.role==='central');
+      if(!dataFiles.length) throw new Error('ยังไม่มีไฟล์ข้อมูลราคาที่จะตรวจ');
+      if(!masterRec) log('ไม่พบ Real_Master_CPI — ผู้ดูแลจะว่าง และร้านจะถูกจัดเป็นร้านอื่นๆ', 'warn');
+      if(!centralRec) log('ไม่พบไฟล์ราคากลาง — Sheet ราคากลางจะว่าง', 'warn');
+      const {shopRules,userMap}=parseMaster(masterRec);
+      log(`โหลดกฎร้าน ${shopRules.length.toLocaleString()} กลุ่ม / mapping ผู้ดูแล ${userMap.size.toLocaleString()} CODE7`, shopRules.length?'ok':'warn');
+      const centralMap=parseCentral(centralRec);
+      log(`โหลดราคากลาง ${centralMap.size.toLocaleString()} คู่ รหัส+ร้าน`, centralMap.size?'ok':'warn');
+      const rows=parseDataFiles(dataFiles,shopRules,userMap);
+      if(!rows.length) throw new Error('ไม่พบแถวข้อมูลราคาในไฟล์ที่เลือก');
+      log(`รวมข้อมูลสำหรับตรวจ ${rows.length.toLocaleString()} แถว`, 'ok');
+      state.results=buildResults(rows,centralMap); state.activeKey='01_RELไม่ตรง';
+      Object.entries(state.results).forEach(([k,v])=>log(`${k}: ${v.length.toLocaleString()} รายการ`,'ok'));
+      renderResults(); setStatus(`ประมวลผลสำเร็จ ${rows.length.toLocaleString()} แถว`, 'ok');
+    }catch(e){ console.error(e); setStatus(`เกิดข้อผิดพลาด: ${e.message||e}`, 'err'); log(String(e.stack||e),'err'); }
+  }
+
+  dropZone.addEventListener('click',()=>fileInput.click());
+  fileInput.addEventListener('change',e=>{addFiles([...e.target.files]); e.target.value='';});
+  ['dragenter','dragover'].forEach(ev=>dropZone.addEventListener(ev,e=>{e.preventDefault();dropZone.classList.add('drag');}));
+  ['dragleave','drop'].forEach(ev=>dropZone.addEventListener(ev,e=>{e.preventDefault();dropZone.classList.remove('drag');}));
+  dropZone.addEventListener('drop',e=>addFiles([...e.dataTransfer.files].filter(f=>/\.xls[xm]?$/i.test(f.name))));
+  $('clearBtn').addEventListener('click',()=>{state.files=[];state.results=null;state.logs=[];renderFiles();$('results').hidden=true;logEl.hidden=true;setStatus('');});
+  processBtn.addEventListener('click',process);
+  $('searchBox').addEventListener('input',renderTable);
+  $('exportAllBtn').addEventListener('click',exportAll);
+  $('exportImportBtn').addEventListener('click',exportImport);
+
+  if(!window.XLSX) setStatus('ไม่สามารถโหลด SheetJS ได้ — ไฟล์ HTML นี้ต้องเชื่อมต่ออินเทอร์เน็ตอย่างน้อยตอนเปิดใช้งาน', 'err');
+})();
+</script>
+</body>
+</html>
