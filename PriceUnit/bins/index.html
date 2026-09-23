@@ -282,15 +282,15 @@
       <div class="period-card prev-period">
         <div class="period-title"><span class="period-badge">1</span>เดือนก่อน</div>
         <div class="period-fields">
-          <div class="field price-field"><label>ราคาเดือนก่อน (บาท)</label><input id="prevPrice" type="number" step="0.01" value="" inputmode="decimal" placeholder="กรอกราคา"></div>
-          <div class="field qty-field"><label>ปริมาณรวมเดือนก่อน</label><input id="prevQty" type="number" step="any" value="" inputmode="decimal" placeholder="กรอกปริมาณ"></div>
+          <div class="field price-field"><label>ราคาเดือนก่อน (บาท)</label><input id="prevPrice" type="number" step="0.01" value="58" inputmode="decimal"></div>
+          <div class="field qty-field"><label>ปริมาณรวมเดือนก่อน</label><input id="prevQty" type="number" step="any" value="1000" inputmode="decimal"></div>
         </div>
       </div>
       <div class="period-card curr-period">
         <div class="period-title"><span class="period-badge">2</span>เดือนนี้</div>
         <div class="period-fields">
-          <div class="field price-field"><label>ราคาเดือนนี้ (บาท)</label><input id="currPrice" type="number" step="0.01" value="" inputmode="decimal" placeholder="กรอกราคา"></div>
-          <div class="field qty-field"><label>ปริมาณรวมเดือนนี้</label><input id="currQty" type="number" step="any" value="" inputmode="decimal" placeholder="กรอกปริมาณ"></div>
+          <div class="field price-field"><label>ราคาเดือนนี้ (บาท)</label><input id="currPrice" type="number" step="0.01" value="84" inputmode="decimal"></div>
+          <div class="field qty-field"><label>ปริมาณรวมเดือนนี้</label><input id="currQty" type="number" step="any" value="1500" inputmode="decimal"></div>
         </div>
       </div>
     </div>
@@ -324,17 +324,17 @@
             <div class="product-card prev">
               <div class="month">เดือนก่อน</div>
               <div class="bag">สินค้า</div>
-              <div class="metric">ขนาด<strong><span id="prevQtyText">—</span></strong></div>
-              <div class="metric">ราคาเดือนก่อน<strong><span id="prevPriceText">—</span> บาท</strong></div>
-              <div class="unit-price">ราคาต่อหน่วย<strong><span id="prevUnitPriceText">—</span></strong></div>
+              <div class="metric">ขนาด<strong><span id="prevQtyText">1,000</span></strong></div>
+              <div class="metric">ราคาเดือนก่อน<strong><span id="prevPriceText">58.00</span> บาท</strong></div>
+              <div class="unit-price">ราคาต่อหน่วย<strong><span id="prevUnitPriceText">0.0580</span></strong></div>
             </div>
             <div class="arrow">➜</div>
             <div class="product-card curr">
               <div class="month">เดือนนี้</div>
               <div class="bag">สินค้า</div>
-              <div class="metric">ขนาด<strong><span id="currQtyText">—</span></strong></div>
-              <div class="metric">ราคาเดือนนี้<strong><span id="currPriceText">—</span> บาท</strong></div>
-              <div class="unit-price">ราคาต่อหน่วย<strong><span id="currUnitPriceText">—</span></strong></div>
+              <div class="metric">ขนาด<strong><span id="currQtyText">1,500</span></strong></div>
+              <div class="metric">ราคาเดือนนี้<strong><span id="currPriceText">84.00</span> บาท</strong></div>
+              <div class="unit-price">ราคาต่อหน่วย<strong><span id="currUnitPriceText">0.0560</span></strong></div>
             </div>
           </div>
         </div>
@@ -365,10 +365,10 @@
       <div class="panel compare-panel">
         <div class="panel-head">การคำนวณราคาเปรียบเทียบ</div>
         <div class="calc-box">
-          <div class="calc-line" id="compareFormulaText">กรอกข้อมูลเพื่อคำนวณราคาเปรียบเทียบ</div>
+          <div class="calc-line" id="compareFormulaText">ราคาเปรียบเทียบ = (58 × 1,500) ÷ 1,000</div>
           <div class="compare-highlight">
             <div class="compare-label">ราคาเปรียบเทียบที่ใช้</div>
-            <div class="compare-value"><span id="comparePriceText">—</span> <small>บาท</small></div>
+            <div class="compare-value"><span id="comparePriceText">87.00</span> <small>บาท</small></div>
           </div>
         </div>
       </div>
@@ -377,18 +377,18 @@
         <div class="panel-head">ค่า REL (ผลลัพธ์รอง)</div>
         <div class="rel-box">
           <div class="rel-formula">REL = (ราคาเดือนนี้ ÷ ราคาเปรียบเทียบ) × 100</div>
-          <div class="rel-formula" id="relFormulaText">กรอกข้อมูลเพื่อคำนวณ REL</div>
-          <div class="big-result"><span id="relText">—</span></div>
+          <div class="rel-formula" id="relFormulaText">REL = (84 ÷ 87) × 100</div>
+          <div class="big-result"><span id="relText">96.55</span></div>
         </div>
       </div>
 
       <div class="summary">
         <h3>สรุปผล</h3>
         <ul>
-          <li style="font-size:25px;background:#fff4bf;border-radius:12px;padding:12px">ราคาเปรียบเทียบ = <b style="color:#b42318"><span id="sumCompare">—</span> บาท</b></li>
-          <li>ราคาเดือนนี้ = <b><span id="sumCurrent">—</span> บาท</b></li>
-          <li>REL = <b><span id="sumRel">—</span></b></li>
-          <li id="changeLine">กรอกข้อมูลด้านบนเพื่อคำนวณผล</li>
+          <li style="font-size:25px;background:#fff4bf;border-radius:12px;padding:12px">ราคาเปรียบเทียบ = <b style="color:#b42318"><span id="sumCompare">87.00</span> บาท</b></li>
+          <li>ราคาเดือนนี้ = <b><span id="sumCurrent">84.00</span> บาท</b></li>
+          <li>REL = <b><span id="sumRel">96.55</span></b></li>
+          <li id="changeLine">เมื่อปรับปริมาณแล้ว พบว่า <b class="down">ราคาลดลง 3.45%</b></li>
         </ul>
       </div>
     </section>
@@ -405,10 +405,8 @@
   const nfUnit = new Intl.NumberFormat('th-TH',{minimumFractionDigits:4,maximumFractionDigits:6});
 
   function n(id){
-    const raw = $(id).value.trim();
-    if (raw === '') return NaN;
-    const v = parseFloat(raw);
-    return Number.isFinite(v) ? v : NaN;
+    const v = parseFloat($(id).value);
+    return Number.isFinite(v) ? v : 0;
   }
 
   function updateAll(){
@@ -417,26 +415,7 @@
     const currPrice = n('currPrice');
     const currQty = n('currQty');
 
-    const ready = [prevPrice, prevQty, currPrice, currQty].every(Number.isFinite) && prevQty !== 0 && currQty !== 0;
-    if (!ready){
-      $('prevQtyText').textContent = Number.isFinite(prevQty) ? nfQty.format(prevQty) : '—';
-      $('currQtyText').textContent = Number.isFinite(currQty) ? nfQty.format(currQty) : '—';
-      $('prevPriceText').textContent = Number.isFinite(prevPrice) ? nf2.format(prevPrice) : '—';
-      $('currPriceText').textContent = Number.isFinite(currPrice) ? nf2.format(currPrice) : '—';
-      $('prevUnitPriceText').textContent = (Number.isFinite(prevPrice) && Number.isFinite(prevQty) && prevQty !== 0) ? nfUnit.format(prevPrice / prevQty) : '—';
-      $('currUnitPriceText').textContent = (Number.isFinite(currPrice) && Number.isFinite(currQty) && currQty !== 0) ? nfUnit.format(currPrice / currQty) : '—';
-      $('compareFormulaText').textContent = 'กรอกข้อมูลให้ครบ 4 ค่า เพื่อคำนวณราคาเปรียบเทียบ';
-      $('comparePriceText').textContent = '—';
-      $('relFormulaText').textContent = 'กรอกข้อมูลให้ครบเพื่อคำนวณ REL';
-      $('relText').textContent = '—';
-      $('sumCompare').textContent = '—';
-      $('sumCurrent').textContent = Number.isFinite(currPrice) ? nf2.format(currPrice) : '—';
-      $('sumRel').textContent = '—';
-      $('changeLine').textContent = 'กรอกข้อมูลด้านบนเพื่อคำนวณผล';
-      return;
-    }
-
-    const comparePrice = (prevPrice * currQty) / prevQty;
+    const comparePrice = prevQty !== 0 ? (prevPrice * currQty) / prevQty : 0;
     const rel = comparePrice !== 0 ? (currPrice / comparePrice) * 100 : 0;
     const diff = rel - 100;
     const prevUnitPrice = prevQty !== 0 ? prevPrice / prevQty : 0;
