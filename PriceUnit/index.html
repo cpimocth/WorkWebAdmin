@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>สูตรการปรับปริมาณ - Dynamic Infographic</title>
+<style>
+  :root {
+    --navy:#0b2f68;
+    --blue:#156dd1;
+    --blue2:#eaf5ff;
+    --red:#e21538;
+    --red2:#fff0f3;
+    --text:#10213e;
+    --muted:#60708a;
+    --line:#d7e7f7;
+    --green:#15925a;
+    --shadow:0 10px 28px rgba(15,59,110,.10);
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    font-family:"Noto Sans Thai","Tahoma",system-ui,-apple-system,sans-serif;
+    background:#eef3f8;
+    color:var(--text);
+  }
+  .page{
+    max-width:1600px;
+    margin:20px auto;
+    background:#fff;
+    border-radius:24px;
+    box-shadow:var(--shadow);
+    overflow:hidden;
+  }
+  .controls{
+    padding:24px 28px 26px;
+    background:linear-gradient(135deg,#eef7ff,#f9fcff);
+    border-bottom:2px solid #d7e7f7;
+  }
+  .controls-title{
+    font-size:26px;
+    font-weight:900;
+    color:var(--navy);
+    margin-bottom:16px;
+  }
+  .controls-subtitle{
+    font-size:16px;
+    color:#55708e;
+    font-weight:700;
+    margin-top:-8px;
+    margin-bottom:16px;
+  }
+  .period-inputs{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:22px;
+    align-items:stretch;
+  }
+  .period-card{
+    background:#fff;
+    border:3px solid #d8e7f5;
+    border-radius:22px;
+    padding:18px;
+    box-shadow:0 8px 22px rgba(30,80,130,.07);
+  }
+  .period-card.prev-period{border-color:#b9d8fb;background:linear-gradient(180deg,#f8fcff,#eef7ff)}
+  .period-card.curr-period{border-color:#f4c4cf;background:linear-gradient(180deg,#fffafb,#fff1f4)}
+  .period-title{
+    display:flex;align-items:center;gap:10px;
+    font-size:24px;font-weight:950;margin-bottom:14px;
+  }
+  .prev-period .period-title{color:var(--navy)}
+  .curr-period .period-title{color:#b51d3e}
+  .period-badge{
+    width:42px;height:42px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;
+    color:#fff;font-size:20px;font-weight:950;flex:0 0 42px;
+  }
+  .prev-period .period-badge{background:var(--navy)}
+  .curr-period .period-badge{background:var(--red)}
+  .period-fields{display:grid;grid-template-columns:1fr;gap:12px}
+  .field{
+    background:#fff;
+    border:2px solid #d5e4f3;
+    border-radius:18px;
+    padding:12px 14px 14px;
+    box-shadow:0 5px 14px rgba(30,80,130,.05);
+  }
+  .field.price-field{border-color:#bfdcff}
+  .field.qty-field{border-color:#f4ccd4}
+  .field label{
+    display:block;
+    font-size:20px;
+    font-weight:950;
+    color:#2c4567;
+    margin:0 0 7px;
+  }
+  .field input{
+    width:100%;
+    border:2px solid #c6d8ea;
+    border-radius:14px;
+    padding:14px 16px;
+    font-size:34px;
+    font-weight:900;
+    color:var(--navy);
+    outline:none;
+    background:#fbfdff;
+  }
+  .field input:focus{border-color:var(--blue);box-shadow:0 0 0 4px rgba(21,109,209,.12);background:#fff}
+  .qty-field input{color:#b51d3e}
+  .actions{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap}
+  button{
+    border:0;border-radius:12px;padding:12px 20px;font-size:16px;font-weight:900;cursor:pointer;
+  }
+  .btn-primary{background:var(--navy);color:#fff}
+  .btn-secondary{background:#eaf2fa;color:var(--navy)}
+  .infographic{padding:28px}
+  .hero{
+    display:grid;
+    grid-template-columns:1.3fr .9fr;
+    gap:22px;
+    align-items:center;
+    margin-bottom:18px;
+  }
+  .hero h1{
+    margin:0;
+    font-size:clamp(40px,5vw,82px);
+    line-height:.95;
+    letter-spacing:-1px;
+    font-weight:900;
+    color:var(--navy);
+  }
+  .hero h1 span{color:var(--red)}
+  .subtitle{
+    font-size:clamp(20px,2vw,34px);
+    font-weight:800;
+    margin-top:10px;
+    color:#18396f;
+  }
+  .subtitle2{font-size:clamp(16px,1.4vw,24px);color:#345477;margin-top:4px}
+  .principle{
+    background:linear-gradient(135deg,#edf8ff,#dceeff);
+    border-radius:22px;
+    padding:18px 22px;
+    display:flex;gap:16px;align-items:flex-start;
+    min-height:150px;
+  }
+  .target{font-size:54px;line-height:1}
+  .principle h3{margin:0 0 6px;font-size:30px;color:var(--navy)}
+  .principle p{margin:0;font-size:20px;line-height:1.55;color:#27476c}
+  .row-top{
+    display:grid;
+    grid-template-columns:1.05fr .95fr;
+    gap:16px;
+  }
+  .panel{
+    border:1px solid var(--line);
+    border-radius:22px;
+    overflow:hidden;
+    background:#fff;
+    box-shadow:0 7px 20px rgba(34,86,130,.05);
+  }
+  .panel-head{
+    background:linear-gradient(135deg,#0e3e78,#1568b7);
+    color:white;
+    font-size:28px;
+    font-weight:900;
+    padding:12px 18px;
+  }
+  .panel-body{padding:18px}
+  .product-flow{
+    display:grid;
+    grid-template-columns:1fr 90px 1fr;
+    gap:12px;
+    align-items:center;
+  }
+  .product-card{text-align:center;padding:14px;border-radius:16px}
+  .product-card.prev{background:#eef7ff}
+  .product-card.curr{background:#fff1f4}
+  .bag{
+    width:130px;height:150px;margin:0 auto 10px;
+    border-radius:18px 18px 28px 28px;
+    display:flex;align-items:center;justify-content:center;
+    color:#fff;font-weight:900;font-size:24px;
+    box-shadow:inset 0 -12px 0 rgba(0,0,0,.06),0 8px 18px rgba(0,0,0,.08)
+  }
+  .prev .bag{background:linear-gradient(145deg,#0d5aaa,#2c9ce5)}
+  .curr .bag{background:linear-gradient(145deg,#bf1234,#f05c78)}
+  .arrow{font-size:58px;text-align:center;color:#e4445e;font-weight:900}
+  .month{display:inline-block;padding:7px 16px;border-radius:999px;color:#fff;font-weight:900;margin-bottom:10px}
+  .prev .month{background:var(--navy)}
+  .curr .month{background:var(--red)}
+  .metric{font-size:20px;line-height:1.45}
+  .metric strong{font-size:31px;display:block;color:var(--navy)}
+  .curr .metric strong{color:#a91531}
+  .unit-price{
+    margin-top:10px;padding:10px 12px;border-radius:12px;background:#fff;border:1px solid rgba(20,60,110,.12);
+    font-size:18px;font-weight:850;color:#405b7a;
+  }
+  .unit-price strong{display:block;font-size:25px;margin-top:2px;color:#173f75}
+  .curr .unit-price strong{color:#a91531}
+  .formula-panel{background:linear-gradient(180deg,#fbfdff,#fff)}
+  .formula-wrap{padding:22px 24px;text-align:center}
+  .formula-title{font-size:22px;color:#48617e;margin-bottom:18px}
+  .formula-equation{
+    display:grid;
+    grid-template-columns:auto 1fr;
+    gap:18px;
+    align-items:center;
+    font-size:28px;
+    font-weight:900;
+  }
+  .fraction{display:grid;grid-template-rows:1fr 2px 1fr;gap:8px;align-items:center}
+  .fraction .line{background:var(--navy);height:2px}
+  .fraction .num,.fraction .den{font-size:26px;font-weight:900;padding:11px 14px;border-radius:14px;background:#f7f9fc;color:var(--text);border:1px solid #e0e8f2}
+  .term-prev{color:var(--navy);font-weight:950}
+  .term-curr{color:var(--red);font-weight:950}
+  .formula-legend{display:flex;justify-content:center;gap:14px;flex-wrap:wrap;margin-top:14px;font-size:16px;font-weight:850}
+  .legend-prev,.legend-curr{padding:6px 10px;border-radius:999px}
+  .legend-prev{background:#eaf4ff;color:var(--navy)}
+  .legend-curr{background:#fff0f3;color:#b51d3e}
+  .unit-note{margin-top:18px;font-size:19px;color:#2f5077;font-weight:700}
+  .row-bottom{display:grid;grid-template-columns:1fr 1fr .72fr;gap:16px;margin-top:16px}
+  .calc-box{padding:20px;background:linear-gradient(180deg,#f8fbff,#edf7ff)}
+  .calc-line{font-size:25px;font-weight:800;line-height:1.65;text-align:center}
+  .big-result{font-size:48px;font-weight:900;color:var(--blue);text-align:center;margin-top:4px}
+  .compare-panel{
+    border:3px solid #ffc84b;
+    box-shadow:0 12px 30px rgba(240,171,0,.18);
+  }
+  .compare-panel .panel-head{
+    background:linear-gradient(135deg,#0b2f68,#0f5aa3);
+  }
+  .compare-highlight{
+    margin-top:14px;
+    border-radius:18px;
+    background:linear-gradient(135deg,#fff4bf,#ffe36d);
+    border:2px solid #ffc928;
+    padding:16px 18px;
+    text-align:center;
+    box-shadow:0 8px 20px rgba(224,164,0,.14);
+  }
+  .compare-label{font-size:20px;font-weight:900;color:#704900;margin-bottom:2px}
+  .compare-value{font-size:70px;line-height:1;font-weight:950;color:#b42318}
+  .compare-value small{font-size:28px;color:#704900}
+  .rel-box .big-result{font-size:42px;color:#58728f}
+  .rel-box{padding:20px;background:linear-gradient(180deg,#fff,#f3f8ff)}
+  .rel-formula{font-size:23px;font-weight:800;text-align:center;line-height:1.7}
+  .summary{padding:18px;background:linear-gradient(180deg,#fff6f7,#fff);border:1px solid #f5cbd4;border-radius:22px}
+  .summary h3{margin:0 0 12px;font-size:28px;color:#c51437}
+  .summary ul{list-style:none;padding:0;margin:0}
+  .summary li{padding:9px 0;font-size:21px;border-bottom:1px dashed #f2c6cf}
+  .summary li:last-child{border-bottom:0}
+  .summary b{color:var(--navy)}
+  .down{color:var(--red)!important}.up{color:var(--green)!important}.same{color:#777!important}
+  .footer-note{
+    margin-top:16px;
+    background:#f0f7ff;border-radius:16px;padding:13px 18px;
+    font-size:17px;color:#395b7f;text-align:center;font-weight:700;
+  }
+  @media(max-width:1100px){
+    .period-inputs{grid-template-columns:1fr}
+    .hero,.row-top,.row-bottom{grid-template-columns:1fr}
+  }
+  @media(max-width:650px){
+    .period-inputs{grid-template-columns:1fr}
+    .product-flow{grid-template-columns:1fr}.arrow{transform:rotate(90deg)}
+    .formula-equation{grid-template-columns:1fr}
+    .infographic{padding:16px}.controls{padding:14px}
+  }
+  @media print{
+    body{background:#fff}.controls{display:none}.page{box-shadow:none;margin:0;max-width:none;border-radius:0}
+    .infographic{padding:12mm}
+  }
+</style>
+</head>
+<body>
+<div class="page">
+  <section class="controls">
+    <div class="controls-title">กรอกข้อมูล 4 ค่า</div>
+    <div class="controls-subtitle">ปริมาณเดือนก่อนและเดือนนี้ควรใช้หน่วยเดียวกัน เพื่อให้การปรับราคาเปรียบเทียบถูกต้อง</div>
+    <div class="period-inputs">
+      <div class="period-card prev-period">
+        <div class="period-title"><span class="period-badge">1</span>เดือนก่อน</div>
+        <div class="period-fields">
+          <div class="field price-field"><label>ราคาเดือนก่อน (บาท)</label><input id="prevPrice" type="number" step="0.01" value="58" inputmode="decimal"></div>
+          <div class="field qty-field"><label>ปริมาณรวมเดือนก่อน</label><input id="prevQty" type="number" step="any" value="1000" inputmode="decimal"></div>
+        </div>
+      </div>
+      <div class="period-card curr-period">
+        <div class="period-title"><span class="period-badge">2</span>เดือนนี้</div>
+        <div class="period-fields">
+          <div class="field price-field"><label>ราคาเดือนนี้ (บาท)</label><input id="currPrice" type="number" step="0.01" value="84" inputmode="decimal"></div>
+          <div class="field qty-field"><label>ปริมาณรวมเดือนนี้</label><input id="currQty" type="number" step="any" value="1500" inputmode="decimal"></div>
+        </div>
+      </div>
+    </div>
+    <div class="actions">
+      <button class="btn-primary" onclick="updateAll()">คำนวณใหม่</button>
+      <button class="btn-secondary" onclick="window.print()">พิมพ์ / Save PDF</button>
+    </div>
+  </section>
+
+  <main class="infographic">
+    <section class="hero">
+      <div>
+        <h1>สูตรการ<span>ปรับปริมาณ</span></h1>
+        <div class="subtitle">กรณีสินค้าเป็นชนิดเดียวกัน แต่ขนาด/ปริมาณเปลี่ยนไป</div>
+        <div class="subtitle2">เพื่อให้สามารถเปรียบเทียบราคาได้อย่างถูกต้อง</div>
+      </div>
+      <div class="principle">
+        <div class="target">🎯</div>
+        <div>
+          <h3>หลักการ</h3>
+          <p>เมื่อสินค้าเป็นชนิดเดียวกัน แต่ขนาด/ปริมาณต่างกัน ต้องปรับราคาให้อยู่ในหน่วยเดียวกันก่อน แล้วจึงนำไปเปรียบเทียบราคา</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="row-top">
+      <div class="panel">
+        <div class="panel-head">ตัวอย่างสินค้า (ขนาด/ปริมาณเปลี่ยนไป)</div>
+        <div class="panel-body">
+          <div class="product-flow">
+            <div class="product-card prev">
+              <div class="month">เดือนก่อน</div>
+              <div class="bag">สินค้า</div>
+              <div class="metric">ขนาด<strong><span id="prevQtyText">1,000</span></strong></div>
+              <div class="metric">ราคาเดือนก่อน<strong><span id="prevPriceText">58.00</span> บาท</strong></div>
+              <div class="unit-price">ราคาต่อหน่วย<strong><span id="prevUnitPriceText">0.0580</span></strong></div>
+            </div>
+            <div class="arrow">➜</div>
+            <div class="product-card curr">
+              <div class="month">เดือนนี้</div>
+              <div class="bag">สินค้า</div>
+              <div class="metric">ขนาด<strong><span id="currQtyText">1,500</span></strong></div>
+              <div class="metric">ราคาเดือนนี้<strong><span id="currPriceText">84.00</span> บาท</strong></div>
+              <div class="unit-price">ราคาต่อหน่วย<strong><span id="currUnitPriceText">0.0560</span></strong></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel formula-panel">
+        <div class="panel-head">สูตรการปรับปริมาณ (ราคาเปรียบเทียบ)</div>
+        <div class="formula-wrap">
+          <div class="formula-title">ใช้สูตร</div>
+          <div class="formula-equation">
+            <div>ราคาเปรียบเทียบ =</div>
+            <div class="fraction">
+              <div class="num"><span class="term-prev">ราคาเดือนก่อน</span> × <span class="term-curr">ปริมาณรวมเดือนนี้</span></div>
+              <div class="line"></div>
+              <div class="den"><span class="term-prev">ปริมาณรวมเดือนก่อน</span></div>
+            </div>
+          </div>
+          <div class="formula-legend">
+            <span class="legend-prev">สีน้ำเงิน = ข้อมูลเดือนก่อน</span>
+            <span class="legend-curr">สีแดง = ข้อมูลเดือนนี้</span>
+          </div>
+          <div class="unit-note">ปริมาณเดือนก่อนและเดือนนี้ต้องใช้ <b>หน่วยเดียวกัน</b></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="row-bottom">
+      <div class="panel compare-panel">
+        <div class="panel-head">การคำนวณราคาเปรียบเทียบ</div>
+        <div class="calc-box">
+          <div class="calc-line" id="compareFormulaText">ราคาเปรียบเทียบ = (58 × 1,500) ÷ 1,000</div>
+          <div class="compare-highlight">
+            <div class="compare-label">ราคาเปรียบเทียบที่ใช้</div>
+            <div class="compare-value"><span id="comparePriceText">87.00</span> <small>บาท</small></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head">ค่า REL (ผลลัพธ์รอง)</div>
+        <div class="rel-box">
+          <div class="rel-formula">REL = (ราคาเดือนนี้ ÷ ราคาเปรียบเทียบ) × 100</div>
+          <div class="rel-formula" id="relFormulaText">REL = (84 ÷ 87) × 100</div>
+          <div class="big-result"><span id="relText">96.55</span></div>
+        </div>
+      </div>
+
+      <div class="summary">
+        <h3>สรุปผล</h3>
+        <ul>
+          <li style="font-size:25px;background:#fff4bf;border-radius:12px;padding:12px">ราคาเปรียบเทียบ = <b style="color:#b42318"><span id="sumCompare">87.00</span> บาท</b></li>
+          <li>ราคาเดือนนี้ = <b><span id="sumCurrent">84.00</span> บาท</b></li>
+          <li>REL = <b><span id="sumRel">96.55</span></b></li>
+          <li id="changeLine">เมื่อปรับปริมาณแล้ว พบว่า <b class="down">ราคาลดลง 3.45%</b></li>
+        </ul>
+      </div>
+    </section>
+
+    <div class="footer-note">สูตรนี้ใช้เมื่อเป็นสินค้าชนิดเดิม แต่มีการเปลี่ยนขนาด/น้ำหนัก/ปริมาณ โดยปริมาณทั้งสองช่วงต้องใช้หน่วยเดียวกัน เพื่อปรับราคาให้เทียบกันได้บนฐานปริมาณเดียวกัน</div>
+  </main>
+</div>
+
+<script>
+  const $ = (id) => document.getElementById(id);
+  const nf0 = new Intl.NumberFormat('th-TH',{maximumFractionDigits:0});
+  const nf2 = new Intl.NumberFormat('th-TH',{minimumFractionDigits:2,maximumFractionDigits:2});
+  const nfQty = new Intl.NumberFormat('th-TH',{maximumFractionDigits:4});
+  const nfUnit = new Intl.NumberFormat('th-TH',{minimumFractionDigits:4,maximumFractionDigits:6});
+
+  function n(id){
+    const v = parseFloat($(id).value);
+    return Number.isFinite(v) ? v : 0;
+  }
+
+  function updateAll(){
+    const prevPrice = n('prevPrice');
+    const prevQty = n('prevQty');
+    const currPrice = n('currPrice');
+    const currQty = n('currQty');
+
+    const comparePrice = prevQty !== 0 ? (prevPrice * currQty) / prevQty : 0;
+    const rel = comparePrice !== 0 ? (currPrice / comparePrice) * 100 : 0;
+    const diff = rel - 100;
+    const prevUnitPrice = prevQty !== 0 ? prevPrice / prevQty : 0;
+    const currUnitPrice = currQty !== 0 ? currPrice / currQty : 0;
+
+
+    $('prevQtyText').textContent = nfQty.format(prevQty);
+    $('currQtyText').textContent = nfQty.format(currQty);
+    $('prevPriceText').textContent = nf2.format(prevPrice);
+    $('currPriceText').textContent = nf2.format(currPrice);
+    $('prevUnitPriceText').textContent = nfUnit.format(prevUnitPrice);
+    $('currUnitPriceText').textContent = nfUnit.format(currUnitPrice);
+
+    $('compareFormulaText').textContent = `ราคาเปรียบเทียบ = (${nf2.format(prevPrice)} × ${nfQty.format(currQty)}) ÷ ${nfQty.format(prevQty)}`;
+    $('comparePriceText').textContent = nf2.format(comparePrice);
+
+    $('relFormulaText').textContent = `REL = (${nf2.format(currPrice)} ÷ ${nf2.format(comparePrice)}) × 100`;
+    $('relText').textContent = nf2.format(rel);
+
+    $('sumCompare').textContent = nf2.format(comparePrice);
+    $('sumCurrent').textContent = nf2.format(currPrice);
+    $('sumRel').textContent = nf2.format(rel);
+
+    const changeLine = $('changeLine');
+    if (!Number.isFinite(rel) || prevQty === 0 || comparePrice === 0){
+      changeLine.innerHTML = 'กรุณาตรวจสอบค่าปริมาณและราคา';
+    } else if (Math.abs(diff) < 0.005) {
+      changeLine.innerHTML = 'เมื่อปรับปริมาณแล้ว พบว่า <b class="same">ราคาไม่เปลี่ยนแปลง</b>';
+    } else if (diff < 0) {
+      changeLine.innerHTML = `เมื่อปรับปริมาณแล้ว พบว่า <b class="down">ราคาลดลง ${nf2.format(Math.abs(diff))}%</b>`;
+    } else {
+      changeLine.innerHTML = `เมื่อปรับปริมาณแล้ว พบว่า <b class="up">ราคาเพิ่มขึ้น ${nf2.format(diff)}%</b>`;
+    }
+  }
+
+  document.querySelectorAll('.controls input').forEach(el=>{
+    el.addEventListener('input',updateAll);
+    el.addEventListener('change',updateAll);
+  });
+  updateAll();
+</script>
+</body>
+</html>
