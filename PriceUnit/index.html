@@ -441,6 +441,38 @@
       </div>
     </section>
 
+    <section class="row-bottom">
+      <div class="panel compare-panel">
+        <div class="panel-head">การคำนวณราคาเปรียบเทียบ</div>
+        <div class="calc-box">
+          <div class="calc-line" id="compareFormulaText">ราคาเปรียบเทียบ = (90.00 × 400) ÷ 500</div>
+          <div class="compare-highlight">
+            <div class="compare-label">ราคาเปรียบเทียบที่ใช้</div>
+            <div class="compare-value"><span id="comparePriceText">72.00</span> <small>บาท</small></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head">ค่า REL (ผลลัพธ์รอง)</div>
+        <div class="rel-box">
+          <div class="rel-formula">REL = (ราคาเดือนนี้ ÷ ราคาเปรียบเทียบ) × 100</div>
+          <div class="rel-formula" id="relFormulaText">REL = (700.00 ÷ 72.00) × 100</div>
+          <div class="big-result"><span id="relText">972.22</span></div>
+        </div>
+      </div>
+
+      <div class="summary">
+        <h3>สรุปผล</h3>
+        <ul>
+          <li style="font-size:25px;background:#fff4bf;border-radius:12px;padding:12px">ราคาเปรียบเทียบ = <b style="color:#b42318"><span id="sumCompare">72.00</span> บาท</b></li>
+          <li>ราคาเดือนนี้ = <b><span id="sumCurrent">700.00</span> บาท</b></li>
+          <li>REL = <b><span id="sumRel">972.22</span></b></li>
+          <li id="changeLine">เมื่อปรับปริมาณแล้ว พบว่า <b class="up">ราคาเพิ่มขึ้น 872.22%</b></li>
+        </ul>
+      </div>
+    </section>
+
     <section class="hero">
       <div>
         <h1>สูตรการ<span>ปรับปริมาณ</span></h1>
@@ -455,6 +487,8 @@
         </div>
       </div>
     </section>
+
+    
 
     <section class="row-top">
       <div class="panel">
@@ -501,37 +535,7 @@
       </div>
     </section>
 
-    <section class="row-bottom">
-      <div class="panel compare-panel">
-        <div class="panel-head">การคำนวณราคาเปรียบเทียบ</div>
-        <div class="calc-box">
-          <div class="calc-line" id="compareFormulaText">ราคาเปรียบเทียบ = (90.00 × 400) ÷ 500</div>
-          <div class="compare-highlight">
-            <div class="compare-label">ราคาเปรียบเทียบที่ใช้</div>
-            <div class="compare-value"><span id="comparePriceText">72.00</span> <small>บาท</small></div>
-          </div>
-        </div>
-      </div>
-
-      <div class="panel">
-        <div class="panel-head">ค่า REL (ผลลัพธ์รอง)</div>
-        <div class="rel-box">
-          <div class="rel-formula">REL = (ราคาเดือนนี้ ÷ ราคาเปรียบเทียบ) × 100</div>
-          <div class="rel-formula" id="relFormulaText">REL = (700.00 ÷ 72.00) × 100</div>
-          <div class="big-result"><span id="relText">972.22</span></div>
-        </div>
-      </div>
-
-      <div class="summary">
-        <h3>สรุปผล</h3>
-        <ul>
-          <li style="font-size:25px;background:#fff4bf;border-radius:12px;padding:12px">ราคาเปรียบเทียบ = <b style="color:#b42318"><span id="sumCompare">72.00</span> บาท</b></li>
-          <li>ราคาเดือนนี้ = <b><span id="sumCurrent">700.00</span> บาท</b></li>
-          <li>REL = <b><span id="sumRel">972.22</span></b></li>
-          <li id="changeLine">เมื่อปรับปริมาณแล้ว พบว่า <b class="up">ราคาเพิ่มขึ้น 872.22%</b></li>
-        </ul>
-      </div>
-    </section>
+    
 
     <div class="footer-note">สูตรนี้ใช้เมื่อเป็นสินค้าชนิดเดิม แต่มีการเปลี่ยนขนาด/น้ำหนัก/ปริมาณ โดยปริมาณทั้งสองช่วงต้องใช้หน่วยเดียวกัน เพื่อปรับราคาให้เทียบกันได้บนฐานปริมาณเดียวกัน</div>
   </main>
