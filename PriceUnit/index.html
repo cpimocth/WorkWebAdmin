@@ -1,8 +1,6 @@
-<!DOCTYPE html>
-<html lang="th">
-<head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<html lang="th"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>สูตรการปรับปริมาณ - Dynamic Infographic</title>
 <style>
   :root {
@@ -50,6 +48,31 @@
     margin-top:-8px;
     margin-bottom:16px;
   }
+  .meta-inputs{
+    display:flex;
+    align-items:end;
+    gap:12px;
+    flex-wrap:wrap;
+    margin:0 0 18px;
+  }
+  .meta-field{display:flex;flex-direction:column;gap:5px}
+  .meta-field label{font-size:14px;font-weight:850;color:#49637f}
+  .meta-field input{
+    height:42px;
+    border:2px solid #cbdceb;
+    border-radius:10px;
+    padding:7px 11px;
+    font-size:17px;
+    font-weight:750;
+    color:var(--navy);
+    background:#fff;
+    outline:none;
+  }
+  .meta-field input:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(21,109,209,.10)}
+  .meta-field.code7 input{width:125px}
+  .meta-field.product-name input{width:280px}
+  .meta-field.change-input input{width:150px}
+  .change-arrow{font-size:22px;font-weight:950;color:#667f99;padding-bottom:7px}
   .period-inputs{
     display:grid;
     grid-template-columns:1fr 1fr;
@@ -107,12 +130,15 @@
   }
   .field input:focus{border-color:var(--blue);box-shadow:0 0 0 4px rgba(21,109,209,.12);background:#fff}
   .qty-field input{color:#b51d3e}
+  .calc-preview{margin-top:7px;font-size:15px;font-weight:800;color:#60708a;min-height:22px}
+  .calc-preview strong{color:#0b2f68;font-size:17px}
+  .calc-preview.error{color:#c51437}
   .actions{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap}
   button{
     border:0;border-radius:12px;padding:12px 20px;font-size:16px;font-weight:900;cursor:pointer;
   }
   .btn-primary{background:var(--navy);color:#fff}
-  .btn-secondary{background:#eaf2fa;color:var(--navy)}
+  .btn-secondary{background:linear-gradient(135deg,#ffb703,#ff8c00);color:#fff;font-size:18px;padding:14px 24px;border-radius:14px;box-shadow:0 8px 18px rgba(255,140,0,.28);border:2px solid #fff3cd;letter-spacing:.2px;transition:transform .15s ease,box-shadow .15s ease,filter .15s ease}.btn-secondary:hover{transform:translateY(-1px);box-shadow:0 10px 22px rgba(255,140,0,.34);filter:brightness(1.03)}.btn-secondary:active{transform:translateY(0);box-shadow:0 5px 12px rgba(255,140,0,.24)}
   .infographic{padding:28px}
   .hero{
     display:grid;
@@ -262,14 +288,97 @@
     .hero,.row-top,.row-bottom{grid-template-columns:1fr}
   }
   @media(max-width:650px){
+    .meta-inputs{align-items:stretch}
+    .meta-field,.meta-field.code7,.meta-field.product-name,.meta-field.change-input{width:100%}
+    .meta-field input,.meta-field.code7 input,.meta-field.product-name input,.meta-field.change-input input{width:100%}
+    .change-arrow{text-align:center;padding:0;transform:rotate(90deg)}
     .period-inputs{grid-template-columns:1fr}
     .product-flow{grid-template-columns:1fr}.arrow{transform:rotate(90deg)}
     .formula-equation{grid-template-columns:1fr}
     .infographic{padding:16px}.controls{padding:14px}
   }
+  .print-meta{display:none}
+
+  @page{size:A4 portrait;margin:4mm}
   @media print{
-    body{background:#fff}.controls{display:none}.page{box-shadow:none;margin:0;max-width:none;border-radius:0}
-    .infographic{padding:12mm}
+    html,body{margin:0!important;padding:0!important;background:#fff!important;width:100%!important;height:100%!important;overflow:hidden!important}
+    body{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+    .controls{display:none!important}
+    .page{
+      width:202mm!important;
+      height:289mm!important;
+      max-width:202mm!important;
+      max-height:289mm!important;
+      margin:0!important;
+      border-radius:0!important;
+      box-shadow:none!important;
+      overflow:hidden!important;
+      page-break-after:avoid!important;
+      break-after:avoid-page!important;
+    }
+    .infographic{
+      box-sizing:border-box!important;
+      padding:2mm!important;
+      width:185.1852%!important;
+      max-width:none!important;
+      transform:scale(.54);
+      transform-origin:top left;
+    }
+    .print-meta{
+      display:grid!important;
+      grid-template-columns:150px 1fr 56px 1fr;
+      gap:10px;
+      align-items:stretch;
+      margin:0 0 10px;
+      padding:10px 12px;
+      border:2px solid #d7e7f7;
+      border-radius:14px;
+      background:#f8fbff;
+      page-break-inside:avoid;
+      break-inside:avoid;
+    }
+    .print-meta-item{min-width:0}
+    .print-meta-label{font-size:14px;font-weight:900;color:#60708a;margin-bottom:2px}
+    .print-meta-value{font-size:20px;font-weight:950;color:#0b2f68;line-height:1.2;overflow-wrap:anywhere}
+    .print-meta-arrow{display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:950;color:#e21538}
+    .hero{margin-bottom:10px!important;gap:12px!important}
+    .hero h1{font-size:48px!important}
+    .subtitle{font-size:22px!important;margin-top:4px!important}
+    .subtitle2{font-size:16px!important}
+    .principle{min-height:0!important;padding:10px 14px!important}
+    .principle h3{font-size:22px!important}
+    .principle p{font-size:15px!important;line-height:1.35!important}
+    .target{font-size:38px!important}
+    .row-top,.row-bottom{gap:10px!important;min-width:0!important}
+    .row-top>*,.row-bottom>*,.hero>*{min-width:0!important;max-width:100%!important}
+    .row-bottom{margin-top:10px!important}
+    .panel-head{font-size:20px!important;padding:8px 12px!important}
+    .panel-body,.formula-wrap,.calc-box,.rel-box,.summary{padding:10px!important}
+    .product-card{padding:8px!important}
+    .bag{width:88px!important;height:96px!important;font-size:17px!important;margin-bottom:6px!important}
+    .month{padding:4px 10px!important;margin-bottom:5px!important}
+    .metric{font-size:15px!important}
+    .metric strong{font-size:22px!important}
+    .unit-price{font-size:14px!important;padding:6px 8px!important;margin-top:5px!important}
+    .unit-price strong{font-size:18px!important}
+    .arrow{font-size:38px!important}
+    .formula-title{font-size:16px!important;margin-bottom:8px!important}
+    .formula-equation{font-size:19px!important;gap:10px!important}
+    .fraction .num,.fraction .den{font-size:18px!important;padding:7px 9px!important}
+    .formula-legend{font-size:12px!important;margin-top:7px!important}
+    .unit-note{font-size:14px!important;margin-top:8px!important}
+    .calc-line{font-size:18px!important;line-height:1.35!important}
+    .compare-highlight{padding:8px 10px!important;margin-top:7px!important}
+    .compare-label{font-size:15px!important}
+    .compare-value{font-size:44px!important}
+    .compare-value small{font-size:20px!important}
+    .rel-formula{font-size:16px!important;line-height:1.35!important}
+    .rel-box .big-result{font-size:34px!important}
+    .summary h3{font-size:21px!important;margin-bottom:5px!important}
+    .summary li{font-size:15px!important;padding:5px 0!important}
+    .summary li[style]{font-size:18px!important;padding:7px!important}
+    .footer-note{font-size:13px!important;padding:7px 10px!important;margin-top:9px!important}
+    .panel,.summary,.hero,.row-top,.row-bottom,.footer-note{page-break-inside:avoid;break-inside:avoid}
   }
 </style>
 </head>
@@ -277,30 +386,61 @@
 <div class="page">
   <section class="controls">
     <div class="controls-title">กรอกข้อมูล 4 ค่า</div>
-    <div class="controls-subtitle">ปริมาณเดือนก่อนและเดือนนี้ควรใช้หน่วยเดียวกัน เพื่อให้การปรับราคาเปรียบเทียบถูกต้อง</div>
+    <div class="controls-subtitle">พิมพ์ตัวเลขหรือสูตรคำนวณได้ เช่น 200*6, 500/2, 120+30 — ปริมาณเดือนก่อนและเดือนนี้ควรใช้หน่วยเดียวกัน</div>
+    <div class="meta-inputs">
+      <div class="meta-field code7">
+        <label for="code7">หมวด 7 ตัว</label>
+        <input id="code7" type="text" inputmode="numeric" maxlength="7" autocomplete="off" placeholder="เช่น 1160001">
+      </div>
+      <div class="meta-field product-name">
+        <label for="changeFrom">เปลี่ยนจาก</label>
+        <input id="changeFrom" type="text" autocomplete="off" placeholder="พิมพ์ชื่อสินค้าเดิม">
+      </div>
+      <div class="change-arrow" aria-hidden="true">⇒</div>
+      <div class="meta-field product-name">
+        <label for="changeTo">เปลี่ยนเป็น</label>
+        <input id="changeTo" type="text" autocomplete="off" placeholder="พิมพ์ชื่อสินค้าใหม่">
+      </div>
+    </div>
     <div class="period-inputs">
       <div class="period-card prev-period">
         <div class="period-title"><span class="period-badge">1</span>เดือนก่อน</div>
         <div class="period-fields">
-          <div class="field price-field"><label>ราคาเดือนก่อน (บาท)</label><input id="prevPrice" type="number" step="0.01" value="" inputmode="decimal" placeholder="กรอกราคา"></div>
-          <div class="field qty-field"><label>ปริมาณรวมเดือนก่อน</label><input id="prevQty" type="number" step="any" value="" inputmode="decimal" placeholder="กรอกปริมาณ"></div>
+          <div class="field price-field"><label>ราคาเดือนก่อน (บาท)</label><input id="prevPrice" type="text" value="" inputmode="text" autocomplete="off" placeholder="เช่น 90 หรือ 30*3"><div class="calc-preview" id="prevPricePreview"></div></div>
+          <div class="field qty-field"><label>ปริมาณรวมเดือนก่อน</label><input id="prevQty" type="text" value="" inputmode="text" autocomplete="off" placeholder="เช่น 200*6"><div class="calc-preview" id="prevQtyPreview"></div></div>
         </div>
       </div>
       <div class="period-card curr-period">
         <div class="period-title"><span class="period-badge">2</span>เดือนนี้</div>
         <div class="period-fields">
-          <div class="field price-field"><label>ราคาเดือนนี้ (บาท)</label><input id="currPrice" type="number" step="0.01" value="" inputmode="decimal" placeholder="กรอกราคา"></div>
-          <div class="field qty-field"><label>ปริมาณรวมเดือนนี้</label><input id="currQty" type="number" step="any" value="" inputmode="decimal" placeholder="กรอกปริมาณ"></div>
+          <div class="field price-field"><label>ราคาเดือนนี้ (บาท)</label><input id="currPrice" type="text" value="" inputmode="text" autocomplete="off" placeholder="เช่น 700 หรือ 350*2"><div class="calc-preview" id="currPricePreview"></div></div>
+          <div class="field qty-field"><label>ปริมาณรวมเดือนนี้</label><input id="currQty" type="text" value="" inputmode="text" autocomplete="off" placeholder="เช่น 200*6"><div class="calc-preview" id="currQtyPreview"></div></div>
         </div>
       </div>
     </div>
     <div class="actions">
       <button class="btn-primary" onclick="updateAll()">คำนวณใหม่</button>
-      <button class="btn-secondary" onclick="window.print()">พิมพ์ / Save PDF</button>
+      <button class="btn-secondary" onclick="printWithFilename()">💾 พิมพ์ / Save PDF</button>
     </div>
   </section>
 
   <main class="infographic">
+    <section class="print-meta" aria-label="ข้อมูลสินค้าในการพิมพ์">
+      <div class="print-meta-item">
+        <div class="print-meta-label">หมวด 7 ตัว</div>
+        <div class="print-meta-value" id="printCode7">—</div>
+      </div>
+      <div class="print-meta-item">
+        <div class="print-meta-label">เปลี่ยนจาก</div>
+        <div class="print-meta-value" id="printChangeFrom">—</div>
+      </div>
+      <div class="print-meta-arrow">⇒</div>
+      <div class="print-meta-item">
+        <div class="print-meta-label">เปลี่ยนเป็น</div>
+        <div class="print-meta-value" id="printChangeTo">—</div>
+      </div>
+    </section>
+
     <section class="hero">
       <div>
         <h1>สูตรการ<span>ปรับปริมาณ</span></h1>
@@ -324,17 +464,17 @@
             <div class="product-card prev">
               <div class="month">เดือนก่อน</div>
               <div class="bag">สินค้า</div>
-              <div class="metric">ขนาด<strong><span id="prevQtyText">—</span></strong></div>
-              <div class="metric">ราคาเดือนก่อน<strong><span id="prevPriceText">—</span> บาท</strong></div>
-              <div class="unit-price">ราคาต่อหน่วย<strong><span id="prevUnitPriceText">—</span></strong></div>
+              <div class="metric">ขนาด<strong><span id="prevQtyText">500</span></strong></div>
+              <div class="metric">ราคาเดือนก่อน<strong><span id="prevPriceText">90.00</span> บาท</strong></div>
+              <div class="unit-price">ราคาต่อหน่วย<strong><span id="prevUnitPriceText">0.1800</span></strong></div>
             </div>
             <div class="arrow">➜</div>
             <div class="product-card curr">
               <div class="month">เดือนนี้</div>
               <div class="bag">สินค้า</div>
-              <div class="metric">ขนาด<strong><span id="currQtyText">—</span></strong></div>
-              <div class="metric">ราคาเดือนนี้<strong><span id="currPriceText">—</span> บาท</strong></div>
-              <div class="unit-price">ราคาต่อหน่วย<strong><span id="currUnitPriceText">—</span></strong></div>
+              <div class="metric">ขนาด<strong><span id="currQtyText">400</span></strong></div>
+              <div class="metric">ราคาเดือนนี้<strong><span id="currPriceText">700.00</span> บาท</strong></div>
+              <div class="unit-price">ราคาต่อหน่วย<strong><span id="currUnitPriceText">1.7500</span></strong></div>
             </div>
           </div>
         </div>
@@ -365,10 +505,10 @@
       <div class="panel compare-panel">
         <div class="panel-head">การคำนวณราคาเปรียบเทียบ</div>
         <div class="calc-box">
-          <div class="calc-line" id="compareFormulaText">กรอกข้อมูลเพื่อคำนวณราคาเปรียบเทียบ</div>
+          <div class="calc-line" id="compareFormulaText">ราคาเปรียบเทียบ = (90.00 × 400) ÷ 500</div>
           <div class="compare-highlight">
             <div class="compare-label">ราคาเปรียบเทียบที่ใช้</div>
-            <div class="compare-value"><span id="comparePriceText">—</span> <small>บาท</small></div>
+            <div class="compare-value"><span id="comparePriceText">72.00</span> <small>บาท</small></div>
           </div>
         </div>
       </div>
@@ -377,18 +517,18 @@
         <div class="panel-head">ค่า REL (ผลลัพธ์รอง)</div>
         <div class="rel-box">
           <div class="rel-formula">REL = (ราคาเดือนนี้ ÷ ราคาเปรียบเทียบ) × 100</div>
-          <div class="rel-formula" id="relFormulaText">กรอกข้อมูลเพื่อคำนวณ REL</div>
-          <div class="big-result"><span id="relText">—</span></div>
+          <div class="rel-formula" id="relFormulaText">REL = (700.00 ÷ 72.00) × 100</div>
+          <div class="big-result"><span id="relText">972.22</span></div>
         </div>
       </div>
 
       <div class="summary">
         <h3>สรุปผล</h3>
         <ul>
-          <li style="font-size:25px;background:#fff4bf;border-radius:12px;padding:12px">ราคาเปรียบเทียบ = <b style="color:#b42318"><span id="sumCompare">—</span> บาท</b></li>
-          <li>ราคาเดือนนี้ = <b><span id="sumCurrent">—</span> บาท</b></li>
-          <li>REL = <b><span id="sumRel">—</span></b></li>
-          <li id="changeLine">กรอกข้อมูลด้านบนเพื่อคำนวณผล</li>
+          <li style="font-size:25px;background:#fff4bf;border-radius:12px;padding:12px">ราคาเปรียบเทียบ = <b style="color:#b42318"><span id="sumCompare">72.00</span> บาท</b></li>
+          <li>ราคาเดือนนี้ = <b><span id="sumCurrent">700.00</span> บาท</b></li>
+          <li>REL = <b><span id="sumRel">972.22</span></b></li>
+          <li id="changeLine">เมื่อปรับปริมาณแล้ว พบว่า <b class="up">ราคาเพิ่มขึ้น 872.22%</b></li>
         </ul>
       </div>
     </section>
@@ -404,14 +544,84 @@
   const nfQty = new Intl.NumberFormat('th-TH',{maximumFractionDigits:4});
   const nfUnit = new Intl.NumberFormat('th-TH',{minimumFractionDigits:4,maximumFractionDigits:6});
 
+  function evaluateExpression(raw){
+    const text = String(raw ?? '').trim();
+    if (text === '') return { value: NaN, empty: true, error: false };
+
+    // รองรับตัวเลข เครื่องหมาย + - * / วงเล็บ จุดทศนิยม และ comma คั่นหลักพัน
+    const cleaned = text.replace(/,/g, '').replace(/[×xX]/g, '*').replace(/[÷]/g, '/');
+    if (!/^[0-9+\-*/().\s]+$/.test(cleaned)) {
+      return { value: NaN, empty: false, error: true };
+    }
+
+    try {
+      // ใช้เฉพาะอักขระที่ตรวจสอบแล้วด้านบน จึงไม่มี identifier หรือคำสั่ง JavaScript อื่น
+      const value = Function('"use strict"; return (' + cleaned + ');')();
+      return {
+        value: (typeof value === 'number' && Number.isFinite(value)) ? value : NaN,
+        empty: false,
+        error: !(typeof value === 'number' && Number.isFinite(value))
+      };
+    } catch (e) {
+      return { value: NaN, empty: false, error: true };
+    }
+  }
+
   function n(id){
-    const raw = $(id).value.trim();
-    if (raw === '') return NaN;
-    const v = parseFloat(raw);
-    return Number.isFinite(v) ? v : NaN;
+    return evaluateExpression($(id).value).value;
+  }
+
+  function updatePreview(inputId, previewId, formatter){
+    const raw = $(inputId).value.trim();
+    const preview = $(previewId);
+    const result = evaluateExpression(raw);
+    preview.classList.remove('error');
+
+    if (result.empty){
+      preview.textContent = '';
+    } else if (result.error){
+      preview.textContent = 'สูตรไม่ถูกต้อง';
+      preview.classList.add('error');
+    } else if (/[+\-*/()×xX÷]/.test(raw.replace(/^[-+]?\d+(?:[.,]\d+)?$/, '')) || /[*/()×xX÷]/.test(raw)) {
+      preview.innerHTML = `= <strong>${formatter.format(result.value)}</strong>`;
+    } else {
+      preview.textContent = '';
+    }
+  }
+
+  function updatePrintMeta(){
+    $('printCode7').textContent = $('code7').value.trim() || '—';
+    $('printChangeFrom').textContent = $('changeFrom').value.trim() || '—';
+    $('printChangeTo').textContent = $('changeTo').value.trim() || '—';
+  }
+
+  function makePdfFilename(){
+    const code7 = $('code7').value.trim();
+    const from = $('changeFrom').value.trim();
+    const to = $('changeTo').value.trim();
+    const base = (from && to) ? `${from}เปลี่ยนเป็น${to}` : (from || to || 'ปรับปริมาณ');
+    const fullName = code7 ? `${code7}_${base}` : base;
+    // ตัดช่องว่างทั้งหมด และแทนอักขระที่ใช้ในชื่อไฟล์ไม่ได้
+    return fullName.replace(/\s+/g,'').replace(/[\\/:*?"<>|]/g,'-');
+  }
+
+  function printWithFilename(){
+    updatePrintMeta();
+    const oldTitle = document.title;
+    document.title = makePdfFilename();
+    const restore = () => { document.title = oldTitle; window.removeEventListener('afterprint', restore); };
+    window.addEventListener('afterprint', restore);
+    window.print();
+    // fallback สำหรับ browser ที่ไม่ยิง afterprint
+    setTimeout(() => { if (document.title !== oldTitle) document.title = oldTitle; }, 1500);
   }
 
   function updateAll(){
+    updatePreview('prevPrice','prevPricePreview',nf2);
+    updatePreview('prevQty','prevQtyPreview',nfQty);
+    updatePreview('currPrice','currPricePreview',nf2);
+    updatePreview('currQty','currQtyPreview',nfQty);
+
     const prevPrice = n('prevPrice');
     const prevQty = n('prevQty');
     const currPrice = n('currPrice');
@@ -472,11 +682,24 @@
     }
   }
 
+  const code7Input = $('code7');
+  if (code7Input){
+    code7Input.addEventListener('input',()=>{
+      code7Input.value = code7Input.value.replace(/\D/g,'').slice(0,7);
+    });
+  }
+
   document.querySelectorAll('.controls input').forEach(el=>{
     el.addEventListener('input',updateAll);
     el.addEventListener('change',updateAll);
   });
+  ['code7','changeFrom','changeTo'].forEach(id=>{
+    $(id).addEventListener('input',updatePrintMeta);
+    $(id).addEventListener('change',updatePrintMeta);
+  });
+  updatePrintMeta();
   updateAll();
 </script>
-</body>
-</html>
+
+
+</body></html>
