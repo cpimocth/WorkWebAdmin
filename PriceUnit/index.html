@@ -385,8 +385,8 @@
 <body>
 <div class="page">
   <section class="controls">
-    <div class="controls-title">กรอกข้อมูล 4 ค่า</div>
-    <div class="controls-subtitle">พิมพ์ตัวเลขหรือสูตรคำนวณได้ เช่น 200*6, 500/2, 120+30 — ปริมาณเดือนก่อนและเดือนนี้ควรใช้หน่วยเดียวกัน</div>
+    <div class="controls-title">กรอกข้อมูลดังนี้ไป</div>
+    <div class="controls-subtitle"></div>
     <div class="meta-inputs">
       <div class="meta-field code7">
         <label for="code7">หมวด 7 ตัว</label>
@@ -487,8 +487,6 @@
         </div>
       </div>
     </section>
-
-    
 
     <section class="row-top">
       <div class="panel">
@@ -600,11 +598,12 @@
   }
 
   function makePdfFilename(){
+    const month = String(new Date().getMonth() + 1).padStart(2, '0');
     const code7 = $('code7').value.trim();
     const from = $('changeFrom').value.trim();
     const to = $('changeTo').value.trim();
     const base = (from && to) ? `${from}เปลี่ยนเป็น${to}` : (from || to || 'ปรับปริมาณ');
-    const fullName = code7 ? `${code7}_${base}` : base;
+    const fullName = code7 ? `${month}_${code7}_${base}` : `${month}_${base}`;
     // ตัดช่องว่างทั้งหมด และแทนอักขระที่ใช้ในชื่อไฟล์ไม่ได้
     return fullName.replace(/\s+/g,'').replace(/[\\/:*?"<>|]/g,'-');
   }
