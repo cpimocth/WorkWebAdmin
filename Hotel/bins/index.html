@@ -1,2674 +1,1207 @@
 <!DOCTYPE html>
-
 <html lang="th">
-
 <head>
-
   <meta charset="UTF-8">
-
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <title>Dashboard ตรวจสอบทิศทางราคาห้องพัก & สเปคซ้ำ</title>
-
+  <title>ระบบวิเคราะห์การเปลี่ยนแปลงราคาห้องพัก & ตรวจสอบสเปคซ้ำ</title>
   <!-- Tailwind CSS & Fonts -->
-
   <script src="https://cdn.tailwindcss.com"></script>
-
   <link rel="preconnect" href="https://fonts.googleapis.com">
-
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-
   <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-
   <!-- SheetJS -->
-
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-
   <!-- Chart.js -->
-
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
   <style>
-
     body { font-family: 'Sarabun', sans-serif; }
-
     .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
-
     .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
-
     .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
-
-  
-
-    /* =========================================================
-       Visual refresh only — application logic remains unchanged
-       ========================================================= */
-    :root {
-      --brand-950:#172554;
-      --brand-900:#1e3a8a;
-      --brand-700:#1d4ed8;
-      --brand-600:#2563eb;
-      --brand-500:#3b82f6;
-      --ink:#0f172a;
-      --muted:#64748b;
-      --line:#e2e8f0;
-      --panel:rgba(255,255,255,.94);
-      --panel-soft:#f8fafc;
-      --success:#059669;
-      --danger:#e11d48;
-      --warning:#d97706;
-      --shadow:0 10px 30px rgba(15,23,42,.06);
-      --shadow-hover:0 14px 38px rgba(15,23,42,.10);
-    }
-
-    * { box-sizing: border-box; }
-    html { scroll-behavior: smooth; }
-    body {
-      color: var(--ink);
-      background:
-        radial-gradient(circle at 8% 2%, rgba(59,130,246,.10), transparent 24rem),
-        radial-gradient(circle at 94% 12%, rgba(14,165,233,.08), transparent 26rem),
-        #f4f7fb !important;
-      font-feature-settings: "tnum" 1, "liga" 1;
-    }
-
-    /* Top bar */
-    body > header {
-      position: sticky;
-      top: 0;
-      z-index: 40;
-      background: linear-gradient(118deg,#172554 0%,#1d4ed8 52%,#0284c7 100%) !important;
-      border-bottom: 1px solid rgba(255,255,255,.16);
-      box-shadow: 0 8px 26px rgba(30,64,175,.18) !important;
-    }
-    body > header::after {
-      content:"";
-      position:absolute;
-      inset:0;
-      pointer-events:none;
-      background:linear-gradient(90deg,transparent,rgba(255,255,255,.05),transparent);
-    }
-    body > header > div { position:relative; z-index:1; padding-top:1rem !important; padding-bottom:1rem !important; }
-    body > header h1 { font-size:1.3rem !important; letter-spacing:-.02em; text-shadow:0 1px 1px rgba(0,0,0,.08); }
-    body > header p { color:#dbeafe !important; }
-    body > header span.p-2 {
-      border:1px solid rgba(255,255,255,.18);
-      background:rgba(255,255,255,.12) !important;
-      box-shadow:inset 0 1px 0 rgba(255,255,255,.08);
-    }
-    #btnExport {
-      border:1px solid rgba(255,255,255,.18);
-      background:rgba(5,150,105,.96) !important;
-      box-shadow:0 5px 14px rgba(5,150,105,.28) !important;
-    }
-    #btnExport:hover { transform:translateY(-1px); box-shadow:0 8px 18px rgba(5,150,105,.34) !important; }
-
-    main { max-width: 1440px !important; }
-
-    /* Shared cards */
-    main > div.bg-white,
-    #resultSection > div.bg-white,
-    #resultSection > div > div.bg-white,
-    #duplicateSection,
-    #detailModal > div {
-      background:var(--panel) !important;
-      border-color:rgba(203,213,225,.82) !important;
-      box-shadow:var(--shadow) !important;
-      backdrop-filter: blur(10px);
-    }
-    main > div.bg-white:hover,
-    #resultSection > div.bg-white:hover,
-    #resultSection > div > div.bg-white:hover {
-      box-shadow:var(--shadow-hover) !important;
-    }
-
-    /* Upload / control panel */
-    main > div:first-child {
-      position:relative;
-      overflow:hidden;
-      border-radius:1.1rem !important;
-      padding:1.25rem !important;
-    }
-    main > div:first-child::before {
-      content:"ข้อมูลและตัวกรอง";
-      display:block;
-      width:max-content;
-      margin-bottom:.9rem;
-      padding:.35rem .65rem;
-      border-radius:999px;
-      background:#eff6ff;
-      border:1px solid #dbeafe;
-      color:#1d4ed8;
-      font-size:.72rem;
-      font-weight:700;
-      letter-spacing:.02em;
-    }
-    main > div:first-child label {
-      color:#334155 !important;
-      font-weight:700 !important;
-    }
-    #excelFile, #sheetSelect {
-      min-height:42px;
-      border-color:#cbd5e1 !important;
-      background:#fff !important;
-      box-shadow:0 1px 2px rgba(15,23,42,.03);
-      transition:.2s ease;
-    }
-    #excelFile:hover, #sheetSelect:hover { border-color:#93c5fd !important; }
-    #excelFile:focus, #sheetSelect:focus { outline:none; border-color:#3b82f6 !important; box-shadow:0 0 0 3px rgba(59,130,246,.12) !important; }
-    #excelFile::file-selector-button { border-radius:.55rem !important; }
-    #btnFilterDiscount, #btnFilterRegular, #btnFilterAll { min-height:34px; border-radius:.55rem !important; }
-
-    /* Supporting links and guidance */
-    .work-guidelines {
-      margin-top:.55rem;
-      padding:.8rem .95rem;
-      border:1px solid #e2e8f0;
-      border-left:3px solid #3b82f6;
-      border-radius:.75rem;
-      background:linear-gradient(90deg,#f8fbff 0%,#fff 100%);
-      color:#475569;
-      line-height:1.65;
-    }
-    .work-guidelines ul { list-style:disc; padding-left:1.1rem; }
-    .work-guidelines ul ul { list-style:circle; margin-top:.25rem; }
-    .work-guidelines a { color:#2563eb; font-weight:600; }
-    #dupNavJump {
-      width:max-content;
-      margin-top:.4rem;
-      padding:.45rem .7rem;
-      border-radius:.6rem;
-      background:#fff7ed;
-      border:1px solid #fed7aa;
-    }
-
-    /* KPI cards */
-    #resultSection > div.grid.grid-cols-2 > div {
-      position:relative;
-      overflow:hidden;
-      border-radius:1rem !important;
-      min-height:118px;
-      transition:transform .18s ease, box-shadow .18s ease;
-    }
-    #resultSection > div.grid.grid-cols-2 > div:hover { transform:translateY(-2px); box-shadow:var(--shadow-hover) !important; }
-    #resultSection > div.grid.grid-cols-2 > div::after {
-      content:"";
-      position:absolute;
-      width:72px;
-      height:72px;
-      right:-24px;
-      top:-24px;
-      border-radius:999px;
-      background:currentColor;
-      opacity:.045;
-    }
-    #kpiTotalItems, #kpiTotalComparisons, #kpiUpCount, #kpiDownCount, #kpiSameCount {
-      font-size:1.85rem !important;
-      letter-spacing:-.04em;
-    }
-
-    /* Content section titles */
-    #resultSection h2 { letter-spacing:-.01em; }
-    #resultSection h2::before {
-      content:"";
-      display:inline-block;
-      width:4px;
-      height:16px;
-      margin-right:.55rem;
-      border-radius:999px;
-      background:#3b82f6;
-      vertical-align:-2px;
-    }
-    #duplicateSection h2::before { background:#f59e0b; }
-
-    /* Chart / table panels */
-    #resultSection .lg\:col-span-7,
-    #resultSection .lg\:col-span-5 {
-      border-radius:1rem !important;
-    }
-    #dailyTrendChart { max-height:330px; }
-
-    table { border-collapse:separate; border-spacing:0; }
-    thead th {
-      background:#f8fafc !important;
-      color:#475569 !important;
-      border-bottom:1px solid #e2e8f0;
-      letter-spacing:.015em;
-      text-transform:none !important;
-      white-space:nowrap;
-    }
-    tbody tr { transition:background-color .14s ease; }
-    tbody td { border-bottom-color:#f1f5f9; }
-    #itemsTableBody tr:hover,
-    #dailySummaryTableBody tr:hover { background:#f8fbff !important; }
-    .font-mono { font-family:'Sarabun', ui-monospace, monospace !important; font-variant-numeric:tabular-nums; }
-
-    #searchInput, #movementFilter {
-      min-height:34px;
-      border-color:#cbd5e1 !important;
-    }
-    #searchInput:focus, #movementFilter:focus {
-      outline:none;
-      border-color:#3b82f6 !important;
-      box-shadow:0 0 0 3px rgba(59,130,246,.10) !important;
-    }
-
-    /* Duplicate warning zone */
-    #duplicateSection {
-      border:1px solid #f5c76b !important;
-      border-radius:1rem !important;
-      box-shadow:0 12px 34px rgba(180,83,9,.08) !important;
-    }
-    #duplicateSection > div:first-child {
-      background:linear-gradient(100deg,#fffaf0 0%,#fff7ed 58%,#fffbeb 100%) !important;
-    }
-    #badgeDupStatus { box-shadow:inset 0 0 0 1px rgba(255,255,255,.4); }
-    #btnExportDup { box-shadow:0 4px 10px rgba(217,119,6,.16); }
-
-    /* Modal */
-    #detailModal { background:rgba(15,23,42,.55) !important; }
-    #detailModal > div { border-radius:1.1rem !important; box-shadow:0 28px 70px rgba(15,23,42,.25) !important; }
-    #detailModal thead { position:sticky; top:0; z-index:2; }
-
-    /* Scrollbars */
-    .custom-scrollbar::-webkit-scrollbar { width:7px; height:7px; }
-    .custom-scrollbar::-webkit-scrollbar-track { background:#f8fafc; border-radius:999px; }
-    .custom-scrollbar::-webkit-scrollbar-thumb { background:#cbd5e1; border-radius:999px; border:2px solid #f8fafc; }
-    .custom-scrollbar::-webkit-scrollbar-thumb:hover { background:#94a3b8; }
-
-    /* Buttons */
-    button { transition:transform .15s ease, box-shadow .15s ease, background-color .15s ease, border-color .15s ease; }
-    button:not(:disabled):active { transform:translateY(1px); }
-
-    /* Mobile refinements */
-    @media (max-width: 767px) {
-      body > header { position:relative; }
-      main { padding-left:.8rem !important; padding-right:.8rem !important; }
-      main > div:first-child { padding:1rem !important; }
-      #resultSection > div.grid.grid-cols-2 > div { min-height:104px; }
-      #searchInput { width:100% !important; }
-      #resultSection .p-5.border-b { align-items:stretch !important; }
-      #resultSection .p-5.border-b > div.flex { flex-wrap:wrap; }
-    }
-
-    @media print {
-      body { background:#fff !important; }
-      body > header { position:relative; box-shadow:none !important; }
-      main > div:first-child { display:none !important; }
-      #resultSection > * { break-inside:avoid; }
-      button { display:none !important; }
-    }
-
   </style>
-
 </head>
-
 <body class="bg-slate-50 text-slate-800 min-h-screen pb-16">
 
-
-
   <!-- Header -->
-
   <header class="bg-gradient-to-r from-blue-700 via-indigo-700 to-sky-700 text-white shadow-md">
-
     <div class="max-w-7xl mx-auto px-4 py-6 sm:px-6 lg:px-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-
       <div>
-
         <div class="flex items-center space-x-3">
-
           <span class="p-2 bg-white/10 rounded-lg backdrop-blur-sm">
-
             <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
-
             </svg>
-
           </span>
-
           <h1 class="text-2xl font-bold tracking-tight">ระบบตรวจสอบทิศทางราคาห้องพัก & ตรวจสอบสเปคซ้ำ</h1>
-
         </div>
-
         <p class="text-blue-100 text-sm mt-1">วิเคราะห์เปรียบเทียบวันต่อวัน</p>
-
       </div>
-
-
 
       <!-- Quick Action Buttons -->
-
       <div class="flex items-center gap-2">
-
         <button id="btnExport" onclick="exportToExcel()" class="hidden items-center gap-1.5 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold rounded-lg shadow-sm transition">
-
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-
           ส่งออกรายงานทั้งหมด (Excel)
-
         </button>
-
       </div>
-
     </div>
-
   </header>
 
-
-
-  <main class="max-w-7xl mx-auto px-4 py-7 sm:px-6 lg:px-8 space-y-6">
-
-
+  <main class="max-w-7xl mx-auto px-4 py-6 sm:px-6 lg:px-8 space-y-6">
 
     <!-- Upload Card & Controls -->
-
-    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 transition-all">
-
+    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 transition-all">
       <div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
-
         <!-- File Dropzone -->
-
         <div class="md:col-span-5">
-
           <label class="block text-sm font-semibold text-slate-700 mb-2">1. อัปโหลดไฟล์ Excel (.xlsx / .xls)</label>
-
           <input type="file" id="excelFile" accept=".xlsx, .xls" class="block w-full text-sm text-slate-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer border border-slate-300 rounded-lg p-1 bg-slate-50/50">
-
         </div>
-
-
 
         <!-- Sheet Selector -->
-
         <div class="md:col-span-3">
-
           <label class="block text-sm font-semibold text-slate-700 mb-2">2. เลือกชีท</label>
-
           <select id="sheetSelect" onchange="processCurrentSheet()" disabled class="w-full py-2.5 px-3 bg-white border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 text-slate-700 disabled:bg-slate-100 disabled:cursor-not-allowed">
-
             <option value="">-- กรุณาอัปโหลดไฟล์ --</option>
-
           </select>
-
         </div>
-
-
 
         <!-- Price Type Filter -->
-
         <div class="md:col-span-4">
-
           <label class="block text-sm font-semibold text-slate-700 mb-2">3. เลือกรูปแบบราคา</label>
-
           <div class="flex items-center gap-1 bg-slate-100 p-1 rounded-lg border border-slate-200">
-
             <button type="button" onclick="setPriceTypeFilter('ราคาลด')" id="btnFilterDiscount" class="flex-1 py-1.5 px-3 text-xs font-semibold rounded-md bg-white text-blue-700 shadow-sm transition">ราคาลด</button>
-
             <button type="button" onclick="setPriceTypeFilter('ราคาเต็ม')" id="btnFilterRegular" class="flex-1 py-1.5 px-3 text-xs font-medium text-slate-600 hover:text-slate-900 transition">ราคาเต็ม</button>
-
             <button type="button" onclick="setPriceTypeFilter('all')" id="btnFilterAll" class="flex-1 py-1.5 px-3 text-xs font-medium text-slate-600 hover:text-slate-900 transition">ทั้งหมด</button>
-
           </div>
-
         </div>
-
       </div>
-
-
 
       <div class="mt-3 text-xs font-medium text-slate-500 flex items-center justify-between">
-
       <div class="flex flex-col gap-1.5 text-sm">
-
       <div class="flex items-center gap-1.5">
-
         <svg class="w-4 h-4 text-blue-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-
         <span>ให้ดูตาม columns สีแดง</span>
-
       </div>
-
       <div class="flex flex-col pl-5.5">
-
         <a href="https://docs.google.com/spreadsheets/d/1e4BV-mGsQ9sjfnskj_3kKNp5I8WyXpynRoH7ypBtFXg/edit?gid=0#gid=0" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline">Sheet แทนที่ สำหรับส่งบริษัท (พี่อ้อมตรวจ)</a>
-
         <a href="https://docs.google.com/spreadsheets/d/1Hfapt9yHyfusxNOYQ8ghwMO6oQmk2ayIYsEWuQpnwqE/edit?gid=0#gid=0" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline">Sheet เพิ่มใหม่ สำหรับส่งบริษัท (พี่อ้อมตรวจ)</a>
-
         <a href="https://docs.google.com/spreadsheets/d/11AOUmzTdnSmWb23yghlGOx6MRctMKvmLipEZ2mQfkYI/edit?gid=0#gid=0" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline">Sheet ดูตัวซ้ำ (น้องดำเนินการ)</a>
-
         <a href="https://docs.google.com/spreadsheets/d/1cuUeJLI9TXq8smP95gq_Br77I26dcNS_uW2Y2-2sUW0/edit?gid=1236058176#gid=1236058176" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline">Sheet สำหรับวางข้อมูล (น้องดำเนินการ)</a>
-
         <div class="work-guidelines">
-
   <ul class="guidelines-list">
-
     <li>
-
       <strong>กรณีเพิ่มใหม่:</strong> ให้เพิ่มใน 23AI ให้เรียบร้อย โดยปฏิบัติตาม
-
       <ul>
-
         <li>
-
           สเปคข้อ 1.1.3: 
-
           <a href="https://cpi-cpip.tpso.go.th/ords/r/tpso/cpi/spec-ccode?clear=101010002&session=1745653841840&cs=3ay-AdxP_6BowJcaZg9PsEEzuWPdWnIZGULxOOPuaoMMI7gbog5g5_9p2CEKy6ayXj0XwAvxClnzwAoTIgyeoVA" target="_blank" rel="noopener noreferrer">
-
             ลิงก์สเปคข้อ 1.1.3
-
           </a>
-
         </li>
-
         <li>
-
           ร้านข้อ 1.2.1: 
-
           <a href="https://cpi-cpip.tpso.go.th/ords/r/tpso/cpi/shop1?clear=102010001&session=1745653841840&cs=30Gah_LIMkUdwi6PvcWK2QvOavbPub6R4c99TDo_UWJSwDL2_cro2mp90kW_7zF-MzGA0VTSSDYsdGH5B4MBhgw" target="_blank" rel="noopener noreferrer">
-
             ลิงก์ร้านข้อ 1.2.1
-
           </a>
-
         </li>
-
       </ul>
-
     </li>
-
     <li>
-
       <strong>กรณีแทนที่:</strong> ให้เปลี่ยนสเปคและแหล่งใน 23AI ให้เรียบร้อย
-
     </li>
-
   </ul>
-
 </div>
-
         <a href="#duplicateSection" id="dupNavJump" class="hidden text-amber-700 font-semibold hover:underline flex items-center gap-1">
-
           <span class="inline-block w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
-
           พบสเปคซ้ำในชีทนี้ คลิกเพื่อดูด้านล่าง ↓
-
         </a>
-
       </div>
-
     </div>
-
-
 
     <!-- Dashboard Content -->
-
     <div id="resultSection" class="hidden space-y-6">
 
-
-
       <!-- Overall Summary KPI Cards -->
-
       <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
-
         <div class="bg-white rounded-xl p-5 border border-slate-200 shadow-sm">
-
           <div class="text-xs font-medium text-slate-500 uppercase tracking-wider">จำนวนรายการทั้งหมด</div>
-
           <div id="kpiTotalItems" class="text-2xl font-bold text-slate-800 mt-2">0</div>
-
           <div id="kpiFilterBadge" class="text-xs text-blue-600 font-semibold mt-1">ราคาลด</div>
-
         </div>
-
-
 
         <div class="bg-white rounded-xl p-5 border border-slate-200 shadow-sm">
-
           <div class="text-xs font-medium text-slate-500 uppercase tracking-wider">จำนวนคู่เปรียบเทียบรวม</div>
-
           <div id="kpiTotalComparisons" class="text-2xl font-bold text-slate-800 mt-2">0</div>
-
           <div class="text-xs text-slate-400 mt-1">ครั้งที่ตรวจพบราคา</div>
-
         </div>
-
-
 
         <div class="bg-emerald-50/60 rounded-xl p-5 border border-emerald-200 shadow-sm">
-
           <div class="flex items-center justify-between">
-
             <span class="text-xs font-semibold text-emerald-800 uppercase tracking-wider">ราคาขึ้น (+)</span>
-
             <span class="p-1 bg-emerald-100 text-emerald-700 rounded-md">
-
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"/></svg>
-
             </span>
-
           </div>
-
           <div id="kpiUpCount" class="text-2xl font-bold text-emerald-700 mt-2">0</div>
-
           <div id="kpiUpPct" class="text-xs font-medium text-emerald-600 mt-1">0%</div>
-
         </div>
-
-
 
         <div class="bg-rose-50/60 rounded-xl p-5 border border-rose-200 shadow-sm">
-
           <div class="flex items-center justify-between">
-
             <span class="text-xs font-semibold text-rose-800 uppercase tracking-wider">ราคาลง (-)</span>
-
             <span class="p-1 bg-rose-100 text-rose-700 rounded-md">
-
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/></svg>
-
             </span>
-
           </div>
-
           <div id="kpiDownCount" class="text-2xl font-bold text-rose-700 mt-2">0</div>
-
           <div id="kpiDownPct" class="text-xs font-medium text-rose-600 mt-1">0%</div>
-
         </div>
-
-
 
         <div class="bg-slate-100/70 rounded-xl p-5 border border-slate-200 shadow-sm col-span-2 md:col-span-1">
-
           <div class="flex items-center justify-between">
-
             <span class="text-xs font-semibold text-slate-700 uppercase tracking-wider">ราคาคงที่ (=)</span>
-
             <span class="p-1 bg-slate-200 text-slate-700 rounded-md">
-
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14"/></svg>
-
             </span>
-
           </div>
-
           <div id="kpiSameCount" class="text-2xl font-bold text-slate-700 mt-2">0</div>
-
           <div id="kpiSamePct" class="text-xs font-medium text-slate-500 mt-1">0%</div>
-
         </div>
-
       </div>
-
-
 
       <!-- Chart & Daily Timeline Breakdown -->
-
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-
         <div class="lg:col-span-7 bg-white rounded-xl shadow-sm border border-slate-200 p-5 flex flex-col">
-
           <div class="flex items-center justify-between mb-4">
-
             <h2 class="text-base font-bold text-slate-800">ทิศทางราคารายวัน (2-1, 3-2, ... จนถึงสิ้นเดือน)</h2>
-
             <span class="text-xs bg-blue-50 text-blue-700 px-2.5 py-1 rounded-full font-medium">Stacked Bar Chart</span>
-
           </div>
-
           <div class="relative flex-1 min-h-[300px]">
-
             <canvas id="dailyTrendChart"></canvas>
-
           </div>
-
         </div>
-
-
 
         <div class="lg:col-span-5 bg-white rounded-xl shadow-sm border border-slate-200 p-5 flex flex-col">
-
           <div class="flex items-center justify-between mb-3">
-
             <h2 class="text-base font-bold text-slate-800">สรุปการขยับราคาแต่ละช่วงวัน</h2>
-
             <span id="dailyTableBadge" class="text-xs text-slate-500"></span>
-
           </div>
-
           <div class="overflow-y-auto max-h-[300px] border border-slate-100 rounded-lg custom-scrollbar">
-
             <table class="w-full text-xs text-left">
-
               <thead class="bg-slate-100 text-slate-600 sticky top-0 uppercase font-semibold">
-
                 <tr>
-
                   <th class="py-2.5 px-3">ช่วงวัน</th>
-
                   <th class="py-2.5 px-3 text-right text-emerald-700">ขึ้น (+)</th>
-
                   <th class="py-2.5 px-3 text-right text-rose-700">ลง (-)</th>
-
                   <th class="py-2.5 px-3 text-right text-slate-600">คงที่ (=)</th>
-
                   <th class="py-2.5 px-3 text-right">รวมตรวจพบ</th>
-
                 </tr>
-
               </thead>
-
               <tbody id="dailySummaryTableBody" class="divide-y divide-slate-100 font-medium"></tbody>
-
             </table>
-
           </div>
-
         </div>
-
       </div>
-
-
 
       <!-- Main Itemized Table Section -->
-
       <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-
         <div class="p-5 border-b border-slate-200 flex flex-col md:flex-row md:items-center md:justify-between gap-3 bg-slate-50/50">
-
           <div>
-
             <h2 class="text-base font-bold text-slate-800">รายละเอียดรายสินค้า (รหัสแหล่ง + รหัสสเปค)</h2>
-
             <p class="text-xs text-slate-500 mt-0.5">นับจำนวนครั้งที่ราคา ขึ้น / ลง / คงที่ ตลอดทั้งเดือนของแต่ละรายการ</p>
-
           </div>
-
           <div class="flex items-center gap-2">
-
             <div class="relative">
-
               <input type="text" id="searchInput" oninput="filterTable()" placeholder="ค้นหา รหัส, โรงแรม, ห้อง..." class="w-60 pl-8 pr-3 py-1.5 text-xs bg-white border border-slate-300 rounded-lg focus:ring-1 focus:ring-blue-500">
-
               <svg class="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-
             </div>
-
             <select id="movementFilter" onchange="filterTable()" class="py-1.5 px-2.5 text-xs bg-white border border-slate-300 rounded-lg text-slate-700">
-
               <option value="all">ภาวะทั้งหมด</option>
-
               <option value="has_up">มีราคาขึ้น (+)</option>
-
               <option value="has_down">มีราคาลง (-)</option>
-
               <option value="only_same">คงที่ตลอดเดือน (=)</option>
-
             </select>
-
           </div>
-
         </div>
-
-
 
         <div class="overflow-x-auto custom-scrollbar">
-
           <table class="w-full text-xs text-left">
-
             <thead class="bg-slate-100 text-slate-600 uppercase font-semibold border-b border-slate-200">
-
               <tr>
-
                 <th class="py-3 px-3 w-12 text-center">#</th>
-
                 <th class="py-3 px-3">รูปแบบราคา</th>
-
                 <th class="py-3 px-3">รหัสแหล่ง</th>
-
                 <th class="py-3 px-3">รหัสสเปค</th>
-
                 <th class="py-3 px-3">ชื่อโรงแรม / แหล่งจัดเก็บ</th>
-
                 <th class="py-3 px-3">ประเภทห้อง</th>
-
                 <th class="py-3 px-3 text-right text-emerald-700">ขึ้น (+)</th>
-
                 <th class="py-3 px-3 text-right text-rose-700">ลง (-)</th>
-
                 <th class="py-3 px-3 text-right text-slate-600">คงที่ (=)</th>
-
                 <th class="py-3 px-3 text-center">ภาวะหลัก</th>
-
                 <th class="py-3 px-3 text-center">สถานะสเปค</th>
-
                 <th class="py-3 px-3 text-center">การดำเนินการ</th>
-
               </tr>
-
             </thead>
-
             <tbody id="itemsTableBody" class="divide-y divide-slate-100"></tbody>
-
           </table>
-
         </div>
-
-
 
         <div class="p-3 border-t border-slate-200 flex items-center justify-between text-xs text-slate-500 bg-slate-50/50">
-
           <span id="tableRecordCount">แสดง 0 รายการ</span>
-
           <div class="flex items-center gap-1" id="paginationControls"></div>
-
         </div>
-
       </div>
 
-
-
       <!-- ========================================== -->
-
       <!-- SECTION: DUPLICATE SPEC CHECK (สเปคซ้ำ) -->
-
       <!-- ========================================== -->
-
       <section id="duplicateSection" class="bg-white rounded-xl shadow-sm border border-amber-200 overflow-hidden mt-8 transition-all">
-
         <!-- Section Header -->
-
         <div class="p-5 border-b border-amber-200 bg-gradient-to-r from-amber-50 via-orange-50 to-amber-50 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-
           <div class="flex items-start gap-3">
-
             <div class="p-2 bg-amber-500 text-white rounded-lg shadow-sm mt-0.5">
-
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
-
               </svg>
-
             </div>
-
             <div>
-
               <div class="flex items-center gap-2">
-
                 <h2 class="text-base font-bold text-amber-900">ตรวจสอบและติดตาม "สเปคซ้ำ"</h2>
-
                 <span id="badgeDupStatus" class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-100 text-amber-800 border border-amber-300">
-
                   กำลังตรวจสอบ...
-
                 </span>
-
               </div>
-
               <p class="text-xs text-amber-700 mt-1">
-
                 การซ้ำซ้อนพิจารณาจากการซ้ำของคู่ <strong>[รหัสแหล่ง + รหัสสเปค]</strong> ในแหล่งเดียวกัน (เช่น รหัสแหล่งเดียวกันแต่มีหลายประเภทห้องที่ใช้สเปคเดียวกัน หรือซ้ำรอปรับปรุง)
-
               </p>
-
             </div>
-
           </div>
-
-
 
           <!-- Quick Action -->
-
           <div class="flex items-center gap-2">
-
             <button onclick="exportDuplicatesToExcel()" id="btnExportDup" class="hidden items-center gap-1.5 px-3 py-1.5 bg-amber-600 hover:bg-amber-700 text-white text-xs font-semibold rounded-lg shadow-sm transition">
-
               <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
-
               ส่งออกเฉพาะรายการสเปคซ้ำ (.xlsx)
-
             </button>
-
           </div>
-
         </div>
-
-
 
         <!-- Duplicate KPI Mini Cards -->
-
         <div class="p-5 border-b border-slate-100 bg-amber-50/20">
-
           <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-
             <div class="bg-white p-4 rounded-lg border border-amber-200/70 shadow-2xs">
-
               <div class="text-xs text-slate-500 font-medium">จำนวนกลุ่ม [รหัสแหล่ง+รหัสสเปค] ที่ซ้ำ</div>
-
               <div id="dupGroupCount" class="text-2xl font-bold text-amber-800 mt-1">0 กลุ่ม</div>
-
               <div class="text-[11px] text-slate-400 mt-0.5">คู่รหัสที่มีตั้งแต่ 2 แถวขึ้นไป</div>
-
             </div>
-
             <div class="bg-white p-4 rounded-lg border border-amber-200/70 shadow-2xs">
-
               <div class="text-xs text-slate-500 font-medium">จำนวนรายการห้องพักที่ได้รับผลกระทบ</div>
-
               <div id="dupRowCount" class="text-2xl font-bold text-rose-700 mt-1">0 รายการ</div>
-
               <div class="text-[11px] text-slate-400 mt-0.5">แถวข้อมูลที่อยู่ในกลุ่มสเปคซ้ำ</div>
-
             </div>
-
             <div class="bg-white p-4 rounded-lg border border-amber-200/70 shadow-2xs">
-
               <div class="text-xs text-slate-500 font-medium">ข้อสังเกตจากผู้บันทึก/ผู้ตรวจ</div>
-
               <div id="dupRemarkCount" class="text-base font-bold text-slate-700 mt-1">0 รายการที่ระบุภาวะ</div>
-
               <div class="text-[11px] text-slate-400 mt-0.5">เช่น สเปคซ้ำรอปรับปรุง(ส่วนกลาง)</div>
-
             </div>
-
           </div>
-
         </div>
-
-
 
         <!-- Duplicates Grouped Table -->
-
         <div class="overflow-x-auto custom-scrollbar">
-
           <table class="w-full text-xs text-left">
-
             <thead class="bg-slate-100 text-slate-700 uppercase font-semibold border-b border-slate-200">
-
               <tr>
-
                 <th class="py-3 px-3 w-12 text-center">กลุ่มที่</th>
-
                 <th class="py-3 px-3">รหัสแหล่ง</th>
-
                 <th class="py-3 px-3">รหัสสเปค</th>
-
                 <th class="py-3 px-3">รูปแบบราคา</th>
-
                 <th class="py-3 px-3">ลำดับเดิม</th>
-
                 <th class="py-3 px-3">ชื่อโรงแรม</th>
-
                 <th class="py-3 px-3">ประเภทห้องที่ซ้ำกัน</th>
-
                 <th class="py-3 px-3 text-center">หมายเหตุ / ภาวะตรวจพบ</th>
-
                 <th class="py-3 px-3 text-center">การดำเนินการ</th>
-
               </tr>
-
             </thead>
-
             <tbody id="duplicateTableBody" class="divide-y divide-slate-100">
-
               <!-- Injected by JS -->
-
             </tbody>
-
           </table>
-
         </div>
-
       </section>
 
-
-
     </div>
-
   </main>
 
-
-
   <!-- Modal for Day-by-Day Inspection -->
-
   <div id="detailModal" class="hidden fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-
     <div class="bg-white rounded-xl shadow-xl border border-slate-200 max-w-3xl w-full max-h-[90vh] flex flex-col overflow-hidden">
-
       <div class="p-4 border-b border-slate-200 flex items-center justify-between bg-slate-50">
-
         <div>
-
           <div class="flex items-center gap-2">
-
             <h3 id="modalTitle" class="text-sm font-bold text-slate-800">รายละเอียดการเคลื่อนไหวของราคา</h3>
-
             <span id="modalPriceTypeBadge" class="px-2 py-0.5 rounded text-[10px] font-bold"></span>
-
           </div>
-
           <p id="modalSubtitle" class="text-xs text-slate-500 mt-0.5"></p>
-
         </div>
-
         <button onclick="closeModal()" class="text-slate-400 hover:text-slate-600 p-1.5 rounded-lg hover:bg-slate-200">
-
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-
         </button>
-
       </div>
-
-
 
       <div class="p-4 overflow-y-auto custom-scrollbar flex-1 space-y-4">
-
         <!-- Summary in Modal -->
-
         <div class="grid grid-cols-3 gap-3 text-center">
-
           <div class="p-2.5 rounded-lg bg-emerald-50 border border-emerald-200">
-
             <span class="text-xs text-emerald-800 font-medium">จำนวนขึ้น (+)</span>
-
             <div id="modalUpCount" class="text-lg font-bold text-emerald-700">0</div>
-
           </div>
-
           <div class="p-2.5 rounded-lg bg-rose-50 border border-rose-200">
-
             <span class="text-xs text-rose-800 font-medium">จำนวนลง (-)</span>
-
             <div id="modalDownCount" class="text-lg font-bold text-rose-700">0</div>
-
           </div>
-
           <div class="p-2.5 rounded-lg bg-slate-100 border border-slate-200">
-
             <span class="text-xs text-slate-700 font-medium">จำนวนคงที่ (=)</span>
-
             <div id="modalSameCount" class="text-lg font-bold text-slate-700">0</div>
-
           </div>
-
         </div>
 
-
-
         <table class="w-full text-xs text-left border border-slate-200 rounded-lg overflow-hidden">
-
           <thead class="bg-slate-100 text-slate-600 font-semibold uppercase">
-
             <tr>
-
               <th class="py-2 px-3">เปรียบเทียบวัน</th>
-
               <th class="py-2 px-3 text-right">ราคาวันก่อนหน้า</th>
-
               <th class="py-2 px-3 text-right">ราคาวันปัจจุบัน</th>
-
               <th class="py-2 px-3 text-right">ผลต่าง (บาท)</th>
-
               <th class="py-2 px-3 text-center">สถานะ</th>
-
             </tr>
-
           </thead>
-
           <tbody id="modalTimelineBody" class="divide-y divide-slate-100 font-medium"></tbody>
-
         </table>
-
       </div>
-
-
 
       <div class="p-3 border-t border-slate-200 bg-slate-50 flex justify-end">
-
         <button onclick="closeModal()" class="px-4 py-1.5 bg-slate-200 hover:bg-slate-300 text-slate-700 text-xs font-semibold rounded-lg transition">ปิดหน้าต่าง</button>
-
       </div>
-
     </div>
-
   </div>
 
-
-
   <script>
-
     // Global Application State
-
     let workbookInstance = null;
-
     let rawParsedItems = [];     // All extracted items with metadata
-
     let analyzedItems = [];      // Filtered items (by chosen price type)
-
     let duplicateGroups = [];    // Detected duplicate spec groups
-
     let duplicateItemsList = []; // Flattened duplicate items
-
     let dailyAggregates = [];
-
     let overallTotals = { up: 0, down: 0, same: 0, comparisons: 0, totalItems: 0 };
-
     let chartInstance = null;
-
     let selectedPriceType = 'ราคาลด';
-
     let dayNumbersGlobal = [];
 
-
-
     // Pagination state
-
     let currentPage = 1;
-
     const pageSize = 15;
-
     let filteredItems = [];
 
-
-
     // File Input Listener
-
     document.getElementById('excelFile').addEventListener('change', function(e) {
-
       const file = e.target.files[0];
-
       if (!file) return;
 
-
-
       const reader = new FileReader();
-
       reader.onload = function(evt) {
-
         try {
-
           const data = new Uint8Array(evt.target.result);
-
           workbookInstance = XLSX.read(data, { type: 'array' });
 
-
-
           const sheetSelect = document.getElementById('sheetSelect');
-
           sheetSelect.innerHTML = '';
-
           workbookInstance.SheetNames.forEach((name) => {
-
             const opt = document.createElement('option');
-
             opt.value = name;
-
             opt.textContent = name;
-
             sheetSelect.appendChild(opt);
-
           });
-
           sheetSelect.disabled = false;
 
-
-
           const preferred = ['เนย', 'รวมชีท', 'พราว'];
-
           let matched = workbookInstance.SheetNames.find(s => preferred.includes(s));
-
           if (matched) {
-
             sheetSelect.value = matched;
-
           }
 
-
-
           processCurrentSheet();
-
         } catch (err) {
-
           alert('เกิดข้อผิดพลาดในการอ่านไฟล์ Excel: ' + err.message);
-
         }
-
       };
-
       reader.readAsArrayBuffer(file);
-
     });
 
-
-
     // Set Price Type Filter
-
     function setPriceTypeFilter(type) {
-
       selectedPriceType = type;
 
-
-
       const btnDiscount = document.getElementById('btnFilterDiscount');
-
       const btnRegular = document.getElementById('btnFilterRegular');
-
       const btnAll = document.getElementById('btnFilterAll');
 
-
-
       [btnDiscount, btnRegular, btnAll].forEach(btn => {
-
         btn.className = "flex-1 py-1.5 px-3 text-xs font-medium text-slate-600 hover:text-slate-900 transition";
-
       });
 
-
-
       if (type === 'ราคาลด') {
-
         btnDiscount.className = "flex-1 py-1.5 px-3 text-xs font-semibold rounded-md bg-white text-blue-700 shadow-sm transition";
-
         document.getElementById('kpiFilterBadge').textContent = 'ราคาลด';
-
         document.getElementById('kpiFilterBadge').className = 'text-xs text-blue-600 font-semibold mt-1';
-
       } else if (type === 'ราคาเต็ม') {
-
         btnRegular.className = "flex-1 py-1.5 px-3 text-xs font-semibold rounded-md bg-white text-indigo-700 shadow-sm transition";
-
         document.getElementById('kpiFilterBadge').textContent = 'ราคาเต็ม';
-
         document.getElementById('kpiFilterBadge').className = 'text-xs text-indigo-600 font-semibold mt-1';
-
       } else {
-
         btnAll.className = "flex-1 py-1.5 px-3 text-xs font-semibold rounded-md bg-white text-emerald-700 shadow-sm transition";
-
         document.getElementById('kpiFilterBadge').textContent = 'ราคาเต็ม & ราคาลด ทั้งหมด';
-
         document.getElementById('kpiFilterBadge').className = 'text-xs text-emerald-600 font-semibold mt-1';
-
       }
-
-
 
       applyPriceFilterAndRender();
-
     }
 
-
-
     // Process Sheet
-
     function processCurrentSheet() {
-
       if (!workbookInstance) return;
-
       const sheetName = document.getElementById('sheetSelect').value;
-
       const sheet = workbookInstance.Sheets[sheetName];
-
       if (!sheet) return;
 
-
-
       const rawMatrix = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: null });
-
       if (!rawMatrix || rawMatrix.length === 0) {
-
         alert('ไม่พบข้อมูลในชีทที่เลือก');
-
         return;
-
       }
-
-
 
       // Detect Header Row
-
       let headerRowIndex = -1;
-
       let colMap = {
-
         indexNo: -1,
-
         sourceCode: -1,
-
         specCode: -1,
-
         hotelName: -1,
-
         roomType: -1,
-
         priceType: -1,
-
         auditorStatus: -1,
-
         days: {}
-
       };
 
-
-
       for (let r = 0; r < Math.min(10, rawMatrix.length); r++) {
-
         const row = rawMatrix[r];
-
         if (!row) continue;
-
         for (let c = 0; c < row.length; c++) {
-
           const val = String(row[c] || '').trim();
-
           if (val === 'ลำดับ') colMap.indexNo = c;
-
           if (val === 'รหัสแหล่ง') colMap.sourceCode = c;
-
           if (val === 'รหัสสเปค' || val === 'รหัสเปค' || (val === 'รหัส' && colMap.specCode === -1)) colMap.specCode = c;
-
           if (val === 'ชื่อโรงแรม' || val === 'ลักษณะจำเพาะ2') colMap.hotelName = c;
-
           if (val === 'ประเภทห้อง') colMap.roomType = c;
-
           if (val === 'ราคา' || val === 'รูปแบบราคา') colMap.priceType = c;
-
           if (val.includes('ภาวะ') || val.includes('ผู้ตรวจ')) colMap.auditorStatus = c;
-
         }
-
         if (colMap.sourceCode !== -1 && colMap.specCode !== -1) {
-
           headerRowIndex = r;
-
           break;
-
         }
-
       }
-
-
 
       if (headerRowIndex === -1) {
-
         alert('ไม่พบคอลัมน์หลัก ("รหัสแหล่ง" หรือ "รหัสสเปค/รหัสเปค") ในชีทนี้');
-
         return;
-
       }
-
-
 
       // Extract day columns
-
       const headerRow = rawMatrix[headerRowIndex];
-
       colMap.days = {};
-
       for (let c = 0; c < headerRow.length; c++) {
-
         const val = headerRow[c];
-
         const num = parseInt(val, 10);
-
         if (!isNaN(num) && num >= 1 && num <= 31) {
-
           colMap.days[num] = c;
-
         }
-
       }
-
-
 
       dayNumbersGlobal = Object.keys(colMap.days).map(Number).sort((a,b) => a - b);
 
-
-
       // Extract raw rows
-
       const extractedRows = [];
-
       for (let r = headerRowIndex + 1; r < rawMatrix.length; r++) {
-
         const row = rawMatrix[r];
-
         if (!row || row.length === 0) continue;
 
-
-
         let pType = colMap.priceType !== -1 ? String(row[colMap.priceType] || '').trim() : '';
-
         if (!pType) continue;
 
-
-
         extractedRows.push({
-
           excelRowIndex: r + 1,
-
           indexNo: colMap.indexNo !== -1 ? row[colMap.indexNo] : '',
-
           sourceCode: colMap.sourceCode !== -1 ? (row[colMap.sourceCode] !== null ? String(row[colMap.sourceCode]).trim() : '') : '',
-
           specCode: colMap.specCode !== -1 ? (row[colMap.specCode] !== null ? String(row[colMap.specCode]).trim() : '') : '',
-
           hotelName: colMap.hotelName !== -1 ? (row[colMap.hotelName] !== null ? String(row[colMap.hotelName]).trim() : '') : '',
-
           roomType: colMap.roomType !== -1 ? (row[colMap.roomType] !== null ? String(row[colMap.roomType]).trim() : '') : '',
-
           auditorStatus: colMap.auditorStatus !== -1 ? (row[colMap.auditorStatus] !== null ? String(row[colMap.auditorStatus]).trim() : '') : '',
-
           priceType: pType,
-
           rowRaw: row
-
         });
-
       }
-
-
 
       // Backward-fill from paired 'ราคาลด' up to 'ราคาเต็ม'
-
       for (let i = 0; i < extractedRows.length; i++) {
-
         const curr = extractedRows[i];
-
         if (curr.priceType.includes('เต็ม') && i + 1 < extractedRows.length) {
-
           const next = extractedRows[i + 1];
-
           if (next.priceType.includes('ลด')) {
-
             if (!curr.indexNo && next.indexNo) curr.indexNo = next.indexNo;
-
             if (!curr.sourceCode && next.sourceCode) curr.sourceCode = next.sourceCode;
-
             if (!curr.specCode && next.specCode) curr.specCode = next.specCode;
-
             if (!curr.hotelName && next.hotelName) curr.hotelName = next.hotelName;
-
             if (!curr.roomType && next.roomType) curr.roomType = next.roomType;
-
             if (!curr.auditorStatus && next.auditorStatus) curr.auditorStatus = next.auditorStatus;
-
           }
-
         }
-
       }
-
-
 
       // Forward-fill metadata from row above for grouping
-
       let carryIndex = '', carrySource = '', carrySpec = '', carryHotel = '', carryRoom = '';
-
       for (let i = 0; i < extractedRows.length; i++) {
-
         const row = extractedRows[i];
-
         if (row.indexNo) carryIndex = row.indexNo; else row.indexNo = carryIndex;
-
         if (row.sourceCode) carrySource = row.sourceCode; else row.sourceCode = carrySource;
-
         if (row.specCode) carrySpec = row.specCode; else row.specCode = carrySpec;
-
         if (row.hotelName) carryHotel = row.hotelName; else row.hotelName = carryHotel;
-
         if (row.roomType) carryRoom = row.roomType; else row.roomType = carryRoom;
-
       }
 
-
-
       // Build parsed items
-
       rawParsedItems = [];
-
       extractedRows.forEach((item, originalIdx) => {
-
         const dailyPrices = {};
-
         dayNumbersGlobal.forEach(d => {
-
           const colIdx = colMap.days[d];
-
           let pVal = item.rowRaw[colIdx];
-
           if (pVal !== null && pVal !== undefined && pVal !== '' && !isNaN(Number(pVal))) {
-
             dailyPrices[d] = Number(pVal);
-
           } else {
-
             dailyPrices[d] = null;
-
           }
-
         });
 
-
-
         // Consecutive delta: 2-1, 3-2, ...
-
         const stepChanges = [];
-
         let countUp = 0;
-
         let countDown = 0;
-
         let countSame = 0;
 
-
-
         for (let i = 1; i < dayNumbersGlobal.length; i++) {
-
           const prevDay = dayNumbersGlobal[i - 1];
-
           const currDay = dayNumbersGlobal[i];
-
           const prevP = dailyPrices[prevDay];
-
           const currP = dailyPrices[currDay];
 
-
-
           if (prevP !== null && currP !== null) {
-
             const diff = currP - prevP;
-
             let status = 'same';
-
             if (diff > 0) {
-
               status = 'up';
-
               countUp++;
-
             } else if (diff < 0) {
-
               status = 'down';
-
               countDown++;
-
             } else {
-
               countSame++;
-
             }
-
             stepChanges.push({
-
               fromDay: prevDay,
-
               toDay: currDay,
-
               prevPrice: prevP,
-
               currPrice: currP,
-
               diff: diff,
-
               status: status
-
             });
-
           }
-
         }
-
-
 
         const normType = item.priceType.includes('ลด') ? 'ราคาลด' : 'ราคาเต็ม';
 
-
-
         rawParsedItems.push({
-
           id: originalIdx,
-
           excelRowIndex: item.excelRowIndex,
-
           indexNo: item.indexNo || '-',
-
           sourceCode: item.sourceCode || '-',
-
           specCode: item.specCode || '-',
-
           hotelName: item.hotelName || 'ไม่ระบุชื่อ',
-
           roomType: item.roomType || '-',
-
           priceType: normType,
-
           auditorStatus: item.auditorStatus || '',
-
           dailyPrices: dailyPrices,
-
           stepChanges: stepChanges,
-
           countUp: countUp,
-
           countDown: countDown,
-
           countSame: countSame,
-
           totalValidSteps: countUp + countDown + countSame,
-
           isDuplicate: false, // will be tagged below
-
           dupGroupKey: ''
-
         });
-
       });
-
-
 
       // Detect duplicates based on [รหัสแหล่ง + รหัสสเปค]
-
       detectDuplicates();
 
-
-
       applyPriceFilterAndRender();
-
     }
-
-
 
     // Detect Duplicates of [รหัสสเปค + รหัสแหล่ง]
-
     function detectDuplicates() {
-
       // Grouping map
-
       const groupMap = {};
 
-
-
       rawParsedItems.forEach(item => {
-
         // Group by sourceCode + specCode + priceType
-
         const key = `${item.sourceCode}___${item.specCode}___${item.priceType}`;
-
         if (!groupMap[key]) {
-
           groupMap[key] = [];
-
         }
-
         groupMap[key].push(item);
-
       });
-
-
 
       duplicateGroups = [];
-
       duplicateItemsList = [];
 
-
-
       let groupCounter = 1;
-
       for (const key in groupMap) {
-
         const list = groupMap[key];
-
         // If there are more than 1 entry with identical sourceCode + specCode within same priceType, or contains "สเปคซ้ำ"
-
         if (list.length > 1 && list[0].sourceCode !== '-' && list[0].specCode !== '-') {
-
           list.forEach(it => {
-
             it.isDuplicate = true;
-
             it.dupGroupKey = key;
-
             duplicateItemsList.push(it);
-
           });
-
-
 
           duplicateGroups.push({
-
             groupNo: groupCounter++,
-
             sourceCode: list[0].sourceCode,
-
             specCode: list[0].specCode,
-
             priceType: list[0].priceType,
-
             hotelName: list[0].hotelName,
-
             items: list
-
           });
-
         }
-
       }
-
-
 
       renderDuplicateSection();
-
     }
-
-
 
     // Render Duplicate Section
-
     function renderDuplicateSection() {
-
       const tbody = document.getElementById('duplicateTableBody');
-
       const badge = document.getElementById('badgeDupStatus');
-
       const jumpLink = document.getElementById('dupNavJump');
-
       const btnExportDup = document.getElementById('btnExportDup');
-
       tbody.innerHTML = '';
 
-
-
       const totalGroups = duplicateGroups.length;
-
       const totalDupRows = duplicateItemsList.length;
-
       const totalRemarks = duplicateItemsList.filter(it => it.auditorStatus.includes('ซ้ำ') || it.auditorStatus.includes('รอปรับปรุง')).length;
 
-
-
       document.getElementById('dupGroupCount').textContent = `${totalGroups} กลุ่ม`;
-
       document.getElementById('dupRowCount').textContent = `${totalDupRows} รายการ`;
-
       document.getElementById('dupRemarkCount').textContent = `${totalRemarks} รายการมีหมายเหตุ`;
 
-
-
       if (totalGroups === 0) {
-
         badge.textContent = 'ไม่พบสเปคซ้ำในชีทนี้';
-
         badge.className = 'px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-300';
-
         jumpLink.classList.add('hidden');
-
         btnExportDup.classList.add('hidden');
-
         tbody.innerHTML = `
-
           <tr>
-
             <td colspan="9" class="py-8 text-center text-slate-500 font-medium">
-
               <span class="inline-flex items-center gap-1.5 text-emerald-600 font-bold">
-
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-
                 ยอดเยี่ยม! ข้อมูลในชีทนี้ไม่พบการซ้ำซ้อนของคู่ [รหัสแหล่ง + รหัสสเปค]
-
               </span>
-
             </td>
-
           </tr>
-
         `;
-
         return;
-
       }
-
-
 
       badge.textContent = `พบสเปคซ้ำ ${totalGroups} กลุ่ม (${totalDupRows} รายการ)`;
-
       badge.className = 'px-2.5 py-0.5 rounded-full text-xs font-bold bg-rose-100 text-rose-800 border border-rose-300 animate-pulse';
-
       jumpLink.classList.remove('hidden');
-
       btnExportDup.classList.remove('hidden');
-
       btnExportDup.classList.add('flex');
 
-
-
       duplicateGroups.forEach((grp) => {
-
         grp.items.forEach((item, itemIdx) => {
-
           const tr = document.createElement('tr');
-
           tr.className = itemIdx === 0 ? "bg-amber-50/50 hover:bg-amber-100/50 transition border-t-2 border-amber-200" : "bg-amber-50/20 hover:bg-amber-100/40 transition";
 
-
-
           const remarkBadge = item.auditorStatus 
-
             ? `<span class="px-2 py-0.5 rounded text-[11px] font-semibold bg-rose-100 text-rose-800 border border-rose-200">${item.auditorStatus}</span>`
-
             : `<span class="px-2 py-0.5 rounded text-[11px] font-semibold bg-amber-100 text-amber-800 border border-amber-200">สเปคซ้ำ (${grp.items.length} ห้อง)</span>`;
 
-
-
           const priceBadge = item.priceType === 'ราคาลด'
-
             ? '<span class="px-2 py-0.5 rounded text-[10px] bg-blue-50 text-blue-700 border border-blue-200 font-semibold">ราคาลด</span>'
-
             : '<span class="px-2 py-0.5 rounded text-[10px] bg-indigo-50 text-indigo-700 border border-indigo-200 font-semibold">ราคาเต็ม</span>';
 
-
-
           tr.innerHTML = `
-
             <td class="py-2.5 px-3 text-center font-bold text-amber-800">${itemIdx === 0 ? grp.groupNo : ''}</td>
-
             <td class="py-2.5 px-3 font-mono font-medium text-slate-700">${item.sourceCode}</td>
-
             <td class="py-2.5 px-3 font-mono font-bold text-amber-700">${item.specCode}</td>
-
             <td class="py-2.5 px-3">${priceBadge}</td>
-
             <td class="py-2.5 px-3 font-mono text-slate-500">${item.indexNo}</td>
-
             <td class="py-2.5 px-3 font-semibold text-slate-800 max-w-[200px] truncate" title="${item.hotelName}">${item.hotelName}</td>
-
             <td class="py-2.5 px-3 text-slate-700 font-medium">${item.roomType}</td>
-
             <td class="py-2.5 px-3 text-center">${remarkBadge}</td>
-
             <td class="py-2.5 px-3 text-center">
-
               <button onclick="openDetailModalById(${item.id})" class="px-2.5 py-1 text-[11px] bg-amber-100 text-amber-800 hover:bg-amber-200 font-semibold rounded-md transition">
-
                 ดูราคารายวัน
-
               </button>
-
             </td>
-
           `;
-
           tbody.appendChild(tr);
-
         });
-
       });
-
     }
 
-
-
     // Apply Price Filter & Recalculate
-
     function applyPriceFilterAndRender() {
-
       if (selectedPriceType === 'all') {
-
         analyzedItems = [...rawParsedItems];
-
       } else {
-
         analyzedItems = rawParsedItems.filter(item => item.priceType === selectedPriceType);
-
       }
-
-
 
       calculateAggregates(dayNumbersGlobal);
 
-
-
       document.getElementById('resultSection').classList.remove('hidden');
-
       document.getElementById('btnExport').classList.remove('hidden');
-
       document.getElementById('btnExport').classList.add('flex');
 
-
-
       renderKPIs();
-
       renderChart();
-
       renderDailyTable();
-
       filterTable();
-
     }
-
-
 
     // Calculate Aggregates
-
     function calculateAggregates(dayNumbers) {
-
       overallTotals = { up: 0, down: 0, same: 0, comparisons: 0, totalItems: analyzedItems.length };
-
       dailyAggregates = [];
 
-
-
       for (let i = 1; i < dayNumbers.length; i++) {
-
         const prevDay = dayNumbers[i - 1];
-
         const currDay = dayNumbers[i];
-
         let dUp = 0;
-
         let dDown = 0;
-
         let dSame = 0;
 
-
-
         analyzedItems.forEach(item => {
-
           const step = item.stepChanges.find(s => s.fromDay === prevDay && s.toDay === currDay);
-
           if (step) {
-
             if (step.status === 'up') dUp++;
-
             else if (step.status === 'down') dDown++;
-
             else if (step.status === 'same') dSame++;
-
           }
-
         });
-
-
 
         const dTotal = dUp + dDown + dSame;
-
         dailyAggregates.push({
-
           label: `วันที่ ${currDay} เทียบ ${prevDay}`,
-
           shortLabel: `${currDay}-${prevDay}`,
-
           fromDay: prevDay,
-
           toDay: currDay,
-
           up: dUp,
-
           down: dDown,
-
           same: dSame,
-
           total: dTotal
-
         });
-
-
 
         overallTotals.up += dUp;
-
         overallTotals.down += dDown;
-
         overallTotals.same += dSame;
-
         overallTotals.comparisons += dTotal;
-
       }
-
     }
-
-
 
     // Render KPIs
-
     function renderKPIs() {
-
       document.getElementById('kpiTotalItems').textContent = overallTotals.totalItems.toLocaleString();
-
       document.getElementById('kpiTotalComparisons').textContent = overallTotals.comparisons.toLocaleString();
-
-
-
+      
       document.getElementById('kpiUpCount').textContent = overallTotals.up.toLocaleString();
-
       document.getElementById('kpiDownCount').textContent = overallTotals.down.toLocaleString();
-
       document.getElementById('kpiSameCount').textContent = overallTotals.same.toLocaleString();
 
-
-
       const total = overallTotals.comparisons || 1;
-
       document.getElementById('kpiUpPct').textContent = `${((overallTotals.up / total) * 100).toFixed(1)}%`;
-
       document.getElementById('kpiDownPct').textContent = `${((overallTotals.down / total) * 100).toFixed(1)}%`;
-
       document.getElementById('kpiSamePct').textContent = `${((overallTotals.same / total) * 100).toFixed(1)}%`;
-
     }
-
-
 
     // Render Daily Breakdown Table
-
     function renderDailyTable() {
-
       const tbody = document.getElementById('dailySummaryTableBody');
-
       tbody.innerHTML = '';
-
       document.getElementById('dailyTableBadge').textContent = `รวม ${dailyAggregates.length} ช่วงเปรียบเทียบ`;
 
-
-
       dailyAggregates.forEach(d => {
-
         const tr = document.createElement('tr');
-
         tr.className = "hover:bg-slate-50 transition";
-
         tr.innerHTML = `
-
           <td class="py-2 px-3 font-semibold text-slate-700">${d.label}</td>
-
           <td class="py-2 px-3 text-right font-bold text-emerald-600">${d.up.toLocaleString()}</td>
-
           <td class="py-2 px-3 text-right font-bold text-rose-600">${d.down.toLocaleString()}</td>
-
           <td class="py-2 px-3 text-right text-slate-600">${d.same.toLocaleString()}</td>
-
           <td class="py-2 px-3 text-right font-semibold text-slate-800">${d.total.toLocaleString()}</td>
-
         `;
-
         tbody.appendChild(tr);
-
       });
-
     }
-
-
 
     // Render Chart
-
     function renderChart() {
-
       const ctx = document.getElementById('dailyTrendChart').getContext('2d');
-
       if (chartInstance) {
-
         chartInstance.destroy();
-
       }
-
-
 
       const labels = dailyAggregates.map(d => d.shortLabel);
-
       const dataUp = dailyAggregates.map(d => d.up);
-
       const dataDown = dailyAggregates.map(d => d.down);
-
       const dataSame = dailyAggregates.map(d => d.same);
 
-
-
       chartInstance = new Chart(ctx, {
-
         type: 'bar',
-
         data: {
-
           labels: labels,
-
           datasets: [
-
             {
-
               label: 'ราคาขึ้น (+)',
-
               data: dataUp,
-
               backgroundColor: '#10b981',
-
               borderRadius: 3
-
             },
-
             {
-
               label: 'ราคาลง (-)',
-
               data: dataDown,
-
               backgroundColor: '#f43f5e',
-
               borderRadius: 3
-
             },
-
             {
-
               label: 'ราคาคงที่ (=)',
-
               data: dataSame,
-
               backgroundColor: '#94a3b8',
-
               borderRadius: 3
-
             }
-
           ]
-
         },
-
         options: {
-
           responsive: true,
-
           maintainAspectRatio: false,
-
           scales: {
-
             x: {
-
               stacked: true,
-
               grid: { display: false },
-
               ticks: { font: { size: 10, family: 'Sarabun' } }
-
             },
-
             y: {
-
               stacked: true,
-
               ticks: { font: { size: 10, family: 'Sarabun' } },
-
               grid: { color: '#f1f5f9' }
-
             }
-
           },
-
           plugins: {
-
             legend: {
-
               position: 'top',
-
               labels: { font: { size: 11, family: 'Sarabun' } }
-
             },
-
             tooltip: {
-
               titleFont: { family: 'Sarabun' },
-
               bodyFont: { family: 'Sarabun' }
-
             }
-
           }
-
         }
-
       });
-
     }
-
-
 
     // Filter Table Data
-
     function filterTable() {
-
       const term = document.getElementById('searchInput').value.toLowerCase().trim();
-
       const movement = document.getElementById('movementFilter').value;
 
-
-
       filteredItems = analyzedItems.filter(item => {
-
         const matchTerm = !term ||
-
           item.sourceCode.toLowerCase().includes(term) ||
-
           item.specCode.toLowerCase().includes(term) ||
-
           item.hotelName.toLowerCase().includes(term) ||
-
           item.roomType.toLowerCase().includes(term) ||
-
           item.priceType.toLowerCase().includes(term);
 
-
-
         let matchMovement = true;
-
         if (movement === 'has_up') matchMovement = item.countUp > 0;
-
         else if (movement === 'has_down') matchMovement = item.countDown > 0;
-
         else if (movement === 'only_same') matchMovement = item.countUp === 0 && item.countDown === 0;
 
-
-
         return matchTerm && matchMovement;
-
       });
-
-
 
       currentPage = 1;
-
       renderItemsTable();
-
     }
-
-
 
     // Render Itemized Table with Pagination
-
     function renderItemsTable() {
-
       const tbody = document.getElementById('itemsTableBody');
-
       tbody.innerHTML = '';
 
-
-
       const total = filteredItems.length;
-
       document.getElementById('tableRecordCount').textContent = `แสดง ${total === 0 ? 0 : ((currentPage - 1) * pageSize) + 1} - ${Math.min(currentPage * pageSize, total)} จากทั้งหมด ${total.toLocaleString()} รายการ`;
 
-
-
       const start = (currentPage - 1) * pageSize;
-
       const pagedData = filteredItems.slice(start, start + pageSize);
 
-
-
       if (pagedData.length === 0) {
-
         tbody.innerHTML = `<tr><td colspan="12" class="py-8 text-center text-slate-400">ไม่พบรายการที่ตรงกับเงื่อนไขค้นหา</td></tr>`;
-
         renderPagination(0);
-
         return;
-
       }
-
-
 
       pagedData.forEach((item, idx) => {
-
         let dominantBadge = '<span class="px-2 py-0.5 rounded text-[10px] bg-slate-100 text-slate-600 font-semibold">คงที่ตลอด</span>';
-
         if (item.countUp > item.countDown && item.countUp > 0) {
-
           dominantBadge = '<span class="px-2 py-0.5 rounded text-[10px] bg-emerald-100 text-emerald-700 font-semibold">ปรับขึ้นบ่อย</span>';
-
         } else if (item.countDown > item.countUp && item.countDown > 0) {
-
           dominantBadge = '<span class="px-2 py-0.5 rounded text-[10px] bg-rose-100 text-rose-700 font-semibold">ปรับลงบ่อย</span>';
-
         } else if (item.countUp > 0 && item.countUp === item.countDown) {
-
           dominantBadge = '<span class="px-2 py-0.5 rounded text-[10px] bg-amber-100 text-amber-700 font-semibold">ขึ้น/ลง เท่ากัน</span>';
-
         }
-
-
 
         const priceBadge = item.priceType === 'ราคาลด'
-
           ? '<span class="px-2 py-0.5 rounded text-[10px] bg-blue-50 text-blue-700 border border-blue-200 font-semibold">ราคาลด</span>'
-
           : '<span class="px-2 py-0.5 rounded text-[10px] bg-indigo-50 text-indigo-700 border border-indigo-200 font-semibold">ราคาเต็ม</span>';
 
-
-
         const dupIndicator = item.isDuplicate
-
           ? '<span class="px-1.5 py-0.5 rounded text-[10px] bg-amber-100 text-amber-800 border border-amber-300 font-bold" title="สเปคซ้ำในแหล่งเดียวกัน">ซ้ำ ⚠️</span>'
-
           : '<span class="px-1.5 py-0.5 rounded text-[10px] text-slate-400 font-medium">ปกติ</span>';
 
-
-
         const tr = document.createElement('tr');
-
         tr.className = item.isDuplicate ? "bg-amber-50/20 hover:bg-amber-50/50 transition" : "hover:bg-slate-50 transition";
-
         tr.innerHTML = `
-
           <td class="py-2.5 px-3 text-center text-slate-400">${start + idx + 1}</td>
-
           <td class="py-2.5 px-3 whitespace-nowrap">${priceBadge}</td>
-
           <td class="py-2.5 px-3 font-mono font-medium text-slate-700">${item.sourceCode}</td>
-
           <td class="py-2.5 px-3 font-mono font-medium text-blue-700">${item.specCode}</td>
-
           <td class="py-2.5 px-3 font-semibold text-slate-800 max-w-[170px] truncate" title="${item.hotelName}">${item.hotelName}</td>
-
           <td class="py-2.5 px-3 text-slate-600 max-w-[130px] truncate" title="${item.roomType}">${item.roomType}</td>
-
           <td class="py-2.5 px-3 text-right font-bold text-emerald-600">${item.countUp}</td>
-
           <td class="py-2.5 px-3 text-right font-bold text-rose-600">${item.countDown}</td>
-
           <td class="py-2.5 px-3 text-right text-slate-500">${item.countSame}</td>
-
           <td class="py-2.5 px-3 text-center">${dominantBadge}</td>
-
           <td class="py-2.5 px-3 text-center">${dupIndicator}</td>
-
           <td class="py-2.5 px-3 text-center">
-
             <button onclick="openDetailModalById(${item.id})" class="px-2.5 py-1 text-[11px] bg-blue-50 text-blue-700 hover:bg-blue-100 font-semibold rounded-md transition">
-
               ดูรายวัน
-
             </button>
-
           </td>
-
         `;
-
         tbody.appendChild(tr);
-
       });
-
-
 
       renderPagination(total);
-
     }
-
-
 
     // Pagination
-
     function renderPagination(total) {
-
       const container = document.getElementById('paginationControls');
-
       container.innerHTML = '';
-
       const totalPages = Math.ceil(total / pageSize);
-
       if (totalPages <= 1) return;
 
-
-
       const prevBtn = document.createElement('button');
-
       prevBtn.className = "px-2 py-1 border rounded bg-white hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed";
-
       prevBtn.textContent = '◀';
-
       prevBtn.disabled = currentPage === 1;
-
       prevBtn.onclick = () => { currentPage--; renderItemsTable(); };
-
       container.appendChild(prevBtn);
 
-
-
       const span = document.createElement('span');
-
       span.className = "px-2 font-medium";
-
       span.textContent = `${currentPage} / ${totalPages}`;
-
       container.appendChild(span);
 
-
-
       const nextBtn = document.createElement('button');
-
       nextBtn.className = "px-2 py-1 border rounded bg-white hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed";
-
       nextBtn.textContent = '▶';
-
       nextBtn.disabled = currentPage === totalPages;
-
       nextBtn.onclick = () => { currentPage++; renderItemsTable(); };
-
       container.appendChild(nextBtn);
-
     }
-
-
 
     // Open Drill-down Modal by ID
-
     function openDetailModalById(id) {
-
       const item = rawParsedItems.find(it => it.id === id);
-
       if (!item) return;
 
-
-
       document.getElementById('modalTitle').textContent = `${item.hotelName} (${item.roomType})`;
-
       document.getElementById('modalSubtitle').textContent = `รหัสแหล่ง: ${item.sourceCode} | รหัสสเปค: ${item.specCode}`;
-
-
-
+      
       const badgeElem = document.getElementById('modalPriceTypeBadge');
-
       badgeElem.textContent = item.priceType;
-
       badgeElem.className = item.priceType === 'ราคาลด'
-
         ? 'px-2 py-0.5 rounded text-[10px] font-bold bg-blue-100 text-blue-800'
-
         : 'px-2 py-0.5 rounded text-[10px] font-bold bg-indigo-100 text-indigo-800';
 
-
-
       document.getElementById('modalUpCount').textContent = item.countUp;
-
       document.getElementById('modalDownCount').textContent = item.countDown;
-
       document.getElementById('modalSameCount').textContent = item.countSame;
 
-
-
       const modalTbody = document.getElementById('modalTimelineBody');
-
       modalTbody.innerHTML = '';
 
-
-
       item.stepChanges.forEach(step => {
-
         let badge = '<span class="px-2 py-0.5 rounded text-[10px] bg-slate-100 text-slate-600 font-bold">คงที่</span>';
-
         let diffFormatted = '0';
-
         let diffClass = 'text-slate-600';
 
-
-
         if (step.status === 'up') {
-
           badge = '<span class="px-2 py-0.5 rounded text-[10px] bg-emerald-100 text-emerald-700 font-bold">ขึ้น (+)</span>';
-
           diffFormatted = `+${step.diff.toLocaleString()}`;
-
           diffClass = 'text-emerald-600 font-bold';
-
         } else if (step.status === 'down') {
-
           badge = '<span class="px-2 py-0.5 rounded text-[10px] bg-rose-100 text-rose-700 font-bold">ลง (-)</span>';
-
           diffFormatted = `${step.diff.toLocaleString()}`;
-
           diffClass = 'text-rose-600 font-bold';
-
         }
 
-
-
         const tr = document.createElement('tr');
-
         tr.className = "hover:bg-slate-50 transition";
-
         tr.innerHTML = `
-
           <td class="py-2 px-3 font-semibold text-slate-700">วันที่ ${step.toDay} เทียบวันที่ ${step.fromDay}</td>
-
           <td class="py-2 px-3 text-right font-mono">${step.prevPrice.toLocaleString()}</td>
-
           <td class="py-2 px-3 text-right font-mono">${step.currPrice.toLocaleString()}</td>
-
           <td class="py-2 px-3 text-right font-mono ${diffClass}">${diffFormatted}</td>
-
           <td class="py-2 px-3 text-center">${badge}</td>
-
         `;
-
         modalTbody.appendChild(tr);
-
       });
-
-
 
       document.getElementById('detailModal').classList.remove('hidden');
-
     }
-
-
 
     function closeModal() {
-
       document.getElementById('detailModal').classList.add('hidden');
-
     }
-
-
 
     // Export Duplicates Only to Excel
-
     function exportDuplicatesToExcel() {
-
       if (duplicateItemsList.length === 0) {
-
         alert('ไม่พบรายการสเปคซ้ำ');
-
         return;
-
       }
 
-
-
       const wb = XLSX.utils.book_new();
-
       const dupRows = [];
 
-
-
       duplicateGroups.forEach(grp => {
-
         grp.items.forEach(item => {
-
           dupRows.push({
-
             'กลุ่มที่ซ้ำ': grp.groupNo,
-
             'รหัสแหล่ง': item.sourceCode,
-
             'รหัสสเปค': item.specCode,
-
             'รูปแบบราคา': item.priceType,
-
             'ลำดับเดิม': item.indexNo,
-
             'ชื่อโรงแรม': item.hotelName,
-
             'ประเภทห้อง': item.roomType,
-
             'ภาวะ/หมายเหตุ': item.auditorStatus || 'สเปคซ้ำในแหล่งเดียวกัน',
-
             'จำนวนขึ้น(+)': item.countUp,
-
             'จำนวนลง(-)': item.countDown,
-
             'จำนวนคงที่(=)': item.countSame
-
           });
-
         });
-
       });
 
-
-
       const wsDup = XLSX.utils.json_to_sheet(dupRows);
-
       XLSX.utils.book_append_sheet(wb, wsDup, "รายการสเปคซ้ำ");
 
-
-
       const currentSheetName = document.getElementById('sheetSelect').value || 'Hotel';
-
       XLSX.writeFile(wb, `รายงานสเปคซ้ำ_${currentSheetName}.xlsx`);
-
     }
 
-
-
     // Export All Analysis to Excel
-
     function exportToExcel() {
-
       if (analyzedItems.length === 0) {
-
         alert('ยังไม่มีข้อมูลการวิเคราะห์');
-
         return;
-
       }
-
-
 
       const wb = XLSX.utils.book_new();
 
-
-
       // Sheet 1: Summary Items
-
       const itemRows = analyzedItems.map((item, idx) => ({
-
         'ลำดับ': idx + 1,
-
         'รูปแบบราคา': item.priceType,
-
         'รหัสแหล่ง': item.sourceCode,
-
         'รหัสสเปค': item.specCode,
-
         'ชื่อโรงแรม': item.hotelName,
-
         'ประเภทห้อง': item.roomType,
-
         'สเปคซ้ำ': item.isDuplicate ? 'ซ้ำ' : 'ปกติ',
-
         'ภาวะ/หมายเหตุ': item.auditorStatus,
-
         'จำนวนวันราคาขึ้น (+)': item.countUp,
-
         'จำนวนวันราคาลง (-)': item.countDown,
-
         'จำนวนวันราคาคงที่ (=)': item.countSame,
-
         'รวมจำนวนครั้งที่เปรียบเทียบ': item.totalValidSteps
-
       }));
-
       const wsItems = XLSX.utils.json_to_sheet(itemRows);
-
       XLSX.utils.book_append_sheet(wb, wsItems, "สรุปรายสินค้า");
 
-
-
       // Sheet 2: Daily Aggregates
-
       const dailyRows = dailyAggregates.map(d => ({
-
         'ช่วงเปรียบเทียบ': d.label,
-
         'วันก่อนหน้า': d.fromDay,
-
         'วันปัจจุบัน': d.toDay,
-
         'จำนวนราคาขึ้น (+)': d.up,
-
         'จำนวนราคาลง (-)': d.down,
-
         'จำนวนราคาคงที่ (=)': d.same,
-
         'รวมตรวจพบทั้งหมด': d.total
-
       }));
-
       const wsDaily = XLSX.utils.json_to_sheet(dailyRows);
-
       XLSX.utils.book_append_sheet(wb, wsDaily, "สรุปภาพรวมรายวัน");
 
-
-
       // Sheet 3: Duplicates if any
-
       if (duplicateItemsList.length > 0) {
-
         const dupRows = [];
-
         duplicateGroups.forEach(grp => {
-
           grp.items.forEach(item => {
-
             dupRows.push({
-
               'กลุ่มที่ซ้ำ': grp.groupNo,
-
               'รหัสแหล่ง': item.sourceCode,
-
               'รหัสสเปค': item.specCode,
-
               'รูปแบบราคา': item.priceType,
-
               'ลำดับเดิม': item.indexNo,
-
               'ชื่อโรงแรม': item.hotelName,
-
               'ประเภทห้อง': item.roomType,
-
               'ภาวะ/หมายเหตุ': item.auditorStatus || 'สเปคซ้ำในแหล่งเดียวกัน'
-
             });
-
           });
-
         });
-
         const wsDup = XLSX.utils.json_to_sheet(dupRows);
-
         XLSX.utils.book_append_sheet(wb, wsDup, "รายการสเปคซ้ำ");
-
       }
 
-
-
       const currentSheetName = document.getElementById('sheetSelect').value || 'Hotel';
-
       XLSX.writeFile(wb, `รายงานวิเคราะห์ทิศทางราคา_${currentSheetName}_${selectedPriceType}.xlsx`);
-
     }
-
   </script>
-
 </body>
-
 </html>
