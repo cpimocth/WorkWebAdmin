@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>CPI MoM / YoY / AoA Web App</title>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<style>
+:root{--navy:#0f2f55;--blue:#145da0;--teal:#0f8b8d;--bg:#f5f7fb;--card:#fff;--text:#1f2937;--muted:#667085;--line:#d9e2ec;--ok:#157347;--warn:#a15c00;--bad:#b42318;--shadow:0 8px 24px rgba(15,47,85,.08)}
+*{box-sizing:border-box}body{margin:0;font-family:"Tahoma","Noto Sans Thai",Arial,sans-serif;background:var(--bg);color:var(--text)}
+header{background:linear-gradient(135deg,var(--navy),#174a7e);color:white;padding:22px 28px}.wrap{max-width:1500px;margin:auto}.title{font-size:28px;font-weight:800}.subtitle{opacity:.88;margin-top:5px}
+main{padding:22px 28px 40px}.grid{display:grid;grid-template-columns:1fr;gap:16px}.card{background:var(--card);border:1px solid #e8edf3;border-radius:16px;padding:18px;box-shadow:var(--shadow)}
+.drop{border:2px dashed #9fb7cf;border-radius:14px;padding:28px;text-align:center;background:#fbfdff;transition:.15s}.drop.drag{border-color:var(--teal);background:#eefafa}.drop input{display:none}.btn{border:0;border-radius:10px;padding:10px 14px;font-weight:700;cursor:pointer}.btn.primary{background:var(--blue);color:#fff}.btn.teal{background:var(--teal);color:#fff}.btn.ghost{background:#eef3f8;color:var(--navy)}.btn:disabled{opacity:.5;cursor:not-allowed}
+.toolbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center}.toolbar select,.toolbar input{border:1px solid var(--line);border-radius:9px;padding:9px 10px;background:#fff;min-height:39px}.grow{flex:1;min-width:220px}
+.kpis{display:grid;grid-template-columns:repeat(5,minmax(150px,1fr));gap:12px;margin-top:14px}.kpi{border:1px solid #e4eaf0;border-radius:12px;padding:13px;background:#fcfdff}.kpi .v{font-size:23px;font-weight:800;color:var(--navy)}.kpi .l{font-size:12px;color:var(--muted);margin-top:3px}
+.status{font-size:13px;color:var(--muted);margin-top:10px;white-space:pre-wrap}.filelist{margin-top:12px;display:grid;gap:7px}.file{padding:9px 10px;border:1px solid #e6ebf0;border-radius:9px;background:#fff;font-size:13px}.good{color:var(--ok)}.warn{color:var(--warn)}.bad{color:var(--bad)}
+.tablewrap{overflow:auto;border:1px solid #e4e9ef;border-radius:12px;max-height:620px}table{border-collapse:separate;border-spacing:0;width:100%;font-size:12px;white-space:nowrap}th{position:sticky;top:0;background:#edf3f9;color:#17324d;z-index:2;text-align:left;border-bottom:1px solid #cfd9e3;padding:9px}td{padding:8px 9px;border-bottom:1px solid #edf0f3}tr:hover td{background:#fafcff}.num{text-align:right;font-variant-numeric:tabular-nums}.chip{display:inline-block;padding:3px 7px;border-radius:999px;font-weight:700;font-size:11px}.chip.ok{background:#e7f6ec;color:#157347}.chip.diff{background:#fff1e8;color:#a15c00}.chip.na{background:#f1f3f5;color:#667085}
+.note{font-size:13px;line-height:1.55;color:#4b5563}.section-title{font-weight:800;color:var(--navy);font-size:18px;margin-bottom:10px}@media(max-width:900px){.kpis{grid-template-columns:repeat(2,1fr)}header,main{padding-left:14px;padding-right:14px}}
+</style>
+</head>
+<body>
+<header><div class="wrap"><div class="title">CPI MoM / YoY / AoA Web App</div><div class="subtitle">อ่าน Excel รายงาน 6.1.7 หลายภาค/หลายเดือน • ตรวจ Level/Parent • คำนวณและ QC</div></div></header>
+<main><div class="wrap grid">
+<section class="card">
+  <div class="section-title">1) นำเข้าไฟล์ Excel</div>
+  <div id="drop" class="drop">
+    <div style="font-size:18px;font-weight:800;color:var(--navy)">ลากไฟล์ .xlsx มาวางที่นี่</div>
+    <div class="note" style="margin:7px 0 13px">รองรับหลายไฟล์พร้อมกัน เช่น 5 ภาค และหลายเดือน</div>
+    <button class="btn primary" onclick="document.getElementById('files').click()">เลือกไฟล์ Excel</button>
+    <input id="files" type="file" accept=".xlsx,.xls" multiple />
+  </div>
+  <div class="toolbar" style="margin-top:12px">
+    <button id="clearBtn" class="btn ghost">ล้างข้อมูล</button>
+    <button id="exportBtn" class="btn teal" disabled>Export ผลเป็น Excel</button>
+    <span class="note">Level ใช้ 7 หลักแรกของรหัส; ตำแหน่ง 6 และ 7 ถือเป็น Level 6 เดียวกัน</span>
+  </div>
+  <div id="status" class="status">ยังไม่มีไฟล์</div>
+  <div id="filelist" class="filelist"></div>
+</section>
+
+<section class="card">
+  <div class="section-title">2) ตัวกรองและสรุปผล</div>
+  <div class="toolbar">
+    <select id="region"><option value="">ทุกภาค</option></select>
+    <select id="period"><option value="">ทุกเดือน</option></select>
+    <select id="level"><option value="">ทุก Level</option></select>
+    <input id="search" class="grow" placeholder="ค้นหารหัส หรือชื่อหมวด/รายการ" />
+    <select id="qc"><option value="">QC ทั้งหมด</option><option value="ok">ผ่าน (≤ 0.01)</option><option value="diff">ต่าง (> 0.01)</option><option value="na">คำนวณไม่ได้</option></select>
+  </div>
+  <div class="kpis">
+    <div class="kpi"><div id="kRows" class="v">0</div><div class="l">รายการที่แสดง</div></div>
+    <div class="kpi"><div id="kRegions" class="v">0</div><div class="l">ภาค</div></div>
+    <div class="kpi"><div id="kPeriods" class="v">0</div><div class="l">งวด</div></div>
+    <div class="kpi"><div id="kOk" class="v">0</div><div class="l">MoM ผ่าน ≤ 0.01</div></div>
+    <div class="kpi"><div id="kDiff" class="v">0</div><div class="l">MoM ต่าง > 0.01</div></div>
+  </div>
+</section>
+
+<section class="card">
+  <div class="section-title">3) ผลคำนวณ MoM / YoY / AoA</div>
+  <div class="note" style="margin-bottom:10px">MoM ใช้เดือนก่อนหน้า (ถ้าไม่ได้อัปโหลดเดือนก่อน ระบบใช้ Previous Index ที่อยู่ในไฟล์ปัจจุบัน) • YoY ใช้เดือนเดียวกันปีก่อน • AoA ใช้ค่าเฉลี่ยดัชนี ม.ค.–เดือนปัจจุบัน เทียบช่วงเดียวกันปีก่อน</div>
+  <div class="tablewrap"><table><thead><tr>
+    <th>รหัส</th><th>หมวด/รายการ</th><th>ภาค</th><th>งวด</th><th>Level</th><th>Parent</th><th class="num">Weight</th><th class="num">Index</th>
+    <th class="num">MoM Excel</th><th class="num">MoM Calc</th><th class="num">Diff</th><th>QC</th>
+    <th class="num">YoY Excel</th><th class="num">YoY Calc</th><th class="num">AoA Excel</th><th class="num">AoA Calc</th>
+  </tr></thead><tbody id="tbody"></tbody></table></div>
+  <div id="shown" class="status"></div>
+</section>
+</div></main>
+<script>
+const MONTHS={"มกราคม":1,"กุมภาพันธ์":2,"มีนาคม":3,"เมษายน":4,"พฤษภาคม":5,"มิถุนายน":6,"กรกฎาคม":7,"สิงหาคม":8,"กันยายน":9,"ตุลาคม":10,"พฤศจิกายน":11,"ธันวาคม":12};
+const MNAME=Object.fromEntries(Object.entries(MONTHS).map(([k,v])=>[v,k]));
+let rows=[];
+const $=id=>document.getElementById(id);
+function norm(x){return (x??"").toString().replace(/\s+/g," ").trim()}
+function n(x){if(x===null||x===undefined||x==="")return null;const v=Number((x+"").replace(/,/g,""));return Number.isFinite(v)?v:null}
+function fmt(x,d=4){return x===null||x===undefined||!Number.isFinite(Number(x))?"":Number(x).toLocaleString("th-TH",{minimumFractionDigits:0,maximumFractionDigits:d})}
+function code16(x){let s=(x??"").toString().replace(/\.0$/,"").replace(/\D/g,"");return s.padStart(16,"0").slice(-16)}
+function levelOf(code){const k=code16(code).slice(0,7);if(k==="0000000")return 0;let p=0;for(let i=0;i<7;i++)if(k[i]!=="0")p=i+1;return Math.min(p,6)}
+function regionFrom(title,filename){const m=title.match(/ของ\s+(.+?)\s*\(GM\)/);if(m)return norm(m[1]);for(const s of ["กรุงเทพมหานคร และปริมณฑล","กรุงเทพมหานครและปริมณฑล","ภาคตะวันออกเฉียงเหนือ","ภาคกลาง","ภาคเหนือ","ภาคใต้","ประเทศ"])if(filename.includes(s))return s.replace("กรุงเทพมหานคร และปริมณฑล","กรุงเทพมหานครและปริมณฑล");return filename.replace(/\.[^.]+$/,"")}
+function parsePeriod(title,headers,filename){let m=title.match(/เดือน\s*([ก-๙]+)\s*ปี\s*(\d{4})/);if(m&&MONTHS[m[1]])return [+m[2],MONTHS[m[1]]];const joined=headers.join(" ");for(const [name,mo] of Object.entries(MONTHS)){const re=new RegExp(name+"\\s*(\\d{4})");const q=joined.match(re);if(q)return [+q[1],mo]}throw new Error("ไม่พบเดือน/ปีในไฟล์: "+filename)}
+function findHeader(aoa){for(let i=0;i<Math.min(15,aoa.length);i++){const v=(aoa[i]||[]).map(norm);if(v.includes("รหัส")&&v.includes("หมวด/รายการ"))return i}return -1}
+function parseFile(wb,filename){const ws=wb.Sheets[wb.SheetNames[0]];const aoa=XLSX.utils.sheet_to_json(ws,{header:1,raw:true,defval:null});if(!aoa.length)throw new Error("ไฟล์ว่าง");const hi=findHeader(aoa);if(hi<0)throw new Error("ไม่พบหัวตาราง รหัส / หมวด/รายการ");const title=norm(aoa[0]?.[0]);const headers=(aoa[hi]||[]).map((v,j)=>norm(v)||`_col_${j}`);const [year,month]=parsePeriod(title,headers,filename);const region=regionFrom(title,filename);const idx={};headers.forEach((h,i)=>idx[h]=i);const weightCols=headers.map((h,i)=>[h,i]).filter(([h])=>h.startsWith("น้ำหนัก"));const indexCols=headers.map((h,i)=>[h,i]).filter(([h])=>h.startsWith("ดัชนี"));const weightCurrent=weightCols.at(-1)?.[1], indexCurrent=indexCols.at(-1)?.[1], prevIndex=indexCols.length>=2?indexCols.at(-2)[1]:null;
+  const mom=headers.findIndex(h=>h.toLowerCase()==="mom"),yoy=headers.findIndex(h=>h.toLowerCase()==="yoy"),ao=headers.findIndex(h=>h.toLowerCase()==="aoa");
+  const out=[]; const stack=[];
+  for(let r=hi+1;r<aoa.length;r++){const a=aoa[r]||[];if(a.every(v=>v===null||v===""))continue;const c=code16(a[idx["รหัส"]]);if(!/^\d{16}$/.test(c))continue;const lv=levelOf(c);while(stack.length&&stack.at(-1).lv>=lv)stack.pop();const parent=stack.length?stack.at(-1).code:null;const obj={code:c,item:norm(a[idx["หมวด/รายการ"]]),region,year,month,period:`${year}-${String(month).padStart(2,"0")}`,level:lv,parent,weight:n(a[weightCurrent]),index:n(a[indexCurrent]),prevIndex:n(a[prevIndex]),momSource:n(a[mom]),yoySource:n(a[yoy]),aoaSource:n(a[ao])};out.push(obj);stack.push({lv,code:c});}
+  return out;
+}
+function compute(){const map=new Map();for(const r of rows)map.set(`${r.region}|${r.code}|${r.year}|${r.month}`,r.index);for(const r of rows){let py=r.year,pm=r.month-1;if(pm===0){py--;pm=12}let prev=map.get(`${r.region}|${r.code}|${py}|${pm}`);if(prev==null)prev=r.prevIndex;r.momCalc=(r.index!=null&&prev!=null&&prev!==0)?(r.index/prev-1)*100:null;const yp=map.get(`${r.region}|${r.code}|${r.year-1}|${r.month}`);r.yoyCalc=(r.index!=null&&yp!=null&&yp!==0)?(r.index/yp-1)*100:null;let cur=[],old=[],ok=true;for(let m=1;m<=r.month;m++){const a=map.get(`${r.region}|${r.code}|${r.year}|${m}`),b=map.get(`${r.region}|${r.code}|${r.year-1}|${m}`);if(a==null||b==null){ok=false;break}cur.push(a);old.push(b)}if(ok&&old.length){const ac=cur.reduce((a,b)=>a+b,0)/cur.length,ap=old.reduce((a,b)=>a+b,0)/old.length;r.aoaCalc=ap!==0?(ac/ap-1)*100:null}else r.aoaCalc=null;r.momDiff=(r.momCalc!=null&&r.momSource!=null)?r.momCalc-r.momSource:null;r.qc=r.momDiff==null?"na":Math.abs(r.momDiff)<=0.01?"ok":"diff"}}
+function options(){const fill=(id,vals,label)=>{const el=$(id),cur=el.value;el.innerHTML=`<option value="">${label}</option>`+[...vals].sort().map(v=>`<option value="${v}">${v}</option>`).join("");if([...vals].map(String).includes(cur))el.value=cur};fill("region",new Set(rows.map(r=>r.region)),"ทุกภาค");fill("period",new Set(rows.map(r=>r.period)),"ทุกเดือน");fill("level",new Set(rows.map(r=>r.level)),"ทุก Level")}
+function filtered(){const rg=$("region").value,p=$("period").value,lv=$("level").value,q=$("search").value.trim().toLowerCase(),qc=$("qc").value;return rows.filter(r=>(!rg||r.region===rg)&&(!p||r.period===p)&&(!lv||String(r.level)===lv)&&(!qc||r.qc===qc)&&(!q||r.code.includes(q)||r.item.toLowerCase().includes(q)))}
+function render(){const data=filtered(),max=500;$("tbody").innerHTML=data.slice(0,max).map(r=>`<tr><td>${r.code}</td><td>${escapeHtml(r.item)}</td><td>${escapeHtml(r.region)}</td><td>${r.period}</td><td class="num">${r.level}</td><td>${r.parent??""}</td><td class="num">${fmt(r.weight,6)}</td><td class="num">${fmt(r.index,6)}</td><td class="num">${fmt(r.momSource)}</td><td class="num">${fmt(r.momCalc)}</td><td class="num">${fmt(r.momDiff)}</td><td>${qcChip(r.qc)}</td><td class="num">${fmt(r.yoySource)}</td><td class="num">${fmt(r.yoyCalc)}</td><td class="num">${fmt(r.aoaSource)}</td><td class="num">${fmt(r.aoaCalc)}</td></tr>`).join("");$("shown").textContent=data.length>max?`แสดง ${max.toLocaleString()} จาก ${data.length.toLocaleString()} รายการ (ใช้ตัวกรองเพื่อดูเฉพาะรายการ)`:`แสดง ${data.length.toLocaleString()} รายการ`;$("kRows").textContent=data.length.toLocaleString();$("kRegions").textContent=new Set(data.map(r=>r.region)).size;$("kPeriods").textContent=new Set(data.map(r=>r.period)).size;$("kOk").textContent=data.filter(r=>r.qc==="ok").length.toLocaleString();$("kDiff").textContent=data.filter(r=>r.qc==="diff").length.toLocaleString()}
+function qcChip(q){return q==="ok"?'<span class="chip ok">ผ่าน</span>':q==="diff"?'<span class="chip diff">ต่าง</span>':'<span class="chip na">N/A</span>'}
+function escapeHtml(s){return (s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"}[c]))}
+async function handleFiles(files){if(!files.length)return;let logs=[];for(const f of files){try{const buf=await f.arrayBuffer();const wb=XLSX.read(buf,{type:"array"});const parsed=parseFile(wb,f.name);rows.push(...parsed);logs.push(`<div class="file good">✓ ${escapeHtml(f.name)} — ${parsed.length.toLocaleString()} รายการ</div>`)}catch(e){logs.push(`<div class="file bad">✗ ${escapeHtml(f.name)} — ${escapeHtml(e.message)}</div>`)}}compute();options();render();$("filelist").insertAdjacentHTML("beforeend",logs.join(""));$("status").textContent=`โหลดข้อมูลรวม ${rows.length.toLocaleString()} รายการ`;$("exportBtn").disabled=!rows.length}
+function exportXlsx(){const data=filtered().map(r=>({"รหัส":r.code,"หมวด/รายการ":r.item,"ภาค":r.region,"ปี":r.year,"เดือน":r.month,"งวด":r.period,"Level":r.level,"Parent":r.parent,"Weight":r.weight,"Index":r.index,"MoM_Excel":r.momSource,"MoM_Calc":r.momCalc,"MoM_Diff":r.momDiff,"MoM_QC":r.qc,"YoY_Excel":r.yoySource,"YoY_Calc":r.yoyCalc,"AoA_Excel":r.aoaSource,"AoA_Calc":r.aoaCalc}));const wb=XLSX.utils.book_new(),ws=XLSX.utils.json_to_sheet(data);XLSX.utils.book_append_sheet(wb,ws,"ผลคำนวณ");XLSX.writeFile(wb,"CPI_MoM_YoY_AoA_Result.xlsx")}
+const drop=$("drop");drop.addEventListener("dragover",e=>{e.preventDefault();drop.classList.add("drag")});drop.addEventListener("dragleave",()=>drop.classList.remove("drag"));drop.addEventListener("drop",e=>{e.preventDefault();drop.classList.remove("drag");handleFiles([...e.dataTransfer.files].filter(f=>/\.xlsx?$/i.test(f.name)))});$("files").addEventListener("change",e=>handleFiles([...e.target.files]));for(const id of ["region","period","level","search","qc"])$(id).addEventListener(id==="search"?"input":"change",render);$("clearBtn").addEventListener("click",()=>{rows=[];$("filelist").innerHTML="";$("status").textContent="ยังไม่มีไฟล์";$("exportBtn").disabled=true;options();render()});$("exportBtn").addEventListener("click",exportXlsx);
+render();
+</script>
+</body></html>
