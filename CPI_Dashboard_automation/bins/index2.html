@@ -1,6 +1,8 @@
-<html lang="th"><head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>TPSO CPI Report | 6.1.7 Relative Report</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
@@ -209,11 +211,11 @@
         <div><strong>TPSO CPI Report</strong><small>โครงสร้างรายงานตาม Cpig</small></div>
       </div>
       <div class="toolbar">
-        <input id="fileInput" type="file" accept=".xlsx,.xls" multiple="" hidden="">
+        <input id="fileInput" type="file" accept=".xlsx,.xls" multiple hidden />
         <button class="tool-btn" onclick="document.getElementById('fileInput').click()">📂 นำเข้า Excel 6.1.7</button>
-        <select id="periodSelect" class="tool-select" onchange="onPeriodChange()" title="งวดข้อมูล"><option value="256909">กันยายน 2569</option></select>
-        <select id="datasetSelect" class="tool-select" onchange="onDatasetChange()" title="ชุดดัชนี"><option value="G">G • ชุดทั่วไป</option></select>
-        <select id="regionSelect" class="tool-select" onchange="renderAll()" title="พื้นที่"><option value="NATIONAL">ภาพรวมประเทศ</option></select>
+        <select id="periodSelect" class="tool-select" onchange="onPeriodChange()" title="งวดข้อมูล"><option>ยังไม่มีข้อมูล</option></select>
+        <select id="datasetSelect" class="tool-select" onchange="onDatasetChange()" title="ชุดดัชนี"><option>ยังไม่มีข้อมูล</option></select>
+        <select id="regionSelect" class="tool-select" onchange="renderAll()" title="พื้นที่"><option>ยังไม่มีข้อมูล</option></select>
         <button class="tool-btn" onclick="window.print()">🖨️ พิมพ์ / PDF</button>
       </div>
       <div class="nav-pages">
@@ -233,9 +235,9 @@
       </div>
     </section>
 
-    <div id="report" style="display: none;">
+    <div id="report">
       <div class="statusbar">
-        <div class="meta" id="statusMeta">กันยายน 2569 • ชุดทั่วไป (G) • ภาพรวมประเทศ • 639 แถว • โหลดแล้ว 1 ไฟล์ (1 พื้นที่ของชุดนี้ในงวดนี้)</div>
+        <div class="meta" id="statusMeta">-</div>
         <div class="actions">
           <button class="mini-btn" onclick="capturePage('page-1')">📷 PNG หน้า 1</button>
           <button class="mini-btn" onclick="capturePage('page-9')">📷 PNG Poster</button>
@@ -245,101 +247,100 @@
 
       <section class="report-page" id="page-1">
         <div class="page-topline"></div>
-        <div class="page-head"><div><h2 class="page-title" id="p1Title">ดัชนีราคาผู้บริโภคชุดทั่วไป • ภาพรวมประเทศ</h2><p class="page-subtitle" id="p1Sub">เดือนกันยายน 2569 • ปีฐาน 2566 = 100 • G</p></div><div class="page-no">1</div></div>
+        <div class="page-head"><div><h2 class="page-title" id="p1Title">ดัชนีราคาผู้บริโภค</h2><p class="page-subtitle" id="p1Sub">-</p></div><div class="page-no">1</div></div>
         <div class="page-body">
-          <div class="ribbon" id="headlineRibbon">ดัชนีราคาผู้บริโภคชุดทั่วไป เดือนกันยายน 2569 เท่ากับ 102.93</div>
+          <div class="ribbon" id="headlineRibbon">ดัชนีราคาผู้บริโภค เท่ากับ -</div>
           <table class="compare-table">
             <thead><tr><th>เมื่อเทียบกับระยะเวลา</th><th id="summaryHeadlineHead">ดัชนีราคาผู้บริโภคชุดทั่วไป</th><th>ดัชนีราคาผู้บริโภคพื้นฐาน</th></tr></thead>
-            <tbody id="summaryCompareBody"><tr><td>เดือนกันยายน 2568 (YoY)</td><td><span class="metric-val positive">+2.82</span></td><td><span class="metric-val positive">+1.50</span></td></tr><tr><td>เดือนสิงหาคม 2569 (MoM)</td><td><span class="metric-val positive">+0.25</span></td><td><span class="metric-val positive">+0.01</span></td></tr><tr><td>เฉลี่ย 9 เดือน (ม.ค.–ก.ย.) ปี 2569 เทียบช่วงเดียวกันปีก่อน (AoA)</td><td><span class="metric-val positive">+1.54</span></td><td><span class="metric-val positive">+1.01</span></td></tr></tbody>
+            <tbody id="summaryCompareBody"></tbody>
           </table>
-          <div class="highlights"><h3>Highlights</h3><p id="highlightsText">ดัชนีราคาผู้บริโภคชุดทั่วไป ของประเทศ เดือนกันยายน 2569 เท่ากับ 102.93 เมื่อเทียบกับเดือนเดียวกันของปีก่อน สูงขึ้นร้อยละ 2.82 (YoY) โดยหมวดที่มีส่วนผลักดันสำคัญ ได้แก่ พาหนะ การขนส่ง และการสื่อสาร, อาหารสำเร็จรูป, ข้าว  แป้งและผลิตภัณฑ์จากแป้ง ขณะที่หมวดที่ช่วยชะลอ ได้แก่ เคหสถาน, เครื่องนุ่งห่มและรองเท้า เมื่อเทียบกับเดือนก่อน สูงขึ้นร้อยละ 0.25 (MoM) ด้านรายการที่ผลักดันขึ้นในเดือนนี้ ได้แก่ พาหนะ การขนส่ง และการสื่อสาร, เนื้อสัตว์ เป็ดไก่ และสัตว์น้ำ, ผลไม้สด ส่วนแรงกดดันลงสำคัญ ได้แก่ เคหสถาน, ไข่และผลิตภัณฑ์นม, ผักสด และเฉลี่ย 9 เดือนแรก สูงขึ้นร้อยละ 1.54 (AoA) สำหรับเงินเฟ้อพื้นฐาน สูงขึ้นร้อยละ 1.50 (YoY), สูงขึ้นร้อยละ 0.01 (MoM) และ สูงขึ้นร้อยละ 1.01 (AoA) .</p></div>
+          <div class="highlights"><h3>Highlights</h3><p id="highlightsText">-</p></div>
         </div>
         <div class="footer">กองดัชนีเศรษฐกิจการค้า • สำนักงานนโยบายและยุทธศาสตร์การค้า</div>
       </section>
 
       <section class="report-page" id="page-2">
         <div class="page-topline"></div>
-        <div class="page-head"><div><h2 class="page-title" id="p2Title">สถิติอัตราการเปลี่ยนแปลงและภาพรวมดัชนีราคาผู้บริโภคชุดทั่วไป</h2><p class="page-subtitle" id="p2Sub">เดือนกันยายน 2569 • ชุดทั่วไป (G) • ภาพรวมประเทศ</p></div><div class="page-no">2</div></div>
+        <div class="page-head"><div><h2 class="page-title" id="p2Title">สถิติอัตราเงินเฟ้อและภาพรวมดัชนีราคาผู้บริโภค</h2><p class="page-subtitle" id="p2Sub">-</p></div><div class="page-no">2</div></div>
         <div class="page-body">
-          <div class="grid-3" id="headlineKpis"><div class="kpi"><div class="label">ดัชนี</div><div class="value">102.93</div><div class="hint">ชุดทั่วไป (G)</div></div><div class="kpi"><div class="label">YoY ชุดทั่วไป</div><div class="value positive">+2.82%</div><div class="hint">เทียบเดือนเดียวกันปีก่อน</div></div><div class="kpi"><div class="label">เงินเฟ้อพื้นฐาน YoY</div><div class="value positive">+1.50%</div><div class="hint">ไม่รวมอาหารสดและพลังงาน</div></div></div>
-          <div class="chart-card" style="margin-top:16px"><div class="chart-wrap"><canvas id="trendChart" width="1055" height="330" style="display: block; box-sizing: border-box; height: 330px; width: 1055px;"></canvas></div></div>
-          <div class="table-toolbar" style="margin-top:14px"><span class="limit-label">แสดงหมวดในตาราง</span><select id="overviewLimitSelect" class="table-limit-select" onchange="renderAll()"><option value="3">3</option><option value="6">6</option><option value="9">9</option><option value="12" selected="">12</option><option value="15">15</option><option value="20">20</option><option value="30">30</option></select><span class="limit-label">รายการ</span></div>
-          <div class="metric-board" id="metricBoard"><div class="head">รายการ</div><div class="head">YoY</div><div class="head">MoM</div><div class="head">AoA</div><div class="name">รวมทุกรายการ</div><div class="barcell"><span class="bar pos" style="width:12.13297790880202%;left:50%"></span><span class="num positive">+2.82</span></div><div class="barcell"><span class="bar pos" style="width:5.137038172343534%;left:50%"></span><span class="num positive">+0.25</span></div><div class="barcell"><span class="bar pos" style="width:11.307819221024099%;left:50%"></span><span class="num positive">+1.54</span></div><div class="name">อาหารและเครื่องดื่มไม่มีแอลกอฮอล์</div><div class="barcell"><span class="bar pos" style="width:13.241868945978023%;left:50%"></span><span class="num positive">+3.07</span></div><div class="barcell"><span class="bar pos" style="width:3.679339692385366%;left:50%"></span><span class="num positive">+0.18</span></div><div class="barcell"><span class="bar pos" style="width:10.354575452242061%;left:50%"></span><span class="num positive">+1.41</span></div><div class="name">- อาหารสด</div><div class="barcell"><span class="bar pos" style="width:12.18569815077147%;left:50%"></span><span class="num positive">+2.83</span></div><div class="barcell"><span class="bar pos" style="width:5.396080888584359%;left:50%"></span><span class="num positive">+0.27</span></div><div class="barcell"><span class="bar pos" style="width:2.9618908726651347%;left:50%"></span><span class="num positive">+0.40</span></div><div class="name">หมวดอื่น ๆ ที่ไม่ใช่อาหารและเครื่องดื่ม</div><div class="barcell"><span class="bar pos" style="width:11.488231747004097%;left:50%"></span><span class="num positive">+2.67</span></div><div class="barcell"><span class="bar pos" style="width:6.006261382282408%;left:50%"></span><span class="num positive">+0.30</span></div><div class="barcell"><span class="bar pos" style="width:11.932414118201637%;left:50%"></span><span class="num positive">+1.62</span></div><div class="name">เครื่องนุ่งห่มและรองเท้า</div><div class="barcell"><span class="bar neg" style="width:1.843700945671733%;"></span><span class="num negative">-0.43</span></div><div class="barcell"><span class="bar pos" style="width:0.4154420382625002%;left:50%"></span><span class="num positive">+0.02</span></div><div class="barcell"><span class="bar neg" style="width:7.81981026456897%;"></span><span class="num negative">-1.06</span></div><div class="name">เคหสถาน</div><div class="barcell"><span class="bar neg" style="width:4.722725793483671%;"></span><span class="num negative">-1.10</span></div><div class="barcell"><span class="bar neg" style="width:29.48137362736436%;"></span><span class="num negative">-1.45</span></div><div class="barcell"><span class="bar neg" style="width:2.4386453361616875%;"></span><span class="num negative">-0.33</span></div><div class="name">การตรวจรักษาและบริการส่วนบุคคล</div><div class="barcell"><span class="bar pos" style="width:3.4915100118687548%;left:50%"></span><span class="num positive">+0.81</span></div><div class="barcell"><span class="bar pos" style="width:3.0630736219549575%;left:50%"></span><span class="num positive">+0.15</span></div><div class="barcell"><span class="bar neg" style="width:2.9652053503034588%;"></span><span class="num negative">-0.40</span></div><div class="name">พาหนะ การขนส่งและการสื่อสาร</div><div class="barcell"><span class="bar pos" style="width:34.50333090853402%;left:50%"></span><span class="num positive">+8.01</span></div><div class="barcell"><span class="bar pos" style="width:45%;left:50%"></span><span class="num positive">+2.22</span></div><div class="barcell"><span class="bar pos" style="width:35.532378763773494%;left:50%"></span><span class="num positive">+4.82</span></div><div class="name">- พลังงาน</div><div class="barcell"><span class="bar pos" style="width:45%;left:50%"></span><span class="num positive">+10.45</span></div><div class="barcell"><span class="bar pos" style="width:30.23253664869543%;left:50%"></span><span class="num positive">+1.49</span></div><div class="barcell"><span class="bar pos" style="width:45%;left:50%"></span><span class="num positive">+6.11</span></div><div class="name">การบันเทิง การอ่าน การศึกษาฯ</div><div class="barcell"><span class="bar pos" style="width:5.960359316972319%;left:50%"></span><span class="num positive">+1.38</span></div><div class="barcell"><span class="bar pos" style="width:5.9504769289024315%;left:50%"></span><span class="num positive">+0.29</span></div><div class="barcell"><span class="bar pos" style="width:6.346414471745919%;left:50%"></span><span class="num positive">+0.86</span></div><div class="name">ยาสูบและเครื่องดื่มมีแอลกอฮอล์</div><div class="barcell"><span class="bar pos" style="width:0.042512155901833916%;left:50%"></span><span class="num positive">+0.01</span></div><div class="barcell"><span class="bar pos" style="width:0.40063380154708883%;left:50%"></span><span class="num positive">+0.02</span></div><div class="barcell"><span class="bar neg" style="width:0.4361852572034647%;"></span><span class="num negative">-0.06</span></div><div class="name">ดัชนีราคาผู้บริโภคพื้นฐาน</div><div class="barcell"><span class="bar pos" style="width:6.45275948543206%;left:50%"></span><span class="num positive">+1.50</span></div><div class="barcell"><span class="bar pos" style="width:0.19696983357074596%;left:50%"></span><span class="num positive">+0.01</span></div><div class="barcell"><span class="bar pos" style="width:7.414191856696718%;left:50%"></span><span class="num positive">+1.01</span></div></div>
+          <div class="grid-3" id="headlineKpis"></div>
+          <div class="chart-card" style="margin-top:16px"><div class="chart-wrap"><canvas id="trendChart"></canvas></div></div>
+          <div class="table-toolbar" style="margin-top:14px"><span class="limit-label">แสดงหมวดในตาราง</span><select id="overviewLimitSelect" class="table-limit-select" onchange="renderAll()"><option value="3">3</option><option value="6">6</option><option value="9">9</option><option value="12" selected>12</option><option value="15">15</option><option value="20">20</option><option value="30">30</option></select><span class="limit-label">รายการ</span></div>
+          <div class="metric-board" id="metricBoard"></div>
         </div>
         <div class="footer">กราฟแนวโน้มใช้ข้อมูลทุกงวดที่อัปโหลดสำหรับพื้นที่ที่เลือก</div>
       </section>
 
       <section class="report-page" id="page-3">
         <div class="page-topline"></div>
-        <div class="page-head"><div><h2 class="page-title" id="p3Title">อัตราการเปลี่ยนแปลงดัชนีราคาผู้บริโภคชุดทั่วไป</h2><p class="page-subtitle" id="p3Sub">เดือนกันยายน 2568 (YoY) <b class="positive">สูงขึ้นร้อยละ 2.82</b></p></div><div class="page-no">3</div></div>
-        <div class="page-body"><div class="table-toolbar"><span class="limit-label">สินค้าสำคัญต่อกลุ่ม</span><select id="yoyLimitSelect" class="table-limit-select" onchange="renderAll()"><option value="3" selected="">3</option><option value="6">6</option><option value="9">9</option><option value="12">12</option><option value="15">15</option><option value="20">20</option><option value="30">30</option></select><span class="limit-label">รายการ</span></div><div id="yoyComponents"><div class="component-header">หมวดอาหารและเครื่องดื่มไม่มีแอลกอฮอล์ <span class="positive">สูงขึ้นร้อยละ 3.07</span></div><table class="component-table"><thead><tr><th>กลุ่มสินค้า</th><th>ทิศทาง</th><th>สินค้าสำคัญที่ส่งผลกระทบ</th></tr></thead><tbody><tr><td>ข้าว แป้ง และผลิตภัณฑ์จากแป้ง</td><td class="positive">+ ร้อยละ 4.87</td><td>จากการสูงขึ้นของราคาข้าวสารเจ้า • ขนมปังปอนด์ • วุ้นเส้น</td></tr><tr><td>เนื้อสัตว์ เป็ด ไก่ และสัตว์น้ำ</td><td class="positive">+ ร้อยละ 1.47</td><td>จากการสูงขึ้นของราคาไก่สด • เนื้อสุกร • ปลาทู</td></tr><tr><td>ไข่และผลิตภัณฑ์นม</td><td class="positive">+ ร้อยละ 3.76</td><td>จากการสูงขึ้นของราคาไข่ไก่ • นมผง • นมเปรี้ยว</td></tr><tr><td>ผักสด</td><td class="positive">+ ร้อยละ 4.62</td><td>จากการสูงขึ้นของราคามะนาว • ต้นหอม • ผักกาดขาว</td></tr><tr><td>ผลไม้สด</td><td class="positive">+ ร้อยละ 1.34</td><td>จากการสูงขึ้นของราคาฝรั่ง • ส้มเขียวหวาน • มะละกอสุก</td></tr><tr><td>เครื่องประกอบอาหาร</td><td class="positive">+ ร้อยละ 0.54</td><td>จากการสูงขึ้นของราคาน้ำปลา • กะปิ • น้ำพริกแกง</td></tr><tr><td>เครื่องดื่มไม่มีแอลกอฮอล์</td><td class="positive">+ ร้อยละ 1.60</td><td>จากการสูงขึ้นของราคาน้ำดื่มบริสุทธิ์ • กาแฟผงสำเร็จรูป • น้ำอัดลม</td></tr><tr><td>ผลิตภัณฑ์น้ำตาล</td><td class="positive">+ ร้อยละ 2.48</td><td>จากการสูงขึ้นของราคาขนมหวาน • ไอศกรีม • น้ำตาลทรายแดง</td></tr><tr><td>อาหารสำเร็จรูป</td><td class="positive">+ ร้อยละ 3.82</td><td>จากการสูงขึ้นของราคาก๋วยเตี๋ยว • กับข้าวสำเร็จรูป • ข้าวราดแกง</td></tr></tbody></table><div class="component-header">หมวดอื่น ๆ ที่ไม่ใช่อาหารและเครื่องดื่ม <span class="positive">สูงขึ้นร้อยละ 2.67</span></div><table class="component-table"><thead><tr><th>กลุ่มสินค้า</th><th>ทิศทาง</th><th>สินค้าสำคัญที่ส่งผลกระทบ</th></tr></thead><tbody><tr><td>เครื่องนุ่งห่มและรองเท้า</td><td class="negative">− ร้อยละ 0.43</td><td>จากการลดลงของราคาเสื้อเชิ้ตสตรี • กางเกงขายาวสตรี • รองเท้าผ้าใบบุรุษ</td></tr><tr><td>เคหสถาน</td><td class="negative">− ร้อยละ 1.10</td><td>จากการลดลงของราคาค่ากระแสไฟฟ้า • ค่าจ้างเหมาซ่อมแซมบ้าน (ค่าแรงพร้อมวัสดุก่อสร้าง) • ผ้าปูที่นอน</td></tr><tr><td>การตรวจรักษาและบริการส่วนบุคคล</td><td class="positive">+ ร้อยละ 0.81</td><td>จากการสูงขึ้นของราคากระดาษชำระ/กระดาษสำหรับเช็ดหน้า • ค่าเบี้ยประกันสุขภาพ (ไม่รวมประเภทสะสมทรัพย์) • แชมพู</td></tr><tr><td>พาหนะ การขนส่ง และการสื่อสาร</td><td class="positive">+ ร้อยละ 8.01</td><td>จากการสูงขึ้นของราคาน้ำมันดีเซล • แก๊สโซฮอล์ 95 • แก๊สโซฮอล์ 91</td></tr><tr><td>การบันเทิง การอ่าน การศึกษา และการศาสนา</td><td class="positive">+ ร้อยละ 1.38</td><td>จากการสูงขึ้นของราคาค่าทัศนาจรต่างประเทศ • อาหารสัตว์เลี้ยง • ค่าเดินทางไปเยี่ยมญาติและทำบุญ</td></tr><tr><td>ยาสูบและเครื่องดื่มมีแอลกอฮอล์</td><td class="positive">+ ร้อยละ 0.01</td><td>จากการสูงขึ้นของราคาเบียร์</td></tr></tbody></table></div></div>
+        <div class="page-head"><div><h2 class="page-title" id="p3Title">อัตราการเปลี่ยนแปลงดัชนีราคาผู้บริโภค ชุดทั่วไป</h2><p class="page-subtitle" id="p3Sub">เทียบกับเดือนเดียวกันของปีก่อน (YoY)</p></div><div class="page-no">3</div></div>
+        <div class="page-body"><div class="table-toolbar"><span class="limit-label">สินค้าสำคัญต่อกลุ่ม</span><select id="yoyLimitSelect" class="table-limit-select" onchange="renderAll()"><option value="3" selected>3</option><option value="6">6</option><option value="9">9</option><option value="12">12</option><option value="15">15</option><option value="20">20</option><option value="30">30</option></select><span class="limit-label">รายการ</span></div><div id="yoyComponents"></div></div>
         <div class="footer">สินค้าสำคัญที่ส่งผลกระทบคัดจากรายการย่อยตาม Contribution ของ YoY</div>
       </section>
 
       <section class="report-page" id="page-4">
         <div class="page-topline"></div>
-        <div class="page-head"><div><h2 class="page-title" id="p4Title">อัตราการเปลี่ยนแปลงดัชนีราคาผู้บริโภคชุดทั่วไป</h2><p class="page-subtitle" id="p4Sub">เดือนสิงหาคม 2569 (MoM) <b class="positive">สูงขึ้นร้อยละ 0.25</b></p></div><div class="page-no">4</div></div>
-        <div class="page-body"><div class="table-toolbar"><span class="limit-label">สินค้าสำคัญต่อกลุ่ม</span><select id="momLimitSelect" class="table-limit-select" onchange="renderAll()"><option value="3" selected="">3</option><option value="6">6</option><option value="9">9</option><option value="12">12</option><option value="15">15</option><option value="20">20</option><option value="30">30</option></select><span class="limit-label">รายการ</span></div><div id="momComponents"><div class="component-header">หมวดอาหารและเครื่องดื่มไม่มีแอลกอฮอล์ <span class="positive">สูงขึ้นร้อยละ 0.18</span></div><table class="component-table"><thead><tr><th>กลุ่มสินค้า</th><th>ทิศทาง</th><th>สินค้าสำคัญที่ส่งผลกระทบ</th></tr></thead><tbody><tr><td>ข้าว แป้ง และผลิตภัณฑ์จากแป้ง</td><td class="positive">+ ร้อยละ 0.53</td><td>จากการสูงขึ้นของราคาข้าวสารเจ้า • ข้าวสารเหนียว • อาหารธัญพืช</td></tr><tr><td>เนื้อสัตว์ เป็ด ไก่ และสัตว์น้ำ</td><td class="positive">+ ร้อยละ 0.44</td><td>จากการสูงขึ้นของราคาเนื้อสุกร • ไก่สด • กระดูกซี่โครงหมู</td></tr><tr><td>ไข่และผลิตภัณฑ์นม</td><td class="negative">− ร้อยละ 1.28</td><td>จากการลดลงของราคานมสด • นมถั่วเหลือง • นมข้นหวาน</td></tr><tr><td>ผักสด</td><td class="negative">− ร้อยละ 0.58</td><td>จากการลดลงของราคาแตงกวา • ฟักทอง • มะละกอดิบ</td></tr><tr><td>ผลไม้สด</td><td class="positive">+ ร้อยละ 1.13</td><td>จากการสูงขึ้นของราคาส้มเขียวหวาน • มะละกอสุก • มะม่วง</td></tr><tr><td>เครื่องประกอบอาหาร</td><td class="negative">− ร้อยละ 0.05</td><td>จากการลดลงของราคาซอสหอยนางรม • เกลือป่น • กะทิสำเร็จรูป</td></tr><tr><td>เครื่องดื่มไม่มีแอลกอฮอล์</td><td class="positive">+ ร้อยละ 0.37</td><td>จากการสูงขึ้นของราคาน้ำดื่มบริสุทธิ์ • ผลิตภัณฑ์เสริมอาหาร • น้ำอัดลม</td></tr><tr><td>ผลิตภัณฑ์น้ำตาล</td><td class="negative">− ร้อยละ 0.07</td><td>จากการลดลงของราคาน้ำตาลทราย</td></tr><tr><td>อาหารสำเร็จรูป</td><td class="positive">+ ร้อยละ 0.08</td><td>จากการสูงขึ้นของราคาก๋วยเตี๋ยว • โจ๊ก/ข้าวต้มทรงเครื่อง • ข้าวหมูแดง</td></tr></tbody></table><div class="component-header">หมวดอื่น ๆ ที่ไม่ใช่อาหารและเครื่องดื่ม <span class="positive">สูงขึ้นร้อยละ 0.30</span></div><table class="component-table"><thead><tr><th>กลุ่มสินค้า</th><th>ทิศทาง</th><th>สินค้าสำคัญที่ส่งผลกระทบ</th></tr></thead><tbody><tr><td>เครื่องนุ่งห่มและรองเท้า</td><td class="positive">+ ร้อยละ 0.02</td><td>จากการสูงขึ้นของราคารองเท้าแตะหนังสตรี • รองเท้าผ้าใบบุรุษ • กางเกงขายาวบุรุษ</td></tr><tr><td>เคหสถาน</td><td class="negative">− ร้อยละ 1.45</td><td>จากการลดลงของราคาค่ากระแสไฟฟ้า • ผลิตภัณฑ์ซักผ้า • ผลิตภัณฑ์ทำความสะอาดพื้น (น้ำยาถูพื้น)</td></tr><tr><td>การตรวจรักษาและบริการส่วนบุคคล</td><td class="positive">+ ร้อยละ 0.15</td><td>จากการสูงขึ้นของราคาน้ำหอม • แชมพู • ครีมนวดผม</td></tr><tr><td>พาหนะ การขนส่ง และการสื่อสาร</td><td class="positive">+ ร้อยละ 2.22</td><td>จากการสูงขึ้นของราคาน้ำมันดีเซล • แก๊สโซฮอล์ 95 • แก๊สโซฮอล์ 91</td></tr><tr><td>การบันเทิง การอ่าน การศึกษา และการศาสนา</td><td class="positive">+ ร้อยละ 0.29</td><td>จากการสูงขึ้นของราคาค่าทัศนาจรต่างประเทศ • ค่าห้องพักโรงแรม • เครื่องถวายพระ</td></tr><tr><td>ยาสูบและเครื่องดื่มมีแอลกอฮอล์</td><td class="positive">+ ร้อยละ 0.02</td><td>จากการสูงขึ้นของราคาเบียร์ • ไวน์</td></tr></tbody></table></div></div>
+        <div class="page-head"><div><h2 class="page-title" id="p4Title">อัตราการเปลี่ยนแปลงดัชนีราคาผู้บริโภค ชุดทั่วไป</h2><p class="page-subtitle" id="p4Sub">เทียบกับเดือนก่อนหน้า (MoM)</p></div><div class="page-no">4</div></div>
+        <div class="page-body"><div class="table-toolbar"><span class="limit-label">สินค้าสำคัญต่อกลุ่ม</span><select id="momLimitSelect" class="table-limit-select" onchange="renderAll()"><option value="3" selected>3</option><option value="6">6</option><option value="9">9</option><option value="12">12</option><option value="15">15</option><option value="20">20</option><option value="30">30</option></select><span class="limit-label">รายการ</span></div><div id="momComponents"></div></div>
         <div class="footer">สินค้าสำคัญที่ส่งผลกระทบคัดจากรายการย่อยตาม Contribution ของ MoM</div>
       </section>
 
       <section class="report-page" id="page-5">
         <div class="page-topline"></div>
-        <div class="page-head"><div><h2 class="page-title" id="p5Title">อัตราการเปลี่ยนแปลงดัชนีราคาผู้บริโภคชุดทั่วไป</h2><p class="page-subtitle" id="p5Sub">เฉลี่ย 9 เดือน (ม.ค.–ก.ย.) ปี 2569 เทียบช่วงเดียวกันปีก่อน (AoA) <b class="positive">สูงขึ้นร้อยละ 1.54</b></p></div><div class="page-no">5</div></div>
-        <div class="page-body"><div class="table-toolbar"><span class="limit-label">สินค้าสำคัญต่อกลุ่ม</span><select id="aoaLimitSelect" class="table-limit-select" onchange="renderAll()"><option value="3" selected="">3</option><option value="6">6</option><option value="9">9</option><option value="12">12</option><option value="15">15</option><option value="20">20</option><option value="30">30</option></select><span class="limit-label">รายการ</span></div><div id="aoaComponents"><div class="component-header">หมวดอาหารและเครื่องดื่มไม่มีแอลกอฮอล์ <span class="positive">สูงขึ้นร้อยละ 1.41</span></div><table class="component-table"><thead><tr><th>กลุ่มสินค้า</th><th>ทิศทาง</th><th>สินค้าสำคัญที่ส่งผลกระทบ</th></tr></thead><tbody><tr><td>ข้าว แป้ง และผลิตภัณฑ์จากแป้ง</td><td class="positive">+ ร้อยละ 1.72</td><td>จากการสูงขึ้นของราคาข้าวสารเจ้า • เต้าหู้ • วุ้นเส้น</td></tr><tr><td>เนื้อสัตว์ เป็ด ไก่ และสัตว์น้ำ</td><td class="negative">− ร้อยละ 1.08</td><td>จากการลดลงของราคาเนื้อสุกร • เนื้อสุกรบด • กระดูกซี่โครงหมู</td></tr><tr><td>ไข่และผลิตภัณฑ์นม</td><td class="positive">+ ร้อยละ 1.22</td><td>จากการสูงขึ้นของราคาไข่ไก่ • นมสด • นมถั่วเหลือง</td></tr><tr><td>ผักสด</td><td class="positive">+ ร้อยละ 5.15</td><td>จากการสูงขึ้นของราคามะนาว • พริกสด • ต้นหอม</td></tr><tr><td>ผลไม้สด</td><td class="negative">− ร้อยละ 1.41</td><td>จากการลดลงของราคาทุเรียน • มะม่วง • เงาะ</td></tr><tr><td>เครื่องประกอบอาหาร</td><td class="negative">− ร้อยละ 2.44</td><td>จากการลดลงของราคาน้ำมันพืช • มะพร้าว (ผลแห้ง/ขูด) • ซอสหอยนางรม</td></tr><tr><td>เครื่องดื่มไม่มีแอลกอฮอล์</td><td class="positive">+ ร้อยละ 1.66</td><td>จากการสูงขึ้นของราคากาแฟผงสำเร็จรูป • น้ำดื่มบริสุทธิ์ • น้ำปั่นผลไม้/ผัก</td></tr><tr><td>ผลิตภัณฑ์น้ำตาล</td><td class="positive">+ ร้อยละ 1.51</td><td>จากการสูงขึ้นของราคาขนมหวาน • ไอศกรีม • น้ำตาลมะพร้าว</td></tr><tr><td>อาหารสำเร็จรูป</td><td class="positive">+ ร้อยละ 2.64</td><td>จากการสูงขึ้นของราคากับข้าวสำเร็จรูป • ข้าวราดแกง • ก๋วยเตี๋ยว</td></tr></tbody></table><div class="component-header">หมวดอื่น ๆ ที่ไม่ใช่อาหารและเครื่องดื่ม <span class="positive">สูงขึ้นร้อยละ 1.62</span></div><table class="component-table"><thead><tr><th>กลุ่มสินค้า</th><th>ทิศทาง</th><th>สินค้าสำคัญที่ส่งผลกระทบ</th></tr></thead><tbody><tr><td>เครื่องนุ่งห่มและรองเท้า</td><td class="negative">− ร้อยละ 1.06</td><td>จากการลดลงของราคาเสื้อเชิ้ตสตรี • เสื้อยืดสตรี • กางเกงขายาวสตรี</td></tr><tr><td>เคหสถาน</td><td class="negative">− ร้อยละ 0.33</td><td>จากการลดลงของราคาค่ากระแสไฟฟ้า • ค่าจ้างเหมาซ่อมแซมบ้าน (ค่าแรงพร้อมวัสดุก่อสร้าง) • ค่าจ้างเหมาช่างไฟฟ้า (ค่าแรงพร้อมค่าอุปกรณ์ระบบไฟฟ้าทุกชนิด)</td></tr><tr><td>การตรวจรักษาและบริการส่วนบุคคล</td><td class="negative">− ร้อยละ 0.40</td><td>จากการลดลงของราคาแชมพู • ครีมนวดผม • โฟมล้างหน้า</td></tr><tr><td>พาหนะ การขนส่ง และการสื่อสาร</td><td class="positive">+ ร้อยละ 4.82</td><td>จากการสูงขึ้นของราคาน้ำมันดีเซล • แก๊สโซฮอล์ 95 • แก๊สโซฮอล์ 91</td></tr><tr><td>การบันเทิง การอ่าน การศึกษา และการศาสนา</td><td class="positive">+ ร้อยละ 0.86</td><td>จากการสูงขึ้นของราคาค่าทัศนาจรต่างประเทศ • ค่าเดินทางไปเยี่ยมญาติและทำบุญ • ค่าเล่าเรียน -  ค่าธรรมเนียมประถมศึกษาภาคเอกชน</td></tr><tr><td>ยาสูบและเครื่องดื่มมีแอลกอฮอล์</td><td class="negative">− ร้อยละ 0.06</td><td>จากการลดลงของราคาเบียร์ • สุรา • ไวน์</td></tr></tbody></table></div></div>
+        <div class="page-head"><div><h2 class="page-title" id="p5Title">อัตราการเปลี่ยนแปลงดัชนีราคาผู้บริโภค ชุดทั่วไป</h2><p class="page-subtitle" id="p5Sub">เฉลี่ยสะสมตั้งแต่ต้นปี (AoA)</p></div><div class="page-no">5</div></div>
+        <div class="page-body"><div class="table-toolbar"><span class="limit-label">สินค้าสำคัญต่อกลุ่ม</span><select id="aoaLimitSelect" class="table-limit-select" onchange="renderAll()"><option value="3" selected>3</option><option value="6">6</option><option value="9">9</option><option value="12">12</option><option value="15">15</option><option value="20">20</option><option value="30">30</option></select><span class="limit-label">รายการ</span></div><div id="aoaComponents"></div></div>
         <div class="footer">สินค้าสำคัญที่ส่งผลกระทบคัดจากรายการย่อยตาม Contribution ของ AoA</div>
       </section>
 
       <section class="report-page" id="page-6">
         <div class="page-topline"></div>
-        <div class="page-head"><div><h2 class="page-title" id="p6Title">อัตราการเปลี่ยนแปลงของเงินเฟ้อ (YoY) จำแนกรายภาค • ชุดทั่วไป</h2><p class="page-subtitle" id="p6Sub">เดือนกันยายน 2568 (YoY) • เดือนกันยายน 2569 • G</p></div><div class="page-no">6</div></div>
+        <div class="page-head"><div><h2 class="page-title" id="p6Title">อัตราการเปลี่ยนแปลงของเงินเฟ้อ (YoY) จำแนกรายภาค</h2><p class="page-subtitle" id="p6Sub">-</p></div><div class="page-no">6</div></div>
         <div class="page-body">
-          <div id="regionalNote" class="section-note" style="display: block; margin-bottom: 14px;">ขณะนี้มีข้อมูลรายภาค 0 พื้นที่สำหรับ ชุดทั่วไป (G) ในงวดนี้ — อัปโหลดไฟล์ชุดเดียวกันของ กรุงเทพฯ/ปริมณฑล ภาคกลาง ภาคเหนือ ภาคตะวันออกเฉียงเหนือ และภาคใต้ เพื่อให้ครบตามรูปแบบรายงาน</div>
+          <div id="regionalNote" class="section-note" style="display:none;margin-bottom:14px"></div>
           <div class="table-toolbar">
-            <div class="regional-control-group"><span class="limit-label">เปรียบเทียบ</span><select id="regionalMetricSelect" class="table-limit-select" onchange="renderAll()"><option value="yoy" selected="">YoY</option><option value="mom">MoM</option><option value="aoa">AoA</option></select></div>
+            <div class="regional-control-group"><span class="limit-label">เปรียบเทียบ</span><select id="regionalMetricSelect" class="table-limit-select" onchange="renderAll()"><option value="yoy" selected>YoY</option><option value="mom">MoM</option><option value="aoa">AoA</option></select></div>
             <div class="regional-control-group"><label class="regional-check"><input type="checkbox" id="regionalContributionToggle" onchange="renderAll()"> แสดง Contribute</label></div>
-            <div class="regional-control-group"><span class="limit-label">แสดงสินค้า ↑ / ↓ ต่อภาค</span><select id="regionalProductLimitSelect" class="table-limit-select" onchange="renderAll()"><option value="3">3</option><option value="6" selected="">6</option><option value="9">9</option><option value="12">12</option><option value="15">15</option><option value="20">20</option><option value="30">30</option></select><span class="limit-label">รายการ</span></div>
+            <div class="regional-control-group"><span class="limit-label">แสดงสินค้า ↑ / ↓ ต่อภาค</span><select id="regionalProductLimitSelect" class="table-limit-select" onchange="renderAll()"><option value="3">3</option><option value="6" selected>6</option><option value="9">9</option><option value="12">12</option><option value="15">15</option><option value="20">20</option><option value="30">30</option></select><span class="limit-label">รายการ</span></div>
           </div>
-          <div class="region-grid" id="regionCards" style="grid-template-columns: repeat(1, minmax(0px, 1fr));"><div class="region-card"><div class="rh" style="background:#1476ad">ภาพรวมประเทศ</div><div class="rv positive">+2.82%</div><div class="list"><div class="up-list">▲ น้ำมันดีเซล<br>แก๊สโซฮอล์ 95<br>แก๊สโซฮอล์ 91<br>ข้าวสารเจ้า<br>ก๋วยเตี๋ยว<br>กับข้าวสำเร็จรูป</div><div class="down-list">▼ ค่ากระแสไฟฟ้า<br>นมสด<br>ค่าจ้างเหมาซ่อมแซมบ้าน (ค่าแรงพร้อมวัสดุก่อสร้าง)<br>มะเขือเทศ<br>ค่าห้องพักโรงแรม<br>ค่าธรรมเนียมผ่านทางพิเศษ</div></div></div></div>
-          <div id="regionalTableWrap"><table class="regional-table"><thead><tr><th>ภาค</th><th>รวม<br><small>YoY</small></th><th>อาหารและเครื่องดื่มไม่มีแอลกอฮอล์<br><small>YoY</small></th><th>อื่น ๆ ที่ไม่ใช่อาหารและเครื่องดื่ม<br><small>YoY</small></th></tr></thead><tbody><tr><td>ภาพรวมประเทศ</td><td class="positive"><b>+2.82</b></td><td class="positive"><b>+3.07</b></td><td class="positive"><b>+2.67</b></td></tr></tbody></table></div>
-          <div class="highlights" style="margin-top:18px"><h3 style="font-style:normal">สรุปรายภาค</h3><p id="regionalNarrative">เดือนกันยายน 2568 (YoY) ภาพรวมประเทศ สูงขึ้นร้อยละ 2.82 .</p></div>
+          <div class="region-grid" id="regionCards"></div>
+          <div id="regionalTableWrap"></div>
+          <div class="highlights" style="margin-top:18px"><h3 style="font-style:normal">สรุปรายภาค</h3><p id="regionalNarrative">-</p></div>
         </div>
         <div class="footer">หน้า 6 จะสมบูรณ์เมื่ออัปโหลดไฟล์ของแต่ละภาคในงวดเดียวกัน</div>
       </section>
 
       <section class="report-page" id="page-7">
         <div class="page-topline"></div>
-        <div class="page-head"><div><h2 class="page-title" id="p7Title">แนวโน้มอัตราเงินเฟ้อทั่วไป</h2><p class="page-subtitle" id="p7Sub">แนวโน้มเดือนตุลาคม 2569 • ชุดทั่วไป (G) • อ้างอิงงวดล่าสุด กันยายน 2569</p></div><div class="page-no">7</div></div>
+        <div class="page-head"><div><h2 class="page-title" id="p7Title">แนวโน้มอัตราเงินเฟ้อทั่วไป</h2><p class="page-subtitle" id="p7Sub">-</p></div><div class="page-no">7</div></div>
         <div class="page-body">
           <div class="outlook-layout">
-            <div class="chart-card"><div class="chart-wrap" style="height:360px"><canvas id="outlookChart" width="529" height="360" style="display: block; box-sizing: border-box; height: 360px; width: 529px;"></canvas></div><div class="section-note" style="margin-top:10px">เส้นกราฟเป็นข้อมูลจริงจาก Excel ที่อัปโหลด ไม่ใช่ค่าคาดการณ์ล่วงหน้า</div></div>
+            <div class="chart-card"><div class="chart-wrap" style="height:360px"><canvas id="outlookChart"></canvas></div><div class="section-note" style="margin-top:10px">เส้นกราฟเป็นข้อมูลจริงจาก Excel ที่อัปโหลด ไม่ใช่ค่าคาดการณ์ล่วงหน้า</div></div>
             <div>
-              <div class="outlook-box"><h3 class="positive">ปัจจัยสนับสนุนให้อัตราเงินเฟ้อสูงขึ้น</h3><ul class="outlook-list" id="outlookUpList"><li>ยังไม่มีข้อความ — กด “แก้ไขข้อความแนวโน้มสำหรับงวดนี้” เพื่อเพิ่ม</li></ul></div>
-              <div class="outlook-box" style="margin-top:12px"><h3 class="negative">ปัจจัยสนับสนุนให้อัตราเงินเฟ้อลดลง</h3><ul class="outlook-list" id="outlookDownList"><li>ยังไม่มีข้อความ — กด “แก้ไขข้อความแนวโน้มสำหรับงวดนี้” เพื่อเพิ่ม</li></ul></div>
+              <div class="outlook-box"><h3 class="positive">ปัจจัยสนับสนุนให้อัตราเงินเฟ้อสูงขึ้น</h3><ul class="outlook-list" id="outlookUpList"></ul></div>
+              <div class="outlook-box" style="margin-top:12px"><h3 class="negative">ปัจจัยสนับสนุนให้อัตราเงินเฟ้อลดลง</h3><ul class="outlook-list" id="outlookDownList"></ul></div>
             </div>
           </div>
           <div class="forecast-strip">
-            <div class="f"><strong id="forecastRange">—</strong><span>กรอบคาดการณ์เงินเฟ้อทั้งปี</span></div>
-            <div class="f"><strong id="forecastMid">—</strong><span>ค่ากลาง</span></div>
-            <div class="f"><strong id="nextRelease">—</strong><span>กำหนดเผยแพร่ครั้งต่อไป</span></div>
+            <div class="f"><strong id="forecastRange">-</strong><span>กรอบคาดการณ์เงินเฟ้อทั้งปี</span></div>
+            <div class="f"><strong id="forecastMid">-</strong><span>ค่ากลาง</span></div>
+            <div class="f"><strong id="nextRelease">-</strong><span>กำหนดเผยแพร่ครั้งต่อไป</span></div>
           </div>
           <details class="editor"><summary>✏️ แก้ไขข้อความแนวโน้มสำหรับงวดนี้</summary>
             <label>ปัจจัยหนุน (1 บรรทัด = 1 ข้อ)<textarea id="outlookUpInput"></textarea></label>
             <label>ปัจจัยลด (1 บรรทัด = 1 ข้อ)<textarea id="outlookDownInput"></textarea></label>
-            <div class="grid-3" style="margin-top:8px"><label>กรอบทั้งปี<input id="forecastRangeInput"></label><label>ค่ากลาง<input id="forecastMidInput"></label><label>เผยแพร่ครั้งต่อไป<input id="nextReleaseInput"></label></div>
+            <div class="grid-3" style="margin-top:8px"><label>กรอบทั้งปี<input id="forecastRangeInput" /></label><label>ค่ากลาง<input id="forecastMidInput" /></label><label>เผยแพร่ครั้งต่อไป<input id="nextReleaseInput" /></label></div>
             <button class="primary-btn" style="margin-top:10px" onclick="saveOutlook()">บันทึกข้อความแนวโน้ม</button>
           </details>
         </div>
         <div class="footer">ข้อความแนวโน้มไม่ได้อยู่ในไฟล์ 6.1.7 จึงแยกเป็นข้อมูลที่ผู้ใช้แก้ไขและบันทึกเฉพาะงวด</div>
       </section>
 
- <section class="report-page" id="page-8">
-<div class="page-topline"></div>
-<div class="page-head"><div><h2 class="page-title" id="p8Title">ตารางแสดงดัชนีราคาผู้บริโภคชุดทั่วไปและอัตราการเปลี่ยนแปลง</h2><p class="page-subtitle" id="p8Sub">เดือนกันยายน 2569 • ปีฐาน 2566 = 100 • ชุดทั่วไป (G) • ภาพรวมประเทศ</p></div><div class="page-no">8</div></div>
-<div class="page-body"><div class="table-toolbar"><span class="limit-label">แสดงรายการในตาราง</span><select class="table-limit-select" id="detailLimitSelect" onchange="renderAll()"><option value="3">3</option><option value="6">6</option><option value="9">9</option><option value="12">12</option><option value="15">15</option><option value="20">20</option><option selected="" value="30">30</option></select><span class="limit-label">รายการ</span></div><div class="detail-wrap"><table class="detail-table"><thead id="detailHead"><tr><th rowspan="2">รหัส</th><th rowspan="2">รายการ</th><th rowspan="2">สัดส่วนน้ำหนัก</th><th colspan="5">กันยายน 2569</th><th colspan="4">สิงหาคม 2569</th></tr><tr><th>ดัชนี</th><th class="prior-year-index">ดัชนีปีก่อน<br/><small>กันยายน 2568</small></th><th>MoM</th><th>YoY</th><th>AoA</th><th>ดัชนี</th><th>MoM</th><th>YoY</th><th>AoA</th></tr></thead><tbody id="detailBody"><tr class="major"><td>0000000</td><td>ดัชนีราคาผู้บริโภคชุดทั่วไป</td><td>100.00</td><td>102.93</td><td class="prior-year-index">—</td><td class="positive">0.25</td><td class="positive">2.82</td><td class="positive">1.54</td><td>102.67</td><td class="neutral">—</td><td class="neutral">—</td><td class="neutral">—</td></tr><tr class="major"><td>1000000</td><td>หมวดอาหารและเครื่องดื่มไม่มีแอลกอฮอล์</td><td>39.53</td><td>104.94</td><td class="prior-year-index">—</td><td class="positive">0.18</td><td class="positive">3.07</td><td class="positive">1.41</td><td>104.75</td><td class="neutral">—</td><td class="neutral">—</td><td class="neutral">—</td></tr><tr class=""><td>1110000</td><td>ข้าว แป้งและผลิตภัณฑ์จากแป้ง</td><td>3.50</td><td>107.62</td><td class="prior-year-index">—</td><td class="positive">0.53</td><td class="positive">4.87</td><td class="positive">1.72</td><td>107.05</td><td class="neutral">—</td><td class="neutral">—</td><td class="neutral">—</td></tr><tr class=""><td>1120000</td><td>เนื้อสัตว์ เป็ดไก่และสัตว์น้ำ</td><td>7.14</td><td>100.53</td><td class="prior-year-index">—</td><td class="positive">0.44</td><td class="positive">1.47</td><td class="negative">-1.08</td><td>100.09</td><td class="neutral">—</td><td class="neutral">—</td><td class="neutral">—</td></tr><tr class=""><td>1130000</td><td>ไข่และผลิตภัณฑ์นม</td><td>1.76</td><td>104.19</td><td class="prior-year-index">—</td><td class="negative">-1.28</td><td class="positive">3.76</td><td class="positive">1.22</td><td>105.54</td><td class="neutral">—</td><td class="neutral">—</td><td class="neutral">—</td></tr><tr class=""><td>1140000</td><td>ผักและผลไม้</td><td>4.84</td><td>99.01</td><td class="prior-year-index">—</td><td class="positive">0.38</td><td class="positive">3.06</td><td class="positive">1.43</td><td>98.64</td><td class="neutral">—</td><td class="neutral">—</td><td class="neutral">—</td></tr><tr class="sub"><td>1141100</td><td>- ผักสด</td><td>2.23</td><td>98.69</td><td class="prior-year-index">—</td><td class="negative">-0.58</td><td class="positive">4.62</td><td class="positive">5.15</td><td>99.27</td><td class="neutral">—</td><td class="neutral">—</td><td class="neutral">—</td></tr><tr class="sub"><td>1142100</td><td>- ผลไม้สด</td><td>2.19</td><td>100.65</td><td class="prior-year-index">—</td><td class="positive">1.13</td><td class="positive">1.34</td><td class="negative">-1.41</td><td>99.53</td><td class="neutral">—</td><td class="neutral">—</td><td class="neutral">—</td></tr><tr class=""><td>1150000</td><td>เครื่องประกอบอาหาร</td><td>1.15</td><td>102.07</td><td class="prior-year-index">—</td><td class="negative">-0.05</td><td class="positive">0.54</td><td class="negative">-2.44</td><td>102.12</td><td class="neutral">—</td><td class="neutral">—</td><td class="neutral">—</td></tr><tr class=""><td>1160000</td><td>เครื่องดื่มไม่มีแอลกอฮอล์</td><td>3.35</td><td>108.40</td><td class="prior-year-index">—</td><td class="positive">0.37</td><td class="positive">1.60</td><td class="positive">1.66</td><td>108.00</td><td class="neutral">—</td><td class="neutral">—</td><td class="neutral">—</td></tr><tr class=""><td>1170000</td><td>ผลิตภัณฑ์น้ำตาล</td><td>0.85</td><td>107.41</td><td class="prior-year-index">—</td><td class="negative">-0.07</td><td class="positive">2.48</td><td class="positive">1.51</td><td>107.48</td><td class="neutral">—</td><td class="neutral">—</td><td class="neutral">—</td></tr><tr class=""><td>1200000</td><td>อาหารสำเร็จรูป</td><td>16.95</td><td>108.39</td><td class="prior-year-index">—</td><td class="positive">0.08</td><td class="positive">3.82</td><td class="positive">2.64</td><td>108.30</td><td class="neutral">—</td><td class="neutral">—</td><td class="neutral">—</td></tr><tr class="sub"><td>1230000</td><td>- อาหารพร้อมทาน</td><td>15.27</td><td>108.55</td><td class="prior-year-index">—</td><td class="positive">0.17</td><td class="positive">4.00</td><td class="positive">2.85</td><td>108.37</td><td class="neutral">—</td><td class="neutral">—</td><td class="neutral">—</td></tr><tr class="sub"><td>1240000</td><td>- อาหารจากร้านยอดนิยม</td><td>1.10</td><td>104.23</td><td class="prior-year-index">—</td><td class="positive">0.08</td><td class="positive">1.54</td><td class="positive">0.96</td><td>104.15</td><td class="neutral">—</td><td class="neutral">—</td><td class="neutral">—</td></tr><tr class="sub"><td>1250000</td><td>- อาหารฟาสต์ฟู้ด/delivery</td><td>0.58</td><td>107.01</td><td class="prior-year-index">—</td><td class="negative">-2.20</td><td class="positive">3.44</td><td class="positive">0.67</td><td>109.42</td><td class="neutral">—</td><td class="neutral">—</td><td class="neutral">—</td></tr><tr class="major"><td>8000000</td><td>หมวดอื่น ๆ ที่ไม่ใช่อาหารและเครื่องดื่ม</td><td>60.47</td><td>101.62</td><td class="prior-year-index">—</td><td class="positive">0.30</td><td class="positive">2.67</td><td class="positive">1.62</td><td>101.32</td><td class="neutral">—</td><td class="neutral">—</td><td class="neutral">—</td></tr><tr class=""><td>2000000</td><td>หมวดเครื่องนุ่งห่มและรองเท้า</td><td>2.02</td><td>97.70</td><td class="prior-year-index">—</td><td class="positive">0.02</td><td class="negative">-0.43</td><td class="negative">-1.06</td><td>97.68</td><td class="neutral">—</td><td class="neutral">—</td><td class="neutral">—</td></tr><tr class=""><td>3000000</td><td>หมวดเคหสถาน</td><td>23.67</td><td>98.32</td><td class="prior-year-index">—</td><td class="negative">-1.45</td><td class="negative">-1.10</td><td class="negative">-0.33</td><td>99.77</td><td class="neutral">—</td><td class="neutral">—</td><td class="neutral">—</td></tr><tr class=""><td>4000000</td><td>หมวดการตรวจรักษาและบริการส่วนบุคคล</td><td>6.20</td><td>99.49</td><td class="prior-year-index">—</td><td class="positive">0.15</td><td class="positive">0.81</td><td class="negative">-0.40</td><td>99.34</td><td class="neutral">—</td><td class="neutral">—</td><td class="neutral">—</td></tr><tr class=""><td>5000000</td><td>หมวดพาหนะการขนส่งและการสื่อสาร</td><td>23.37</td><td>105.98</td><td class="prior-year-index">—</td><td class="positive">2.22</td><td class="positive">8.01</td><td class="positive">4.82</td><td>103.68</td><td class="neutral">—</td><td class="neutral">—</td><td class="neutral">—</td></tr><tr class="sub"><td>5100000</td><td>- ค่าโดยสารสาธารณะ</td><td>1.64</td><td>108.59</td><td class="prior-year-index">—</td><td class="positive">0.56</td><td class="positive">7.85</td><td class="positive">6.54</td><td>107.98</td><td class="neutral">—</td><td class="neutral">—</td><td class="neutral">—</td></tr><tr class="sub"><td>5220000</td><td>- น้ำมันเชื้อเพลิง</td><td>8.93</td><td>113.51</td><td class="prior-year-index">—</td><td class="positive">5.95</td><td class="positive">20.69</td><td class="positive">11.39</td><td>107.14</td><td class="neutral">—</td><td class="neutral">—</td><td class="neutral">—</td></tr><tr class="sub"><td>5400000</td><td>- การสื่อสาร</td><td>3.97</td><td>101.13</td><td class="prior-year-index">—</td><td class="positive">0.23</td><td class="positive">0.75</td><td class="positive">0.40</td><td>100.90</td><td class="neutral">—</td><td class="neutral">—</td><td class="neutral">—</td></tr><tr class=""><td>6000000</td><td>หมวดการบันเทิง การอ่าน การศึกษาฯ</td><td>4.00</td><td>102.57</td><td class="prior-year-index">—</td><td class="positive">0.29</td><td class="positive">1.38</td><td class="positive">0.86</td><td>102.27</td><td class="neutral">—</td><td class="neutral">—</td><td class="neutral">—</td></tr><tr class=""><td>7000000</td><td>หมวดยาสูบและเครื่องดื่มมีแอลกอฮอล์</td><td>1.21</td><td>101.28</td><td class="prior-year-index">—</td><td class="positive">0.02</td><td class="positive">0.01</td><td class="negative">-0.06</td><td>101.26</td><td class="neutral">—</td><td class="neutral">—</td><td class="neutral">—</td></tr><tr class="major"><td>9300000</td><td>ดัชนีราคาผู้บริโภคพื้นฐาน</td><td>69.67</td><td>102.98</td><td class="prior-year-index">—</td><td class="positive">0.01</td><td class="positive">1.50</td><td class="positive">1.01</td><td>102.97</td><td class="neutral">—</td><td class="neutral">—</td><td class="neutral">—</td></tr><tr class="major"><td>9000000</td><td>กลุ่มอาหารสดและพลังงาน</td><td>30.33</td><td>103.07</td><td class="prior-year-index">—</td><td class="positive">0.79</td><td class="positive">6.00</td><td class="positive">2.79</td><td>102.26</td><td class="neutral">—</td><td class="neutral">—</td><td class="neutral">—</td></tr><tr class="sub"><td>9100000</td><td>- อาหารสด</td><td>17.24</td><td>101.77</td><td class="prior-year-index">—</td><td class="positive">0.27</td><td class="positive">2.83</td><td class="positive">0.40</td><td>101.50</td><td class="neutral">—</td><td class="neutral">—</td><td class="neutral">—</td></tr><tr class="sub"><td>9200000</td><td>- พลังงาน</td><td>13.09</td><td>104.87</td><td class="prior-year-index">—</td><td class="positive">1.49</td><td class="positive">10.45</td><td class="positive">6.11</td><td>103.33</td><td class="neutral">—</td><td class="neutral">—</td><td class="neutral">—</td></tr></tbody></table></div><div class="section-note" id="detailIndexNote" style="margin-top:12px">ดัชนีปีก่อน = เดือนเดียวกันของปีก่อน: อ่านจากไฟล์ปัจจุบัน หรือไฟล์งวดเดียวกันปีก่อนที่อัปโหลด (ชุด/พื้นที่/ปีฐานเดียวกัน) หากไม่พบแสดง — โดยไม่คำนวณย้อนจาก YoY; อัตรา MoM/YoY/AoA ของเดือนก่อนยังต้องใช้ไฟล์เดือนก่อน</div></div>
-<div class="footer">ชุดดัชนี ปีฐาน และชื่อพื้นที่อ่านจากหัวรายงานใน Excel</div>
-</section>
-
+      <section class="report-page" id="page-8">
+        <div class="page-topline"></div>
+        <div class="page-head"><div><h2 class="page-title" id="p8Title">ตารางแสดงดัชนีราคาผู้บริโภคทั่วไปและอัตราการเปลี่ยนแปลง</h2><p class="page-subtitle" id="p8Sub">-</p></div><div class="page-no">8</div></div>
+        <div class="page-body"><div class="table-toolbar"><span class="limit-label">แสดงรายการในตาราง</span><select id="detailLimitSelect" class="table-limit-select" onchange="renderAll()"><option value="3">3</option><option value="6">6</option><option value="9">9</option><option value="12">12</option><option value="15">15</option><option value="20">20</option><option value="30" selected>30</option></select><span class="limit-label">รายการ</span></div><div class="detail-wrap"><table class="detail-table"><thead id="detailHead"></thead><tbody id="detailBody"></tbody></table></div><div class="section-note" style="margin-top:12px">คอลัมน์อัตราการเปลี่ยนแปลงของ “เดือนก่อน” จะแสดงเมื่อมีการอัปโหลดไฟล์งวดก่อนหน้าของพื้นที่เดียวกัน; ดัชนีเดือนก่อนอ่านได้โดยตรงจากไฟล์ปัจจุบัน</div></div>
+        <div class="footer">ชุดดัชนี ปีฐาน และชื่อพื้นที่อ่านจากหัวรายงานใน Excel</div>
+      </section>
 
       <section class="report-page" id="page-9">
         <div class="page-topline"></div>
@@ -348,22 +349,22 @@
             <div>
               <div class="poster-brand">TPSO • Trade Policy and Strategy Office</div>
               <h2 id="posterMainTitle">อัตราเงินเฟ้อทั่วไป</h2>
-              <div class="poster-period" id="posterPeriod">เดือนกันยายน 2569 • G</div>
-              <div class="poster-yoy">เปลี่ยนแปลง <b id="posterYoy">สูงขึ้นร้อยละ 2.82</b> (YoY)</div>
-              <div style="margin-top:8px;font-size:14px;color:#b8d8ef;font-weight:800" id="posterRegion">ชุดทั่วไป • ภาพรวมประเทศ</div>
+              <div class="poster-period" id="posterPeriod">-</div>
+              <div class="poster-yoy">เปลี่ยนแปลง <b id="posterYoy">-</b> (YoY)</div>
+              <div style="margin-top:8px;font-size:14px;color:#b8d8ef;font-weight:800" id="posterRegion">-</div>
             </div>
             <div>
-              <div class="mini-rate-card" id="posterHeadlineCard"><h4>ดัชนีราคาผู้บริโภคชุดทั่วไป</h4><div class="mini-rate-grid"><div class="hdr">งวด</div><div class="hdr">ดัชนี</div><div class="hdr">%MoM</div><div class="hdr">%YoY</div><div class="hdr">%AoA</div><div>ปัจจุบัน</div><div>102.93</div><div class="positive">0.25</div><div class="positive">2.82</div><div class="positive">1.54</div><div>เดือนก่อน</div><div>102.67</div><div>—</div><div>—</div><div>—</div></div></div>
-              <div class="mini-rate-card" id="posterCoreCard"><h4>เงินเฟ้อพื้นฐาน • Core CPI</h4><div class="mini-rate-grid"><div class="hdr">งวด</div><div class="hdr">ดัชนี</div><div class="hdr">%MoM</div><div class="hdr">%YoY</div><div class="hdr">%AoA</div><div>ปัจจุบัน</div><div>102.98</div><div class="positive">0.01</div><div class="positive">1.50</div><div class="positive">1.01</div><div>เดือนก่อน</div><div>102.97</div><div>—</div><div>—</div><div>—</div></div></div>
+              <div class="mini-rate-card" id="posterHeadlineCard"></div>
+              <div class="mini-rate-card" id="posterCoreCard"></div>
             </div>
           </div>
-          <div class="poster-summary" id="posterSummary">ดัชนีราคาผู้บริโภคชุดทั่วไป ของประเทศ เดือนกันยายน 2569 เท่ากับ 102.93 เมื่อเทียบกับเดือนเดียวกันของปีก่อน สูงขึ้นร้อยละ 2.82 (YoY) โดยหมวดที่มีส่วนผลักดันสำคัญ ได้แก่ พาหนะ การขนส่ง และการสื่อสาร, อาหารสำเร็จรูป, ข้าว  แป้งและผลิตภัณฑ์จากแป้ง ขณะที่หมวดที่ช่วยชะลอ ได้แก่ เคหสถาน, เครื่องนุ่งห่มและรองเท้า เมื่อเทียบกับเดือนก่อน สูงขึ้นร้อยละ 0.25 (MoM) ด้านรายการที่ผลักดันขึ้นในเดือนนี้ ได้แก่ พาหนะ การขนส่ง และการสื่อสาร, เนื้อสัตว์ เป็ดไก่ และสัตว์น้ำ, ผลไม้สด ส่วนแรงกดดันลงสำคัญ ได้แก่ เคหสถาน, ไข่และผลิตภัณฑ์นม, ผักสด และเฉลี่ย 9 เดือนแรก สูงขึ้นร้อยละ 1.54 (AoA) สำหรับเงินเฟ้อพื้นฐาน สูงขึ้นร้อยละ 1.50 (YoY), สูงขึ้นร้อยละ 0.01 (MoM) และ สูงขึ้นร้อยละ 1.01 (AoA) .</div>
+          <div class="poster-summary" id="posterSummary">-</div>
           <div class="poster-bottom">
             <div>
-              <div class="poster-card"><h3>สัดส่วนน้ำหนัก</h3><div class="poster-donut"><canvas id="posterWeightChart" width="286" height="250" style="display: block; box-sizing: border-box; height: 250px; width: 286px;"></canvas></div><div class="weight-legend" id="weightLegend"><div><span><i style="display:inline-block;width:9px;height:9px;border-radius:2px;background:#e9e5e2;margin-right:5px"></i>อาหารและเครื่องดื่มไม่มีแอลกอฮอล์</span><b>39.53%</b></div><div><span><i style="display:inline-block;width:9px;height:9px;border-radius:2px;background:#7bb5dd;margin-right:5px"></i>เครื่องนุ่งห่มและรองเท้า</span><b>2.02%</b></div><div><span><i style="display:inline-block;width:9px;height:9px;border-radius:2px;background:#c5eef0;margin-right:5px"></i>เคหสถาน</span><b>23.67%</b></div><div><span><i style="display:inline-block;width:9px;height:9px;border-radius:2px;background:#d4f3f1;margin-right:5px"></i>การตรวจรักษาและบริการส่วนบุคคล</span><b>6.20%</b></div><div><span><i style="display:inline-block;width:9px;height:9px;border-radius:2px;background:#ffd041;margin-right:5px"></i>พาหนะ การขนส่งฯ</span><b>23.37%</b></div><div><span><i style="display:inline-block;width:9px;height:9px;border-radius:2px;background:#ffe487;margin-right:5px"></i>การบันเทิง/การศึกษา</span><b>4.00%</b></div><div><span><i style="display:inline-block;width:9px;height:9px;border-radius:2px;background:#d4d0d9;margin-right:5px"></i>ยาสูบ/แอลกอฮอล์</span><b>1.21%</b></div></div></div>
-              <div class="poster-card" style="margin-top:14px"><h3>สรุปตัวเลขสำคัญ</h3><div id="posterKpiList" style="font-size:13px;line-height:1.8;font-weight:800">ชุดทั่วไป <b>102.93</b><br>YoY <b class="positive">+2.82%</b><br>MoM <b class="positive">+0.25%</b><br>AoA <b class="positive">+1.54%</b><br>Core YoY <b class="positive">+1.50%</b></div></div>
+              <div class="poster-card"><h3>สัดส่วนน้ำหนัก</h3><div class="poster-donut"><canvas id="posterWeightChart"></canvas></div><div class="weight-legend" id="weightLegend"></div></div>
+              <div class="poster-card" style="margin-top:14px"><h3>สรุปตัวเลขสำคัญ</h3><div id="posterKpiList" style="font-size:13px;line-height:1.8;font-weight:800"></div></div>
             </div>
-            <div class="poster-card poster-outlook"><h3 id="posterOutlookTitle">แนวโน้มอัตราเงินเฟ้อทั่วไป</h3><ul id="posterOutlookUp"><li>ยังไม่มีข้อความ — กด “แก้ไขข้อความแนวโน้มสำหรับงวดนี้” เพื่อเพิ่ม</li></ul><div class="downh">ปัจจัยที่ช่วยชะลอเงินเฟ้อ</div><ul id="posterOutlookDown"><li>ยังไม่มีข้อความ — กด “แก้ไขข้อความแนวโน้มสำหรับงวดนี้” เพื่อเพิ่ม</li></ul><div class="forecast-strip" style="grid-template-columns:1fr 1fr;margin-top:14px"><div class="f"><strong id="posterForecastRange">—</strong><span>กรอบคาดการณ์ทั้งปี</span></div><div class="f"><strong id="posterForecastMid">—</strong><span>ค่ากลาง</span></div></div></div>
+            <div class="poster-card poster-outlook"><h3 id="posterOutlookTitle">แนวโน้มอัตราเงินเฟ้อทั่วไป</h3><ul id="posterOutlookUp"></ul><div class="downh">ปัจจัยที่ช่วยชะลอเงินเฟ้อ</div><ul id="posterOutlookDown"></ul><div class="forecast-strip" style="grid-template-columns:1fr 1fr;margin-top:14px"><div class="f"><strong id="posterForecastRange">-</strong><span>กรอบคาดการณ์ทั้งปี</span></div><div class="f"><strong id="posterForecastMid">-</strong><span>ค่ากลาง</span></div></div></div>
           </div>
         </div>
         <div class="footer">One-page infographic ตามแนวทาง PowerPoint ที่แนบมา • กด “PNG Poster” ด้านบนเพื่อบันทึก</div>
@@ -371,8 +372,8 @@
     </div>
   </main>
 
-  <div class="loading" id="loading" style="display: none;"><div class="box"><div class="spinner"></div><b>กำลังอ่านและจัดโครงสร้างข้อมูล...</b></div></div>
-  <div class="toast" id="toast" style="display: none;">นำเข้าสำเร็จ 1 ไฟล์</div>
+  <div class="loading" id="loading"><div class="box"><div class="spinner"></div><b>กำลังอ่านและจัดโครงสร้างข้อมูล...</b></div></div>
+  <div class="toast" id="toast"></div>
 
 <script>
   const MONTHS_FULL = ['', 'มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
@@ -498,65 +499,6 @@
     return null;
   }
 
-
-  // Read each monthly index header independently; do not assume the first/last
-  // index column is the previous/current month when a prior-year column exists.
-  function indexHeaderPeriod(header){
-    const h=String(header||'').replace(/\s+/g,' ').trim();
-    let month=parseMonthFromText(h),year=null;
-    const full=h.match(/(?:^|\D)((?:25|20)\d{2})(?!\d)/);
-    if(full)year=Number(full[1]);
-    const compact=h.match(/(?:^|\D)((?:25|20)\d{2})(0[1-9]|1[0-2])(?!\d)/);
-    const numeric=h.match(/(?:^|\D)(0?[1-9]|1[0-2])\s*[\/-]\s*((?:25|20)\d{2})(?!\d)/);
-    if(compact){year=Number(compact[1]);month=Number(compact[2]);}
-    else if(numeric){month=Number(numeric[1]);year=Number(numeric[2]);}
-    if(month&&!year){
-      const short=h.match(/(?:^|\D)(\d{2})\s*$/);
-      if(short)year=2500+Number(short[1]);
-    }
-    if(year&&year<2400)year+=543;
-    return {month,year,key:month&&year?periodKey(year,month):null};
-  }
-  function resolveIndexColumns(headers,meta,fileName){
-    const cols=headers.map((h,i)=>({h,i})).filter(c=>
-      /^ดัชนี(?:\s|$|เดือน|ปี|ปัจจุบัน|งวด)/.test(c.h)&&
-      !/เฉลี่ย|average/i.test(c.h)
-    ).map(c=>({
-      ...c,period:indexHeaderPeriod(c.h),
-      priorYear:/ปีก่อน|ปีที่แล้ว|previous\s*year|last\s*year/i.test(c.h),
-      priorMonth:/เดือนก่อน|เดือนที่แล้ว|งวดก่อน|previous\s*month/i.test(c.h),
-      current:/ปัจจุบัน|เดือนนี้|งวดนี้|current/i.test(c.h)
-    }));
-    if(!cols.length)throw new Error(`ไม่พบคอลัมน์ดัชนีใน ${fileName}`);
-    // The report period takes precedence over column order and base-year text.
-    const periodMeta=String(meta||'').replace(/ปีฐาน\s*(?:25|20)\d{2}/g,'');
-    const reportPart=periodMeta.match(/เดือน\s*(.*)/)?.[1]||periodMeta;
-    const explicitCurrent=cols.find(c=>c.current&&!c.priorYear&&!c.priorMonth);
-    const dated=cols.filter(c=>c.period.key&&!c.priorYear&&!c.priorMonth).sort((a,b)=>b.period.key-a.period.key);
-    const metaPeriod=indexHeaderPeriod(reportPart);
-    const month=metaPeriod.month||explicitCurrent?.period.month||dated[0]?.period.month;
-    const year=metaPeriod.year||explicitCurrent?.period.year||dated[0]?.period.year;
-    if(!month||!year)throw new Error(`อ่านเดือน/ปีไม่ได้จาก ${fileName}`);
-    const p=prevPeriod(year,month);
-    const compatible=(c,y,m)=>(!c.period.year||c.period.year===y)&&(!c.period.month||c.period.month===m);
-    const exact=(y,m)=>cols.find(c=>c.period.key===periodKey(y,m));
-    let currentIndexCol=exact(year,month)||cols.find(c=>c.current&&!c.priorYear&&!c.priorMonth&&compatible(c,year,month));
-    const prevYearIndexCol=exact(year-1,month)||cols.find(c=>c.priorYear&&!c.priorMonth&&compatible(c,year-1,month))||null;
-    let prevIndexCol=exact(p.y,p.m)||cols.find(c=>c.priorMonth&&!c.priorYear&&compatible(c,p.y,p.m))||null;
-    if(!currentIndexCol){
-      const candidates=cols.filter(c=>c!==prevYearIndexCol&&c!==prevIndexCol&&!c.priorYear&&!c.priorMonth&&compatible(c,year,month));
-      if(candidates.length===1)currentIndexCol=candidates[0];
-      // Preserve the original two-column layout only when dates are not known.
-      else if(cols.length===2&&candidates.length===2&&cols.every(c=>!c.period.key))currentIndexCol=candidates[candidates.length-1];
-    }
-    if(!prevIndexCol&&cols.length===2&&currentIndexCol){
-      const candidate=cols.find(c=>c!==currentIndexCol);
-      if(candidate&&candidate!==prevYearIndexCol&&!candidate.priorYear&&compatible(candidate,p.y,p.m))prevIndexCol=candidate;
-    }
-    if(!currentIndexCol)throw new Error(`ระบุคอลัมน์ดัชนี ${periodLabel(year,month)} ไม่ได้ใน ${fileName}`);
-    return {currentIndexCol,prevIndexCol,prevYearIndexCol,month,year};
-  }
-
   function parseReport(arrayRows,fileName){
     let headerRow=-1;
     for(let i=0;i<Math.min(arrayRows.length,30);i++){
@@ -568,9 +510,18 @@
     const meta=arrayRows.slice(0,headerRow).flat().filter(Boolean).join(' ');
     const dataset=detectDataset(meta,fileName);
     const region=detectRegion(meta,fileName);
-    const {currentIndexCol,prevIndexCol,prevYearIndexCol,month,year}=resolveIndexColumns(headers,meta,fileName);
+    const indexCols=headers.map((h,i)=>({h,i})).filter(x=>x.h.startsWith('ดัชนี '));
     const shareCols=headers.map((h,i)=>({h,i})).filter(x=>x.h.startsWith('สัดส่วนน้ำหนัก'));
     const weightCols=headers.map((h,i)=>({h,i})).filter(x=>/^น้ำหนัก\s/.test(x.h));
+    if(!indexCols.length)throw new Error(`ไม่พบคอลัมน์ดัชนีใน ${fileName}`);
+    const currentIndexCol=indexCols[indexCols.length-1];
+    const prevIndexCol=indexCols.length>1?indexCols[0]:null;
+    let month=parseMonthFromText(meta) || parseMonthFromText(currentIndexCol.h);
+    let year=null;
+    const ym=(meta.match(/ปี\s*(25\d{2})/)||currentIndexCol.h.match(/(25\d{2})/)); if(ym)year=Number(ym[1]);
+    if(!month)month=parseMonthFromText(currentIndexCol.h);
+    if(!year){const y=currentIndexCol.h.match(/(25\d{2})/);if(y)year=Number(y[1]);}
+    if(!month||!year)throw new Error(`อ่านเดือน/ปีไม่ได้จาก ${fileName}`);
     let baseYear=null; const bm=meta.match(/ปีฐาน\s*(25\d{2})/); if(bm)baseYear=Number(bm[1]);
     const idxByExact=(names)=>{for(const name of names){const i=headers.findIndex(h=>h.trim().toLowerCase()===name.toLowerCase());if(i>=0)return i;}return -1};
     const iCode=idxByExact(['รหัส']); const iName=idxByExact(['หมวด/รายการ','รายการ']);
@@ -587,14 +538,14 @@
       const name=txt(a[iName]); if(!name)continue;
       rows.push({
         code,name,level:sigLen(code),
-        weightSharePrev:prevShare>=0?n(a[prevShare]):null,weightPrev:prevWeight>=0?n(a[prevWeight]):null,indexPrev:prevIndexCol?n(a[prevIndexCol.i]):null,indexPrevYear:prevYearIndexCol?n(a[prevYearIndexCol.i]):null,
+        weightSharePrev:prevShare>=0?n(a[prevShare]):null,weightPrev:prevWeight>=0?n(a[prevWeight]):null,indexPrev:prevIndexCol?n(a[prevIndexCol.i]):null,
         weightShare:currShare>=0?n(a[currShare]):null,relWeight:iRelW>=0?n(a[iRelW]):null,relPrice:iRelP>=0?n(a[iRelP]):null,weight:currWeight>=0?n(a[currWeight]):null,index:n(a[currentIndexCol.i]),
         mom:iMom>=0?n(a[iMom]):null,yoy:iYoy>=0?n(a[iYoy]):null,aoa:iAoa>=0?n(a[iAoa]):null,qoq:iQoq>=0?n(a[iQoq]):null,hoh:iHoh>=0?n(a[iHoh]):null,
         cMom:iCMom>=0?n(a[iCMom]):null,cYoy:iCYoy>=0?n(a[iCYoy]):null,cAoa:iCAoa>=0?n(a[iCAoa]):null,cQoq:iCQoq>=0?n(a[iCQoq]):null,cHoh:iCHoh>=0?n(a[iCHoh]):null,group:iGroup>=0?txt(a[iGroup]):''
       });
     }
     const byCode=new Map(rows.map(x=>[x.code,x]));
-    return {fileName,meta,datasetType:dataset.id,datasetLabel:dataset.label,datasetFullLabel:dataset.fullLabel,regionId:region.id,regionLabel:region.label,month,year,key:periodKey(year,month),baseYear,indexPrevYearHeader:prevYearIndexCol?.h||null,rows,byCode};
+    return {fileName,meta,datasetType:dataset.id,datasetLabel:dataset.label,datasetFullLabel:dataset.fullLabel,regionId:region.id,regionLabel:region.label,month,year,key:periodKey(year,month),baseYear,rows,byCode};
   }
 
   async function importFiles(files){
@@ -652,22 +603,6 @@
   function onDatasetChange(){rebuildRegionSelector();renderAll()}
   function currentReport(){const key=Number(document.getElementById('periodSelect').value),datasetType=document.getElementById('datasetSelect').value,reg=document.getElementById('regionSelect').value;return state.reports.find(r=>r.key===key&&r.datasetType===datasetType&&r.regionId===reg)||null}
   function previousReport(report){if(!report)return null;const p=prevPeriod(report.year,report.month);return state.reports.find(r=>r.year===p.y&&r.month===p.m&&r.datasetType===report.datasetType&&r.regionId===report.regionId)||null}
-
-
-  function previousYearReport(report){
-    // Do not join indices across datasets, areas or unverified/different bases.
-    if(!report||report.baseYear===null||report.baseYear===undefined)return null;
-    return state.reports.find(r=>r.year===report.year-1&&r.month===report.month&&
-      r.datasetType===report.datasetType&&r.regionId===report.regionId&&r.baseYear===report.baseYear)||null;
-  }
-  function previousYearIndexInfo(report,row,priorReport=previousYearReport(report)){
-    const direct=n(row?.indexPrevYear);
-    if(direct!==null)return {value:direct,source:`อ่านจากไฟล์งวดปัจจุบัน: ${report.fileName}${report.indexPrevYearHeader?` | ${report.indexPrevYearHeader}`:''}`};
-    const priorRow=row?priorReport?.byCode.get(row.code):null;
-    const value=n(priorRow?.index);
-    if(value!==null)return {value,source:`อ่านจากไฟล์เดือนเดียวกันปีก่อน: ${priorReport.fileName}`};
-    return {value:null,source:'ไม่พบดัชนีเดือนเดียวกันปีก่อนในข้อมูลที่นำเข้า (ชุด/พื้นที่/ปีฐานเดียวกัน) ไม่คำนวณย้อนจาก YoY'};
-  }
 
   function ratePhrase(v){if(v===null||v===undefined)return 'ไม่พบข้อมูล';if(v>0)return `สูงขึ้นร้อยละ ${fmt(Math.abs(v))}`;if(v<0)return `ลดลงร้อยละ ${fmt(Math.abs(v))}`;return 'ไม่เปลี่ยนแปลง'}
   function metricLabel(report,metric){
@@ -843,18 +778,10 @@
   function renderPage7(report){const o=getOutlook(report);const nextM=report.month===12?1:report.month+1,nextY=report.month===12?report.year+1:report.year;document.getElementById('p7Title').textContent=report.datasetType==='G'?'แนวโน้มอัตราเงินเฟ้อทั่วไป':`แนวโน้ม${datasetFullLabel(report)}`;document.getElementById('p7Sub').textContent=`แนวโน้มเดือน${MONTHS_FULL[nextM]} ${nextY} • ${datasetLabel(report)} (${report.datasetType}) • อ้างอิงงวดล่าสุด ${MONTHS_FULL[report.month]} ${report.year}`;renderOutlookChart(report);renderOutlookList('outlookUpList',o.up);renderOutlookList('outlookDownList',o.down);document.getElementById('forecastRange').textContent=o.range||'—';document.getElementById('forecastMid').textContent=o.mid||'—';document.getElementById('nextRelease').textContent=o.next||'—';document.getElementById('outlookUpInput').value=(o.up||[]).join('\n');document.getElementById('outlookDownInput').value=(o.down||[]).join('\n');document.getElementById('forecastRangeInput').value=o.range||'';document.getElementById('forecastMidInput').value=o.mid||'';document.getElementById('nextReleaseInput').value=o.next||''}
 
   function renderPage8(report){
-    const prev=previousReport(report),priorYear=previousYearReport(report),p=prevPeriod(report.year,report.month);
-    document.getElementById('p8Title').textContent=`ตารางแสดง${datasetFullLabel(report)}และอัตราการเปลี่ยนแปลง`;
-    document.getElementById('p8Sub').textContent=`เดือน${MONTHS_FULL[report.month]} ${report.year}${report.baseYear?` • ปีฐาน ${report.baseYear} = 100`:''} • ${datasetLabel(report)} (${report.datasetType}) • ${report.regionLabel}`;
-    document.getElementById('detailHead').innerHTML=`<tr><th rowspan="2" scope="col">รหัส</th><th rowspan="2" scope="col">รายการ</th><th rowspan="2" scope="col">สัดส่วนน้ำหนัก</th><th colspan="5" scope="colgroup">${MONTHS_FULL[report.month]} ${report.year}</th><th colspan="4" scope="colgroup">${MONTHS_FULL[p.m]} ${p.y}</th></tr><tr><th scope="col">ดัชนี</th><th scope="col" class="prior-year-index">ดัชนีปีก่อน<br><small>${periodLabel(report.year-1,report.month)}</small></th><th scope="col">MoM</th><th scope="col">YoY</th><th scope="col">AoA</th><th scope="col">ดัชนี</th><th scope="col">MoM</th><th scope="col">YoY</th><th scope="col">AoA</th></tr>`;
+    const prev=previousReport(report),p=prevPeriod(report.year,report.month);document.getElementById('p8Title').textContent=`ตารางแสดง${datasetFullLabel(report)}และอัตราการเปลี่ยนแปลง`;document.getElementById('p8Sub').textContent=`เดือน${MONTHS_FULL[report.month]} ${report.year}${report.baseYear?` • ปีฐาน ${report.baseYear} = 100`:''} • ${datasetLabel(report)} (${report.datasetType}) • ${report.regionLabel}`;
+    document.getElementById('detailHead').innerHTML=`<tr><th rowspan="2">รหัส</th><th rowspan="2">รายการ</th><th rowspan="2">สัดส่วนน้ำหนัก</th><th colspan="4">${MONTHS_FULL[report.month]} ${report.year}</th><th colspan="4">${MONTHS_FULL[p.m]} ${p.y}</th></tr><tr><th>ดัชนี</th><th>MoM</th><th>YoY</th><th>AoA</th><th>ดัชนี</th><th>MoM</th><th>YoY</th><th>AoA</th></tr>`;
     const detailLimit=getTableLimit('detailLimitSelect',30);
-    document.getElementById('detailBody').innerHTML=DETAIL_CODES.slice(0,detailLimit).map(([c,label,type])=>{
-      const row=findRow(report,c),pr=prev?findRow(prev,c):null;
-      if(!row)return '';
-      const rowLabel=c==='0000000'?datasetFullLabel(report):label;
-      const prior=previousYearIndexInfo(report,row,priorYear);
-      return `<tr class="${type}"><td>${c}</td><td>${escapeHtml(rowLabel)}</td><td>${fmt(row.weightShare)}</td><td>${fmt(row.index)}</td><td class="prior-year-index" title="${escapeHtml(prior.source)}">${fmt(prior.value)}</td><td class="${cls(row.mom)}">${fmt(row.mom)}</td><td class="${cls(row.yoy)}">${fmt(row.yoy)}</td><td class="${cls(row.aoa)}">${fmt(row.aoa)}</td><td>${fmt(row.indexPrev)}</td><td class="${cls(pr?.mom)}">${fmt(pr?.mom)}</td><td class="${cls(pr?.yoy)}">${fmt(pr?.yoy)}</td><td class="${cls(pr?.aoa)}">${fmt(pr?.aoa)}</td></tr>`;
-    }).join('');
+    document.getElementById('detailBody').innerHTML=DETAIL_CODES.slice(0,detailLimit).map(([c,label,type])=>{const row=findRow(report,c),pr=prev?findRow(prev,c):null;if(!row)return '';const rowLabel=c==='0000000'?datasetFullLabel(report):label;return `<tr class="${type}"><td>${c}</td><td>${escapeHtml(rowLabel)}</td><td>${fmt(row.weightShare)}</td><td>${fmt(row.index)}</td><td class="${cls(row.mom)}">${fmt(row.mom)}</td><td class="${cls(row.yoy)}">${fmt(row.yoy)}</td><td class="${cls(row.aoa)}">${fmt(row.aoa)}</td><td>${fmt(row.indexPrev)}</td><td class="${cls(pr?.mom)}">${fmt(pr?.mom)}</td><td class="${cls(pr?.yoy)}">${fmt(pr?.yoy)}</td><td class="${cls(pr?.aoa)}">${fmt(pr?.aoa)}</td></tr>`}).join('');
   }
 
   function posterRateCard(title,row,prevRow){return `<h4>${escapeHtml(title)}</h4><div class="mini-rate-grid"><div class="hdr">งวด</div><div class="hdr">ดัชนี</div><div class="hdr">%MoM</div><div class="hdr">%YoY</div><div class="hdr">%AoA</div><div>ปัจจุบัน</div><div>${fmt(row?.index)}</div><div class="${cls(row?.mom)}">${fmt(row?.mom)}</div><div class="${cls(row?.yoy)}">${fmt(row?.yoy)}</div><div class="${cls(row?.aoa)}">${fmt(row?.aoa)}</div><div>เดือนก่อน</div><div>${fmt(row?.indexPrev)}</div><div>${fmt(prevRow?.mom)}</div><div>${fmt(prevRow?.yoy)}</div><div>${fmt(prevRow?.aoa)}</div></div>`}
@@ -874,15 +801,7 @@
   function renderAll(){const report=currentReport();if(!report)return;const total=state.reports.length,setFiles=state.reports.filter(r=>r.key===report.key&&r.datasetType===report.datasetType).length;document.getElementById('statusMeta').textContent=`${periodLabel(report.year,report.month)} • ${datasetLabel(report)} (${report.datasetType}) • ${report.regionLabel} • ${report.rows.length.toLocaleString('th-TH')} แถว • โหลดแล้ว ${total} ไฟล์ (${setFiles} พื้นที่ของชุดนี้ในงวดนี้)`;const componentTitle=`อัตราการเปลี่ยนแปลง${datasetFullLabel(report)}`;document.getElementById('p3Title').textContent=componentTitle;document.getElementById('p4Title').textContent=componentTitle;document.getElementById('p5Title').textContent=componentTitle;renderPage1(report);renderPage2(report);renderComponents(report,'yoy','yoyComponents','p3Sub');renderComponents(report,'mom','momComponents','p4Sub');renderComponents(report,'aoa','aoaComponents','p5Sub');renderPage6(report);renderPage7(report);renderPage8(report);renderPage9(report)}
 
   async function capturePage(id){const el=document.getElementById(id);if(!el)return;setLoading(true);try{const canvas=await html2canvas(el,{scale:2,backgroundColor:'#ffffff',useCORS:true});const a=document.createElement('a');const r=currentReport();a.download=`CPI_${id}_${r?.year||''}${String(r?.month||'').padStart(2,'0')}_${r?.datasetType||''}_${r?.regionId||''}.png`;a.href=canvas.toDataURL('image/png');a.click()}catch(e){console.error(e);toast('บันทึก PNG ไม่สำเร็จ: '+e.message)}finally{setLoading(false)}}
-  function exportCurrentExcel(){
-    const r=currentReport();if(!r)return;
-    const prior=previousYearReport(r);
-    const priorYearColumn=`ดัชนีปีก่อน (${periodLabel(r.year-1,r.month)})`;
-    const rows=r.rows.map(x=>({รหัส:x.code,'หมวด/รายการ':x.name,'สัดส่วนน้ำหนัก':x.weightShare,'ดัชนี':x.index,[priorYearColumn]:previousYearIndexInfo(r,x,prior).value,MoM:x.mom,YoY:x.yoy,AoA:x.aoa,ContributeMoM:x.cMom,ContributeYoY:x.cYoy,ContributeAoA:x.cAoa}));
-    const ws=XLSX.utils.json_to_sheet(rows),wb=XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb,ws,'CPI');
-    XLSX.writeFile(wb,`CPI_${r.year}${String(r.month).padStart(2,'0')}_${r.datasetType}_${r.regionId}.xlsx`);
-  }
+  function exportCurrentExcel(){const r=currentReport();if(!r)return;const rows=r.rows.map(x=>({รหัส:x.code,'หมวด/รายการ':x.name,'สัดส่วนน้ำหนัก':x.weightShare,'ดัชนี':x.index,MoM:x.mom,YoY:x.yoy,AoA:x.aoa,ContributeMoM:x.cMom,ContributeYoY:x.cYoy,ContributeAoA:x.cAoa}));const ws=XLSX.utils.json_to_sheet(rows);const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'CPI');XLSX.writeFile(wb,`CPI_${r.year}${String(r.month).padStart(2,'0')}_${r.datasetType}_${r.regionId}.xlsx`)}
 
   document.getElementById('fileInput').addEventListener('change',e=>importFiles([...e.target.files]));
   const dz=document.getElementById('dropzone');
@@ -894,6 +813,5 @@
     if(typeof XLSX==='undefined') toast('ไม่สามารถโหลดตัวอ่าน Excel ได้ กรุณาเชื่อมต่ออินเทอร์เน็ตแล้วเปิดไฟล์ใหม่');
   });
 </script>
-
-
-</body></html>
+</body>
+</html>
