@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CPI Analysis Report - V17 Province + Region + Spec Count</title>
+    <title>CPI Analysis Report - V16 Monthly + Weekly + Spec Count</title>
     <!-- โหลด Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- โหลด SheetJS -->
@@ -62,29 +62,6 @@
     #taskSpec .spec-heading { font-size: 1.2rem; }
 }
 
-
-
-.geo-view-group .btn-check:checked + .btn { background: #1f4e78; border-color: #1f4e78; color: #fff; }
-.geo-view-group .btn { transition: none; }
-/* V17: geography counting uses the same source rows as the status report. */
-.geo-heading { color: #1f4e78; font-size: 1.25rem; font-weight: 700; }
-.geo-controls { background: #f7f9fc; border: 1px solid #dce5ee; border-radius: 10px; padding: 16px; }
-.geo-filters { display: grid; grid-template-columns: minmax(230px, 1fr) minmax(230px, 1.3fr); gap: 14px; margin-top: 16px; }
-.geo-view-group { display: flex; flex-wrap: wrap; gap: 8px; }
-.geo-view-group .btn { border-radius: 7px; padding: 8px 16px; font-size: .92rem; }
-.geo-meta { color: #586572; font-size: .84rem; line-height: 1.8; }
-.geo-scope { background: #e7eff8; color: #1f4e78; padding: 7px 10px; border-radius: 6px; font-size: .82rem; }
-.geo-caption { color: #1f4e78; font-weight: 600; }
-.geo-totals { display: flex; flex-wrap: wrap; gap: 8px 24px; background: #f1f6fc; border: 1px solid #dce5ee; padding: 13px 16px; border-radius: 8px; font-size: .93rem; font-variant-numeric: tabular-nums; }
-.geo-totals strong { margin-left: 6px; }
-#table3 th { background: #1f4e78 !important; }
-#table3 td { vertical-align: middle; padding: 10px 12px; }
-#table3 td.geo-unknown { color: #8b5b00; background: #fff5db; }
-#geoMappingWarning { font-size: .86rem; line-height: 1.75; }
-@media (max-width: 650px) { .geo-filters { grid-template-columns: 1fr; } .geo-view-group .btn { flex: 1 1 auto; } .geo-heading { font-size: 1.12rem; } }
-
-#resultSection > .alert-info > h4 { min-width: 0; overflow-wrap: anywhere; }
-#fileSetLabelDisplay .badge { max-width: 100%; white-space: normal; text-align: left; line-height: 1.45; overflow-wrap: anywhere; }
     </style>
 </head>
 <body>
@@ -180,7 +157,7 @@
                     <button class="nav-link" data-bs-toggle="tab" data-bs-target="#task2" type="button" role="tab">2. จำนวนขึ้น/ลง/เท่าเดิม</button>
                 </li>
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#task3" type="button" role="tab">3. เขต/จังหวัด และภาค</button>
+                    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#task3" type="button" role="tab">3. แยกตามเขต/จังหวัด</button>
                 </li>
                 <li class="nav-item" role="presentation"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#taskSpec" type="button" role="tab">4. จำนวนสเปค / สินค้ายอดนิยม</button></li>
             </ul>
@@ -206,31 +183,9 @@
                     </div>
                 </div>
                 <div class="tab-pane fade" id="task3" role="tabpanel">
-                    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mt-2 mb-3">
-                        <div><h4 class="geo-heading mb-1">จำนวนข้อมูล แยกตามเขต/จังหวัด และภาค</h4><div class="geo-meta">ดูรายละเอียดรายพื้นที่ หรือรวมเป็นรายภาคจากแถวข้อมูลต้นทางเดียวกัน</div></div>
-                        <span id="geoScopeBadge" class="geo-scope"></span>
+                    <div class="table-responsive border rounded mt-2">
+                        <table class="table table-striped table-hover mb-0" id="table3"></table>
                     </div>
-                    <div class="geo-controls mb-3">
-                        <div class="geo-view-group" role="group" aria-label="มิติพื้นที่ที่แสดง">
-                            <input type="radio" class="btn-check" name="geoView" id="geoProvinceView" value="province" autocomplete="off" checked><label class="btn btn-outline-primary" for="geoProvinceView">รายจังหวัด/เขต</label>
-                            <input type="radio" class="btn-check" name="geoView" id="geoRegionView" value="region" autocomplete="off"><label class="btn btn-outline-primary" for="geoRegionView">รายภาค × CODE7</label>
-                            <input type="radio" class="btn-check" name="geoView" id="geoOverviewView" value="overview" autocomplete="off"><label class="btn btn-outline-primary" for="geoOverviewView">สรุปภาพรวมรายภาค</label>
-                        </div>
-                        <div class="geo-filters">
-                            <div><label class="form-label fw-semibold" for="geoRegionFilter">ภาคที่ต้องการดู</label><select id="geoRegionFilter" class="form-select"><option value="">ทุกภาคในไฟล์</option></select></div>
-                            <div><label id="geoSearchLabel" class="form-label fw-semibold" for="geoSearch">ค้นหารายการ / พื้นที่</label><input type="search" id="geoSearch" class="form-control" placeholder="CODE7 / รายการ / ผู้ดูแล / จังหวัดหรือเขต"></div>
-                        </div>
-                        <div id="geoMasterStatus" class="geo-meta mt-3"></div>
-                    </div>
-                    <div id="geoMappingWarning" class="alert alert-warning" role="status" hidden><span id="geoMappingWarningText"></span><button id="exportGeoReviewBtn" type="button" class="btn btn-sm btn-outline-warning ms-2" hidden>ส่งออกจังหวัดที่จับคู่ไม่ได้</button></div>
-                    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-2">
-                        <div id="geoTableTitle" class="geo-caption"></div>
-                        <div class="d-flex flex-wrap gap-2"><button id="exportGeoBtn" type="button" class="btn btn-success btn-sm">ส่งออกมุมมองนี้</button><button id="exportGeoAllBtn" type="button" class="btn btn-outline-success btn-sm">ส่งออกทุกมิติพื้นที่</button></div>
-                    </div>
-                    <div class="table-responsive border rounded mt-2"><table class="table table-striped table-hover mb-0" id="table3"></table></div>
-                    <div id="geoTotals" class="geo-totals mt-3" role="status" aria-live="polite"></div>
-                    <div id="geoCountNote" class="geo-meta mt-2"></div>
-                    <details class="mt-2"><summary class="geo-meta text-primary fw-semibold">หลักเกณฑ์การนับรายภาค</summary><div class="geo-meta mt-2">ขึ้น = REL มากกว่า 100 / ลง = REL น้อยกว่า 100 / เท่าเดิม = REL เท่ากับ 100 ตามเกณฑ์เดิม นับเฉพาะแถวที่มี CODE7 และสถานะราคา ไม่ตัดแถวซ้ำตามสเปคหรือร้าน<br>รายภาคเป็นผลรวมจำนวนแถว ไม่ใช่ค่าเฉลี่ยของแต่ละจังหวัด สวิตช์ Checked ด้านบนมีผลกับทุกมิติ ส่วนช่องค้นหาและตัวกรองภาคในแท็บนี้ไม่เปลี่ยนรายงานแท็บอื่น<br>ใช้ชื่อภาคจากชีต “รหัสจังหวัด” ใน Real_Master_CPI ที่นำเข้าโดยตรง ไม่กำหนดจังหวัดเข้าภาคเอง แถวที่จังหวัดว่างหรือจับคู่ภาคไม่ได้ยังคงนับในกลุ่ม “ไม่พบข้อมูลภาค” เพื่อไม่ให้ยอดหาย<br>จำนวนจังหวัดในภาพรวมรายภาคนับชื่อจังหวัดไม่ซ้ำ กลุ่มเขตต่าง ๆ ของกรุงเทพมหานครจึงนับเป็นจังหวัดเดียว และจำนวน CODE7 นับรหัสหมวดไม่ซ้ำภายในภาค<br>ปุ่ม “ส่งออกมุมมองนี้” ยึดตัวกรองที่แสดง ส่วน “ส่งออกทุกมิติพื้นที่” และปุ่ม Excel หลักส่งออกครบทุกภาคภายใต้สวิตช์ Checked ที่เลือก</div></details>
                 </div>
 <div class="tab-pane fade" id="taskSpec" role="tabpanel">
                     <div class="d-flex flex-wrap justify-content-between align-items-start gap-3 mt-2">
@@ -292,12 +247,6 @@
         let currentDataMode = ""; // MONTHLY / WEEKLY
         let defaultMasterBuffer = null;
         let defaultMasterFileName = "";
-        let task3_region_data = [], task3_overview_data = [], geoReviewRows = [];
-        let geoStats = { eligible: 0, excluded: 0, unmapped: 0 };
-        let geoMasterMeta = { sheet: '', headerRow: 0, provinceCount: 0, regions: [], warnings: [] };
-        const GEO_UNKNOWN_REGION = 'ไม่พบข้อมูลภาค';
-        const GEO_UNKNOWN_PROVINCE = 'ไม่ระบุจังหวัด/เขต';
-        const geoNumber = new Intl.NumberFormat('th-TH');
 
         function geometricMean(arr) {
             if(arr.length === 0) return 0;
@@ -551,218 +500,6 @@
             renderTable('table1', getFormattedData(activeData, false));
         }
 
-
-        // V17: mappings come from the uploaded master, never from a built-in region list.
-        function normalizeGeoKey(value) {
-            let text = String(value ?? '').trim().replace(/\s+/g, '').replace(/^จังหวัด/, '').replace(/^จ\./, '');
-            if (/^\d{1,2}(?:\.0+)?$/.test(text)) text = String(Number(text)).padStart(2, '0');
-            return text;
-        }
-        function readMasterGeography(workbook) {
-            const lookup = new Map(), conflicts = new Set(), provinceNames = new Set(), regions = new Set();
-            const info = { sheet: '', headerRow: 0, provinceCount: 0, regions: [], warnings: [] };
-            const sheetName = workbook.SheetNames.find(name => name.includes('รหัสจังหวัด'));
-            const add = (key, entry) => {
-                key = normalizeGeoKey(key);
-                if (!key || conflicts.has(key)) return;
-                const old = lookup.get(key);
-                if (old && (old.province !== entry.province || old.region !== entry.region)) {
-                    lookup.delete(key); conflicts.add(key);
-                } else if (!old) lookup.set(key, entry);
-            };
-            if (!sheetName) {
-                info.warnings.push('ไม่พบชีต “รหัสจังหวัด” ใน Master จึงไม่กำหนดภาคให้อัตโนมัติ');
-                return { lookup, conflicts, info };
-            }
-            info.sheet = sheetName;
-            const matrix = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName], { header: 1, defval: '' });
-            let headerRow = -1, provinceCol = -1, regionCol = -1, codeCol = -1;
-            for (let i = 0; i < Math.min(20, matrix.length); i++) {
-                const header = matrix[i].map(value => cleanHeader(value));
-                const pc = header.findIndex(value => value === 'จังหวัด' || value === 'ชื่อจังหวัด');
-                const rc = header.findIndex(value => value === 'ภาค' || value === 'ชื่อภาค');
-                if (pc >= 0 && rc >= 0) {
-                    headerRow = i; provinceCol = pc; regionCol = rc;
-                    codeCol = header.findIndex(value => value === 'รหัสจังหวัด'); break;
-                }
-            }
-            if (headerRow < 0) {
-                info.warnings.push('ไม่พบหัวคอลัมน์ “จังหวัด” และ “ภาค” ในชีตรหัสจังหวัด');
-                return { lookup, conflicts, info };
-            }
-            info.headerRow = headerRow + 1;
-            for (const row of matrix.slice(headerRow + 1)) {
-                const province = cleanHeader(row[provinceCol]), region = cleanHeader(row[regionCol]);
-                if (!province || !region) continue;
-                const entry = { province, region, group: '' };
-                add(province, entry);
-                if (codeCol >= 0 && cleanHeader(row[codeCol]) !== '') add(row[codeCol], entry);
-                provinceNames.add(province); regions.add(region);
-            }
-            // Only spelling aliases are fixed; their region is always read from the master.
-            const bkk = lookup.get(normalizeGeoKey('กรุงเทพมหานคร'));
-            if (bkk) ['กทม.', 'กทม', 'กรุงเทพ', 'กรุงเทพฯ'].forEach(alias => add(alias, bkk));
-            // The optional usage sheet explicitly identifies Bangkok's survey groups.
-            // It does not override the province-to-region classification in รหัสจังหวัด.
-            const usageName = workbook.SheetNames.find(name => name.trim() === 'จังหวัดใช้งาน');
-            if (usageName && bkk) {
-                const usage = XLSX.utils.sheet_to_json(workbook.Sheets[usageName], { header: 1, defval: '' });
-                for (let i = 0; i < Math.min(20, usage.length); i++) {
-                    const header = usage[i].map(value => cleanHeader(value));
-                    const groupCol = header.indexOf('จังหวัด/กลุ่ม'), areaCol = header.indexOf('ภาค');
-                    if (groupCol < 0 || areaCol < 0) continue;
-                    for (const row of usage.slice(i + 1)) {
-                        const group = cleanHeader(row[groupCol]);
-                        if (normalizeGeoKey(row[areaCol]) !== normalizeGeoKey(bkk.province) || !group.startsWith('กลุ่ม')) continue;
-                        const entry = { ...bkk, group };
-                        [group, 'กทม.' + group, 'กทม' + group, 'กรุงเทพฯ' + group, 'กรุงเทพมหานคร' + group].forEach(alias => add(alias, entry));
-                    }
-                    break;
-                }
-            }
-            info.provinceCount = provinceNames.size;
-            info.regions = Array.from(regions);
-            if (conflicts.size) info.warnings.push(`Master มีชื่อ/รหัสจังหวัดจับคู่ขัดแย้ง ${conflicts.size} ค่า จึงเว้นการกำหนดภาคสำหรับค่าที่ขัดแย้ง`);
-            if (!provinceNames.size) info.warnings.push('ไม่มีคู่จังหวัด–ภาคที่สมบูรณ์ใน Master');
-            return { lookup, conflicts, info };
-        }
-        function compareGeoRegions(a, b) {
-            if (a === b) return 0;
-            if (a === GEO_UNKNOWN_REGION) return 1;
-            if (b === GEO_UNKNOWN_REGION) return -1;
-            const ai = geoMasterMeta.regions.indexOf(a), bi = geoMasterMeta.regions.indexOf(b);
-            if (ai >= 0 && bi >= 0) return ai - bi;
-            return a.localeCompare(b, 'th');
-        }
-        // Every eligible source row contributes once to each geographical dimension.
-        // Missing/unknown provinces get an explicit bucket so totals reconcile to tab 2.
-        function aggregateGeographicalCounts(rows) {
-            const byProvince = new Map(), byRegion = new Map(), overview = new Map(), reviews = new Map();
-            const stats = { eligible: 0, excluded: 0, unmapped: 0 };
-            const emptyCounts = () => ({ 'ขึ้น': 0, 'ลง': 0, 'เท่าเดิม': 0, 'จำนวนรวม': 0 });
-            const increment = (entry, status) => { entry[status]++; entry['จำนวนรวม']++; };
-            for (const p of rows) {
-                if (!p.code7 || !['ขึ้น', 'ลง', 'เท่าเดิม'].includes(p.status)) { stats.excluded++; continue; }
-                stats.eligible++;
-                const region = p.isRegionMapped ? p.region : GEO_UNKNOWN_REGION;
-                const area = p.prov_dist || GEO_UNKNOWN_PROVINCE;
-                const provinceKey = JSON.stringify([p.code7, region, area]);
-                const regionKey = JSON.stringify([p.code7, region]);
-                if (!byProvince.has(provinceKey)) byProvince.set(provinceKey, { 'ผู้ดูแล': p.itemAdmin, 'CODE7': p.code7, 'รายการ': p.itemName, 'ภาค': region, 'จังหวัด/เขต': area, ...emptyCounts() });
-                if (!byRegion.has(regionKey)) byRegion.set(regionKey, { 'ผู้ดูแล': p.itemAdmin, 'CODE7': p.code7, 'รายการ': p.itemName, 'ภาค': region, ...emptyCounts() });
-                if (!overview.has(region)) overview.set(region, { region, provinces: new Set(), categories: new Set(), counts: emptyCounts() });
-                increment(byProvince.get(provinceKey), p.status);
-                increment(byRegion.get(regionKey), p.status);
-                const summary = overview.get(region);
-                increment(summary.counts, p.status);
-                // Do not describe an unverified source label as a verified province.
-                if (p.isRegionMapped && p.provinceName) summary.provinces.add(p.provinceName);
-                summary.categories.add(p.code7);
-                if (!p.isRegionMapped) {
-                    stats.unmapped++;
-                    const source = p.provinceSource || '';
-                    const reason = p.geoMappingReason || (source ? 'ไม่พบจังหวัดในชีตรหัสจังหวัด' : 'จังหวัดว่างในข้อมูลหลัก');
-                    const key = JSON.stringify([source, area, reason]);
-                    if (!reviews.has(key)) reviews.set(key, { 'จังหวัดต้นทาง': source, 'จังหวัด/เขต': area, 'ประเด็น': reason, 'จำนวนข้อมูล': 0 });
-                    reviews.get(key)['จำนวนข้อมูล']++;
-                }
-            }
-            const province = Array.from(byProvince.values()).sort((a,b) => a.CODE7.localeCompare(b.CODE7) || compareGeoRegions(a['ภาค'], b['ภาค']) || a['จังหวัด/เขต'].localeCompare(b['จังหวัด/เขต'], 'th'));
-            const region = Array.from(byRegion.values()).sort((a,b) => a.CODE7.localeCompare(b.CODE7) || compareGeoRegions(a['ภาค'], b['ภาค']));
-            const totals = Array.from(overview.values()).sort((a,b) => compareGeoRegions(a.region, b.region)).map(entry => ({ 'ภาค': entry.region, 'จำนวนจังหวัด': entry.provinces.size, 'จำนวน CODE7': entry.categories.size, ...entry.counts }));
-            return { province, region, overview: totals, reviews: Array.from(reviews.values()), stats };
-        }
-        function geographyView() { return document.querySelector('input[name="geoView"]:checked').value; }
-        function geographyViewInfo(view = geographyView()) {
-            return view === 'province' ? { name: 'รายจังหวัด/เขต', sheet: '3.Prov_Dist_Count', rows: task3_data }
-                : view === 'region' ? { name: 'รายภาค × CODE7', sheet: '3.Region_Count', rows: task3_region_data }
-                : { name: 'สรุปภาพรวมรายภาค', sheet: '3.Region_Overview', rows: task3_overview_data };
-        }
-        function refreshGeographyRegions() {
-            const select = document.getElementById('geoRegionFilter'), previous = select.value;
-            const regions = Array.from(new Set(task3_region_data.map(row => row['ภาค']))).sort(compareGeoRegions);
-            select.replaceChildren(new Option('ทุกภาคในไฟล์', ''));
-            regions.forEach(region => select.add(new Option(region, region)));
-            select.value = regions.includes(previous) ? previous : '';
-        }
-        function filteredGeographyData() {
-            const region = document.getElementById('geoRegionFilter').value;
-            const query = document.getElementById('geoSearch').value.trim().toLocaleLowerCase('th');
-            return geographyViewInfo().rows.filter(row => (!region || row['ภาค'] === region) && (!query || Object.entries(row).some(([key, value]) => ['CODE7', 'รายการ', 'ผู้ดูแล', 'ภาค', 'จังหวัด/เขต'].includes(key) && String(value ?? '').toLocaleLowerCase('th').includes(query))));
-        }
-        function updateGeographyView() {
-            const rows = filteredGeographyData(), view = geographyViewInfo();
-            const onlyChecked = document.getElementById('countToggle').checked;
-            renderTable('table3', rows);
-            document.querySelectorAll('#table3 tbody tr').forEach(tr => {
-                const columns = rows.length ? Object.keys(rows[0]) : [];
-                const index = columns.indexOf('ภาค');
-                if (index >= 0 && tr.cells[index]?.textContent === GEO_UNKNOWN_REGION) tr.cells[index].classList.add('geo-unknown');
-            });
-            document.getElementById('geoScopeBadge').textContent = onlyChecked ? 'นับเฉพาะ Checked' : 'นับทั้ง Checked และไม่ Checked';
-            const regionLabel = document.getElementById('geoRegionFilter').value || 'ทุกภาคในไฟล์';
-            document.getElementById('geoTableTitle').textContent = `${view.name} — ${regionLabel} | ${geoNumber.format(rows.length)} แถวสรุป`;
-            document.getElementById('geoSearch').placeholder = geographyView() === 'overview' ? 'ค้นหาชื่อภาค' : 'CODE7 / รายการ / ผู้ดูแล / จังหวัดหรือเขต';
-            document.getElementById('geoMasterStatus').textContent = geoMasterMeta.sheet
-                ? `อ้างอิง Master: ชีต ${geoMasterMeta.sheet} (หัวตารางแถว ${geoMasterMeta.headerRow}) • ${geoNumber.format(geoMasterMeta.provinceCount)} จังหวัด • ${geoNumber.format(geoMasterMeta.regions.length)} ภาค • ใช้ชื่อภาคตาม Master`
-                : 'ยังไม่มีตารางจังหวัด–ภาคที่อ่านได้จาก Master';
-            const warnings = [...geoMasterMeta.warnings];
-            if (geoStats.unmapped) warnings.push(`จับคู่ภาคไม่ได้ ${geoNumber.format(geoStats.unmapped)} แถวที่มีสถานะราคาในขอบเขตการนับนี้ — ยังนับไว้ในกลุ่ม “${GEO_UNKNOWN_REGION}” ไม่ตัดทิ้ง (ตรวจได้จากไฟล์ส่งออกจังหวัดที่จับคู่ไม่ได้)`);
-            document.getElementById('geoMappingWarning').hidden = !warnings.length;
-            document.getElementById('geoMappingWarningText').textContent = warnings.join(' / ');
-            document.getElementById('exportGeoReviewBtn').hidden = !geoReviewRows.length;
-            const totals = { 'ขึ้น': 0, 'ลง': 0, 'เท่าเดิม': 0, 'จำนวนรวม': 0 };
-            for (const row of rows) for (const key of Object.keys(totals)) totals[key] += row[key];
-            const footer = document.getElementById('geoTotals'); footer.replaceChildren();
-            const title = document.createElement('span'); title.textContent = 'ผลรวมที่แสดง'; footer.appendChild(title);
-            for (const [key, value] of Object.entries(totals)) {
-                const span = document.createElement('span'); span.textContent = key;
-                const strong = document.createElement('strong'); strong.textContent = geoNumber.format(value); span.appendChild(strong); footer.appendChild(span);
-            }
-            document.getElementById('geoCountNote').textContent = `ฐานการนับก่อนกรองภาค/ค้นหา: ${geoNumber.format(geoStats.eligible)} แถวที่มี CODE7 และสถานะราคา • อีก ${geoNumber.format(geoStats.excluded)} แถวไม่มี CODE7 หรือไม่มีสถานะราคา จึงไม่อยู่ในตารางขึ้น/ลง/เท่าเดิม • จำนวนจังหวัดนับเฉพาะจังหวัดที่จับคู่กับ Master ได้`;
-            document.getElementById('exportGeoBtn').disabled = !rows.length;
-            document.getElementById('exportGeoAllBtn').disabled = !task3_data.length;
-        }
-        function geographyWorksheet(rows) {
-            const sheet = XLSX.utils.json_to_sheet(rows);
-            if (!rows.length) return sheet;
-            const columns = Object.keys(rows[0]);
-            sheet['!cols'] = columns.map(key => ({ wch: key === 'รายการ' ? 25 : key === 'ภาค' ? 32 : key.includes('จังหวัด') ? 27 : key === 'ประเด็น' ? 55 : key === 'CODE7' ? 12 : 16 }));
-            sheet['!autofilter'] = { ref: sheet['!ref'] };
-            const totalCol = columns.indexOf('จำนวนรวม'), start = columns.indexOf('ขึ้น'), end = columns.indexOf('เท่าเดิม');
-            for (let r = 0; r < rows.length; r++) {
-                columns.forEach((key, c) => {
-                    const cell = sheet[XLSX.utils.encode_cell({ r: r + 1, c })];
-                    if (!cell) return;
-                    if (key === 'CODE7') { cell.t = 's'; cell.v = String(rows[r][key]); cell.z = '@'; }
-                    else if (typeof rows[r][key] === 'number') cell.z = '#,##0';
-                });
-                // Include the cached computed value and a transparent, editable total formula.
-                if (totalCol >= 0 && start >= 0 && end >= 0) {
-                    const cell = sheet[XLSX.utils.encode_cell({ r: r + 1, c: totalCol })];
-                    cell.f = `SUM(${XLSX.utils.encode_col(start)}${r + 2}:${XLSX.utils.encode_col(end)}${r + 2})`;
-                }
-            }
-            return sheet;
-        }
-        function appendGeographySheets(workbook) {
-            ['province', 'region', 'overview'].forEach(mode => {
-                const view = geographyViewInfo(mode);
-                if (view.rows.length) XLSX.utils.book_append_sheet(workbook, geographyWorksheet(view.rows), view.sheet);
-            });
-            if (geoReviewRows.length) XLSX.utils.book_append_sheet(workbook, geographyWorksheet(geoReviewRows), '3.Unmapped_Province');
-        }
-        function exportGeography(allDimensions = false) {
-            const view = geographyViewInfo(), rows = filteredGeographyData();
-            if (allDimensions ? !task3_data.length : !rows.length) { alert('ไม่มีข้อมูลพื้นที่ตามเงื่อนไข'); return; }
-            const workbook = XLSX.utils.book_new();
-            if (allDimensions) appendGeographySheets(workbook);
-            else XLSX.utils.book_append_sheet(workbook, geographyWorksheet(rows), view.sheet);
-            const scope = document.getElementById('countToggle').checked ? 'Checked' : 'All';
-            const filename = `CPI_Area_Counts_${allDimensions ? 'All_Dimensions' : geographyView()}_${scope}.xlsx`;
-            XLSX.writeFile(workbook, filename);
-        }
-
         function updateCountViews() {
             let onlyChecked = document.getElementById('countToggle').checked;
             let dataToCount = onlyChecked ? processedData.filter(p => p.isChecked) : processedData;
@@ -783,30 +520,30 @@
                 'จำนวนรวม': task2_map[k]['ขึ้น'] + task2_map[k]['ลง'] + task2_map[k]['เท่าเดิม'] 
             })).sort((a,b) => a.CODE7.localeCompare(b.CODE7));
 
-            const geography = aggregateGeographicalCounts(dataToCount);
-            task3_data = geography.province;
-            task3_region_data = geography.region;
-            task3_overview_data = geography.overview;
-            geoReviewRows = geography.reviews;
-            geoStats = geography.stats;
+            let task3_map = {};
+            dataToCount.forEach(p => {
+                if(!p.code7 || !p.status || !p.prov_dist) return;
+                let key = p.code7 + "|||" + p.prov_dist;
+                if(!task3_map[key]) task3_map[key] = { c: p.code7, name: p.itemName, admin: p.itemAdmin, p: p.prov_dist, up: 0, down: 0, eq: 0 };
+                if(p.status === 'ขึ้น') task3_map[key].up++;
+                if(p.status === 'ลง') task3_map[key].down++;
+                if(p.status === 'เท่าเดิม') task3_map[key].eq++;
+            });
+            task3_data = Object.values(task3_map).map(v => ({ 
+                'ผู้ดูแล': v.admin, 
+                'CODE7': v.c, 
+                'รายการ': v.name, 
+                'จังหวัด/เขต': v.p, 
+                'ขึ้น': v.up, 
+                'ลง': v.down, 
+                'เท่าเดิม': v.eq, 
+                'จำนวนรวม': v.up + v.down + v.eq 
+            })).sort((a,b) => a.CODE7.localeCompare(b.CODE7) || a['จังหวัด/เขต'].localeCompare(b['จังหวัด/เขต']));
+
             renderTable('table2', task2_data);
-            refreshGeographyRegions();
-            updateGeographyView();
+            renderTable('table3', task3_data);
             updateSpecificationViews();
         }
-
-        document.querySelectorAll('input[name="geoView"]').forEach(input => input.addEventListener('change', updateGeographyView));
-        document.getElementById('geoRegionFilter').addEventListener('change', updateGeographyView);
-        let geoSearchTimer;
-        document.getElementById('geoSearch').addEventListener('input', () => { clearTimeout(geoSearchTimer); geoSearchTimer = setTimeout(updateGeographyView, 140); });
-        document.getElementById('exportGeoBtn').addEventListener('click', () => exportGeography(false));
-        document.getElementById('exportGeoAllBtn').addEventListener('click', () => exportGeography(true));
-        document.getElementById('exportGeoReviewBtn').addEventListener('click', () => {
-            if (!geoReviewRows.length) return;
-            const workbook = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(workbook, geographyWorksheet(geoReviewRows), 'จังหวัดที่จับคู่ไม่ได้');
-            XLSX.writeFile(workbook, 'ตรวจสอบการจับคู่จังหวัด_ภาค.xlsx');
-        });
 
         // Add Events
         document.getElementById('decimalToggle').addEventListener('change', () => {
@@ -855,10 +592,25 @@
                     // ==========================================
                     // Mapping Province -> Region
                     // ==========================================
-                    const masterGeography = readMasterGeography(masterWb);
-                    geoMasterMeta = masterGeography.info;
-                    document.getElementById('geoRegionFilter').value = '';
-                    document.getElementById('geoSearch').value = '';
+                    let regionMap = {};
+                    const provSheetName = masterWb.SheetNames.find(s => s.includes('รหัสจังหวัด'));
+                    if (provSheetName) {
+                        const provRows = XLSX.utils.sheet_to_json(masterWb.Sheets[provSheetName]);
+                        provRows.forEach(row => {
+                            let keys = Object.keys(row);
+                            let provKey = keys.find(k => k.includes('จังหวัด') && !k.includes('รหัส'));
+                            let regionKey = keys.find(k => k.includes('ภาค') || k.includes('Unnamed')); 
+                            if (provKey && regionKey) {
+                                let pName = String(row[provKey]).trim();
+                                let rName = String(row[regionKey]).trim();
+                                regionMap[pName] = rName;
+                                regionMap[pName.replace(/\s+/g, '')] = rName;
+                            }
+                        });
+                        let bkkRegion = regionMap['กรุงเทพมหานคร'] || 'กรุงเทพมหานคร และปริมณฑล';
+                        regionMap['กทม.'] = bkkRegion;
+                        regionMap['กรุงเทพ'] = bkkRegion;
+                    }
 
                     // ==========================================
                     // Mapping Item Code -> Name / Admin
@@ -935,7 +687,7 @@
                     const description_col = findDescriptionColumn(keys);
                     const itemName_col = findExactColumn(keys, ['รายการ', 'ชื่อรายการ', 'ITEM_NAME', 'COMMODITY_NAME']);
                     let rel_col = findColumn(keys, (base) => base.toUpperCase() === 'REL' || base.toUpperCase().includes('REL'));
-                    let prov_col = findExactColumn(keys, ['จังหวัด', 'เขต/จังหวัด', 'จังหวัด/เขต', 'ชื่อจังหวัด', 'จังหวัด/กลุ่ม']) || findColumn(keys, base => base.includes('จังหวัด') && !base.includes('รหัส')) || findExactColumn(keys, ['รหัสจังหวัด']);
+                    let prov_col = findColumn(keys, (base) => base.includes('จังหวัด'));
                     let loc_col = findColumn(keys, (base) => base.includes('แหล่งจัดเก็บ'));
                     let comp_col = findColumn(keys, (base) => base.includes('ราคาเปรียบเทียบ') || base.includes('เปรียบเทียบ'));
 
@@ -997,12 +749,9 @@
                         let itemName = itemMap[code7] ? itemMap[code7].name : "";
                         let itemAdmin = itemMap[code7] ? itemMap[code7].admin : "";
 
-                        let prov = String(row[prov_col] ?? '').trim();
-                        const provinceEntry = masterGeography.lookup.get(normalizeGeoKey(prov));
-                        const isRegionMapped = !!provinceEntry;
-                        const provinceName = provinceEntry ? provinceEntry.province : prov;
-                        const geoMappingReason = masterGeography.conflicts.has(normalizeGeoKey(prov)) ? 'ข้อมูลจังหวัดใน Master ขัดแย้ง' : (!prov ? 'จังหวัดว่างในข้อมูลหลัก' : 'ไม่พบจังหวัดในชีตรหัสจังหวัด');
-                        let region = provinceEntry ? provinceEntry.region : `ไม่พบข้อมูลภาค (${prov || 'ไม่ระบุจังหวัด'})`;
+                        let prov = String(row[prov_col] || '').trim();
+                        let provClean = prov.replace(/\s+/g, '');
+                        let region = regionMap[provClean] || regionMap[prov] || `ไม่พบข้อมูลภาค (${prov})`;
 
                         let rel = parseFloat(row[rel_col]);
                         let comp_price = comp_col ? parseFloat(row[comp_col]) : NaN;
@@ -1017,18 +766,16 @@
                         }
                         
                         let loc = String(row[loc_col] || '').trim();
-                        let prov_dist = provinceName;
-                        if(provinceName === 'กรุงเทพมหานคร') {
+                        let prov_dist = prov;
+                        if(['กรุงเทพมหานคร', 'กทม.', 'กรุงเทพ'].includes(prov)) {
                             let m1 = loc.match(/\((กลุ่ม.*?)\)/); 
                             let m2 = loc.match(/(กลุ่ม[^\s\(\)]+)/); 
-                            if(provinceEntry?.group) prov_dist = `กทม.${provinceEntry.group}`;
-                            else if(m1) prov_dist = `กทม.${m1[1]}`;
+                            if(m1) prov_dist = `กทม.${m1[1]}`;
                             else if(m2) prov_dist = `กทม.${m2[1]}`;
                             else prov_dist = "กทม.เขตอื่นๆ";
                         }
                         
                         return { isChecked, code7, itemName, itemAdmin, region, rel, comp_price, prev_price, curr_price, status, prov_dist,
-                            isRegionMapped, provinceName, provinceSource: prov, geoMappingReason,
                             code16: c16, rawCode16: row[code16_col],
                             description: description_col ? exactSourceText(row[description_col]) : '',
                             specItemName: itemName || (itemName_col ? exactSourceText(row[itemName_col]) : ''),
@@ -1199,7 +946,7 @@
 
             if(activeGeoData.length > 0) XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(getFormattedData(activeGeoData, true)), sheetName);
             if(task2_data.length > 0) XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(task2_data), "2.Status_Count");
-            appendGeographySheets(wb);
+            if(task3_data.length > 0) XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(task3_data), "3.Prov_Dist_Count");
             
             appendSpecificationSheets(wb);
 
