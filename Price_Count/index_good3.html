@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CPI Analysis Report - V18 Admin Search in All Tabs</title>
+    <title>CPI Analysis Report - V17 Province + Region + Spec Count</title>
     <!-- โหลด Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- โหลด SheetJS -->
@@ -85,23 +85,6 @@
 
 #resultSection > .alert-info > h4 { min-width: 0; overflow-wrap: anywhere; }
 #fileSetLabelDisplay .badge { max-width: 100%; white-space: normal; text-align: left; line-height: 1.45; overflow-wrap: anywhere; }
-
-/* V18: synchronized caretaker filter. Data is filtered before aggregation. */
-.admin-filter-bar { background: #f5f9ff; border: 1px solid #cfdded; border-radius: 10px; padding: 15px 17px; margin: 2px 0 18px; }
-.admin-filter-title { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 6px 12px; margin-bottom: 11px; color: #1f4e78; font-weight: 700; }
-.admin-filter-chip { display: inline-block; padding: 3px 9px; border-radius: 5px; background: #e3edf9; font-size: .77rem; font-weight: 500; }
-.admin-filter-grid { display: grid; grid-template-columns: minmax(180px, 1.2fr) minmax(180px, 1fr) auto; gap: 10px; align-items: end; }
-.admin-filter-grid > div { min-width: 0; }
-.admin-filter-grid label { font-size: .88rem; font-weight: 600; margin-bottom: 6px; }
-.admin-filter-grid .form-control, .admin-filter-grid .form-select { min-height: 40px; }
-.admin-clear { min-height: 40px; white-space: nowrap; }
-.admin-filter-note { font-size: .82rem; line-height: 1.7; color: #51677e; margin-top: 10px; overflow-wrap: anywhere; }
-.admin-filter-note strong { color: #1f4e78; }
-.admin-filter-empty { border-color: #e0bd6e; background: #fffbf1; }
-.admin-filter-empty .admin-filter-note { color: #805813; }
-.admin-filter-bar .form-control:focus, .admin-filter-bar .form-select:focus { border-color: #5a86b9; box-shadow: 0 0 0 .2rem rgba(31,78,120,.12); }
-@media (max-width: 700px) { .admin-filter-grid { grid-template-columns: 1fr 1fr; } .admin-clear { grid-column: 1 / -1; justify-self: start; } }
-@media (max-width: 480px) { .admin-filter-grid { grid-template-columns: 1fr; } .admin-filter-bar { padding: 13px; } .admin-clear { width: 100%; } }
     </style>
 </head>
 <body>
@@ -204,15 +187,6 @@
             
             <div class="tab-content border border-top-0 p-3 bg-white shadow-sm" id="reportTabsContent">
                 <div class="tab-pane fade show active" id="task1" role="tabpanel">
-                    <section class="admin-filter-bar" data-admin-bar aria-label="ตัวกรองผู้ดูแล ใช้ร่วมกันทุกแท็บ">
-                        <div class="admin-filter-title"><span>ค้นหาผู้ดูแล</span><span class="admin-filter-chip">ใช้ร่วมกันทุกแท็บ</span></div>
-                        <div class="admin-filter-grid">
-                            <div><label for="adminSearch_task1" class="form-label">พิมพ์ชื่อผู้ดูแล</label><input id="adminSearch_task1" data-admin-search class="form-control" type="search" autocomplete="off" placeholder="พิมพ์ชื่อเต็มหรือบางส่วนของชื่อ" aria-describedby="adminNote_task1"></div>
-                            <div><label for="adminSelect_task1" class="form-label">หรือเลือกจากรายชื่อ</label><select id="adminSelect_task1" data-admin-select class="form-select" aria-describedby="adminNote_task1"><option value="">ทุกผู้ดูแล</option></select></div>
-                            <button type="button" data-admin-clear class="btn btn-outline-secondary admin-clear" title="ล้างเฉพาะตัวกรองผู้ดูแล ทุกแท็บ">ล้างผู้ดูแล</button>
-                        </div>
-                        <div id="adminNote_task1" data-admin-note class="admin-filter-note" role="status" aria-live="polite">รายชื่อผู้ดูแลอ้างอิงจาก Master ตาม CODE7 • เลือกครั้งเดียวใช้กับทุกแท็บและไฟล์ส่งออก</div>
-                    </section>
                     <div class="d-flex justify-content-between align-items-center mb-2 mt-1">
                         <p class="text-muted mb-0">ตารางแสดงค่า GeoMean</p>
                         <div class="toggle-container form-check form-switch fs-6 mb-0">
@@ -227,29 +201,11 @@
                     </div>
                 </div>
                 <div class="tab-pane fade" id="task2" role="tabpanel">
-                    <section class="admin-filter-bar" data-admin-bar aria-label="ตัวกรองผู้ดูแล ใช้ร่วมกันทุกแท็บ">
-                        <div class="admin-filter-title"><span>ค้นหาผู้ดูแล</span><span class="admin-filter-chip">ใช้ร่วมกันทุกแท็บ</span></div>
-                        <div class="admin-filter-grid">
-                            <div><label for="adminSearch_task2" class="form-label">พิมพ์ชื่อผู้ดูแล</label><input id="adminSearch_task2" data-admin-search class="form-control" type="search" autocomplete="off" placeholder="พิมพ์ชื่อเต็มหรือบางส่วนของชื่อ" aria-describedby="adminNote_task2"></div>
-                            <div><label for="adminSelect_task2" class="form-label">หรือเลือกจากรายชื่อ</label><select id="adminSelect_task2" data-admin-select class="form-select" aria-describedby="adminNote_task2"><option value="">ทุกผู้ดูแล</option></select></div>
-                            <button type="button" data-admin-clear class="btn btn-outline-secondary admin-clear" title="ล้างเฉพาะตัวกรองผู้ดูแล ทุกแท็บ">ล้างผู้ดูแล</button>
-                        </div>
-                        <div id="adminNote_task2" data-admin-note class="admin-filter-note" role="status" aria-live="polite">รายชื่อผู้ดูแลอ้างอิงจาก Master ตาม CODE7 • เลือกครั้งเดียวใช้กับทุกแท็บและไฟล์ส่งออก</div>
-                    </section>
                     <div class="table-responsive border rounded mt-2">
                         <table class="table table-striped table-hover mb-0" id="table2"></table>
                     </div>
                 </div>
                 <div class="tab-pane fade" id="task3" role="tabpanel">
-                    <section class="admin-filter-bar" data-admin-bar aria-label="ตัวกรองผู้ดูแล ใช้ร่วมกันทุกแท็บ">
-                        <div class="admin-filter-title"><span>ค้นหาผู้ดูแล</span><span class="admin-filter-chip">ใช้ร่วมกันทุกแท็บ</span></div>
-                        <div class="admin-filter-grid">
-                            <div><label for="adminSearch_task3" class="form-label">พิมพ์ชื่อผู้ดูแล</label><input id="adminSearch_task3" data-admin-search class="form-control" type="search" autocomplete="off" placeholder="พิมพ์ชื่อเต็มหรือบางส่วนของชื่อ" aria-describedby="adminNote_task3"></div>
-                            <div><label for="adminSelect_task3" class="form-label">หรือเลือกจากรายชื่อ</label><select id="adminSelect_task3" data-admin-select class="form-select" aria-describedby="adminNote_task3"><option value="">ทุกผู้ดูแล</option></select></div>
-                            <button type="button" data-admin-clear class="btn btn-outline-secondary admin-clear" title="ล้างเฉพาะตัวกรองผู้ดูแล ทุกแท็บ">ล้างผู้ดูแล</button>
-                        </div>
-                        <div id="adminNote_task3" data-admin-note class="admin-filter-note" role="status" aria-live="polite">รายชื่อผู้ดูแลอ้างอิงจาก Master ตาม CODE7 • เลือกครั้งเดียวใช้กับทุกแท็บและไฟล์ส่งออก</div>
-                    </section>
                     <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mt-2 mb-3">
                         <div><h4 class="geo-heading mb-1">จำนวนข้อมูล แยกตามเขต/จังหวัด และภาค</h4><div class="geo-meta">ดูรายละเอียดรายพื้นที่ หรือรวมเป็นรายภาคจากแถวข้อมูลต้นทางเดียวกัน</div></div>
                         <span id="geoScopeBadge" class="geo-scope"></span>
@@ -274,18 +230,9 @@
                     <div class="table-responsive border rounded mt-2"><table class="table table-striped table-hover mb-0" id="table3"></table></div>
                     <div id="geoTotals" class="geo-totals mt-3" role="status" aria-live="polite"></div>
                     <div id="geoCountNote" class="geo-meta mt-2"></div>
-                    <details class="mt-2"><summary class="geo-meta text-primary fw-semibold">หลักเกณฑ์การนับรายภาค</summary><div class="geo-meta mt-2">ขึ้น = REL มากกว่า 100 / ลง = REL น้อยกว่า 100 / เท่าเดิม = REL เท่ากับ 100 ตามเกณฑ์เดิม นับเฉพาะแถวที่มี CODE7 และสถานะราคา ไม่ตัดแถวซ้ำตามสเปคหรือร้าน<br>รายภาคเป็นผลรวมจำนวนแถว ไม่ใช่ค่าเฉลี่ยของแต่ละจังหวัด สวิตช์ Checked ด้านบนมีผลกับทุกมิติ ตัวกรองผู้ดูแลใช้ร่วมกันทุกแท็บ ส่วนช่องค้นหารายการ/พื้นที่และตัวกรองภาคในแท็บนี้ใช้เฉพาะแท็บนี้<br>ใช้ชื่อภาคจากชีต “รหัสจังหวัด” ใน Real_Master_CPI ที่นำเข้าโดยตรง ไม่กำหนดจังหวัดเข้าภาคเอง แถวที่จังหวัดว่างหรือจับคู่ภาคไม่ได้ยังคงนับในกลุ่ม “ไม่พบข้อมูลภาค” เพื่อไม่ให้ยอดหาย<br>จำนวนจังหวัดในภาพรวมรายภาคนับชื่อจังหวัดไม่ซ้ำ กลุ่มเขตต่าง ๆ ของกรุงเทพมหานครจึงนับเป็นจังหวัดเดียว และจำนวน CODE7 นับรหัสหมวดไม่ซ้ำภายในภาค<br>ปุ่ม “ส่งออกมุมมองนี้” ยึดตัวกรองที่แสดง ส่วน “ส่งออกทุกมิติพื้นที่” และปุ่ม Excel หลักส่งออกครบทุกภาคภายใต้ผู้ดูแลและสวิตช์ Checked ที่เลือก</div></details>
+                    <details class="mt-2"><summary class="geo-meta text-primary fw-semibold">หลักเกณฑ์การนับรายภาค</summary><div class="geo-meta mt-2">ขึ้น = REL มากกว่า 100 / ลง = REL น้อยกว่า 100 / เท่าเดิม = REL เท่ากับ 100 ตามเกณฑ์เดิม นับเฉพาะแถวที่มี CODE7 และสถานะราคา ไม่ตัดแถวซ้ำตามสเปคหรือร้าน<br>รายภาคเป็นผลรวมจำนวนแถว ไม่ใช่ค่าเฉลี่ยของแต่ละจังหวัด สวิตช์ Checked ด้านบนมีผลกับทุกมิติ ส่วนช่องค้นหาและตัวกรองภาคในแท็บนี้ไม่เปลี่ยนรายงานแท็บอื่น<br>ใช้ชื่อภาคจากชีต “รหัสจังหวัด” ใน Real_Master_CPI ที่นำเข้าโดยตรง ไม่กำหนดจังหวัดเข้าภาคเอง แถวที่จังหวัดว่างหรือจับคู่ภาคไม่ได้ยังคงนับในกลุ่ม “ไม่พบข้อมูลภาค” เพื่อไม่ให้ยอดหาย<br>จำนวนจังหวัดในภาพรวมรายภาคนับชื่อจังหวัดไม่ซ้ำ กลุ่มเขตต่าง ๆ ของกรุงเทพมหานครจึงนับเป็นจังหวัดเดียว และจำนวน CODE7 นับรหัสหมวดไม่ซ้ำภายในภาค<br>ปุ่ม “ส่งออกมุมมองนี้” ยึดตัวกรองที่แสดง ส่วน “ส่งออกทุกมิติพื้นที่” และปุ่ม Excel หลักส่งออกครบทุกภาคภายใต้สวิตช์ Checked ที่เลือก</div></details>
                 </div>
 <div class="tab-pane fade" id="taskSpec" role="tabpanel">
-                    <section class="admin-filter-bar" data-admin-bar aria-label="ตัวกรองผู้ดูแล ใช้ร่วมกันทุกแท็บ">
-                        <div class="admin-filter-title"><span>ค้นหาผู้ดูแล</span><span class="admin-filter-chip">ใช้ร่วมกันทุกแท็บ</span></div>
-                        <div class="admin-filter-grid">
-                            <div><label for="adminSearch_taskSpec" class="form-label">พิมพ์ชื่อผู้ดูแล</label><input id="adminSearch_taskSpec" data-admin-search class="form-control" type="search" autocomplete="off" placeholder="พิมพ์ชื่อเต็มหรือบางส่วนของชื่อ" aria-describedby="adminNote_taskSpec"></div>
-                            <div><label for="adminSelect_taskSpec" class="form-label">หรือเลือกจากรายชื่อ</label><select id="adminSelect_taskSpec" data-admin-select class="form-select" aria-describedby="adminNote_taskSpec"><option value="">ทุกผู้ดูแล</option></select></div>
-                            <button type="button" data-admin-clear class="btn btn-outline-secondary admin-clear" title="ล้างเฉพาะตัวกรองผู้ดูแล ทุกแท็บ">ล้างผู้ดูแล</button>
-                        </div>
-                        <div id="adminNote_taskSpec" data-admin-note class="admin-filter-note" role="status" aria-live="polite">รายชื่อผู้ดูแลอ้างอิงจาก Master ตาม CODE7 • เลือกครั้งเดียวใช้กับทุกแท็บและไฟล์ส่งออก</div>
-                    </section>
                     <div class="d-flex flex-wrap justify-content-between align-items-start gap-3 mt-2">
                         <div>
                             <h4 class="spec-heading mb-2">จำนวนสเปค และสินค้ายอดนิยม</h4>
@@ -311,7 +258,7 @@
                             <div><label for="specSearch" class="form-label">ค้นหา</label><input id="specSearch" class="form-control" type="search" placeholder="รหัสสินค้า / รายการ / คำในสเปค"></div>
                             <div><label for="specTop" class="form-label">อันดับต่อ CODE7</label><select id="specTop" class="form-select"><option value="0">ทุกอันดับ</option><option value="1">Top 1</option><option value="3">Top 3</option><option value="5">Top 5</option><option value="10">Top 10</option><option value="20">Top 20</option><option value="50">Top 50</option></select></div>
                         </div>
-                        <div class="spec-caption mt-3">การเลือก Checked ใช้สวิตช์ “นับจำนวน: เฉพาะตัวที่ Checked” ด้านบนร่วมกับตารางเดิม • ค่าบนการ์ดคำนวณจากผู้ดูแล เงื่อนไขการนับ และพื้นที่ ไม่เปลี่ยนตามช่องค้นหารหัส/สเปค หรือ Top</div>
+                        <div class="spec-caption mt-3">การเลือก Checked ใช้สวิตช์ “นับจำนวน: เฉพาะตัวที่ Checked” ด้านบนร่วมกับตารางเดิม • ค่าบนการ์ดคำนวณจากเงื่อนไขการนับและพื้นที่ ไม่เปลี่ยนตามช่องค้นหา / Top</div>
                     </div>
                     <div id="specWarning" class="alert alert-warning spec-warning" role="status" hidden></div>
                     <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-2">
@@ -326,7 +273,7 @@
                         <div class="d-flex align-items-center gap-2"><label for="specPageSize">แถวต่อหน้า</label><select id="specPageSize" class="form-select form-select-sm" style="width:90px"><option>25</option><option selected>50</option><option>100</option><option>200</option></select><span id="specPageInfo"></span></div>
                         <div class="d-flex align-items-center gap-2"><button id="specPrev" type="button" class="btn btn-outline-secondary btn-sm">ก่อนหน้า</button><span id="specPageLabel"></span><button id="specNext" type="button" class="btn btn-outline-secondary btn-sm">ถัดไป</button></div>
                     </div>
-                    <p class="spec-caption mt-3 mb-2">ไฟล์ <b>สินค้านิยม.xlsx</b> ส่งออกทุก CODE7 และทุกอันดับของผู้ดูแลที่เลือก ตามเงื่อนไขการนับ / พื้นที่ โดยไม่ตัดตามช่องค้นหารหัส/สเปคและ Top ส่วนปุ่ม “ส่งออกตารางตามตัวกรอง” ส่งออกผลที่กรองครบทุกหน้า</p>
+                    <p class="spec-caption mt-3 mb-2">ไฟล์ <b>สินค้านิยม.xlsx</b> ส่งออกทุก CODE7 และทุกอันดับตามเงื่อนไขการนับ / พื้นที่ โดยไม่ตัดตามช่องค้นหาและ Top ส่วนปุ่ม “ส่งออกตารางตามตัวกรอง” ส่งออกผลที่กรองครบทุกหน้า</p>
                     <details class="mt-3"><summary class="text-primary fw-semibold">หลักเกณฑ์การนับและคอลัมน์ที่ใช้</summary><div id="specMapping" class="spec-mapping mt-2"></div><div class="spec-mapping mt-2">นับหนึ่งครั้งต่อแถว ไม่ตัดแถวซ้ำตามร้าน และไม่ใช้ REL เป็นเงื่อนไข เมื่อจำนวนเท่ากันเรียงรหัสสินค้าจากน้อยไปมาก แล้วให้ Rank ต่อเนื่อง 1, 2, 3… ภายใน CODE7
 คำอธิบายใช้ข้อความเดิมจากไฟล์ หากรหัสเดียวมีหลายคำอธิบาย เลือกข้อความที่พบมากที่สุด (เท่ากันใช้ข้อความที่พบก่อน) และแสดงคำเตือน ไม่รวมรหัสคนละตัวเพียงเพราะคำอธิบายเหมือนกัน
 รหัสที่มีอักขระอื่นแต่ครบ 16 ตัว เช่น รหัสที่ลงท้ายด้วยตัวอักษร จะนับตามต้นทางและแจ้งเตือน ไม่แก้รหัสเอง ส่วนรหัสไม่ครบ 16 ตัว มีช่องว่างภายใน หรือเป็นตัวเลขที่อาจสูญเสียความแม่นยำ จะไม่นำมานับ</div></details>
@@ -351,12 +298,6 @@
         const GEO_UNKNOWN_REGION = 'ไม่พบข้อมูลภาค';
         const GEO_UNKNOWN_PROVINCE = 'ไม่ระบุจังหวัด/เขต';
         const geoNumber = new Intl.NumberFormat('th-TH');
-        const ADMIN_UNASSIGNED = '__CPI_ADMIN_UNASSIGNED__';
-        const ADMIN_MISSING_LABEL = 'ไม่ระบุผู้ดูแล';
-        let adminFilter = { query: '', selected: '' };
-        let adminChoices = [];
-        let adminScopedData = [];
-
 
         function geometricMean(arr) {
             if(arr.length === 0) return 0;
@@ -601,198 +542,6 @@
             });
         }
 
-
-        // Caretaker names come only from the existing CODE7 -> itemAdmin mapping.
-        // Normalize search keys only; do not change source labels or export columns.
-        function adminName(value) { return cleanHeader(value); }
-        function adminSearchKey(value) {
-            return adminName(value).normalize('NFC').replace(/[\u200B-\u200D\uFEFF]/g, '').toLocaleLowerCase('th');
-        }
-        function adminChoiceKey(value) {
-            const name = adminName(value);
-            return name ? 'name:' + name : ADMIN_UNASSIGNED;
-        }
-        function adminMatches(row) {
-            const name = adminName(row.itemAdmin);
-            if (adminFilter.selected && adminChoiceKey(name) !== adminFilter.selected) return false;
-            const query = adminSearchKey(adminFilter.query);
-            return !query || adminSearchKey(name || ADMIN_MISSING_LABEL).includes(query);
-        }
-        function adminFilterActive() { return !!(adminFilter.selected || adminSearchKey(adminFilter.query)); }
-        function adminScopeLabel() {
-            if (adminFilter.selected === ADMIN_UNASSIGNED) return ADMIN_MISSING_LABEL;
-            if (adminFilter.selected) return adminFilter.selected.slice(5);
-            return adminSearchKey(adminFilter.query) ? `ค้นหา “${adminFilter.query.trim()}”` : 'ทุกผู้ดูแล';
-        }
-        function adminExportSuffix() {
-            if (!adminFilterActive()) return '';
-            return '_ผู้ดูแล_' + adminScopeLabel().replace(/[\\/:*?"<>|\x00-\x1F]/g, '_').replace(/\s+/g, '_').slice(0, 60);
-        }
-        function stampAdminWorkbook(workbook) {
-            workbook.Props = { ...(workbook.Props || {}), Subject: 'ผู้ดูแล: ' + adminScopeLabel(),
-                Comments: 'กรองผู้ดูแลจาก Master ตาม CODE7 ก่อนคำนวณทุกตาราง; ผู้ดูแล: ' + adminScopeLabel() };
-        }
-        function initializeAdminFilters() {
-            adminFilter = { query: '', selected: '' };
-            adminScopedData = processedData;
-            const names = new Map();
-            for (const row of processedData) {
-                const name = adminName(row.itemAdmin), key = adminChoiceKey(name);
-                if (!names.has(key)) names.set(key, { key, name: name || ADMIN_MISSING_LABEL });
-            }
-            adminChoices = Array.from(names.values()).sort((a, b) =>
-                a.key === ADMIN_UNASSIGNED ? 1 : b.key === ADMIN_UNASSIGNED ? -1 : a.name.localeCompare(b.name, 'th'));
-            syncAdminControls();
-        }
-        function syncAdminControls() {
-            const query = adminSearchKey(adminFilter.query);
-            const choices = adminChoices.filter(choice => !query || adminSearchKey(choice.name).includes(query));
-            document.querySelectorAll('[data-admin-search]').forEach(input => {
-                if (input.value !== adminFilter.query) input.value = adminFilter.query;
-            });
-            document.querySelectorAll('[data-admin-select]').forEach(select => {
-                select.replaceChildren(new Option(query ? `ทุกชื่อที่ค้นพบ (${choices.length})` : 'ทุกผู้ดูแล', ''));
-                for (const choice of choices) select.add(new Option(choice.name, choice.key));
-                select.value = adminFilter.selected;
-            });
-            document.querySelectorAll('[data-admin-clear]').forEach(button => button.disabled = !adminFilterActive());
-            updateAdminScopeNotes();
-        }
-        function updateAdminScopeNotes() {
-            const people = new Set(adminScopedData.map(row => adminChoiceKey(row.itemAdmin)));
-            const codes = new Set(adminScopedData.map(row => row.code7).filter(Boolean));
-            const unknown = adminScopedData.filter(row => !adminName(row.itemAdmin)).length;
-            const state = !processedData.length ? 'ยังไม่มีข้อมูลที่ประมวลผล'
-                : !adminScopedData.length ? 'ไม่พบข้อมูลของผู้ดูแลตามเงื่อนไขนี้ — ล้างผู้ดูแลเพื่อกลับไปดูทั้งหมด'
-                : `${geoNumber.format(people.size)} กลุ่มผู้ดูแล · ${geoNumber.format(codes.size)} CODE7 · ${geoNumber.format(adminScopedData.length)} แถวต้นทาง${unknown ? ` (ไม่ระบุผู้ดูแล ${geoNumber.format(unknown)} แถว)` : ''}`;
-            document.querySelectorAll('[data-admin-note]').forEach(note => {
-                note.replaceChildren();
-                const label = document.createElement('strong'); label.textContent = `ผู้ดูแล: ${adminScopeLabel()} — `;
-                note.appendChild(label); note.appendChild(document.createTextNode(state));
-                const detail = document.createElement('div');
-                detail.textContent = 'กรองก่อนคำนวณทุกแท็บและไฟล์ส่งออก • จำนวนแถวต้นทางยังไม่กรอง Checked / ราคา / พื้นที่ • ชื่อจาก Master ตาม CODE7';
-                note.appendChild(detail);
-            });
-            document.querySelectorAll('[data-admin-bar]').forEach(bar => bar.classList.toggle('admin-filter-empty', !!processedData.length && !adminScopedData.length));
-        }
-        function applyAdminFilters() {
-            // Synchronous refresh prevents an export from using a stale caretaking scope.
-            adminScopedData = adminFilterActive() ? processedData.filter(adminMatches) : processedData;
-            syncAdminControls();
-            rebuildGeoMeanData(adminScopedData);
-            updateGeoMeanView();
-            updateCountViews();
-        }
-        function setAdminQuery(value) {
-            adminFilter = { query: value, selected: '' };
-            applyAdminFilters();
-        }
-        function setupAdminFilterEvents() {
-            document.querySelectorAll('[data-admin-search]').forEach(input => {
-                input.addEventListener('input', event => { if (!event.isComposing) setAdminQuery(input.value); });
-                input.addEventListener('compositionend', () => setAdminQuery(input.value));
-                input.addEventListener('keydown', event => {
-                    if (event.key === 'Escape') { event.preventDefault(); adminFilter = { query: '', selected: '' }; applyAdminFilters(); }
-                });
-            });
-            document.querySelectorAll('[data-admin-select]').forEach(select => select.addEventListener('change', () => {
-                adminFilter = { query: '', selected: select.value };
-                applyAdminFilters();
-            }));
-            document.querySelectorAll('[data-admin-clear]').forEach(button => button.addEventListener('click', () => {
-                adminFilter = { query: '', selected: '' };
-                applyAdminFilters();
-            }));
-        }
-
-        function rebuildGeoMeanData(rows) {
-            // Task 1: GeoMean ภาพรวม (Overall) - เสมอต้อง isChecked เท่านั้น
-            let task1_map = {};
-            rows.forEach(p => {
-                if(p.isChecked) {
-                    if(!task1_map[p.code7]) task1_map[p.code7] = { name: p.itemName, admin: p.itemAdmin, comp: [], prev: [], curr: [], rel: [] };
-                    if(!isNaN(p.comp_price) && p.comp_price > 0) task1_map[p.code7].comp.push(p.comp_price);
-                    if(!isNaN(p.prev_price) && p.prev_price > 0) task1_map[p.code7].prev.push(p.prev_price);
-                    if(!isNaN(p.curr_price) && p.curr_price > 0) task1_map[p.code7].curr.push(p.curr_price);
-                    if(!isNaN(p.rel) && p.rel > 0) task1_map[p.code7].rel.push(p.rel);
-                }
-            });
-
-            task1_data = Object.keys(task1_map).map(k => {
-                let rcp = geometricMean(task1_map[k].comp);
-                let rp = geometricMean(task1_map[k].prev);
-                let rc = geometricMean(task1_map[k].curr);
-                let rr = geometricMean(task1_map[k].rel);
-
-                if(currentDataMode === 'WEEKLY') {
-                    return {
-                        'ผู้ดูแล': task1_map[k].admin,
-                        'CODE7': k,
-                        'รายการ': task1_map[k].name,
-                        'ราคาเฉลี่ย': rc || 0,
-                        'ราคาเปรียบเทียบ': rcp || 0,
-                        'REL': rr || 0,
-                        'ราคาเดือนที่แล้ว': rp || 0
-                    };
-                }
-
-                return { 
-                    'ผู้ดูแล': task1_map[k].admin, 
-                    'CODE7': k, 
-                    'รายการ': task1_map[k].name, 
-                    'ราคาปัจจุบัน': rc || 0, 
-                    'ราคาเปรียบเทียบ': rcp || 0,
-                    'REL': rr || 0,
-                    'ราคาเดือนที่แล้ว': rp || 0 
-                };
-            }).sort((a,b) => a.CODE7.localeCompare(b.CODE7));
-
-            // Task 4: GeoMean รายภาค (Region) - เสมอต้อง isChecked เท่านั้น
-            let task4_map = {};
-            rows.forEach(p => {
-                if(p.isChecked) {
-                    let key = p.code7 + "|||" + p.region;
-                    if(!task4_map[key]) task4_map[key] = { code7: p.code7, name: p.itemName, admin: p.itemAdmin, region: p.region, comp: [], prev: [], curr: [], rel: [] };
-                    if(!isNaN(p.comp_price) && p.comp_price > 0) task4_map[key].comp.push(p.comp_price);
-                    if(!isNaN(p.prev_price) && p.prev_price > 0) task4_map[key].prev.push(p.prev_price);
-                    if(!isNaN(p.curr_price) && p.curr_price > 0) task4_map[key].curr.push(p.curr_price);
-                    if(!isNaN(p.rel) && p.rel > 0) task4_map[key].rel.push(p.rel);
-                }
-            });
-
-            task4_data = Object.values(task4_map).map(v => {
-                let rcp = geometricMean(v.comp);
-                let rp = geometricMean(v.prev);
-                let rc = geometricMean(v.curr);
-                let rr = geometricMean(v.rel);
-
-                if(currentDataMode === 'WEEKLY') {
-                    return {
-                        'ผู้ดูแล': v.admin,
-                        'CODE7': v.code7,
-                        'รายการ': v.name,
-                        'ภาค': v.region,
-                        'ราคาเฉลี่ย': rc || 0,
-                        'ราคาเปรียบเทียบ': rcp || 0,
-                        'REL': rr || 0,
-                        'ราคาเดือนที่แล้ว': rp || 0
-                    };
-                }
-
-                return { 
-                    'ผู้ดูแล': v.admin, 
-                    'CODE7': v.code7, 
-                    'รายการ': v.name, 
-                    'ภาค': v.region, 
-                    'ราคาปัจจุบัน': rc || 0, 
-                    'ราคาเปรียบเทียบ': rcp || 0,
-                    'REL': rr || 0, 
-                    'ราคาเดือนที่แล้ว': rp || 0
-                };
-            }).sort((a,b) => a.CODE7.localeCompare(b.CODE7) || a.ภาค.localeCompare(b.ภาค));
-
-        }
-
         function updateGeoMeanView() {
             let isRegion = document.getElementById('regionToggle').checked;
             let label = document.getElementById('regionToggleLabel');
@@ -934,8 +683,7 @@
             const regions = Array.from(new Set(task3_region_data.map(row => row['ภาค']))).sort(compareGeoRegions);
             select.replaceChildren(new Option('ทุกภาคในไฟล์', ''));
             regions.forEach(region => select.add(new Option(region, region)));
-            if (previous && !regions.includes(previous)) select.add(new Option(previous + ' — ไม่พบข้อมูลในขอบเขตนี้', previous));
-            select.value = previous;
+            select.value = regions.includes(previous) ? previous : '';
         }
         function filteredGeographyData() {
             const region = document.getElementById('geoRegionFilter').value;
@@ -971,7 +719,7 @@
                 const span = document.createElement('span'); span.textContent = key;
                 const strong = document.createElement('strong'); strong.textContent = geoNumber.format(value); span.appendChild(strong); footer.appendChild(span);
             }
-            document.getElementById('geoCountNote').textContent = `ฐานการนับของผู้ดูแลที่เลือก ก่อนกรองภาค/ค้นหาพื้นที่: ${geoNumber.format(geoStats.eligible)} แถวที่มี CODE7 และสถานะราคา • อีก ${geoNumber.format(geoStats.excluded)} แถวไม่มี CODE7 หรือไม่มีสถานะราคา จึงไม่อยู่ในตารางขึ้น/ลง/เท่าเดิม • จำนวนจังหวัดนับเฉพาะจังหวัดที่จับคู่กับ Master ได้`;
+            document.getElementById('geoCountNote').textContent = `ฐานการนับก่อนกรองภาค/ค้นหา: ${geoNumber.format(geoStats.eligible)} แถวที่มี CODE7 และสถานะราคา • อีก ${geoNumber.format(geoStats.excluded)} แถวไม่มี CODE7 หรือไม่มีสถานะราคา จึงไม่อยู่ในตารางขึ้น/ลง/เท่าเดิม • จำนวนจังหวัดนับเฉพาะจังหวัดที่จับคู่กับ Master ได้`;
             document.getElementById('exportGeoBtn').disabled = !rows.length;
             document.getElementById('exportGeoAllBtn').disabled = !task3_data.length;
         }
@@ -1011,14 +759,13 @@
             if (allDimensions) appendGeographySheets(workbook);
             else XLSX.utils.book_append_sheet(workbook, geographyWorksheet(rows), view.sheet);
             const scope = document.getElementById('countToggle').checked ? 'Checked' : 'All';
-            const filename = `CPI_Area_Counts_${allDimensions ? 'All_Dimensions' : geographyView()}_${scope}${adminExportSuffix()}.xlsx`;
-            stampAdminWorkbook(workbook);
+            const filename = `CPI_Area_Counts_${allDimensions ? 'All_Dimensions' : geographyView()}_${scope}.xlsx`;
             XLSX.writeFile(workbook, filename);
         }
 
         function updateCountViews() {
             let onlyChecked = document.getElementById('countToggle').checked;
-            let dataToCount = onlyChecked ? adminScopedData.filter(p => p.isChecked) : adminScopedData;
+            let dataToCount = onlyChecked ? processedData.filter(p => p.isChecked) : processedData;
 
             let task2_map = {};
             dataToCount.forEach(p => {
@@ -1046,7 +793,6 @@
             refreshGeographyRegions();
             updateGeographyView();
             updateSpecificationViews();
-            document.getElementById('exportBtn').disabled = !task1_data.length && !task4_data.length && !task2_data.length && !task3_data.length && !specReport.length;
         }
 
         document.querySelectorAll('input[name="geoView"]').forEach(input => input.addEventListener('change', updateGeographyView));
@@ -1059,16 +805,16 @@
             if (!geoReviewRows.length) return;
             const workbook = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(workbook, geographyWorksheet(geoReviewRows), 'จังหวัดที่จับคู่ไม่ได้');
-            stampAdminWorkbook(workbook); XLSX.writeFile(workbook, `ตรวจสอบการจับคู่จังหวัด_ภาค${adminExportSuffix()}.xlsx`);
+            XLSX.writeFile(workbook, 'ตรวจสอบการจับคู่จังหวัด_ภาค.xlsx');
         });
 
         // Add Events
         document.getElementById('decimalToggle').addEventListener('change', () => {
-            updateGeoMeanView();
+            if(task1_data.length > 0 || task4_data.length > 0) updateGeoMeanView();
         });
 
         document.getElementById('regionToggle').addEventListener('change', () => {
-            updateGeoMeanView();
+            if(task1_data.length > 0 || task4_data.length > 0) updateGeoMeanView();
         });
 
         document.getElementById('countToggle').addEventListener('change', () => {
@@ -1291,10 +1037,97 @@
                         };
                     });
                     
-                    // Reset shared caretaker scope for this newly imported data set.
-                    initializeAdminFilters();
+                    // Task 1: GeoMean ภาพรวม (Overall) - เสมอต้อง isChecked เท่านั้น
+                    let task1_map = {};
+                    processedData.forEach(p => {
+                        if(p.isChecked) {
+                            if(!task1_map[p.code7]) task1_map[p.code7] = { name: p.itemName, admin: p.itemAdmin, comp: [], prev: [], curr: [], rel: [] };
+                            if(!isNaN(p.comp_price) && p.comp_price > 0) task1_map[p.code7].comp.push(p.comp_price);
+                            if(!isNaN(p.prev_price) && p.prev_price > 0) task1_map[p.code7].prev.push(p.prev_price);
+                            if(!isNaN(p.curr_price) && p.curr_price > 0) task1_map[p.code7].curr.push(p.curr_price);
+                            if(!isNaN(p.rel) && p.rel > 0) task1_map[p.code7].rel.push(p.rel);
+                        }
+                    });
+                    
+                    task1_data = Object.keys(task1_map).map(k => {
+                        let rcp = geometricMean(task1_map[k].comp);
+                        let rp = geometricMean(task1_map[k].prev);
+                        let rc = geometricMean(task1_map[k].curr);
+                        let rr = geometricMean(task1_map[k].rel);
+
+                        if(dataMode === 'WEEKLY') {
+                            return {
+                                'ผู้ดูแล': task1_map[k].admin,
+                                'CODE7': k,
+                                'รายการ': task1_map[k].name,
+                                'ราคาเฉลี่ย': rc || 0,
+                                'ราคาเปรียบเทียบ': rcp || 0,
+                                'REL': rr || 0,
+                                'ราคาเดือนที่แล้ว': rp || 0
+                            };
+                        }
+
+                        return { 
+                            'ผู้ดูแล': task1_map[k].admin, 
+                            'CODE7': k, 
+                            'รายการ': task1_map[k].name, 
+                            'ราคาปัจจุบัน': rc || 0, 
+                            'ราคาเปรียบเทียบ': rcp || 0,
+                            'REL': rr || 0,
+                            'ราคาเดือนที่แล้ว': rp || 0 
+                        };
+                    }).sort((a,b) => a.CODE7.localeCompare(b.CODE7));
+
+                    // Task 4: GeoMean รายภาค (Region) - เสมอต้อง isChecked เท่านั้น
+                    let task4_map = {};
+                    processedData.forEach(p => {
+                        if(p.isChecked) {
+                            let key = p.code7 + "|||" + p.region;
+                            if(!task4_map[key]) task4_map[key] = { code7: p.code7, name: p.itemName, admin: p.itemAdmin, region: p.region, comp: [], prev: [], curr: [], rel: [] };
+                            if(!isNaN(p.comp_price) && p.comp_price > 0) task4_map[key].comp.push(p.comp_price);
+                            if(!isNaN(p.prev_price) && p.prev_price > 0) task4_map[key].prev.push(p.prev_price);
+                            if(!isNaN(p.curr_price) && p.curr_price > 0) task4_map[key].curr.push(p.curr_price);
+                            if(!isNaN(p.rel) && p.rel > 0) task4_map[key].rel.push(p.rel);
+                        }
+                    });
+
+                    task4_data = Object.values(task4_map).map(v => {
+                        let rcp = geometricMean(v.comp);
+                        let rp = geometricMean(v.prev);
+                        let rc = geometricMean(v.curr);
+                        let rr = geometricMean(v.rel);
+
+                        if(dataMode === 'WEEKLY') {
+                            return {
+                                'ผู้ดูแล': v.admin,
+                                'CODE7': v.code7,
+                                'รายการ': v.name,
+                                'ภาค': v.region,
+                                'ราคาเฉลี่ย': rc || 0,
+                                'ราคาเปรียบเทียบ': rcp || 0,
+                                'REL': rr || 0,
+                                'ราคาเดือนที่แล้ว': rp || 0
+                            };
+                        }
+
+                        return { 
+                            'ผู้ดูแล': v.admin, 
+                            'CODE7': v.code7, 
+                            'รายการ': v.name, 
+                            'ภาค': v.region, 
+                            'ราคาปัจจุบัน': rc || 0, 
+                            'ราคาเปรียบเทียบ': rcp || 0,
+                            'REL': rr || 0, 
+                            'ราคาเดือนที่แล้ว': rp || 0
+                        };
+                    }).sort((a,b) => a.CODE7.localeCompare(b.CODE7) || a.ภาค.localeCompare(b.ภาค));
+
+                    // Render View GeoMean
+                    updateGeoMeanView(); 
+
+                    // Render count tables and the new specification report.
                     resetSpecificationControls();
-                    applyAdminFilters();
+                    updateCountViews();
 
                     document.getElementById('loading').style.display = 'none';
                     document.getElementById('resultSection').style.display = 'block';
@@ -1373,8 +1206,7 @@
             // ใช้ชื่อไฟล์ที่อิงตามชุดข้อมูล
             let cleanFileLabel = currentFileSetLabel.replace(/\s+/g, '_');
             let modeFileLabel = currentDataMode === 'WEEKLY' ? 'Weekly' : 'Monthly';
-            let filename = `CPI_Analysis_Report_${cleanFileLabel}_${modeFileLabel}${adminExportSuffix()}.xlsx`;
-            stampAdminWorkbook(wb);
+            let filename = `CPI_Analysis_Report_${cleanFileLabel}_${modeFileLabel}.xlsx`;
             XLSX.writeFile(wb, filename);
         });
 
@@ -1497,7 +1329,7 @@
             const onlyChecked = document.getElementById('countToggle').checked;
             const pricedOnly = document.getElementById('specPriceMode').value === 'priced';
             const region = document.getElementById('specRegion').value;
-            const rows = adminScopedData.filter(p => (!onlyChecked || p.isChecked) && (!pricedOnly || p.hasCurrentPrice) && (!region || p.region === region));
+            const rows = processedData.filter(p => (!onlyChecked || p.isChecked) && (!pricedOnly || p.hasCurrentPrice) && (!region || p.region === region));
             const result = aggregateSpecifications(rows);
             specReport = result.report;
             specSummary = result.summary;
@@ -1525,8 +1357,7 @@
             const selected = select.value;
             select.replaceChildren(new Option('ทั้งหมด', ''));
             specSummary.forEach(s => select.add(new Option(`${s.CODE7} — ${s['รายการ'] || '(ไม่พบชื่อรายการ)'} (${specNumber.format(s['จำนวนสเปค'])} สเปค)`, s.CODE7)));
-            if (selected && !specSummary.some(s => s.CODE7 === selected)) select.add(new Option(selected + ' — ไม่พบข้อมูลในขอบเขตนี้', selected));
-            select.value = selected;
+            if (specSummary.some(s => s.CODE7 === selected)) select.value = selected;
             specPage = 1;
             document.getElementById('specExportStatus').textContent = '';
             renderSpecificationTable();
@@ -1616,16 +1447,11 @@
         function specXmlText(value) {
             return exactSourceText(value).replace(/_x([0-9A-Fa-f]{4})_/g,'_x005F_x$1_').replace(/[\x00-\x08\x0B\x0C\x0E-\x1F]/g,c=>`_x${c.charCodeAt(0).toString(16).toUpperCase().padStart(4,'0')}_`).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\r/g,'&#13;');
         }
-        async function createPopularWorkbook(rows, caretakerScope = adminScopeLabel()) {
+        async function createPopularWorkbook(rows) {
             if (rows.length > 1048575) throw new Error('จำนวนสเปคเกินจำนวนแถวสูงสุดของหนึ่งชีต Excel');
             const template=SPEC_EXPORT_TEMPLATE, lastRow=rows.length+1;
             const files={};
             for (const [name,xml] of Object.entries(template.files)) files[name]=xml.replaceAll('__LASTROW__',String(lastRow));
-            if (files['docProps/core.xml']) {
-                let core = files['docProps/core.xml'].replace(/<dc:description\b[^>]*>[\s\S]*?<\/dc:description>/g, '');
-                core = core.replace('</cp:coreProperties>', `<dc:description xmlns:dc="http://purl.org/dc/elements/1.1/">${specXmlText('ผู้ดูแล: ' + caretakerScope + ' | กรองจาก Master ตาม CODE7 ก่อนนับจำนวนสเปค')}</dc:description></cp:coreProperties>`);
-                files['docProps/core.xml'] = core;
-            }
             const xmlRows=[template.header];
             rows.forEach((row,i)=>{
                 const r=i+2, last=!rows[i+1] || rows[i+1].CODE7!==row.CODE7;
@@ -1649,19 +1475,19 @@
             if (filtered && document.getElementById('specView').value==='summary') {
                 const wb=XLSX.utils.book_new();const ws=XLSX.utils.json_to_sheet(rows,{header:SPEC_SUMMARY_COLUMNS});
                 ws['!cols']=[{wch:12},{wch:28},{wch:16},{wch:16},{wch:22},{wch:24}];ws['!autofilter']={ref:ws['!ref']};
-                XLSX.utils.book_append_sheet(wb,ws,'สรุปจำนวนสเปค');stampAdminWorkbook(wb);XLSX.writeFile(wb,`สรุปจำนวนสเปค_ตามตัวกรอง${adminExportSuffix()}.xlsx`);return;
+                XLSX.utils.book_append_sheet(wb,ws,'สรุปจำนวนสเปค');XLSX.writeFile(wb,'สรุปจำนวนสเปค_ตามตัวกรอง.xlsx');return;
             }
             const button=document.getElementById(filtered?'exportSpecFilteredBtn':'exportPopularBtn');
             const oldText=button.textContent;button.disabled=true;button.textContent='กำลังสร้าง Excel…';
             try {
                 // Freeze a snapshot so an intervening UI change cannot alter this export.
-                const snapshot=rows.map(r=>({...r})), caretakerScope=adminScopeLabel();
-                const blob=await createPopularWorkbook(snapshot, caretakerScope);
+                const snapshot=rows.map(r=>({...r}));
+                const blob=await createPopularWorkbook(snapshot);
                 const filename=filtered?'สินค้านิยม_ตามตัวกรอง.xlsx':'สินค้านิยม.xlsx';
                 downloadSpecificationBlob(blob,filename);
-                document.getElementById('specExportStatus').textContent=`ส่งออก ${filename} แล้ว • ${specNumber.format(snapshot.length)} สเปค • ${specNumber.format(snapshot.reduce((n,r)=>n+r['จำนวนสินค้า'],0))} ข้อมูล • ${filtered?'ตามตัวกรองครบทุกหน้า':'ทุก CODE7 / ทุกอันดับในขอบเขตการนับที่เลือก'} • ผู้ดูแล: ${caretakerScope}`;
+                document.getElementById('specExportStatus').textContent=`ส่งออก ${filename} แล้ว • ${specNumber.format(snapshot.length)} สเปค • ${specNumber.format(snapshot.reduce((n,r)=>n+r['จำนวนสินค้า'],0))} ข้อมูล • ${filtered?'ตามตัวกรองครบทุกหน้า':'ทุก CODE7 / ทุกอันดับในขอบเขตการนับที่เลือก'}`;
             } catch(error) { console.error(error);alert('ส่งออกไม่สำเร็จ: '+error.message); }
-            finally {button.textContent=oldText;button.disabled=filtered ? !filteredSpecificationData().length : !specReport.length;}
+            finally {button.textContent=oldText;button.disabled=false;}
         }
         function appendSpecificationSheets(wb) {
             if (specReport.length) {
@@ -1688,10 +1514,8 @@
             if(!specReviewRows.length)return;
             const wb=XLSX.utils.book_new(),sheet=XLSX.utils.json_to_sheet(specReviewRows);
             sheet['!cols']=[{wch:12},{wch:12},{wch:23},{wch:70},{wch:80}];sheet['!autofilter']={ref:sheet['!ref']};
-            XLSX.utils.book_append_sheet(wb,sheet,'ตรวจสอบสเปค');stampAdminWorkbook(wb);XLSX.writeFile(wb,`ตรวจสอบข้อมูลสเปค${adminExportSuffix()}.xlsx`);
+            XLSX.utils.book_append_sheet(wb,sheet,'ตรวจสอบสเปค');XLSX.writeFile(wb,'ตรวจสอบข้อมูลสเปค.xlsx');
         });
-        setupAdminFilterEvents();
-        initializeAdminFilters();
     </script>
 </body>
 </html>
