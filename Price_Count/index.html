@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CPI Analysis Report (Web App) - V15 Monthly + Weekly</title>
+    <title>CPI Analysis Report - V16 Monthly + Weekly + Spec Count</title>
     <!-- โหลด Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- โหลด SheetJS -->
@@ -24,12 +24,50 @@
         .form-check-input { cursor: pointer; }
         .form-check-label { cursor: pointer; user-select: none; }
         .toggle-container { background: #e9ecef; padding: 10px 15px; border-radius: 8px; display: inline-block; }
+    /* V16: specification counting, additive to the original report */
+#taskSpec { --spec-blue: #1f4e78; }
+.spec-heading { color: var(--spec-blue); font-size: 1.35rem; font-weight: 700; }
+.spec-intro { color: #586572; line-height: 1.75; max-width: 1000px; }
+.spec-metrics { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin: 18px 0; }
+.spec-metric { border: 1px solid #dce5ee; border-radius: 10px; padding: 16px 18px; background: #f8fbff; }
+.spec-metric span { display: block; color: #526170; font-size: .88rem; }
+.spec-metric strong { display: block; font-size: 1.85rem; color: #1f4e78; font-variant-numeric: tabular-nums; margin: 2px 0; }
+.spec-metric small { color: #728091; font-size: .77rem; }
+.spec-controls { background: #f7f9fc; border: 1px solid #dce5ee; border-radius: 10px; padding: 16px; }
+.spec-filter-grid { display: grid; grid-template-columns: 1.2fr 1fr 1.4fr .65fr; gap: 12px; }
+.spec-filter-grid label, .spec-controls label { font-weight: 600; font-size: .9rem; }
+.spec-mapping { font-size: .82rem; color: #586572; white-space: pre-wrap; line-height: 1.7; }
+.spec-warning { white-space: pre-wrap; line-height: 1.65; }
+.spec-table-wrap { max-height: 650px; }
+#specTable th, #specSummaryTable th { background: #1f4e78 !important; }
+#specTable td, #specSummaryTable td { padding: 10px 12px; vertical-align: middle; }
+#specTable td.spec-description { white-space: pre-wrap; overflow-wrap: anywhere; min-width: 320px; max-width: 660px; }
+#specTable td.spec-code, #specSummaryTable td.spec-code { font-family: Consolas, 'Courier New', monospace; font-size: .91rem; letter-spacing: .02em; }
+#specTable tr.spec-top td { background: #eaf6ed; }
+#specTable tr.spec-group-end td { border-bottom: 2px solid #708397; }
+.spec-rank { display: inline-block; min-width: 28px; text-align: center; font-weight: 700; }
+.spec-rank.top { background: #d0ead7; color: #225c34; border-radius: 5px; padding: 2px 7px; }
+.spec-empty { color: #6c757d; text-align: center; padding: 30px !important; }
+.spec-footer { font-size: .86rem; color: #586572; }
+.spec-export-main { background: #1f4e78; border-color: #1f4e78; color: #fff; }
+.spec-export-main:hover { background: #163b5c; border-color: #163b5c; color: #fff; }
+.spec-caption { font-size: .83rem; color: #647383; }
+@media (max-width: 900px) { .spec-filter-grid { grid-template-columns: 1fr 1fr; } .spec-metrics { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 520px) { .spec-filter-grid { grid-template-columns: 1fr; } .spec-metrics { gap: 8px; } .spec-metric { padding: 12px; } .spec-metric strong { font-size: 1.45rem; } }@media (max-width: 576px) {
+    body { padding: 10px; }
+    #resultSection { padding: 12px !important; }
+    #reportTabsContent { padding: 10px !important; }
+    #taskSpec .spec-controls > .d-flex > div { min-width: 0 !important; width: 100%; flex: 1 1 100% !important; }
+    #taskSpec .spec-metric strong { font-size: 1.5rem; }
+    #taskSpec .spec-heading { font-size: 1.2rem; }
+}
+
     </style>
 </head>
 <body>
     <div class="container-fluid mt-3">
         <h2 class="text-center mb-4 header-title">
-            ราคาเฉลี่ย และ จำนวนข้อมูล (สำหรับ23AI)
+            ราคาเฉลี่ย จำนวนข้อมูล และจำนวนสเปค (สำหรับ23AI)
         </h2>
         
         <div class="card p-4 mx-auto" style="max-width: 900px;">
@@ -121,6 +159,7 @@
                 <li class="nav-item" role="presentation">
                     <button class="nav-link" data-bs-toggle="tab" data-bs-target="#task3" type="button" role="tab">3. แยกตามเขต/จังหวัด</button>
                 </li>
+                <li class="nav-item" role="presentation"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#taskSpec" type="button" role="tab">4. จำนวนสเปค / สินค้ายอดนิยม</button></li>
             </ul>
             
             <div class="tab-content border border-top-0 p-3 bg-white shadow-sm" id="reportTabsContent">
@@ -147,6 +186,53 @@
                     <div class="table-responsive border rounded mt-2">
                         <table class="table table-striped table-hover mb-0" id="table3"></table>
                     </div>
+                </div>
+<div class="tab-pane fade" id="taskSpec" role="tabpanel">
+                    <div class="d-flex flex-wrap justify-content-between align-items-start gap-3 mt-2">
+                        <div>
+                            <h4 class="spec-heading mb-2">จำนวนสเปค และสินค้ายอดนิยม</h4>
+                            <p class="spec-intro mb-0">หนึ่งรหัสสินค้า 16 ตัว = หนึ่งสเปค • <b>จำนวนสินค้า</b> คือจำนวนแถวที่พบรหัสนั้นในข้อมูลที่นำเข้า<br>จัดอันดับภายในแต่ละ CODE7 จากจำนวนมากไปน้อย ไม่ใช่ยอดขายหรือจำนวนชิ้นที่ขายได้</p>
+                        </div>
+                        <button id="exportPopularBtn" type="button" class="btn spec-export-main fw-bold px-4 py-3">ดาวน์โหลด สินค้านิยม.xlsx</button>
+                    </div>
+                    <div class="spec-metrics">
+                        <div class="spec-metric"><span>หมวดรายการ</span><strong id="specKpiCategories">0</strong><small>CODE7 ไม่ซ้ำ</small></div>
+                        <div class="spec-metric"><span>จำนวนสเปค</span><strong id="specKpiUnique">0</strong><small>รหัสสินค้า 16 ตัวไม่ซ้ำ</small></div>
+                        <div class="spec-metric"><span>จำนวนข้อมูลที่นับ</span><strong id="specKpiRecords">0</strong><small>ผลรวมคอลัมน์จำนวนสินค้า</small></div>
+                        <div class="spec-metric"><span>รหัสที่ไม่นำมานับ</span><strong id="specKpiSkipped">0</strong><small>แถวที่รหัสไม่ครบ 16 ตัว / ไม่ปลอดภัย</small></div>
+                    </div>
+                    <div class="spec-controls mb-3">
+                        <div class="d-flex flex-wrap align-items-end gap-3 mb-3">
+                            <div style="min-width:260px;flex:1"><label for="specPriceMode" class="form-label">เงื่อนไขการนับสเปค</label><select id="specPriceMode" class="form-select"><option value="all">ทุกแถวที่มีรหัสสินค้า 16 ตัว</option><option value="priced">เฉพาะแถวที่มีราคาเดือนปัจจุบันเป็นตัวเลข (รวม 0)</option></select></div>
+                            <div style="min-width:200px;flex:1"><label for="specRegion" class="form-label">พื้นที่ที่นำมานับ</label><select id="specRegion" class="form-select"><option value="">รวมทุกภาคในไฟล์</option></select></div>
+                            <div class="pb-2"><span class="badge bg-primary" id="specScopeBadge">นับทั้ง Checked และไม่ Checked</span></div>
+                        </div>
+                        <div class="spec-filter-grid">
+                            <div><label for="specCodeFilter" class="form-label">CODE7 / รายการ</label><select id="specCodeFilter" class="form-select"><option value="">ทั้งหมด</option></select></div>
+                            <div><label for="specView" class="form-label">ตารางที่แสดง</label><select id="specView" class="form-select"><option value="detail">สินค้ายอดนิยม (6 คอลัมน์)</option><option value="summary">สรุปจำนวนสเปคต่อ CODE7</option></select></div>
+                            <div><label for="specSearch" class="form-label">ค้นหา</label><input id="specSearch" class="form-control" type="search" placeholder="รหัสสินค้า / รายการ / คำในสเปค"></div>
+                            <div><label for="specTop" class="form-label">อันดับต่อ CODE7</label><select id="specTop" class="form-select"><option value="0">ทุกอันดับ</option><option value="1">Top 1</option><option value="3">Top 3</option><option value="5">Top 5</option><option value="10">Top 10</option><option value="20">Top 20</option><option value="50">Top 50</option></select></div>
+                        </div>
+                        <div class="spec-caption mt-3">การเลือก Checked ใช้สวิตช์ “นับจำนวน: เฉพาะตัวที่ Checked” ด้านบนร่วมกับตารางเดิม • ค่าบนการ์ดคำนวณจากเงื่อนไขการนับและพื้นที่ ไม่เปลี่ยนตามช่องค้นหา / Top</div>
+                    </div>
+                    <div id="specWarning" class="alert alert-warning spec-warning" role="status" hidden></div>
+                    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-2">
+                        <div id="specTableCaption" class="fw-semibold text-dark"></div>
+                        <div class="d-flex flex-wrap gap-2">
+                            <button id="exportSpecFilteredBtn" type="button" class="btn btn-outline-success btn-sm">ส่งออกตารางตามตัวกรอง</button>
+                            <button id="exportSpecReviewBtn" type="button" class="btn btn-outline-warning btn-sm" hidden>ส่งออกรายการที่ควรตรวจสอบ</button>
+                        </div>
+                    </div>
+                    <div class="table-responsive spec-table-wrap border rounded"><table id="specTable" class="table table-hover mb-0"></table><table id="specSummaryTable" class="table table-hover mb-0" hidden></table></div>
+                    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mt-3 spec-footer">
+                        <div class="d-flex align-items-center gap-2"><label for="specPageSize">แถวต่อหน้า</label><select id="specPageSize" class="form-select form-select-sm" style="width:90px"><option>25</option><option selected>50</option><option>100</option><option>200</option></select><span id="specPageInfo"></span></div>
+                        <div class="d-flex align-items-center gap-2"><button id="specPrev" type="button" class="btn btn-outline-secondary btn-sm">ก่อนหน้า</button><span id="specPageLabel"></span><button id="specNext" type="button" class="btn btn-outline-secondary btn-sm">ถัดไป</button></div>
+                    </div>
+                    <p class="spec-caption mt-3 mb-2">ไฟล์ <b>สินค้านิยม.xlsx</b> ส่งออกทุก CODE7 และทุกอันดับตามเงื่อนไขการนับ / พื้นที่ โดยไม่ตัดตามช่องค้นหาและ Top ส่วนปุ่ม “ส่งออกตารางตามตัวกรอง” ส่งออกผลที่กรองครบทุกหน้า</p>
+                    <details class="mt-3"><summary class="text-primary fw-semibold">หลักเกณฑ์การนับและคอลัมน์ที่ใช้</summary><div id="specMapping" class="spec-mapping mt-2"></div><div class="spec-mapping mt-2">นับหนึ่งครั้งต่อแถว ไม่ตัดแถวซ้ำตามร้าน และไม่ใช้ REL เป็นเงื่อนไข เมื่อจำนวนเท่ากันเรียงรหัสสินค้าจากน้อยไปมาก แล้วให้ Rank ต่อเนื่อง 1, 2, 3… ภายใน CODE7
+คำอธิบายใช้ข้อความเดิมจากไฟล์ หากรหัสเดียวมีหลายคำอธิบาย เลือกข้อความที่พบมากที่สุด (เท่ากันใช้ข้อความที่พบก่อน) และแสดงคำเตือน ไม่รวมรหัสคนละตัวเพียงเพราะคำอธิบายเหมือนกัน
+รหัสที่มีอักขระอื่นแต่ครบ 16 ตัว เช่น รหัสที่ลงท้ายด้วยตัวอักษร จะนับตามต้นทางและแจ้งเตือน ไม่แก้รหัสเอง ส่วนรหัสไม่ครบ 16 ตัว มีช่องว่างภายใน หรือเป็นตัวเลขที่อาจสูญเสียความแม่นยำ จะไม่นำมานับ</div></details>
+                    <div id="specExportStatus" class="spec-caption mt-3" role="status" aria-live="polite"></div>
                 </div>
             </div>
         </div>
@@ -302,12 +388,13 @@
 
             const headers = makeUniqueHeaders(matrix[bestIndex]);
             const rows = matrix.slice(bestIndex + 1)
-                .filter(r => r.some(v => cleanHeader(v) !== ''))
-                .map(r => {
+                .map((r, offset) => {
+                    if (!r.some(v => cleanHeader(v) !== '')) return null;
                     const obj = {};
                     headers.forEach((h, idx) => obj[h] = (idx < r.length ? r[idx] : ''));
+                    Object.defineProperty(obj, '__cpiSourceRow', {value: bestIndex + offset + 2, enumerable: false});
                     return obj;
-                });
+                }).filter(Boolean);
 
             return {
                 rows,
@@ -455,6 +542,7 @@
 
             renderTable('table2', task2_data);
             renderTable('table3', task3_data);
+            updateSpecificationViews();
         }
 
         // Add Events
@@ -473,6 +561,7 @@
         document.getElementById('processBtn').addEventListener('click', () => {
             const fileInput = document.getElementById('fileInput');
             const masterFileInput = document.getElementById('masterFileInput');
+            if (typeof XLSX === 'undefined') { alert('ยังโหลดตัวอ่าน Excel ไม่สำเร็จ กรุณาเชื่อมต่ออินเทอร์เน็ตแล้วเปิดหน้าเว็บใหม่'); return; }
 
             if(!fileInput.files.length) {
                 alert('กรุณาอัปโหลดไฟล์ข้อมูลหลักครับ');
@@ -594,7 +683,9 @@
                     // ==========================================
                     // ตรวจชนิดข้อมูล: รายเดือน / รายสัปดาห์
                     // ==========================================
-                    let code16_col = findColumn(keys, (base) => base === 'รหัส' || base === 'COMMODITY_CODE');
+                    let code16_col = findColumn(keys, (base) => base === 'รหัส' || base === 'COMMODITY_CODE') || findExactColumn(keys, ['รหัสรายการ', 'รหัสสินค้า', 'รหัสรายการ 16 หลัก', 'รหัสสินค้า 16 หลัก']);
+                    const description_col = findDescriptionColumn(keys);
+                    const itemName_col = findExactColumn(keys, ['รายการ', 'ชื่อรายการ', 'ITEM_NAME', 'COMMODITY_NAME']);
                     let rel_col = findColumn(keys, (base) => base.toUpperCase() === 'REL' || base.toUpperCase().includes('REL'));
                     let prov_col = findColumn(keys, (base) => base.includes('จังหวัด'));
                     let loc_col = findColumn(keys, (base) => base.includes('แหล่งจัดเก็บ'));
@@ -646,6 +737,7 @@
                         `<span class="badge bg-success fs-6 ms-2">${masterSourceLabel}</span>` +
                         `<div class="small text-muted mt-2">คอลัมน์ Checked: ${targetColName} | ${priceLabel}</div>`;
 
+                    specMeta = { sourceFile: fileInput.files[0].name, sourceSheet: dataWb.SheetNames[0], codeColumn: code16_col, descriptionColumn: description_col, itemColumn: itemName_col, checkedColumn: targetColName, currentPriceColumn: curr_col };
                     processedData = dataRows.map(row => {
                         let u_val = String(row[targetColName] || '').trim().toLowerCase();
                         let isChecked = (u_val === 'checked' || u_val === '1' || u_val === '1.0' || u_val === 'true');
@@ -683,7 +775,13 @@
                             else prov_dist = "กทม.เขตอื่นๆ";
                         }
                         
-                        return { isChecked, code7, itemName, itemAdmin, region, rel, comp_price, prev_price, curr_price, status, prov_dist };
+                        return { isChecked, code7, itemName, itemAdmin, region, rel, comp_price, prev_price, curr_price, status, prov_dist,
+                            code16: c16, rawCode16: row[code16_col],
+                            description: description_col ? exactSourceText(row[description_col]) : '',
+                            specItemName: itemName || (itemName_col ? exactSourceText(row[itemName_col]) : ''),
+                            sourceRow: row.__cpiSourceRow,
+                            hasCurrentPrice: hasNumericCurrentPrice(row[curr_col])
+                        };
                     });
                     
                     // Task 1: GeoMean ภาพรวม (Overall) - เสมอต้อง isChecked เท่านั้น
@@ -774,7 +872,8 @@
                     // Render View GeoMean
                     updateGeoMeanView(); 
 
-                    // Render Count Tables (Tasks 2 & 3) based on current toggle state
+                    // Render count tables and the new specification report.
+                    resetSpecificationControls();
                     updateCountViews();
 
                     document.getElementById('loading').style.display = 'none';
@@ -833,7 +932,7 @@
         }
 
         document.getElementById('exportBtn').addEventListener('click', () => {
-            if(task1_data.length === 0 && task2_data.length === 0 && task3_data.length === 0 && task4_data.length === 0) {
+            if(task1_data.length === 0 && task2_data.length === 0 && task3_data.length === 0 && task4_data.length === 0 && specReport.length === 0) {
                 alert("ไม่มีข้อมูลสำหรับดาวน์โหลด");
                 return;
             }
@@ -849,11 +948,320 @@
             if(task2_data.length > 0) XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(task2_data), "2.Status_Count");
             if(task3_data.length > 0) XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(task3_data), "3.Prov_Dist_Count");
             
+            appendSpecificationSheets(wb);
+
             // ใช้ชื่อไฟล์ที่อิงตามชุดข้อมูล
             let cleanFileLabel = currentFileSetLabel.replace(/\s+/g, '_');
             let modeFileLabel = currentDataMode === 'WEEKLY' ? 'Weekly' : 'Monthly';
             let filename = `CPI_Analysis_Report_${cleanFileLabel}_${modeFileLabel}.xlsx`;
             XLSX.writeFile(wb, filename);
+        });
+
+        const SPEC_EXPORT_TEMPLATE = {"files":{"docProps/app.xml":"<Properties xmlns=\"http://schemas.openxmlformats.org/officeDocument/2006/extended-properties\"><Application>Microsoft Excel Compatible / Openpyxl 3.1.5<\/Application><AppVersion>3.1<\/AppVersion><\/Properties>","docProps/core.xml":"<cp:coreProperties xmlns:cp=\"http://schemas.openxmlformats.org/package/2006/metadata/core-properties\"><dc:creator xmlns:dc=\"http://purl.org/dc/elements/1.1/\">openpyxl<\/dc:creator><dc:title xmlns:dc=\"http://purl.org/dc/elements/1.1/\">สินค้ายอดนิยม<\/dc:title><dc:description xmlns:dc=\"http://purl.org/dc/elements/1.1/\">จำนวนแถวที่พบแต่ละ COMMODITY_CODE ในไฟล์ข้อมูลที่นำเข้า ไม่ใช่ยอดขาย<\/dc:description><dcterms:created xmlns:dcterms=\"http://purl.org/dc/terms/\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"dcterms:W3CDTF\">2026-10-06T02:28:19Z<\/dcterms:created><dcterms:modified xmlns:dcterms=\"http://purl.org/dc/terms/\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"dcterms:W3CDTF\">2026-10-06T02:28:19Z<\/dcterms:modified><\/cp:coreProperties>","xl/theme/theme1.xml":"<?xml version=\"1.0\"?>\n<a:theme xmlns:a=\"http://schemas.openxmlformats.org/drawingml/2006/main\" name=\"Office Theme\">\n  <a:themeElements>\n    <a:clrScheme name=\"Office\">\n      <a:dk1>\n        <a:sysClr val=\"windowText\" lastClr=\"000000\"/>\n      <\/a:dk1>\n      <a:lt1>\n        <a:sysClr val=\"window\" lastClr=\"FFFFFF\"/>\n      <\/a:lt1>\n      <a:dk2>\n        <a:srgbClr val=\"1F497D\"/>\n      <\/a:dk2>\n      <a:lt2>\n        <a:srgbClr val=\"EEECE1\"/>\n      <\/a:lt2>\n      <a:accent1>\n        <a:srgbClr val=\"4F81BD\"/>\n      <\/a:accent1>\n      <a:accent2>\n        <a:srgbClr val=\"C0504D\"/>\n      <\/a:accent2>\n      <a:accent3>\n        <a:srgbClr val=\"9BBB59\"/>\n      <\/a:accent3>\n      <a:accent4>\n        <a:srgbClr val=\"8064A2\"/>\n      <\/a:accent4>\n      <a:accent5>\n        <a:srgbClr val=\"4BACC6\"/>\n      <\/a:accent5>\n      <a:accent6>\n        <a:srgbClr val=\"F79646\"/>\n      <\/a:accent6>\n      <a:hlink>\n        <a:srgbClr val=\"0000FF\"/>\n      <\/a:hlink>\n      <a:folHlink>\n        <a:srgbClr val=\"800080\"/>\n      <\/a:folHlink>\n    <\/a:clrScheme>\n    <a:fontScheme name=\"Office\">\n      <a:majorFont>\n        <a:latin typeface=\"Cambria\"/>\n        <a:ea typeface=\"\"/>\n        <a:cs typeface=\"\"/>\n        <a:font script=\"Jpan\" typeface=\"&#xFF2D;&#xFF33; &#xFF30;&#x30B4;&#x30B7;&#x30C3;&#x30AF;\"/>\n        <a:font script=\"Hang\" typeface=\"&#xB9D1;&#xC740; &#xACE0;&#xB515;\"/>\n        <a:font script=\"Hans\" typeface=\"&#x5B8B;&#x4F53;\"/>\n        <a:font script=\"Hant\" typeface=\"&#x65B0;&#x7D30;&#x660E;&#x9AD4;\"/>\n        <a:font script=\"Arab\" typeface=\"Times New Roman\"/>\n        <a:font script=\"Hebr\" typeface=\"Times New Roman\"/>\n        <a:font script=\"Thai\" typeface=\"Tahoma\"/>\n        <a:font script=\"Ethi\" typeface=\"Nyala\"/>\n        <a:font script=\"Beng\" typeface=\"Vrinda\"/>\n        <a:font script=\"Gujr\" typeface=\"Shruti\"/>\n        <a:font script=\"Khmr\" typeface=\"MoolBoran\"/>\n        <a:font script=\"Knda\" typeface=\"Tunga\"/>\n        <a:font script=\"Guru\" typeface=\"Raavi\"/>\n        <a:font script=\"Cans\" typeface=\"Euphemia\"/>\n        <a:font script=\"Cher\" typeface=\"Plantagenet Cherokee\"/>\n        <a:font script=\"Yiii\" typeface=\"Microsoft Yi Baiti\"/>\n        <a:font script=\"Tibt\" typeface=\"Microsoft Himalaya\"/>\n        <a:font script=\"Thaa\" typeface=\"MV Boli\"/>\n        <a:font script=\"Deva\" typeface=\"Mangal\"/>\n        <a:font script=\"Telu\" typeface=\"Gautami\"/>\n        <a:font script=\"Taml\" typeface=\"Latha\"/>\n        <a:font script=\"Syrc\" typeface=\"Estrangelo Edessa\"/>\n        <a:font script=\"Orya\" typeface=\"Kalinga\"/>\n        <a:font script=\"Mlym\" typeface=\"Kartika\"/>\n        <a:font script=\"Laoo\" typeface=\"DokChampa\"/>\n        <a:font script=\"Sinh\" typeface=\"Iskoola Pota\"/>\n        <a:font script=\"Mong\" typeface=\"Mongolian Baiti\"/>\n        <a:font script=\"Viet\" typeface=\"Times New Roman\"/>\n        <a:font script=\"Uigh\" typeface=\"Microsoft Uighur\"/>\n      <\/a:majorFont>\n      <a:minorFont>\n        <a:latin typeface=\"Calibri\"/>\n        <a:ea typeface=\"\"/>\n        <a:cs typeface=\"\"/>\n        <a:font script=\"Jpan\" typeface=\"&#xFF2D;&#xFF33; &#xFF30;&#x30B4;&#x30B7;&#x30C3;&#x30AF;\"/>\n        <a:font script=\"Hang\" typeface=\"&#xB9D1;&#xC740; &#xACE0;&#xB515;\"/>\n        <a:font script=\"Hans\" typeface=\"&#x5B8B;&#x4F53;\"/>\n        <a:font script=\"Hant\" typeface=\"&#x65B0;&#x7D30;&#x660E;&#x9AD4;\"/>\n        <a:font script=\"Arab\" typeface=\"Arial\"/>\n        <a:font script=\"Hebr\" typeface=\"Arial\"/>\n        <a:font script=\"Thai\" typeface=\"Tahoma\"/>\n        <a:font script=\"Ethi\" typeface=\"Nyala\"/>\n        <a:font script=\"Beng\" typeface=\"Vrinda\"/>\n        <a:font script=\"Gujr\" typeface=\"Shruti\"/>\n        <a:font script=\"Khmr\" typeface=\"DaunPenh\"/>\n        <a:font script=\"Knda\" typeface=\"Tunga\"/>\n        <a:font script=\"Guru\" typeface=\"Raavi\"/>\n        <a:font script=\"Cans\" typeface=\"Euphemia\"/>\n        <a:font script=\"Cher\" typeface=\"Plantagenet Cherokee\"/>\n        <a:font script=\"Yiii\" typeface=\"Microsoft Yi Baiti\"/>\n        <a:font script=\"Tibt\" typeface=\"Microsoft Himalaya\"/>\n        <a:font script=\"Thaa\" typeface=\"MV Boli\"/>\n        <a:font script=\"Deva\" typeface=\"Mangal\"/>\n        <a:font script=\"Telu\" typeface=\"Gautami\"/>\n        <a:font script=\"Taml\" typeface=\"Latha\"/>\n        <a:font script=\"Syrc\" typeface=\"Estrangelo Edessa\"/>\n        <a:font script=\"Orya\" typeface=\"Kalinga\"/>\n        <a:font script=\"Mlym\" typeface=\"Kartika\"/>\n        <a:font script=\"Laoo\" typeface=\"DokChampa\"/>\n        <a:font script=\"Sinh\" typeface=\"Iskoola Pota\"/>\n        <a:font script=\"Mong\" typeface=\"Mongolian Baiti\"/>\n        <a:font script=\"Viet\" typeface=\"Arial\"/>\n        <a:font script=\"Uigh\" typeface=\"Microsoft Uighur\"/>\n      <\/a:minorFont>\n    <\/a:fontScheme>\n    <a:fmtScheme name=\"Office\">\n      <a:fillStyleLst>\n        <a:solidFill>\n          <a:schemeClr val=\"phClr\"/>\n        <\/a:solidFill>\n        <a:gradFill rotWithShape=\"1\">\n          <a:gsLst>\n            <a:gs pos=\"0\">\n              <a:schemeClr val=\"phClr\">\n                <a:tint val=\"50000\"/>\n                <a:satMod val=\"300000\"/>\n              <\/a:schemeClr>\n            <\/a:gs>\n            <a:gs pos=\"35000\">\n              <a:schemeClr val=\"phClr\">\n                <a:tint val=\"37000\"/>\n                <a:satMod val=\"300000\"/>\n              <\/a:schemeClr>\n            <\/a:gs>\n            <a:gs pos=\"100000\">\n              <a:schemeClr val=\"phClr\">\n                <a:tint val=\"15000\"/>\n                <a:satMod val=\"350000\"/>\n              <\/a:schemeClr>\n            <\/a:gs>\n          <\/a:gsLst>\n          <a:lin ang=\"16200000\" scaled=\"1\"/>\n        <\/a:gradFill>\n        <a:gradFill rotWithShape=\"1\">\n          <a:gsLst>\n            <a:gs pos=\"0\">\n              <a:schemeClr val=\"phClr\">\n                <a:shade val=\"51000\"/>\n                <a:satMod val=\"130000\"/>\n              <\/a:schemeClr>\n            <\/a:gs>\n            <a:gs pos=\"80000\">\n              <a:schemeClr val=\"phClr\">\n                <a:shade val=\"93000\"/>\n                <a:satMod val=\"130000\"/>\n              <\/a:schemeClr>\n            <\/a:gs>\n            <a:gs pos=\"100000\">\n              <a:schemeClr val=\"phClr\">\n                <a:shade val=\"94000\"/>\n                <a:satMod val=\"135000\"/>\n              <\/a:schemeClr>\n            <\/a:gs>\n          <\/a:gsLst>\n          <a:lin ang=\"16200000\" scaled=\"0\"/>\n        <\/a:gradFill>\n      <\/a:fillStyleLst>\n      <a:lnStyleLst>\n        <a:ln w=\"9525\" cap=\"flat\" cmpd=\"sng\" algn=\"ctr\">\n          <a:solidFill>\n            <a:schemeClr val=\"phClr\">\n              <a:shade val=\"95000\"/>\n              <a:satMod val=\"105000\"/>\n            <\/a:schemeClr>\n          <\/a:solidFill>\n          <a:prstDash val=\"solid\"/>\n        <\/a:ln>\n        <a:ln w=\"25400\" cap=\"flat\" cmpd=\"sng\" algn=\"ctr\">\n          <a:solidFill>\n            <a:schemeClr val=\"phClr\"/>\n          <\/a:solidFill>\n          <a:prstDash val=\"solid\"/>\n        <\/a:ln>\n        <a:ln w=\"38100\" cap=\"flat\" cmpd=\"sng\" algn=\"ctr\">\n          <a:solidFill>\n            <a:schemeClr val=\"phClr\"/>\n          <\/a:solidFill>\n          <a:prstDash val=\"solid\"/>\n        <\/a:ln>\n      <\/a:lnStyleLst>\n      <a:effectStyleLst>\n        <a:effectStyle>\n          <a:effectLst>\n            <a:outerShdw blurRad=\"40000\" dist=\"20000\" dir=\"5400000\" rotWithShape=\"0\">\n              <a:srgbClr val=\"000000\">\n                <a:alpha val=\"38000\"/>\n              <\/a:srgbClr>\n            <\/a:outerShdw>\n          <\/a:effectLst>\n        <\/a:effectStyle>\n        <a:effectStyle>\n          <a:effectLst>\n            <a:outerShdw blurRad=\"40000\" dist=\"23000\" dir=\"5400000\" rotWithShape=\"0\">\n              <a:srgbClr val=\"000000\">\n                <a:alpha val=\"35000\"/>\n              <\/a:srgbClr>\n            <\/a:outerShdw>\n          <\/a:effectLst>\n        <\/a:effectStyle>\n        <a:effectStyle>\n          <a:effectLst>\n            <a:outerShdw blurRad=\"40000\" dist=\"23000\" dir=\"5400000\" rotWithShape=\"0\">\n              <a:srgbClr val=\"000000\">\n                <a:alpha val=\"35000\"/>\n              <\/a:srgbClr>\n            <\/a:outerShdw>\n          <\/a:effectLst>\n          <a:scene3d>\n            <a:camera prst=\"orthographicFront\">\n              <a:rot lat=\"0\" lon=\"0\" rev=\"0\"/>\n            <\/a:camera>\n            <a:lightRig rig=\"threePt\" dir=\"t\">\n              <a:rot lat=\"0\" lon=\"0\" rev=\"1200000\"/>\n            <\/a:lightRig>\n          <\/a:scene3d>\n          <a:sp3d>\n            <a:bevelT w=\"63500\" h=\"25400\"/>\n          <\/a:sp3d>\n        <\/a:effectStyle>\n      <\/a:effectStyleLst>\n      <a:bgFillStyleLst>\n        <a:solidFill>\n          <a:schemeClr val=\"phClr\"/>\n        <\/a:solidFill>\n        <a:gradFill rotWithShape=\"1\">\n          <a:gsLst>\n            <a:gs pos=\"0\">\n              <a:schemeClr val=\"phClr\">\n                <a:tint val=\"40000\"/>\n                <a:satMod val=\"350000\"/>\n              <\/a:schemeClr>\n            <\/a:gs>\n            <a:gs pos=\"40000\">\n              <a:schemeClr val=\"phClr\">\n                <a:tint val=\"45000\"/>\n                <a:shade val=\"99000\"/>\n                <a:satMod val=\"350000\"/>\n              <\/a:schemeClr>\n            <\/a:gs>\n            <a:gs pos=\"100000\">\n              <a:schemeClr val=\"phClr\">\n                <a:shade val=\"20000\"/>\n                <a:satMod val=\"255000\"/>\n              <\/a:schemeClr>\n            <\/a:gs>\n          <\/a:gsLst>\n          <a:path path=\"circle\">\n            <a:fillToRect l=\"50000\" t=\"-80000\" r=\"50000\" b=\"180000\"/>\n          <\/a:path>\n        <\/a:gradFill>\n        <a:gradFill rotWithShape=\"1\">\n          <a:gsLst>\n            <a:gs pos=\"0\">\n              <a:schemeClr val=\"phClr\">\n                <a:tint val=\"80000\"/>\n                <a:satMod val=\"300000\"/>\n              <\/a:schemeClr>\n            <\/a:gs>\n            <a:gs pos=\"100000\">\n              <a:schemeClr val=\"phClr\">\n                <a:shade val=\"30000\"/>\n                <a:satMod val=\"200000\"/>\n              <\/a:schemeClr>\n            <\/a:gs>\n          <\/a:gsLst>\n          <a:path path=\"circle\">\n            <a:fillToRect l=\"50000\" t=\"50000\" r=\"50000\" b=\"50000\"/>\n          <\/a:path>\n        <\/a:gradFill>\n      <\/a:bgFillStyleLst>\n    <\/a:fmtScheme>\n  <\/a:themeElements>\n  <a:objectDefaults/>\n  <a:extraClrSchemeLst/>\n<\/a:theme>\n","xl/styles.xml":"<styleSheet xmlns=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\"><numFmts count=\"0\"/><fonts count=\"2\"><font><name val=\"Calibri\"/><family val=\"2\"/><color theme=\"1\"/><sz val=\"11\"/><scheme val=\"minor\"/><\/font><font><b val=\"1\"/><color rgb=\"00FFFFFF\"/><\/font><\/fonts><fills count=\"4\"><fill><patternFill/><\/fill><fill><patternFill patternType=\"gray125\"/><\/fill><fill><patternFill patternType=\"solid\"><fgColor rgb=\"001F4E78\"/><bgColor rgb=\"001F4E78\"/><\/patternFill><\/fill><fill><patternFill patternType=\"solid\"><fgColor rgb=\"00C6EFCE\"/><bgColor rgb=\"00C6EFCE\"/><\/patternFill><\/fill><\/fills><borders count=\"3\"><border><left/><right/><top/><bottom/><diagonal/><\/border><border><left style=\"thin\"><color rgb=\"00D3D3D3\"/><\/left><right style=\"thin\"><color rgb=\"00D3D3D3\"/><\/right><top style=\"thin\"><color rgb=\"00D3D3D3\"/><\/top><bottom style=\"thin\"><color rgb=\"00D3D3D3\"/><\/bottom><\/border><border><left style=\"thin\"><color rgb=\"00D3D3D3\"/><\/left><right style=\"thin\"><color rgb=\"00D3D3D3\"/><\/right><top style=\"thin\"><color rgb=\"00D3D3D3\"/><\/top><bottom style=\"medium\"/><\/border><\/borders><cellStyleXfs count=\"1\"><xf numFmtId=\"0\" fontId=\"0\" fillId=\"0\" borderId=\"0\"/><\/cellStyleXfs><cellXfs count=\"6\"><xf numFmtId=\"0\" fontId=\"0\" fillId=\"0\" borderId=\"0\" pivotButton=\"0\" quotePrefix=\"0\" xfId=\"0\"/><xf numFmtId=\"0\" fontId=\"0\" fillId=\"3\" borderId=\"1\" applyAlignment=\"1\" pivotButton=\"0\" quotePrefix=\"0\" xfId=\"0\"><alignment vertical=\"center\"/><\/xf><xf numFmtId=\"0\" fontId=\"0\" fillId=\"0\" borderId=\"1\" applyAlignment=\"1\" pivotButton=\"0\" quotePrefix=\"0\" xfId=\"0\"><alignment vertical=\"center\"/><\/xf><xf numFmtId=\"0\" fontId=\"0\" fillId=\"0\" borderId=\"2\" applyAlignment=\"1\" pivotButton=\"0\" quotePrefix=\"0\" xfId=\"0\"><alignment vertical=\"center\"/><\/xf><xf numFmtId=\"0\" fontId=\"0\" fillId=\"3\" borderId=\"2\" applyAlignment=\"1\" pivotButton=\"0\" quotePrefix=\"0\" xfId=\"0\"><alignment vertical=\"center\"/><\/xf><xf numFmtId=\"0\" fontId=\"1\" fillId=\"2\" borderId=\"0\" applyAlignment=\"1\" pivotButton=\"0\" quotePrefix=\"0\" xfId=\"0\"><alignment horizontal=\"center\" vertical=\"center\"/><\/xf><\/cellXfs><cellStyles count=\"1\"><cellStyle name=\"Normal\" xfId=\"0\" builtinId=\"0\" hidden=\"0\"/><\/cellStyles><tableStyles count=\"0\" defaultTableStyle=\"TableStyleMedium9\" defaultPivotStyle=\"PivotStyleLight16\"/><colors><indexedColors><rgbColor rgb=\"00000000\"/><rgbColor rgb=\"00FFFFFF\"/><rgbColor rgb=\"00FF0000\"/><rgbColor rgb=\"0000FF00\"/><rgbColor rgb=\"000000FF\"/><rgbColor rgb=\"00FFFF00\"/><rgbColor rgb=\"00FF00FF\"/><rgbColor rgb=\"0000FFFF\"/><rgbColor rgb=\"00000000\"/><rgbColor rgb=\"00FFFFFF\"/><rgbColor rgb=\"00FF0000\"/><rgbColor rgb=\"0000FF00\"/><rgbColor rgb=\"000000FF\"/><rgbColor rgb=\"00FFFF00\"/><rgbColor rgb=\"00FF00FF\"/><rgbColor rgb=\"0000FFFF\"/><rgbColor rgb=\"00800000\"/><rgbColor rgb=\"00008000\"/><rgbColor rgb=\"00000080\"/><rgbColor rgb=\"00808000\"/><rgbColor rgb=\"00800080\"/><rgbColor rgb=\"00008080\"/><rgbColor rgb=\"00C0C0C0\"/><rgbColor rgb=\"00808080\"/><rgbColor rgb=\"009999FF\"/><rgbColor rgb=\"00993366\"/><rgbColor rgb=\"00FFFFCC\"/><rgbColor rgb=\"00CCFFFF\"/><rgbColor rgb=\"00660066\"/><rgbColor rgb=\"00FF8080\"/><rgbColor rgb=\"000066CC\"/><rgbColor rgb=\"00CCCCFF\"/><rgbColor rgb=\"00000080\"/><rgbColor rgb=\"00FF00FF\"/><rgbColor rgb=\"00FFFF00\"/><rgbColor rgb=\"0000FFFF\"/><rgbColor rgb=\"00800080\"/><rgbColor rgb=\"00800000\"/><rgbColor rgb=\"00008080\"/><rgbColor rgb=\"000000FF\"/><rgbColor rgb=\"0000CCFF\"/><rgbColor rgb=\"00CCFFFF\"/><rgbColor rgb=\"00CCFFCC\"/><rgbColor rgb=\"00FFFF99\"/><rgbColor rgb=\"0099CCFF\"/><rgbColor rgb=\"00FF99CC\"/><rgbColor rgb=\"00CC99FF\"/><rgbColor rgb=\"00FFCC99\"/><rgbColor rgb=\"003366FF\"/><rgbColor rgb=\"0033CCCC\"/><rgbColor rgb=\"0099CC00\"/><rgbColor rgb=\"00FFCC00\"/><rgbColor rgb=\"00FF9900\"/><rgbColor rgb=\"00FF6600\"/><rgbColor rgb=\"00666699\"/><rgbColor rgb=\"00969696\"/><rgbColor rgb=\"00003366\"/><rgbColor rgb=\"00339966\"/><rgbColor rgb=\"00003300\"/><rgbColor rgb=\"00333300\"/><rgbColor rgb=\"00993300\"/><rgbColor rgb=\"00993366\"/><rgbColor rgb=\"00333399\"/><rgbColor rgb=\"00333333\"/><\/indexedColors><\/colors><\/styleSheet>","_rels/.rels":"<Relationships xmlns=\"http://schemas.openxmlformats.org/package/2006/relationships\"><Relationship Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument\" Target=\"xl/workbook.xml\" Id=\"rId1\"/><Relationship Type=\"http://schemas.openxmlformats.org/package/2006/relationships/metadata/core-properties\" Target=\"docProps/core.xml\" Id=\"rId2\"/><Relationship Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/extended-properties\" Target=\"docProps/app.xml\" Id=\"rId3\"/><\/Relationships>","xl/workbook.xml":"<workbook xmlns=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\"><workbookPr/><workbookProtection/><bookViews><workbookView visibility=\"visible\" minimized=\"0\" showHorizontalScroll=\"1\" showVerticalScroll=\"1\" showSheetTabs=\"1\" tabRatio=\"600\" firstSheet=\"0\" activeTab=\"0\" autoFilterDateGrouping=\"1\"/><\/bookViews><sheets><sheet xmlns:r=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships\" name=\"สินค้ายอดนิยม\" sheetId=\"1\" state=\"visible\" r:id=\"rId1\"/><\/sheets><definedNames><definedName name=\"_xlnm._FilterDatabase\" localSheetId=\"0\" hidden=\"1\">'สินค้ายอดนิยม'!$A$1:$F$__LASTROW__<\/definedName><\/definedNames><calcPr calcId=\"124519\" fullCalcOnLoad=\"1\"/><\/workbook>","xl/_rels/workbook.xml.rels":"<Relationships xmlns=\"http://schemas.openxmlformats.org/package/2006/relationships\"><Relationship Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet\" Target=\"/xl/worksheets/sheet1.xml\" Id=\"rId1\"/><Relationship Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles\" Target=\"styles.xml\" Id=\"rId2\"/><Relationship Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/theme\" Target=\"theme/theme1.xml\" Id=\"rId3\"/><\/Relationships>","[Content_Types].xml":"<Types xmlns=\"http://schemas.openxmlformats.org/package/2006/content-types\"><Default Extension=\"rels\" ContentType=\"application/vnd.openxmlformats-package.relationships+xml\"/><Default Extension=\"xml\" ContentType=\"application/xml\"/><Override PartName=\"/xl/styles.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml\"/><Override PartName=\"/xl/theme/theme1.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.theme+xml\"/><Override PartName=\"/docProps/core.xml\" ContentType=\"application/vnd.openxmlformats-package.core-properties+xml\"/><Override PartName=\"/docProps/app.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.extended-properties+xml\"/><Override PartName=\"/xl/worksheets/sheet1.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml\"/><Override PartName=\"/xl/workbook.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml\"/><\/Types>"},"before":"<worksheet xmlns=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\"><sheetPr><outlinePr summaryBelow=\"1\" summaryRight=\"1\"/><pageSetUpPr/><\/sheetPr><dimension ref=\"A1:F__LASTROW__\"/><sheetViews><sheetView workbookViewId=\"0\"><pane ySplit=\"1\" topLeftCell=\"A2\" activePane=\"bottomLeft\" state=\"frozen\"/><selection pane=\"bottomLeft\" activeCell=\"A1\" sqref=\"A1\"/><\/sheetView><\/sheetViews><sheetFormatPr baseColWidth=\"8\" defaultRowHeight=\"15\"/><cols><col width=\"12\" customWidth=\"1\" min=\"1\" max=\"1\"/><col width=\"15\" customWidth=\"1\" min=\"2\" max=\"2\"/><col width=\"20\" customWidth=\"1\" min=\"3\" max=\"3\"/><col width=\"65\" customWidth=\"1\" min=\"4\" max=\"4\"/><col width=\"12\" customWidth=\"1\" min=\"5\" max=\"5\"/><col width=\"8\" customWidth=\"1\" min=\"6\" max=\"6\"/><\/cols>","after":"<autoFilter ref=\"A1:F__LASTROW__\"/><pageMargins left=\"0.75\" right=\"0.75\" top=\"1\" bottom=\"1\" header=\"0.5\" footer=\"0.5\"/><\/worksheet>","header":"<row r=\"1\"><c r=\"A1\" s=\"5\" t=\"inlineStr\"><is><t>CODE7<\/t><\/is><\/c><c r=\"B1\" s=\"5\" t=\"inlineStr\"><is><t>&#3619;&#3634;&#3618;&#3585;&#3634;&#3619;<\/t><\/is><\/c><c r=\"C1\" s=\"5\" t=\"inlineStr\"><is><t>COMMODITY_CODE<\/t><\/is><\/c><c r=\"D1\" s=\"5\" t=\"inlineStr\"><is><t>DESCRIPTION<\/t><\/is><\/c><c r=\"E1\" s=\"5\" t=\"inlineStr\"><is><t>&#3592;&#3635;&#3609;&#3623;&#3609;&#3626;&#3636;&#3609;&#3588;&#3657;&#3634;<\/t><\/is><\/c><c r=\"F1\" s=\"5\" t=\"inlineStr\"><is><t>Rank<\/t><\/is><\/c><\/row>","styles":{"green":1,"body":2,"bodyLast":3,"greenLast":4}};
+// ==========================================================
+        // V16 - Specification frequency / popularity report
+        // This module is additive. Existing GeoMean/status logic is unchanged.
+        // ==========================================================
+        const SPEC_COLUMNS = ['CODE7', 'รายการ', 'COMMODITY_CODE', 'DESCRIPTION', 'จำนวนสินค้า', 'Rank'];
+        const SPEC_SUMMARY_COLUMNS = ['CODE7', 'รายการ', 'จำนวนสเปค', 'จำนวนสินค้า', 'สเปคอันดับ 1', 'จำนวนสินค้าอันดับ 1'];
+        let specMeta = {};
+        let specReport = [];
+        let specSummary = [];
+        let specReviewRows = [];
+        let specPage = 1;
+        let specStats = {};
+        const specNumber = new Intl.NumberFormat('th-TH');
+
+        function exactSourceText(value) { return value === null || value === undefined ? '' : String(value); }
+        function validSpecificationCode(value) {
+            if (typeof value === 'number' && !Number.isSafeInteger(value)) return false;
+            return /^\S{16}$/u.test(exactSourceText(value).trim().replace(/\.0$/, ''));
+        }
+        function hasNumericCurrentPrice(value) {
+            if (value === null || value === undefined || typeof value === 'boolean') return false;
+            const text = String(value).trim().replace(/,/g, '');
+            return text !== '' && Number.isFinite(Number(text));
+        }
+        function findExactColumn(keys, names) {
+            for (const name of names) {
+                const found = keys.find(k => baseHeaderName(k).toUpperCase() === name.toUpperCase());
+                if (found) return found;
+            }
+            return null;
+        }
+        function findDescriptionColumn(keys) {
+            return findExactColumn(keys, ['DESCRIPTION','ลักษณะจำเพาะ','ลักษณะเฉพาะ','รายละเอียดสินค้า','ชื่อสเปค','ชื่อสเปก','สเปค','สเปก','คำอธิบาย','ชื่อสินค้า'])
+                || findColumn(keys, base => base.includes('ลักษณะจำเพาะ') || base.includes('ลักษณะเฉพาะ'));
+        }
+
+        // A pure function: one row is one observed occurrence. No price/REL filter here.
+        // Source strings are retained verbatim. Rows with invalid codes are auditable.
+        function aggregateSpecifications(rows) {
+            const byCode = new Map();
+            const reviews = [];
+            let skipped = 0, missingDescriptionRows = 0, nonDigitRows = 0;
+            for (const p of rows) {
+                const rawCode = p.rawCode16 === undefined ? p.code16 : p.rawCode16;
+                const code = exactSourceText(p.code16).trim();
+                if (!validSpecificationCode(rawCode) || !/^\S{16}$/u.test(code)) {
+                    skipped++;
+                    reviews.push({ 'แถว Excel': p.sourceRow || '', 'CODE7': p.code7 || '', 'COMMODITY_CODE': exactSourceText(rawCode), 'DESCRIPTION': p.description || '', 'ประเด็น': typeof rawCode === 'number' && !Number.isSafeInteger(rawCode) ? 'รหัสตัวเลขอาจสูญเสียความแม่นยำ: โปรดใช้รหัสแบบข้อความจากต้นทาง' : 'รหัสไม่ครบ 16 ตัวอักษรหรือมีช่องว่างภายใน: ไม่นำมานับ' });
+                    continue;
+                }
+                // The supplied example contains a 16-character code ending in a Thai letter.
+                // Retain and count that exact identifier; flag it rather than silently dropping it.
+                if (!/^\d{16}$/.test(code)) {
+                    nonDigitRows++;
+                    reviews.push({ 'แถว Excel': p.sourceRow || '', 'CODE7': code.slice(0,7), 'COMMODITY_CODE': code, 'DESCRIPTION': p.description || '', 'ประเด็น': 'รหัสมีอักขระที่ไม่ใช่ตัวเลข: คงรหัสและนับตามต้นทาง ไม่ได้ตัดออก' });
+                }
+                let entry = byCode.get(code);
+                if (!entry) {
+                    entry = { code7: code.slice(0, 7), code, name: p.specItemName || p.itemName || '', count: 0, descriptions: new Map(), sourceRows: [], missing: 0 };
+                    byCode.set(code, entry);
+                }
+                entry.count++;
+                if (!entry.name && (p.specItemName || p.itemName)) entry.name = p.specItemName || p.itemName;
+                const description = exactSourceText(p.description);
+                if (description.trim() !== '') {
+                    entry.descriptions.set(description, (entry.descriptions.get(description) || 0) + 1);
+                } else {
+                    entry.missing++;
+                    missingDescriptionRows++;
+                }
+                entry.sourceRows.push(p);
+            }
+            let conflictCodes = 0;
+            const report = [];
+            for (const e of byCode.values()) {
+                let description = '', mostFrequent = -1;
+                for (const [text, count] of e.descriptions) {
+                    if (count > mostFrequent) { description = text; mostFrequent = count; }
+                }
+                const conflict = e.descriptions.size > 1;
+                if (conflict) conflictCodes++;
+                if (conflict || e.missing) {
+                    for (const p of e.sourceRows) {
+                        if (!conflict && exactSourceText(p.description).trim() !== '') continue;
+                        reviews.push({ 'แถว Excel': p.sourceRow || '', 'CODE7': e.code7, 'COMMODITY_CODE': e.code, 'DESCRIPTION': exactSourceText(p.description), 'ประเด็น': conflict ? 'รหัสเดียวมีหลายคำอธิบาย: ตารางหลักใช้ข้อความที่พบมากที่สุด' : 'ไม่มีคำอธิบายสเปคในแถวต้นทาง' });
+                    }
+                }
+                report.push({ 'CODE7': e.code7, 'รายการ': e.name, 'COMMODITY_CODE': e.code, 'DESCRIPTION': description, 'จำนวนสินค้า': e.count, 'Rank': 0 });
+            }
+            report.sort((a,b) => a.CODE7.localeCompare(b.CODE7) || b['จำนวนสินค้า'] - a['จำนวนสินค้า'] || a.COMMODITY_CODE.localeCompare(b.COMMODITY_CODE));
+            let previousCode7 = null, rank = 0;
+            const summaries = new Map();
+            for (const row of report) {
+                if (row.CODE7 !== previousCode7) { previousCode7 = row.CODE7; rank = 0; }
+                row.Rank = ++rank;
+                let summary = summaries.get(row.CODE7);
+                if (!summary) {
+                    summary = { 'CODE7': row.CODE7, 'รายการ': row['รายการ'], 'จำนวนสเปค': 0, 'จำนวนสินค้า': 0, 'สเปคอันดับ 1': row.COMMODITY_CODE, 'จำนวนสินค้าอันดับ 1': row['จำนวนสินค้า'] };
+                    summaries.set(row.CODE7, summary);
+                }
+                summary['จำนวนสเปค']++;
+                summary['จำนวนสินค้า'] += row['จำนวนสินค้า'];
+            }
+            return { report, summary: Array.from(summaries.values()), reviews, stats: { categories: summaries.size, unique: byCode.size, records: rows.length - skipped, skipped, nonDigitRows, conflictCodes, missingDescriptionRows, missingNames: report.filter(r => !r['รายการ']).length } };
+        }
+
+        function resetSpecificationControls() {
+            specPage = 1;
+            document.getElementById('specSearch').value = '';
+            document.getElementById('specCodeFilter').replaceChildren(new Option('ทั้งหมด', ''));
+            const regionSelect = document.getElementById('specRegion');
+            regionSelect.replaceChildren(new Option('รวมทุกภาคในไฟล์', ''));
+            Array.from(new Set(processedData.map(p => p.region).filter(Boolean))).sort((a,b) => a.localeCompare(b, 'th')).forEach(r => regionSelect.add(new Option(r, r)));
+        }
+        function updateSpecificationViews() {
+            const onlyChecked = document.getElementById('countToggle').checked;
+            const pricedOnly = document.getElementById('specPriceMode').value === 'priced';
+            const region = document.getElementById('specRegion').value;
+            const rows = processedData.filter(p => (!onlyChecked || p.isChecked) && (!pricedOnly || p.hasCurrentPrice) && (!region || p.region === region));
+            const result = aggregateSpecifications(rows);
+            specReport = result.report;
+            specSummary = result.summary;
+            specReviewRows = result.reviews;
+            specStats = result.stats;
+            document.getElementById('specKpiCategories').textContent = specNumber.format(specStats.categories);
+            document.getElementById('specKpiUnique').textContent = specNumber.format(specStats.unique);
+            document.getElementById('specKpiRecords').textContent = specNumber.format(specStats.records);
+            document.getElementById('specKpiSkipped').textContent = specNumber.format(specStats.skipped);
+            document.getElementById('specScopeBadge').textContent = onlyChecked ? 'นับเฉพาะ Checked ของชุดที่เลือก' : 'นับทั้ง Checked และไม่ Checked';
+            const warnings = [];
+            if (!specMeta.descriptionColumn) warnings.push('ไม่พบคอลัมน์คำอธิบายสเปค: DESCRIPTION จะเว้นว่าง ไม่มีการเติมข้อความแทน');
+            if (specStats.nonDigitRows) warnings.push(`พบ ${specNumber.format(specStats.nonDigitRows)} แถวที่รหัสมีอักขระที่ไม่ใช่ตัวเลข คงรหัสและนับตามต้นทาง ไม่ได้ตัดออก`);
+            if (specStats.skipped) warnings.push(`ไม่นับ ${specNumber.format(specStats.skipped)} แถวที่รหัสไม่ครบ 16 ตัวอักษรหรือเป็นตัวเลขที่อาจสูญเสียความแม่นยำ`);
+            if (specStats.missingDescriptionRows && specMeta.descriptionColumn) warnings.push(`พบ ${specNumber.format(specStats.missingDescriptionRows)} แถวไม่มีคำอธิบายสเปค แต่ยังนับความถี่เมื่อรหัสถูกต้อง`);
+            if (specStats.conflictCodes) warnings.push(`พบ ${specNumber.format(specStats.conflictCodes)} รหัสที่มีคำอธิบายหลายแบบ ใช้ข้อความที่พบมากที่สุด และเก็บข้อความทุกแบบในรายงานตรวจสอบ`);
+            if (specStats.missingNames) warnings.push(`มี ${specNumber.format(specStats.missingNames)} สเปคที่ไม่พบชื่อรายการจาก Master/ไฟล์หลัก จึงเว้นชื่อรายการว่าง`);
+            const warning = document.getElementById('specWarning');
+            warning.hidden = !warnings.length;
+            warning.textContent = warnings.join('\n');
+            document.getElementById('exportSpecReviewBtn').hidden = !specReviewRows.length;
+            document.getElementById('exportPopularBtn').disabled = !specReport.length;
+            document.getElementById('specMapping').textContent = `ไฟล์ต้นทาง: ${specMeta.sourceFile || '-'} | ชีต: ${specMeta.sourceSheet || '-'}\nCOMMODITY_CODE ← ${specMeta.codeColumn || '-'} | DESCRIPTION ← ${specMeta.descriptionColumn || 'ไม่พบคอลัมน์'}\nCODE7 ← 7 หลักแรกของรหัสสินค้า | รายการ ← Master ข้อมูล_รายการ_ผู้ดูแล (หากไม่พบ ใช้คอลัมน์ ${specMeta.itemColumn || 'รายการ ถ้ามี'} ในไฟล์หลัก)\nจำนวนสินค้า ← จำนวนแถวที่พบรหัสนั้น | Checked ← ${specMeta.checkedColumn || '-'}\nตัวกรองราคาเดือนปัจจุบัน ← ${specMeta.currentPriceColumn || '-'} (ใช้เฉพาะเมื่อเลือกกรองแถวที่มีราคา)`;
+            const select = document.getElementById('specCodeFilter');
+            const selected = select.value;
+            select.replaceChildren(new Option('ทั้งหมด', ''));
+            specSummary.forEach(s => select.add(new Option(`${s.CODE7} — ${s['รายการ'] || '(ไม่พบชื่อรายการ)'} (${specNumber.format(s['จำนวนสเปค'])} สเปค)`, s.CODE7)));
+            if (specSummary.some(s => s.CODE7 === selected)) select.value = selected;
+            specPage = 1;
+            document.getElementById('specExportStatus').textContent = '';
+            renderSpecificationTable();
+        }
+        function filteredSpecificationData() {
+            const isSummary = document.getElementById('specView').value === 'summary';
+            const code7 = document.getElementById('specCodeFilter').value;
+            const query = document.getElementById('specSearch').value.trim().toLocaleLowerCase('th');
+            const top = Number(document.getElementById('specTop').value) || 0;
+            const data = isSummary ? specSummary : specReport;
+            return data.filter(r => (!code7 || r.CODE7 === code7) && (isSummary || !top || r.Rank <= top) && (!query || (isSummary ? [r.CODE7, r['รายการ'], r['สเปคอันดับ 1']] : [r.CODE7, r['รายการ'], r.COMMODITY_CODE, r.DESCRIPTION]).some(v => String(v || '').toLocaleLowerCase('th').includes(query))));
+        }
+        function renderSpecificationTable() {
+            const isSummary = document.getElementById('specView').value === 'summary';
+            const data = filteredSpecificationData();
+            const columns = isSummary ? SPEC_SUMMARY_COLUMNS : SPEC_COLUMNS;
+            const pageSize = Number(document.getElementById('specPageSize').value) || 50;
+            const pageCount = Math.max(1, Math.ceil(data.length / pageSize));
+            specPage = Math.min(Math.max(1, specPage), pageCount);
+            const start = (specPage - 1) * pageSize;
+            const visible = data.slice(start, start + pageSize);
+            document.getElementById('specTable').hidden = isSummary;
+            document.getElementById('specSummaryTable').hidden = !isSummary;
+            document.getElementById('specTop').disabled = isSummary;
+            const table = document.getElementById(isSummary ? 'specSummaryTable' : 'specTable');
+            table.replaceChildren();
+            const head = document.createElement('thead'), hr = document.createElement('tr');
+            columns.forEach(c => { const th = document.createElement('th'); th.textContent = c; th.className = 'py-3 text-center align-middle'; hr.appendChild(th); });
+            head.appendChild(hr); table.appendChild(head);
+            const body = document.createElement('tbody');
+            if (!visible.length) {
+                const row = document.createElement('tr'), td = document.createElement('td');
+                td.colSpan = columns.length; td.className = 'spec-empty'; td.textContent = 'ไม่พบข้อมูลตามเงื่อนไข'; row.appendChild(td); body.appendChild(row);
+            }
+            visible.forEach((r, i) => {
+                const tr = document.createElement('tr');
+                if (!isSummary && r.Rank <= 10) tr.classList.add('spec-top');
+                if (!isSummary && (!data[start + i + 1] || data[start + i + 1].CODE7 !== r.CODE7)) tr.classList.add('spec-group-end');
+                columns.forEach(c => {
+                    const td = document.createElement('td');
+                    if (c === 'Rank') {
+                        const rank = document.createElement('span'); rank.textContent = r[c]; rank.className = `spec-rank${r[c] <= 10 ? ' top' : ''}`; td.className = 'text-center'; td.appendChild(rank);
+                    } else {
+                        td.textContent = typeof r[c] === 'number' ? specNumber.format(r[c]) : exactSourceText(r[c]);
+                        if (c === 'DESCRIPTION') td.className = 'spec-description';
+                        else if (c === 'CODE7' || c === 'COMMODITY_CODE' || c === 'สเปคอันดับ 1') td.className = 'spec-code';
+                        else if (typeof r[c] === 'number') td.className = 'text-end';
+                    }
+                    tr.appendChild(td);
+                });
+                body.appendChild(tr);
+            });
+            table.appendChild(body);
+            document.getElementById('specTableCaption').textContent = isSummary ? 'สรุปจำนวนสเปคต่อ CODE7 — ไม่ตัดจำนวนตาม Top' : 'สินค้ายอดนิยม — ไฮไลต์ Rank 1–10 ของแต่ละ CODE7';
+            document.getElementById('specPageInfo').textContent = data.length ? `${specNumber.format(start + 1)}–${specNumber.format(start + visible.length)} จาก ${specNumber.format(data.length)} ${isSummary ? 'รายการ' : 'สเปค'}` : '0 รายการ';
+            document.getElementById('specPageLabel').textContent = `หน้า ${specNumber.format(specPage)} / ${specNumber.format(pageCount)}`;
+            document.getElementById('specPrev').disabled = specPage <= 1;
+            document.getElementById('specNext').disabled = specPage >= pageCount;
+            document.getElementById('exportSpecFilteredBtn').disabled = !data.length;
+        }
+
+        // Native ZIP writer. No new CDN/library dependency for the styled XLSX export.
+        const SPEC_CRC_TABLE = (() => { const table = new Uint32Array(256); for(let n=0;n<256;n++){let c=n;for(let k=0;k<8;k++)c=(c&1)?(0xedb88320^(c>>>1)):(c>>>1);table[n]=c>>>0;}return table; })();
+        function specCrc32(bytes) { let c=0xffffffff;for(const b of bytes)c=SPEC_CRC_TABLE[(c^b)&255]^(c>>>8);return (c^0xffffffff)>>>0; }
+        async function buildSpecificationZip(files) {
+            const encoder = new TextEncoder(), chunks = [], central = [];
+            let offset = 0;
+            const now = new Date();
+            const dosTime = (now.getHours()<<11)|(now.getMinutes()<<5)|(now.getSeconds()>>1);
+            const dosDate = ((Math.max(1980,now.getFullYear())-1980)<<9)|((now.getMonth()+1)<<5)|now.getDate();
+            for (const [name, contents] of Object.entries(files)) {
+                const nameBytes = encoder.encode(name), raw = encoder.encode(contents);
+                let payload=raw, method=0;
+                if (typeof CompressionStream !== 'undefined') {
+                    try { payload=new Uint8Array(await new Response(new Blob([raw]).stream().pipeThrough(new CompressionStream('deflate-raw'))).arrayBuffer());method=8; } catch (_) { payload=raw;method=0; }
+                }
+                const crc=specCrc32(raw), local=new Uint8Array(30+nameBytes.length), lv=new DataView(local.buffer);
+                lv.setUint32(0,0x04034b50,true);lv.setUint16(4,20,true);lv.setUint16(6,0x800,true);lv.setUint16(8,method,true);lv.setUint16(10,dosTime,true);lv.setUint16(12,dosDate,true);lv.setUint32(14,crc,true);lv.setUint32(18,payload.length,true);lv.setUint32(22,raw.length,true);lv.setUint16(26,nameBytes.length,true);local.set(nameBytes,30);
+                const center=new Uint8Array(46+nameBytes.length), cv=new DataView(center.buffer);
+                cv.setUint32(0,0x02014b50,true);cv.setUint16(4,20,true);cv.setUint16(6,20,true);cv.setUint16(8,0x800,true);cv.setUint16(10,method,true);cv.setUint16(12,dosTime,true);cv.setUint16(14,dosDate,true);cv.setUint32(16,crc,true);cv.setUint32(20,payload.length,true);cv.setUint32(24,raw.length,true);cv.setUint16(28,nameBytes.length,true);cv.setUint32(42,offset,true);center.set(nameBytes,46);
+                chunks.push(local,payload);central.push(center);offset+=local.length+payload.length;
+            }
+            const centralLength=central.reduce((n,b)=>n+b.length,0), end=new Uint8Array(22), ev=new DataView(end.buffer);
+            ev.setUint32(0,0x06054b50,true);ev.setUint16(8,central.length,true);ev.setUint16(10,central.length,true);ev.setUint32(12,centralLength,true);ev.setUint32(16,offset,true);
+            return new Blob([...chunks,...central,end],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+        }
+        function specXmlText(value) {
+            return exactSourceText(value).replace(/_x([0-9A-Fa-f]{4})_/g,'_x005F_x$1_').replace(/[\x00-\x08\x0B\x0C\x0E-\x1F]/g,c=>`_x${c.charCodeAt(0).toString(16).toUpperCase().padStart(4,'0')}_`).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\r/g,'&#13;');
+        }
+        async function createPopularWorkbook(rows) {
+            if (rows.length > 1048575) throw new Error('จำนวนสเปคเกินจำนวนแถวสูงสุดของหนึ่งชีต Excel');
+            const template=SPEC_EXPORT_TEMPLATE, lastRow=rows.length+1;
+            const files={};
+            for (const [name,xml] of Object.entries(template.files)) files[name]=xml.replaceAll('__LASTROW__',String(lastRow));
+            const xmlRows=[template.header];
+            rows.forEach((row,i)=>{
+                const r=i+2, last=!rows[i+1] || rows[i+1].CODE7!==row.CODE7;
+                const style=template.styles[(row.Rank<=10?'green':'body')+(last?'Last':'')];
+                const cells=SPEC_COLUMNS.map((col,j)=>{
+                    const address=String.fromCharCode(65+j)+r;
+                    return j>=4 ? `<c r="${address}" s="${style}" t="n"><v>${Number(row[col])}</v></c>` : `<c r="${address}" s="${style}" t="inlineStr"><is><t xml:space="preserve">${specXmlText(row[col])}</t></is></c>`;
+                }).join('');
+                xmlRows.push(`<row r="${r}">${cells}</row>`);
+            });
+            files['xl/worksheets/sheet1.xml']=template.before.replaceAll('__LASTROW__',String(lastRow))+'<sheetData>'+xmlRows.join('')+'</sheetData>'+template.after.replaceAll('__LASTROW__',String(lastRow));
+            return buildSpecificationZip(files);
+        }
+        function downloadSpecificationBlob(blob, filename) {
+            const url=URL.createObjectURL(blob), anchor=document.createElement('a');
+            anchor.href=url;anchor.download=filename;anchor.style.display='none';document.body.appendChild(anchor);anchor.click();anchor.remove();setTimeout(()=>URL.revokeObjectURL(url),60000);
+        }
+        async function exportPopularWorkbook(filtered=false) {
+            const rows=filtered ? filteredSpecificationData() : specReport;
+            if (!rows.length) { alert('ไม่มีข้อมูลสเปคตามเงื่อนไข'); return; }
+            if (filtered && document.getElementById('specView').value==='summary') {
+                const wb=XLSX.utils.book_new();const ws=XLSX.utils.json_to_sheet(rows,{header:SPEC_SUMMARY_COLUMNS});
+                ws['!cols']=[{wch:12},{wch:28},{wch:16},{wch:16},{wch:22},{wch:24}];ws['!autofilter']={ref:ws['!ref']};
+                XLSX.utils.book_append_sheet(wb,ws,'สรุปจำนวนสเปค');XLSX.writeFile(wb,'สรุปจำนวนสเปค_ตามตัวกรอง.xlsx');return;
+            }
+            const button=document.getElementById(filtered?'exportSpecFilteredBtn':'exportPopularBtn');
+            const oldText=button.textContent;button.disabled=true;button.textContent='กำลังสร้าง Excel…';
+            try {
+                // Freeze a snapshot so an intervening UI change cannot alter this export.
+                const snapshot=rows.map(r=>({...r}));
+                const blob=await createPopularWorkbook(snapshot);
+                const filename=filtered?'สินค้านิยม_ตามตัวกรอง.xlsx':'สินค้านิยม.xlsx';
+                downloadSpecificationBlob(blob,filename);
+                document.getElementById('specExportStatus').textContent=`ส่งออก ${filename} แล้ว • ${specNumber.format(snapshot.length)} สเปค • ${specNumber.format(snapshot.reduce((n,r)=>n+r['จำนวนสินค้า'],0))} ข้อมูล • ${filtered?'ตามตัวกรองครบทุกหน้า':'ทุก CODE7 / ทุกอันดับในขอบเขตการนับที่เลือก'}`;
+            } catch(error) { console.error(error);alert('ส่งออกไม่สำเร็จ: '+error.message); }
+            finally {button.textContent=oldText;button.disabled=false;}
+        }
+        function appendSpecificationSheets(wb) {
+            if (specReport.length) {
+                const sheet=XLSX.utils.json_to_sheet(specReport,{header:SPEC_COLUMNS});
+                sheet['!cols']=[{wch:12},{wch:15},{wch:20},{wch:65},{wch:12},{wch:8}];sheet['!autofilter']={ref:sheet['!ref']};
+                XLSX.utils.book_append_sheet(wb,sheet,'สินค้ายอดนิยม');
+            }
+            if (specSummary.length) {
+                const sheet=XLSX.utils.json_to_sheet(specSummary,{header:SPEC_SUMMARY_COLUMNS});
+                sheet['!cols']=[{wch:12},{wch:28},{wch:16},{wch:16},{wch:22},{wch:24}];sheet['!autofilter']={ref:sheet['!ref']};
+                XLSX.utils.book_append_sheet(wb,sheet,'สรุปจำนวนสเปค');
+            }
+        }
+        document.getElementById('specPriceMode').addEventListener('change',updateSpecificationViews);
+        document.getElementById('specRegion').addEventListener('change',updateSpecificationViews);
+        ['specCodeFilter','specView','specTop','specPageSize'].forEach(id=>document.getElementById(id).addEventListener('change',()=>{specPage=1;renderSpecificationTable();}));
+        let specSearchTimer;
+        document.getElementById('specSearch').addEventListener('input',()=>{clearTimeout(specSearchTimer);specSearchTimer=setTimeout(()=>{specPage=1;renderSpecificationTable();},140);});
+        document.getElementById('specPrev').addEventListener('click',()=>{specPage--;renderSpecificationTable();});
+        document.getElementById('specNext').addEventListener('click',()=>{specPage++;renderSpecificationTable();});
+        document.getElementById('exportPopularBtn').addEventListener('click',()=>exportPopularWorkbook(false));
+        document.getElementById('exportSpecFilteredBtn').addEventListener('click',()=>exportPopularWorkbook(true));
+        document.getElementById('exportSpecReviewBtn').addEventListener('click',()=>{
+            if(!specReviewRows.length)return;
+            const wb=XLSX.utils.book_new(),sheet=XLSX.utils.json_to_sheet(specReviewRows);
+            sheet['!cols']=[{wch:12},{wch:12},{wch:23},{wch:70},{wch:80}];sheet['!autofilter']={ref:sheet['!ref']};
+            XLSX.utils.book_append_sheet(wb,sheet,'ตรวจสอบสเปค');XLSX.writeFile(wb,'ตรวจสอบข้อมูลสเปค.xlsx');
         });
     </script>
 </body>
