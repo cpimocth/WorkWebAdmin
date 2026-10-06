@@ -1,11 +1,11 @@
-<!doctype html>
-<html lang="th">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>CPI Price Validation — Web App</title>
-  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-  <style>
+<!DOCTYPE html>
+
+<html lang="th"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>CPI Price Validation — Web App</title>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<style>
     :root{
       --bg:#f5f7fb; --card:#fff; --ink:#172033; --muted:#667085; --line:#e4e7ec;
       --primary:#1f4e78; --primary2:#2b6da6; --ok:#087443; --warn:#b54708; --danger:#b42318;
@@ -40,78 +40,97 @@
     .table-wrap{overflow:auto;max-height:620px}.data-table{border-collapse:separate;border-spacing:0;width:max-content;min-width:100%;font-size:11.5px}.data-table th{position:sticky;top:0;z-index:2;background:#1f4e78;color:#fff;padding:9px 10px;text-align:left;white-space:nowrap;border-right:1px solid rgba(255,255,255,.12)}.data-table td{padding:7px 10px;border-bottom:1px solid #eef0f3;border-right:1px solid #f1f3f5;vertical-align:top;max-width:360px;white-space:pre-wrap}.data-table tr:nth-child(even) td{background:#fbfcfe}.empty{padding:42px;text-align:center;color:var(--muted)}
     .footer-note{font-size:10.5px;color:var(--muted);padding:9px 12px;border-top:1px solid var(--line)}
     .log{font-size:11px;color:#475467;max-height:130px;overflow:auto;margin-top:10px;padding-top:8px;border-top:1px solid var(--line)}.log div{padding:2px 0}.dot{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:6px;background:#98a2b3}.dot.ok{background:#12b76a}.dot.warn{background:#f79009}.dot.err{background:#f04438}
-  </style>
+  
+[hidden]{display:none!important}.file-row{grid-template-columns:1fr 230px 32px}.logic-notes{font-size:11px;color:var(--muted);margin-top:12px;line-height:1.6}.logic-notes summary{cursor:pointer;font-weight:700}.logic-notes p{margin:6px 0}.file-row select{font-size:12px}.kpis{grid-template-columns:repeat(auto-fit,minmax(150px,1fr))!important} @media(max-width:600px){.file-row{grid-template-columns:1fr 32px}.file-row select{grid-row:2;grid-column:1/-1}.file-row .xbtn{grid-row:1;grid-column:2}.wrap{padding:12px}}
+</style>
 </head>
 <body>
 <div class="wrap">
-  <section class="hero">
-    <div>
-      <h1>CPI Price Validation</h1>
-      <p>ลากไฟล์ Excel เข้ามา → ตรวจตาม logic จาก Analysic_03.ipynb → ดูผลและ Export กลับเป็น Excel</p>
-    </div>
-    <div class="badge">5 Conditions + Import_Monthly</div>
-  </section>
-
-  <div class="grid">
-    <section class="card">
-      <h2>1) ใส่ไฟล์</h2>
-      <div class="sub">รองรับหลายไฟล์พร้อมกัน และเดาประเภทไฟล์ให้อัตโนมัติ</div>
-      <div class="drop" id="dropZone">
-        <strong>วางไฟล์ .xlsx / .xls ที่นี่</strong>
-        <span>หรือคลิกเพื่อเลือกไฟล์ — สามารถใส่ G/L, U รายเดือน, U รายสัปดาห์, Real_Master_CPI และราคากลางพร้อมกัน</span>
-      </div>
-      <input id="fileInput" type="file" accept=".xlsx,.xls,.xlsm" multiple />
-      <div class="file-list" id="fileList"></div>
-      <div class="actions">
-        <button class="btn primary" id="processBtn" disabled>ประมวลผล Condition</button>
-        <button class="btn secondary" id="clearBtn">ล้างไฟล์ทั้งหมด</button>
-      </div>
-      <div id="status" class="status"></div>
-      <div id="log" class="log" hidden></div>
-    </section>
-
-    <section class="card">
-      <h2>Logic ที่ใช้</h2>
-      <div class="sub">ถอดจาก Python เดิม โดยเน้นให้ผลลัพธ์และชื่อ Sheet สอดคล้องกัน</div>
-      <div class="steps">
-        <div class="step"><div class="n">1</div><div><b>REL ไม่ตรง</b><div>คำนวณ RELN = ราคาปัจจุบัน ÷ ราคาเปรียบเทียบ × 100 และตรวจ diffREL &gt; 0</div></div></div>
-        <div class="step"><div class="n">2</div><div><b>ช่องคำนวณว่าง</b><div>ตรวจราคา / ราคาเปรียบเทียบ / REL ที่เป็น 0, ว่าง หรือ NaN ตามชุดเงื่อนไขเดิม</div></div></div>
-        <div class="step"><div class="n">3</div><div><b>ราคากลาง</b><div>Map ด้วย “รหัส + ประเภทร้านค้า” แล้วหาแถวที่ราคาปัจจุบันไม่เท่าราคากลาง</div></div></div>
-        <div class="step"><div class="n">4</div><div><b>ราคาที่สงสัย</b><div>Z-score รายการ 16 หลัก / หมวด 7 หลัก + REL + เหตุผลจากผู้บันทึก/ผู้ตรวจ</div></div></div>
-        <div class="step"><div class="n">5</div><div><b>ตรวจตัวซ้ำ</b><div>ตรวจคู่ “รหัส + รหัสแหล่ง” ซ้ำ และแสดงทุกแถวที่เกี่ยวข้อง</div></div></div>
-      </div>
-      <div class="notice"><b>หมายเหตุ:</b> การ map ร้านใช้ตาราง <code>shop_manual_cleansing</code> ใน Real_Master_CPI และจับ keyword แบบ case-sensitive ตามพฤติกรรมที่เทียบกับผล Python ตัวอย่างได้ใกล้ที่สุด</div>
-    </section>
-  </div>
-
-  <section class="results" id="results" hidden>
-    <div class="kpis" id="kpis"></div>
-    <div class="results-card">
-      <div class="toolbar">
-        <div class="tabs" id="tabs"></div>
-        <div class="search-wrap"><input id="searchBox" class="search" placeholder="ค้นหาในผลลัพธ์..." /></div>
-        <button class="btn primary" id="exportAllBtn">ดาวน์โหลดผลตรวจสอบ 5 ชีต</button>
-        <button class="btn secondary" id="exportImportBtn">ดาวน์โหลด Import_Monthly</button>
-      </div>
-      <div class="table-wrap" id="tableWrap"></div>
-      <div class="footer-note" id="footerNote"></div>
-    </div>
-  </section>
+<section class="hero">
+<div>
+<h1>CPI Price Validation</h1>
+<p>ลากไฟล์ Excel เข้ามา → ตรวจตาม logic จาก Analysic_03(3).ipynb → ดูผลและ Export กลับเป็น Excel</p>
 </div>
-
+<div class="badge">5 Conditions + Import_Monthly + Import_Weekly</div>
+</section>
+<div class="grid">
+<section class="card">
+<h2>1) ใส่ไฟล์</h2>
+<div class="sub">รองรับหลายไฟล์พร้อมกัน และเดาประเภทไฟล์ให้อัตโนมัติ</div>
+<div class="drop" id="dropZone">
+<strong>วางไฟล์ .xlsx / .xls ที่นี่</strong>
+<span>หรือคลิกเพื่อเลือกไฟล์ — สามารถใส่ G/L, U รายเดือน, U รายสัปดาห์, Real_Master_CPI และราคากลางพร้อมกัน</span>
+</div>
+<input accept=".xlsx,.xls,.xlsm" id="fileInput" multiple="" type="file"/>
+<div class="file-list" id="fileList"></div>
+<div class="actions">
+<button class="btn primary" disabled="" id="processBtn">ประมวลผล Condition</button>
+<button class="btn secondary" id="clearBtn">ล้างไฟล์ทั้งหมด</button>
+</div>
+<div class="status" id="status"></div>
+<div class="log" hidden="" id="log"></div>
+</section>
+<section class="card">
+<h2>Logic ที่ใช้</h2>
+<div class="sub">ถอดจาก Python เดิม โดยเน้นให้ผลลัพธ์และชื่อ Sheet สอดคล้องกัน</div>
+<div class="steps">
+<div class="step"><div class="n">1</div><div><b>REL ไม่ตรง</b><div>RELN = ราคาปัจจุบัน / ราคาเปรียบเทียบ x 100 | diffREL = ROUND_HALF_UP(abs(RELN - REL), 2) &gt; 0</div></div></div>
+<div class="step"><div class="n">2</div><div><b>ช่องคำนวณว่าง</b><div>G / L = Checked + 3 conditions | concat df02, df021, df022, df023 | keep last</div></div></div>
+<div class="step"><div class="n">3</div><div><b>ราคากลาง</b><div>รหัส + ประเภทร้านค้า | shop.py + CODE7 | keep last</div></div></div>
+<div class="step"><div class="n">4</div><div><b>ราคาที่สงสัย</b><div>Z-score รายการ 16 หลัก / หมวด 7 หลัก + REL + เหตุผลจากผู้บันทึก/ผู้ตรวจ</div></div></div>
+<div class="step"><div class="n">5</div><div><b>ตรวจตัวซ้ำ</b><div>ตรวจคู่ “รหัส + รหัสแหล่ง” ซ้ำ และแสดงทุกแถวที่เกี่ยวข้อง</div></div></div>
+<div class="step"><div class="n">6</div><div><b>Import_Weekly</b><div>dfw: สป.1 / สป.2 / สป.3 / สป.4 | ราคาทั้งสองฝั่งต้องครบ 4 สัปดาห์ | ไม่กรอง Link</div></div></div></div>
+<div class="notice"><b>Python:</b> df / dfw แยกกัน (concat ถูกคอมเมนต์ไว้)<br/>Master: <code>shop_manual_cleansing</code> + <code>ข้อมูล_รายการ_ผู้ดูแล</code><br/>เปิดผ่านเซิร์ฟเวอร์: ลองโหลด Real_Master_CPI.xlsx อัตโนมัติ<br/>เปิดไฟล์โดยตรง: อัปโหลด Master พร้อมไฟล์ราคา (ไม่อ่านดิสก์โดยไม่ได้รับอนุญาต)</div>
+<details class="logic-notes"><summary>รายละเอียดการเทียบ Python</summary><p>Analysic_03(3).ipynb: cells 19-47, 51, 53-56; shop(1).py: ไฟล์เดิมจาก Library.</p><p>หมายเหตุ: cells 53/55 อ้าง CODE7 / ผู้ดูแล จาก df แทน dw/cp. หน้านี้ใช้รหัสของแถวนั้น สำหรับการแสดงผู้ดูแล; ไม่เปลี่ยนเงื่อนไขเลือกแถวส่งออก.</p><p>Import_Weekly: ราคาเดิม และ ราคากลาง ต้องครบ 4 สัปดาห์; 0 นับว่ามีค่า; Link ไม่จำกัด.</p></details></section>
+</div>
+<section class="results" hidden="" id="results">
+<div class="kpis" id="kpis"></div>
+<div class="results-card">
+<div class="toolbar">
+<div class="tabs" id="tabs"></div>
+<div class="search-wrap"><input class="search" id="searchBox" placeholder="ค้นหาผู้ดูแล / รหัส / จังหวัด / ข้อความ..."/></div>
+<button class="btn primary" id="exportAllBtn">ดาวน์โหลดผลตรวจสอบ 5 ชีต</button>
+<button class="btn secondary" id="exportImportBtn">ดาวน์โหลด Import_Monthly</button><button class="btn secondary" disabled="" id="exportWeeklyBtn">ดาวน์โหลด Import_Weekly</button>
+</div>
+<div class="table-wrap" id="tableWrap"></div>
+<div class="footer-note" id="footerNote"></div>
+</div>
+</section>
+</div>
 <script>
 (() => {
   'use strict';
+
+  // Source of truth: Analysic_03(3).ipynb, code cells 5, 9, 12, 19-56.
+  // Shop exceptions: the user's shop(1).py (source column: collection outlet).
+  const C = {"owner": "ผู้ดูแล", "code7": "CODE7", "code": "รหัส", "spec": "ลักษณะจำเพาะ", "sourceCode": "รหัสแหล่ง", "source": "แหล่งจัดเก็บ", "shop": "ประเภทร้านค้า", "province": "เขต/จังหวัด", "prev": "ราคาเดือนก่อน", "cur": "ราคาปัจจุบัน", "link": "Link", "compare": "ราคาเปรียบเทียบ", "rel": "REL", "recorder": "ภาวะ (ผู้บันทึก)", "inspector": "ภาวะ (ผู้ตรวจ)", "central": "ราคากลาง", "itemCode": "รหัสรายการ", "shopHead": "ห้าง/ร้าน", "usedPrice": "ราคาที่ใช้", "average": "ราคาเฉลี่ย", "other": "ร้านอื่นๆ", "check": "ตรวจสอบ", "passLabel": "ถือว่าผ่าน", "weekCount": "จำนวนสัปดาห์ที่มีราคา", "prevAlt": "ราคาเดือนที่แล้ว", "compareAlt": "เปรียบเทียบ", "recorderAlt": "ภาวะ(ผู้บันทึก)", "inspectorAlt": "ภาวะ(ผู้ตรวจ)"};
+  const KEYS = ["01_RELไม่ตรง", "02_ช่องคำนวณว่าง", "03_ราคากลาง", "04_ราคาที่สงสัย", "05_ตรวจตัวซ้ำ"];
+  const WEEK = ["สป.1", "สป.2", "สป.3", "สป.4"];
+  const CPWEEK = ["สป1", "สป2", "สป3", "สป4"];
+  const WKEY = "06_ราคารายสัปดาห์";
+  const WEEK_RENAME = {"สป. 1.1": "สป.1", "สป. 2.1": "สป.2", "สป.3.1": "สป.3", "สป. 4.1": "สป.4"};
+  const sheetCache = new WeakMap();
+  const pandasNA = new Set(['', '#N/A', '#N/A N/A', '#NA', '-1.#IND', '-1.#QNAN', '-NaN', '-nan', '1.#IND', '1.#QNAN', '<NA>', 'N/A', 'NA', 'NULL', 'NaN', 'None', 'n/a', 'nan', 'null']);
+  const numericPattern = /^[+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:e[+-]?\d+)?$/i;
+  const isNA = v => v == null || (typeof v === 'number' && Number.isNaN(v)) || (typeof v === 'string' && pandasNA.has(v));
+  const cellValue = v => isNA(v) ? null : v;
+  const has = (r,k) => Object.prototype.hasOwnProperty.call(r,k);
+  function resolveHeader(headers, names) { return names.find(k => headers.includes(k)) || null; }
+  const weeklyText = 'รายสัปดาห์';
+  const monthlyText = 'รายเดือน';
+
 
   const ROLE_LABELS = {
     data: 'ข้อมูลราคา (นำมาตรวจ)',
     master: 'Real_Master_CPI',
     central: 'ราคากลาง',
+    weekly: weeklyText + ' (dfw)',
+    centralWeekly: C.central + ' (' + weeklyText + ')',
     ignore: 'ไม่ใช้ / ไฟล์ผลลัพธ์'
   };
 
   const state = {
-    files: [], results: null, activeKey: '01_RELไม่ตรง', logs: []
+    files: [], results: null, monthlyCount:0, weeklyCount:0, weeklyStats:null, busy:false, activeKey: '01_RELไม่ตรง', logs: []
   };
 
   const $ = id => document.getElementById(id);
@@ -138,100 +157,146 @@
   function cleanText(v) { return v == null ? '' : String(v).trim(); }
   function cleanCode(v) { return cleanText(v).replace(/\.0$/, ''); }
   function toNum(v) {
-    if (v == null) return null;
+    if (isNA(v)) return null;
     if (typeof v === 'number') return Number.isFinite(v) ? v : null;
-    const s = String(v).trim().replace(/,/g,'');
-    if (!s || s === '-' || s.toLowerCase() === 'nan') return null;
-    const n = Number(s.replace(/%$/,''));
-    return Number.isFinite(n) ? n : null;
+    const s = String(v).trim();
+    if (!numericPattern.test(s)) return null;
+    const n=Number(s); return Number.isFinite(n) ? n : null;
   }
   function isMissingZero(v) { const n = toNum(v); return n == null || n === 0; }
+  
+  // Banker's Rounding (Round Half to Even) ตามพฤติกรรม round() ของ Pandas/Python
   function roundHalfEven(value, decimals=2) {
+    // Pandas Series.round / NumPy around, used for Z-scores ONLY.
     if (!Number.isFinite(value)) return null;
-    const sign = value < 0 ? -1 : 1;
-    const factor = 10 ** decimals;
-    const x = Math.abs(value) * factor;
-    const floor = Math.floor(x);
-    const frac = x - floor;
-    let rounded;
-    if (Math.abs(frac - 0.5) < 1e-10) rounded = (floor % 2 === 0) ? floor : floor + 1;
-    else rounded = Math.round(x);
-    return sign * rounded / factor;
+    const factor=10**decimals, scaled=Math.abs(value)*factor;
+    const floor=Math.floor(scaled), fraction=scaled-floor;
+    const integer=fraction===0.5 ? (floor%2===0 ? floor : floor+1) : Math.round(scaled);
+    return (value<0 ? -integer : integer)/factor;
   }
+
+  function roundHalfUp(value, decimals=2) {
+    // Decimal(str(value)).quantize(..., rounding=ROUND_HALF_UP).
+    // Decimal digit arithmetic avoids binary tie errors; do NOT add EPSILON.
+    if (!Number.isFinite(value)) return null;
+    if (!Number.isInteger(decimals) || decimals<0 || decimals>10) throw new Error('Invalid rounding precision');
+    const negative=value<0;
+    const parts=Math.abs(value).toString().toLowerCase().split('e');
+    const exponent=Number(parts[1]||0);
+    const bits=parts[0].split('.');
+    const digits=BigInt((bits[0]+(bits[1]||'')).replace(/^0+(?=\d)/,''));
+    const shift=exponent-(bits[1]||'').length+decimals;
+    let integer;
+    if (shift>=0) integer=digits*10n**BigInt(shift);
+    else {
+      const divisor=10n**BigInt(-shift);
+      integer=digits/divisor;
+      if ((digits%divisor)*2n>=divisor) integer+=1n;
+    }
+    return Number((negative ? '-' : '')+integer.toString()+'e-'+decimals);
+  }
+
   function isClose(a,b) {
-    if (!Number.isFinite(a) || !Number.isFinite(b)) return false;
-    return Math.abs(a-b) <= (1e-8 + 1e-5 * Math.abs(b));
+    // Notebook: np.isclose(current-central, 0). Relative tolerance is zero here.
+    return Number.isFinite(a) && Number.isFinite(b) && Math.abs(a-b)<=1e-8;
   }
 
   function makeUniqueHeaders(row) {
-    const seen = new Map();
-    return row.map((v,i) => {
-      let name = cleanText(v) || `_col${i+1}`;
-      const n = seen.get(name) || 0;
-      seen.set(name, n+1);
-      return n === 0 ? name : `${name}.${n}`;
+    const original=Array.from(row,(v,i)=>cleanText(v)||`Unnamed: ${i}`);
+    const occupied=new Set(original), seen=new Set(), counters=new Map();
+    return original.map(name=>{
+      if (!seen.has(name)) { seen.add(name); return name; }
+      let n=(counters.get(name)||0)+1;
+      while (occupied.has(`${name}.${n}`) || seen.has(`${name}.${n}`)) n++;
+      counters.set(name,n); const unique=`${name}.${n}`; seen.add(unique); return unique;
     });
   }
 
   function sheetRows(ws) {
-    return XLSX.utils.sheet_to_json(ws, {header:1, defval:null, raw:false, blankrows:false});
+    if (sheetCache.has(ws)) return sheetCache.get(ws);
+    if (!ws || !ws['!ref']) return [];
+    const range=XLSX.utils.decode_range(ws['!ref']);
+    range.s={r:0,c:0};
+    // Raw numeric cell values, not number-format display strings; retain physical rows.
+    const rows=XLSX.utils.sheet_to_json(ws,{header:1,defval:null,raw:true,blankrows:true,range});
+    sheetCache.set(ws,rows); return rows;
   }
 
-  function findHeaderRow(ws, mode='data') {
-    const arr = sheetRows(ws).slice(0, 25);
-    let best = {idx:-1, score:-1};
-    arr.forEach((row,idx) => {
-      const vals = row.map(cleanText);
-      const set = new Set(vals);
-      let score = 0;
-      if (mode === 'central') {
-        ['รหัสรายการ','ห้าง/ร้าน','ราคาที่ใช้'].forEach(k => { if(set.has(k)) score += 4; });
+  function findHeaderRow(ws,mode='data') {
+    const rows=sheetRows(ws).slice(0,40); let best={idx:-1,score:-1};
+    rows.forEach((row,idx)=>{
+      const headers=makeUniqueHeaders(row), set=new Set(headers); let score=-1;
+      if(mode==='central' || mode==='centralWeekly') {
+        const wanted=mode==='central' ? [C.itemCode,C.shopHead,C.usedPrice] : [C.itemCode,C.shopHead,...CPWEEK];
+        if(wanted.every(k=>set.has(k))) score=wanted.length;
       } else {
-        ['รหัส','ลักษณะจำเพาะ','แหล่งจัดเก็บ','ราคาปัจจุบัน','REL','เปรียบเทียบ','ราคาเปรียบเทียบ','ราคาเฉลี่ย'].forEach(k => { if(set.has(k)) score += 2; });
-        if (vals.filter(x => x === 'รหัส').length >= 2) score += 4;
-        if (set.has('G') || set.has('L') || set.has('U') || set.has('N')) score += 2;
+        const code=set.has(C.code), source=set.has(C.source);
+        const current=set.has(C.cur)||set.has(C.average+'.1');
+        const weekHeaders=getCurrentWeekHeaders(headers);
+        if(code&&source&&(current||weekHeaders.every(Boolean))) {
+          score=[C.code,C.spec,C.source,C.cur,C.rel,C.compare,C.compareAlt,C.average].reduce((n,k)=>n+(set.has(k)?1:0),0);
+        }
       }
-      if (score > best.score) best = {idx,score};
+      if(score>best.score) best={idx,score};
     });
-    const threshold = mode === 'central' ? 10 : 7;
-    return best.score >= threshold ? best.idx : -1;
+    return best.score>=0?best.idx:-1;
   }
 
-  function objectsFromSheet(ws, headerIdx) {
-    const arr = sheetRows(ws);
-    if (headerIdx < 0 || headerIdx >= arr.length) return [];
-    const headers = makeUniqueHeaders(arr[headerIdx]);
-    const out = [];
-    for (let i=headerIdx+1; i<arr.length; i++) {
-      const row = arr[i];
-      if (!row || row.every(v => cleanText(v)==='')) continue;
-      const obj = {};
-      headers.forEach((h,j) => obj[h] = row[j] ?? null);
+  function getCurrentWeekHeaders(headers) {
+    const canonical=s=>s.replace(/\s+/g,'');
+    // Repeated headings become .1 in Pandas: these are the CURRENT month.
+    const duplicate=WEEK.map(k=>headers.find(h=>canonical(h)===k+'.1')||null);
+    if(duplicate.some(Boolean)) return duplicate;
+    return WEEK.map(k=>headers.find(h=>canonical(h)===k)||null);
+  }
+
+  function dataSchema(headers) {
+    const weekHeaders=getCurrentWeekHeaders(headers);
+    return {
+      headers,
+      sourceCode:resolveHeader(headers,[C.code+'.1',C.sourceCode]),
+      prev:resolveHeader(headers,[C.prev,C.prevAlt,C.average]),
+      cur:resolveHeader(headers,[C.cur,C.average+'.1']),
+      compare:resolveHeader(headers,[C.compare,C.compareAlt]),
+      recorder:resolveHeader(headers,[C.recorder,C.recorderAlt]),
+      inspector:resolveHeader(headers,[C.inspector,C.inspectorAlt]),
+      weekHeaders,
+      isWeekly:weekHeaders.some(Boolean)||headers.includes(C.average+'.1')
+    };
+  }
+
+  function objectsFromSheet(ws,headerIdx) {
+    const arr=sheetRows(ws);
+    if(headerIdx<0||headerIdx>=arr.length) return [];
+    const headers=makeUniqueHeaders(arr[headerIdx]), out=[];
+    for(let i=headerIdx+1;i<arr.length;i++) {
+      const row=arr[i]; if(!row||row.every(v=>isNA(v))) continue;
+      const obj={}; headers.forEach((h,j)=>obj[h]=cellValue(row[j]??null));
+      Object.defineProperty(obj,'_excelRow',{value:i+1,enumerable:false});
       out.push(obj);
+    }
+    // Match read_excel inference: an all-numeric Link column is numeric.
+    // In a mixed column (e.g. hyperlinks), a literal string '0' is NOT numeric 0.
+    if(headers.includes(C.link)) {
+      const present=out.map(r=>r[C.link]).filter(v=>v!=null);
+      const numeric=present.length>0&&present.every(v=>toNum(v)!=null);
+      if(numeric) out.forEach(r=>r[C.link]=toNum(r[C.link]));
     }
     return out;
   }
 
-  function inspectWorkbook(wb, filename) {
-    const sheets = wb.SheetNames || [];
-    if (sheets.includes('shop_manual_cleansing') && sheets.includes('ข้อมูล_รายการ_ผู้ดูแล')) {
-      return {role:'master', info:`${sheets.length} sheets`};
+  function inspectWorkbook(wb,filename) {
+    const sheets=wb.SheetNames||[];
+    if(sheets.includes('shop_manual_cleansing') || /Real_Master_CPI/i.test(filename)) return {role:'master',info:`${sheets.length} sheets`};
+    if(sheets.some(s=>[...KEYS,'Monthly_Report','Weekly_Report'].includes(s))) return {role:'ignore',info:'ไฟล์ผลลัพธ์ (ไม่นำมาตรวจซ้ำ)'};
+    for(const s of sheets) if(findHeaderRow(wb.Sheets[s],'centralWeekly')>=0) return {role:'centralWeekly',info:`cenPriceW | ${s}`};
+    for(const s of sheets) if(findHeaderRow(wb.Sheets[s],'central')>=0) return {role:'central',info:`cenPrice | ${s}`};
+    for(const s of sheets) {
+      const h=findHeaderRow(wb.Sheets[s]); if(h<0) continue;
+      const schema=dataSchema(makeUniqueHeaders(sheetRows(wb.Sheets[s])[h]));
+      return {role:schema.isWeekly?'weekly':'data',info:`${schema.isWeekly?'dfw':'df'} | ${s} | Header ${h+1}`};
     }
-    if (sheets.some(s => ['01_RELไม่ตรง','02_ช่องคำนวณว่าง','03_ราคากลาง','04_ราคาที่สงสัย','05_ตรวจตัวซ้ำ','Monthly_Report'].includes(s))) {
-      return {role:'ignore', info:'ตรวจพบว่าเป็นไฟล์ผลลัพธ์'};
-    }
-    for (const s of sheets) {
-      const ws = wb.Sheets[s];
-      if (findHeaderRow(ws,'central') >= 0) return {role:'central', info:`ราคากลาง • ${s}`};
-    }
-    for (const s of sheets) {
-      const ws = wb.Sheets[s];
-      const h = findHeaderRow(ws,'data');
-      if (h >= 0) return {role:'data', info:`ข้อมูลราคา • ${s} • header แถว ${h+1}`};
-    }
-    if (/Real_Master_CPI/i.test(filename)) return {role:'master', info:'เดาจากชื่อไฟล์'};
-    if (/ราคากลาง/i.test(filename)) return {role:'central', info:'เดาจากชื่อไฟล์'};
-    return {role:'ignore', info:'ไม่พบโครงสร้างที่รู้จัก'};
+    return {role:'ignore',info:'ไม่พปโครงสร้างตาม notebook'};
   }
 
   async function addFiles(files) {
@@ -239,13 +304,14 @@
       setStatus('โหลดตัวอ่าน Excel ไม่สำเร็จ กรุณาเชื่อมต่ออินเทอร์เน็ตแล้วเปิดไฟล์ HTML ใหม่', 'err');
       return;
     }
+    invalidateResults();
     setStatus('กำลังอ่านไฟล์...', 'warn');
     for (const file of files) {
       try {
         const buf = await file.arrayBuffer();
         const wb = XLSX.read(buf, {type:'array', cellDates:false, dense:false});
         const guess = inspectWorkbook(wb, file.name);
-        state.files.push({id:crypto.randomUUID ? crypto.randomUUID() : String(Date.now()+Math.random()), file, wb, role:guess.role, info:guess.info});
+        state.files.push({id:globalThis.crypto?.randomUUID ? globalThis.crypto.randomUUID() : String(Date.now()+Math.random()), file, wb, role:guess.role, info:guess.info});
         log(`${file.name} → ${ROLE_LABELS[guess.role]}`, 'ok');
       } catch (e) {
         log(`${file.name} อ่านไม่ได้: ${e.message || e}`, 'err');
@@ -263,12 +329,12 @@
       info.innerHTML = `<div class="file-name" title="${escapeHtml(rec.file.name)}">${escapeHtml(rec.file.name)}</div><div class="file-meta">${escapeHtml(rec.info)}</div>`;
       const sel = document.createElement('select');
       Object.entries(ROLE_LABELS).forEach(([v,l]) => { const o=document.createElement('option'); o.value=v; o.textContent=l; if(rec.role===v)o.selected=true; sel.appendChild(o); });
-      sel.addEventListener('change',()=>{rec.role=sel.value;});
+      sel.addEventListener('change',()=>{rec.role=sel.value;invalidateResults();renderFiles();});
       const del = document.createElement('button'); del.className='xbtn'; del.textContent='×'; del.title='เอาไฟล์ออก';
-      del.addEventListener('click',()=>{state.files=state.files.filter(x=>x.id!==rec.id); renderFiles();});
+      del.addEventListener('click',()=>{state.files=state.files.filter(x=>x.id!==rec.id); invalidateResults();renderFiles();});
       row.append(info,sel,del); fileList.appendChild(row);
     });
-    processBtn.disabled = state.files.filter(x=>x.role==='data').length===0;
+    processBtn.disabled = state.busy || !state.files.some(x=>x.role==='data'||x.role==='weekly');
   }
 
   function parseMaster(rec) {
@@ -279,8 +345,8 @@
       const rows = objectsFromSheet(wb.Sheets['shop_manual_cleansing'],0);
       rows.forEach(r => {
         const result = cleanText(r['Result']);
-        const primary = cleanText(r['Primary Keywords']).split(',').map(x=>x.trim()).filter(Boolean);
-        const sub = cleanText(r['Sub Keywords']).split(',').map(x=>x.trim()).filter(Boolean);
+        const primary = cleanText(r['Primary Keywords']).split(',').map(x=>x.trim()).filter(x=>x&&x.toLowerCase()!=='nan');
+        const sub = cleanText(r['Sub Keywords']).split(',').map(x=>x.trim()).filter(x=>x&&x.toLowerCase()!=='nan');
         if (result && primary.length) shopRules.push({result, primary, sub});
       });
     }
@@ -290,91 +356,129 @@
       rows.forEach(r => {
         const code = cleanCode(r['รหัส']);
         if (!code) return;
-        userMap.set(code.slice(0,7), r['ผู้ดูแล'] ?? null); // keep last เหมือน pandas keep='last'
+        userMap.set(code.slice(0,7), r['ผู้ดูแล'] ?? null);
       });
     }
     return {shopRules,userMap};
   }
 
-  function parseCentral(rec) {
-    const map = new Map();
-    if (!rec) return map;
-    for (const s of rec.wb.SheetNames) {
-      const ws = rec.wb.Sheets[s];
-      const h = findHeaderRow(ws,'central');
-      if (h < 0) continue;
-      const rows = objectsFromSheet(ws,h);
-      rows.forEach(r => {
-        const code = cleanCode(r['รหัสรายการ']);
-        const shop = cleanText(r['ห้าง/ร้าน']);
-        if (!code || !shop) return;
-        map.set(code+'\u001f'+shop, toNum(r['ราคาที่ใช้'])); // keep last
-      });
+  function parseCentral(records,shopRules=[]) {
+    const map=new Map(); let parsed=0,excluded=0,duplicates=0;
+    for(const rec of Array.isArray(records)?records:(records?[records]:[])) {
+      let found=false;
+      for(const s of rec.wb.SheetNames) {
+        const ws=rec.wb.Sheets[s], h=findHeaderRow(ws,'central'); if(h<0) continue;
+        found=true;
+        for(const r of objectsFromSheet(ws,h)) {
+          const code=cleanCode(r[C.itemCode]), rawShop=cleanText(r[C.shopHead]);
+          if(!code||!rawShop) continue;
+          parsed++;
+          const shopType=mapShop(rawShop,shopRules,code.slice(0,7));
+          if(shopType===C.other) {excluded++;continue;}
+          const price=readNumber(r[C.usedPrice],`${rec.file.name} / ${s} / row ${r._excelRow} / ${C.usedPrice}`);
+          const key=code+'\u001f'+shopType;
+          if(map.has(key)) duplicates++;
+          map.set(key,price); // keep='last', including a missing last price.
+        }
+      }
+      if(!found) throw new Error(`${rec.file.name}: ${[C.itemCode,C.shopHead,C.usedPrice].join(' / ')} ?`);
     }
-    return map;
+    map.diagnostics={parsed,excluded,duplicates}; return map;
   }
 
-  function mapShop(name, rules) {
-    const s = cleanText(name);
-    for (const rule of rules) {
-      const primaryMatch = rule.primary.some(k => s.includes(k)); // case-sensitive ตาม Python ที่เทียบผลได้ตรง
-      if (!primaryMatch) continue;
-      if (rule.sub.length) {
-        if (rule.sub.some(k => s.includes(k))) return rule.result;
-      } else return rule.result;
+  function parseWeeklyCentral(records,shopRules=[]) {
+    const map=new Map(); let parsed=0,excluded=0,duplicates=0;
+    for(const rec of records) {
+      let found=false;
+      for(const s of rec.wb.SheetNames) {
+        const ws=rec.wb.Sheets[s],h=findHeaderRow(ws,'centralWeekly');if(h<0)continue;
+        found=true;
+        for(const r of objectsFromSheet(ws,h)) {
+          const rawCode=r[C.itemCode]==null?'':String(r[C.itemCode]);
+          const code=cleanCode(rawCode), name=r[C.shopHead]==null?'':String(r[C.shopHead]);
+          if(!code)continue; parsed++;
+          const type=mapShop(name,shopRules,rawCode.slice(0,7));
+          if(type===C.other){excluded++;continue;}
+          const o={};
+          CPWEEK.forEach(k=>o[k]=readNumber(r[k],`${rec.file.name} / ${s} / row ${r._excelRow} / ${k}`));
+          o[C.weekCount]=r[C.weekCount]??null;
+          const key=code+'\u001f'+type;
+          if(!map.has(key))map.set(key,[]);else duplicates++;
+          map.get(key).push(o); // The notebook's weekly merge DOES NOT deduplicate cp.
+        }
+      }
+      if(!found)throw new Error(`${rec.file.name}: ${[C.itemCode,C.shopHead,...CPWEEK].join(' / ')} ?`);
     }
-    return 'ร้านอื่นๆ';
+    map.diagnostics={parsed,excluded,duplicates};return map;
   }
 
-  function normalizeDataRow(r, shopRules, userMap, meta) {
-    const code = cleanCode(r['รหัส']);
-    const sourceCode = cleanCode(r['รหัส.1'] ?? r['รหัสแหล่ง']);
-    const sourceOriginal = cleanText(r['แหล่งจัดเก็บ']);
-    let province = '';
-    const m = sourceOriginal.match(/.*\((.*?)\)/); // greedy เหมือน Python: จับวงเล็บชุดท้ายที่ match ได้
-    if (m) province = cleanText(m[1]);
-    const sourceClean = sourceOriginal.replace(/\([^)]*\)(?=[^)]*$)/, '').trim();
-
-    let prev = r['ราคาเดือนก่อน'];
-    if (prev == null || cleanText(prev)==='') prev = r['ราคาเดือนที่แล้ว'];
-    let current = r['ราคาปัจจุบัน'];
-    if ((current == null || cleanText(current)==='') && r['ราคาเฉลี่ย.1'] != null) current = r['ราคาเฉลี่ย.1'];
-    if ((prev == null || cleanText(prev)==='') && r['ราคาเฉลี่ย'] != null) prev = r['ราคาเฉลี่ย'];
-
-    const compare = r['ราคาเปรียบเทียบ'] ?? r['เปรียบเทียบ'];
-    const code7 = code.slice(0,7);
-    return {
-      G:r['G'] ?? null, L:r['L'] ?? null, U:r['U'] ?? null, N:r['N'] ?? null,
-      'ผู้ดูแล': userMap.get(code7) ?? null,
-      CODE7:code7,
-      'รหัส':code,
-      'ลักษณะจำเพาะ':r['ลักษณะจำเพาะ'] ?? null,
-      'รหัสแหล่ง':sourceCode,
-      'แหล่งจัดเก็บ':sourceClean,
-      'ประเภทร้านค้า':mapShop(sourceClean,shopRules),
-      'เขต/จังหวัด':province || null,
-      'ราคาเดือนก่อน':toNum(prev),
-      'ราคาปัจจุบัน':toNum(current),
-      'Link':r['Link'] ?? null,
-      'ราคาเปรียบเทียบ':toNum(compare),
-      'REL':toNum(r['REL']),
-      'ภาวะ (ผู้บันทึก)':r['ภาวะ (ผู้บันทึก)'] ?? null,
-      'ภาวะ (ผู้ตรวจ)':r['ภาวะ (ผู้ตรวจ)'] ?? null,
-      _file:meta.file, _sheet:meta.sheet
-    };
+  function readNumber(value,context='') {
+    if(isNA(value))return null;
+    const n=toNum(value);
+    if(n==null)throw new Error(`${context}: ${JSON.stringify(value)} ไม่ใช่ตัวเลข`);
+    return n;
   }
 
-  function parseDataFiles(recs, shopRules, userMap) {
+  function mapShop(name,rules,code7='') {
+    const s=name==null?'':String(name);
+    // These exceptions run BEFORE Excel keyword rules in shop(1).py.
+    if(code7.startsWith('4111')||['1250001','1250002','1250008','1160015'].includes(code7))return C.other;
+    if(s==='ท็อปน์ (เซ็นทรัล นนทบุรี)')return 'Tops';
+    if(s==='ร้านเอเซ่เว่น'||s==='')return C.other;
+    for(const rule of rules) {
+      if(!rule.primary.some(k=>s.includes(k)))continue;
+      if(rule.sub.length&&!rule.sub.some(k=>s.includes(k)))continue;
+      return rule.result;
+    }
+    return C.other;
+  }
+
+  function normalizeDataRow(r,shopRules,userMap,meta) {
+    const schema=meta.schema||dataSchema(Object.keys(r));
+    const rawCode=r[C.code]==null?'':String(r[C.code]),code=cleanCode(rawCode);
+    const sourceCode=cleanCode(schema.sourceCode?r[schema.sourceCode]:null);
+    const sourceOriginal=r[C.source]==null?'':String(r[C.source]);
+    const match=sourceOriginal.match(/.*\((.*?)\)/);
+    const province=match?match[1]:null;
+    const sourceClean=sourceOriginal.replace(/\([^)]*\)(?=[^)]*$)/,'').trim();
+    const context=`${meta.file} / ${meta.sheet} / row ${r._excelRow||'?'}`;
+    const num=key=>key?readNumber(r[key],`${context} / ${key}`):null;
+    const code7=code.slice(0,7);
+    const o={G:r.G??null,L:r.L??null,U:r.U??null,N:r.N??null,
+      [C.owner]:userMap.get(code7)??null,[C.code7]:code7,[C.code]:code,
+      [C.spec]:r[C.spec]??null,[C.sourceCode]:sourceCode,[C.source]:sourceClean,
+      [C.shop]:mapShop(sourceClean,shopRules,rawCode.slice(0,7)),[C.province]:province,
+      [C.prev]:num(schema.prev),[C.cur]:num(schema.cur),[C.link]:r[C.link]??null,
+      [C.compare]:num(schema.compare),[C.rel]:num(C.rel),
+      [C.recorder]:schema.recorder?r[schema.recorder]??null:null,
+      [C.inspector]:schema.inspector?r[schema.inspector]??null:null,
+      _file:meta.file,_sheet:meta.sheet,_row:r._excelRow??null};
+    WEEK.forEach((k,i)=>o[k]=num(schema.weekHeaders[i]));
+    return o;
+  }
+
+  function parseDataFiles(recs,shopRules,userMap) {
     const out=[];
-    recs.forEach(rec => {
-      rec.wb.SheetNames.forEach(s => {
-        const ws=rec.wb.Sheets[s]; const h=findHeaderRow(ws,'data');
-        if(h<0) return;
-        const rows=objectsFromSheet(ws,h);
-        const normalized=rows.map(r=>normalizeDataRow(r,shopRules,userMap,{file:rec.file.name,sheet:s})).filter(r=>r['รหัส']);
-        if(normalized.length){ out.push(...normalized); log(`${rec.file.name} / ${s}: ${normalized.length.toLocaleString()} แถว`, 'ok'); }
-      });
-    });
+    for(const rec of recs) {
+      let found=false;
+      for(const s of rec.wb.SheetNames) {
+        const ws=rec.wb.Sheets[s],h=findHeaderRow(ws,'data');if(h<0)continue;
+        found=true;
+        const schema=dataSchema(makeUniqueHeaders(sheetRows(ws)[h]));
+        if(!schema.sourceCode||!schema.compare)throw new Error(`${rec.file.name} / ${s}: ${C.sourceCode} / ${C.compare} ?`);
+        if(rec.role==='weekly'&&!schema.weekHeaders.every(Boolean))throw new Error(`${rec.file.name} / ${s}: ${WEEK.join(' / ')} ?`);
+        if(rec.role==='data'&&(!schema.cur||!schema.prev||!schema.headers.includes(C.rel)))throw new Error(`${rec.file.name} / ${s}: ${[C.prev,C.cur,C.rel].join(' / ')} ?`);
+        let count=0;
+        for(const r of objectsFromSheet(ws,h)) {
+          if(!cleanCode(r[C.code]))continue;
+          const row=normalizeDataRow(r,shopRules,userMap,{file:rec.file.name,sheet:s,schema});
+          out.push(row);count++;
+        }
+        if(rec.role==='data'&&schema.isWeekly)log(`${rec.file.name} / ${s}: dfw averages explicitly included in df (manual role)`,'warn');
+        log(`${rec.file.name} / ${s}: ${count.toLocaleString()} rows | ${rec.role==='weekly'?'dfw':'df'}`,'ok');
+      }
+      if(!found)throw new Error(`${rec.file.name}: ไม่พบชีตที่มีโครงสร้างข้อมูลราคาตาม notebook`);
+    }
     return out;
   }
 
@@ -390,32 +494,36 @@
   function pickCols(row, cols) { const o={}; cols.forEach(c=>o[c]=row[c] ?? null); return o; }
   function key2(r) { return cleanCode(r['รหัส'])+'\u001f'+cleanCode(r['รหัสแหล่ง']); }
 
+  // =========================================================================
+  // จุดสำคัญ: ฟังก์ชันคำนวณ REL และตรวจสอบความไม่ตรงกัน
+  // =========================================================================
   function conditionREL(rows) {
     const out=[];
-    rows.forEach(r=>{
-      const cur=r['ราคาปัจจุบัน'], cmp=r['ราคาเปรียบเทียบ'], rel=r['REL'];
-      const reln=(Number.isFinite(cur)&&Number.isFinite(cmp)&&cmp!==0)?(cur/cmp*100):null;
-      const diff=(reln!=null && Number.isFinite(rel))?roundHalfEven(reln-rel,2):null;
-      if(diff!=null && diff>0) out.push({...pickCols(r,baseCols), RELN:reln, diffREL:diff});
-    });
+    for(const r of rows) {
+      const cur=r[C.cur],cmp=r[C.compare],recorded=r[C.rel];
+      if(!Number.isFinite(cur)||!Number.isFinite(cmp)||cmp===0||!Number.isFinite(recorded))continue;
+      const reln=(cur/cmp)*100; // No rounding of RELN in notebook cell 21.
+      const diff=roundHalfUp(Math.abs(reln-recorded),2);
+      if(diff!=null&&diff>0)out.push({...pickCols(r,baseCols),RELN:reln,diffREL:diff});
+    }
     return out;
   }
 
   function conditionMissing(rows) {
     const a=[],b=[],c=[],d=[];
-    rows.forEach(r=>{
-      const miss=isMissingZero(r['ราคาปัจจุบัน'])||isMissingZero(r['ราคาเปรียบเทียบ'])||isMissingZero(r['REL']);
-      if(!miss) return;
-      const hasGL = r.G != null || r.L != null;
-      const checked = cleanText(r.G)==='Checked' || cleanText(r.L)==='Checked' || (!hasGL && cleanText(r.U)==='Checked');
-      if(checked) a.push({...r,Status:'Checked'});
-      if(Number.isFinite(r['ราคาเปรียบเทียบ']) && r['ราคาเปรียบเทียบ']>0) b.push({...r});
-      if(Number.isFinite(r['ราคาปัจจุบัน']) && r['ราคาปัจจุบัน']>0 && Number.isFinite(r['ราคาเดือนก่อน']) && r['ราคาเดือนก่อน']>0) c.push({...r});
-      if(Number.isFinite(r['ราคาเดือนก่อน']) && r['ราคาเดือนก่อน']>0) d.push({...r});
-    });
-    const map=new Map();
-    [...a,...b,...c,...d].forEach(r=>map.set(key2(r),r)); // keep last เหมือน drop_duplicates keep='last'
-    return [...map.values()].map(r=>pickCols(r,sheetCols['02_ช่องคำนวณว่าง']));
+    for(const r of rows) {
+      const miss=isMissingZero(r[C.cur])||isMissingZero(r[C.compare])||isMissingZero(r[C.rel]);
+      if(!miss)continue;
+      // Exact notebook rule: G OR L, not U as a fallback.
+      if(r.G==='Checked'||r.L==='Checked')a.push({...r,Status:'Checked'});
+      if(r[C.compare]!=null&&r[C.compare]>0)b.push({...r});
+      if(r[C.cur]!=null&&r[C.cur]>0&&r[C.prev]!=null&&r[C.prev]>0)c.push({...r});
+      if(r[C.prev]!=null&&r[C.prev]>0)d.push({...r});
+    }
+    const joined=[...a,...b,...c,...d],last=new Map();
+    joined.forEach((r,i)=>last.set(key2(r),i));
+    // Preserve the order of LAST occurrences, exactly as concat(...).drop_duplicates(keep='last').
+    return joined.filter((r,i)=>last.get(key2(r))===i).map(r=>pickCols(r,sheetCols[KEYS[1]]));
   }
 
   function attachCentral(rows, centralMap) {
@@ -423,12 +531,7 @@
   }
 
   function conditionCentral(rowsWithCentral) {
-    return rowsWithCentral.filter(r=>{
-      const cp=r['ราคากลาง'];
-      if(!Number.isFinite(cp)) return false;
-      const cur=r['ราคาปัจจุบัน'];
-      return !Number.isFinite(cur) || (cur-cp)!==0;
-    }).map(r=>pickCols(r,sheetCols['03_ราคากลาง']));
+    return rowsWithCentral.filter(r=>Number.isFinite(r[C.central])&&(!Number.isFinite(r[C.cur])||r[C.cur]-r[C.central]!==0)).map(r=>pickCols(r,sheetCols[KEYS[2]]));
   }
 
   function sampleStats(values) {
@@ -474,47 +577,106 @@
       if(check==='ตรวจสอบ' && (recorderOK||inspectorOK)) check='';
       if(check==='ตรวจสอบ' && Number.isFinite(r.REL) && (r.REL>120 || r.REL<80)) out.push(pickCols({...r,'ตรวจสอบ':'ตรวจสอบ'},sheetCols['04_ราคาที่สงสัย']));
     });
-    return out;
+    return out.sort(compareCodePrice);
   }
 
   function conditionDuplicates(rows) {
-    const counts=new Map(); rows.forEach(r=>counts.set(key2(r),(counts.get(key2(r))||0)+1));
-    return rows.filter(r=>(counts.get(key2(r))||0)>1).sort((a,b)=>key2(a).localeCompare(key2(b),'th')).map(r=>pickCols(r,baseCols));
+    const counts=new Map();rows.forEach(r=>counts.set(key2(r),(counts.get(key2(r))||0)+1));
+    return rows.filter(r=>counts.get(key2(r))>1).sort((a,b)=>compareText(a[C.code],b[C.code])||compareText(a[C.sourceCode],b[C.sourceCode])).map(r=>pickCols(r,baseCols));
   }
 
-  function buildResults(rows, centralMap) {
+  function compareText(a,b) {return a===b?0:(a<b?-1:1);}
+  function compareCodePrice(a,b) {
+    const code=compareText(a[C.code],b[C.code]);if(code)return code;
+    const ac=a[C.cur],bc=b[C.cur];
+    if(ac==null)return bc==null?0:1;
+    if(bc==null)return -1;
+    return bc-ac;
+  }
+
+  function buildResults(rows,centralMap) {
     const withCentral=attachCentral(rows,centralMap);
     return {
-      '01_RELไม่ตรง':conditionREL(rows),
-      '02_ช่องคำนวณว่าง':conditionMissing(rows),
-      '03_ราคากลาง':conditionCentral(withCentral),
-      '04_ราคาที่สงสัย':conditionSuspicious(withCentral),
-      '05_ตรวจตัวซ้ำ':conditionDuplicates(rows)
+      [KEYS[0]]:conditionREL(rows),
+      [KEYS[1]]:conditionMissing(rows),
+      [KEYS[2]]:conditionCentral([...withCentral].sort(compareCodePrice)),
+      [KEYS[3]]:conditionSuspicious(withCentral).sort(compareCodePrice),
+      [KEYS[4]]:conditionDuplicates(rows)
     };
   }
 
+  const weeklyCols=[C.owner,C.code7,C.code,C.spec,C.sourceCode,C.source,C.shop,C.province,...WEEK,...CPWEEK,C.weekCount,C.compare,C.link,C.recorder,C.inspector];
+  const weeklyImportCols=[C.code,C.spec,C.sourceCode,C.source,...WEEK,C.compare,C.link,C.recorder,C.inspector];
+  function columnsFor(key){return key===WKEY?weeklyCols:sheetCols[key];}
+
+  function conditionWeekly(rows,centralMap) {
+    const out=[],stats={input:rows.length,eligible:0,matchedRows:0,matchedPairs:0,incomplete:0,equal:0,different:0};
+    for(const r of rows) {
+      if(r[C.shop]===C.other)continue;stats.eligible++;
+      const matches=centralMap.get(cleanCode(r[C.code])+'\u001f'+r[C.shop])||[];
+      if(matches.length)stats.matchedRows++;
+      for(const cp of matches) {
+        stats.matchedPairs++;
+        // notna(): a zero is a real weekly price, not a missing value.
+        const complete=WEEK.every(k=>r[k]!=null)&&CPWEEK.every(k=>cp[k]!=null);
+        if(!complete){stats.incomplete++;continue;}
+        const different=WEEK.some((k,i)=>r[k]-cp[CPWEEK[i]]!==0);
+        if(!different){stats.equal++;continue;}
+        out.push(pickCols({...r,...cp},weeklyCols));stats.different++;
+      }
+    }
+    return {rows:out,stats};
+  }
+
+  function monthlyImportRows(results) {
+    return (results?.[KEYS[2]]||[]).filter(r=>r[C.link]===0).map(r=>({...r,[C.cur]:r[C.central]}));
+  }
+  function weeklyImportRows(results) {
+    return (results?.[WKEY]||[]).map(r=>{
+      const o={...r};WEEK.forEach((k,i)=>o[k]=r[CPWEEK[i]]);
+      // No Link=0 condition in weekly notebook cell 56.
+      return pickCols(o,weeklyImportCols);
+    });
+  }
+
+  function invalidateResults() {
+    state.results=null;state.monthlyCount=0;state.weeklyCount=0;state.weeklyStats=null;setStatus('');
+    $('results').hidden=true;
+    ['exportAllBtn','exportImportBtn','exportWeeklyBtn'].forEach(id=>{if($(id))$(id).disabled=true;});
+  }
+
   function renderResults() {
+    if(!state.results)return;
     const results=state.results; $('results').hidden=false;
-    const order=Object.keys(sheetCols);
-    const labels={'01_RELไม่ตรง':'REL ไม่ตรง','02_ช่องคำนวณว่าง':'ช่องคำนวณว่าง','03_ราคากลาง':'ราคากลางไม่ตรง','04_ราคาที่สงสัย':'ราคาที่สงสัย','05_ตรวจตัวซ้ำ':'ข้อมูลซ้ำ'};
-    $('kpis').innerHTML=order.map(k=>`<div class="kpi"><div class="v">${results[k].length.toLocaleString()}</div><div class="l">${labels[k]}</div></div>`).join('');
+    const order=[...KEYS];
+    if(state.weeklyCount||state.files.some(x=>x.role==='centralWeekly'))order.push(WKEY);
+    const labels=KEYS.map(k=>k.replace(/^\d+_/,''));
+    $('kpis').innerHTML=KEYS.map((k,i)=>`<div class="kpi"><div class="v">${state.monthlyCount?results[k].length.toLocaleString():'\u2014'}</div><div class="l">${labels[i]}</div></div>`).join('');
+    if(order.includes(WKEY))$('kpis').innerHTML+=`<div class="kpi"><div class="v">${results[WKEY].length.toLocaleString()}</div><div class="l">${weeklyText} (Import_Weekly)</div></div>`;
+    $('kpis').style.gridTemplateColumns=`repeat(${order.length},minmax(0,1fr))`;
+    if(!order.includes(state.activeKey))state.activeKey=order[0];
     $('tabs').innerHTML='';
-    order.forEach(k=>{ const b=document.createElement('button'); b.className='tab'+(state.activeKey===k?' active':''); b.textContent=`${k} (${results[k].length.toLocaleString()})`; b.onclick=()=>{state.activeKey=k; $('searchBox').value=''; renderResults();}; $('tabs').appendChild(b); });
+    order.forEach(k=>{const b=document.createElement('button');b.className='tab'+(state.activeKey===k?' active':'');b.textContent=`${k} (${results[k].length.toLocaleString()})`;b.onclick=()=>{state.activeKey=k;renderResults();};$('tabs').appendChild(b);});
+    $('exportAllBtn').disabled=!state.monthlyCount;
+    $('exportImportBtn').disabled=!monthlyImportRows(results).length;
+    $('exportWeeklyBtn').disabled=!weeklyImportRows(results).length;
     renderTable();
   }
 
   function formatCell(v,col) {
-    if(v==null || v==='') return '';
-    if(['ราคาปัจจุบัน','ราคาเปรียบเทียบ','ราคาเดือนก่อน','ราคากลาง','REL','RELN','diffREL'].includes(col) && typeof v==='number') return Number.isInteger(v)?v.toLocaleString('th-TH'):v.toLocaleString('th-TH',{maximumFractionDigits:4});
+    if(v==null||v==='')return '';
+    if(col==='RELN')return String(v); // Keep raw RELN visible; never overwrite the stored value.
+    if(typeof v==='number')return v.toLocaleString('th-TH',{maximumFractionDigits:12});
     return String(v);
   }
 
   function renderTable() {
-    const key=state.activeKey, rows=state.results[key]||[], cols=sheetCols[key]; const q=cleanText($('searchBox').value).toLowerCase();
+    if(!state.results)return;
+    const key=state.activeKey, rows=state.results[key]||[], cols=columnsFor(key); const q=cleanText($('searchBox').value).toLowerCase();
     const filtered=q?rows.filter(r=>cols.some(c=>String(r[c]??'').toLowerCase().includes(q))):rows;
     const max=500, view=filtered.slice(0,max);
     if(!view.length){ $('tableWrap').innerHTML='<div class="empty">ไม่พบรายการใน Condition นี้</div>'; $('footerNote').textContent=`ทั้งหมด ${filtered.length.toLocaleString()} รายการ`; return; }
-    const head='<thead><tr>'+cols.map(c=>`<th>${escapeHtml(c)}</th>`).join('')+'</tr></thead>';
+    const head='<thead><tr>'+cols.map(c=>`<th>${escapeHtml(key===WKEY&&WEEK.includes(c)?'เดิม '+c:key===WKEY&&CPWEEK.includes(c)?C.central+' '+c:c)}</th>`).join('')+'</tr></thead>';
     const body='<tbody>'+view.map(r=>'<tr>'+cols.map(c=>`<td>${escapeHtml(formatCell(r[c],c))}</td>`).join('')+'</tr>').join('')+'</tbody>';
     $('tableWrap').innerHTML=`<table class="data-table">${head}${body}</table>`;
     $('footerNote').textContent=`แสดง ${view.length.toLocaleString()} จาก ${filtered.length.toLocaleString()} รายการ${filtered.length>max?' (จำกัด preview 500 แถว; export ได้ครบทั้งหมด)':''}`;
@@ -531,6 +693,7 @@
       for(let i=1;i<Math.min(data.length,302);i++) max=Math.max(max,String(data[i][ci]??'').length+2);
       return {wch:Math.min(max,45)};
     });
+    cols.forEach((c,i)=>{if([C.code7,C.code,C.sourceCode].includes(c)){for(let r=1;r<data.length;r++){const a=XLSX.utils.encode_cell({r,c:i});if(ws[a]){ws[a].t='s';ws[a].z='@';ws[a].v=String(ws[a].v??'');}}}});
     const linkIdx=cols.indexOf('Link');
     if(linkIdx>=0){
       for(let r=1;r<data.length;r++){
@@ -552,33 +715,78 @@
 
   function exportImport() {
     if(!state.results)return;
-    const cols=['รหัส','ลักษณะจำเพาะ','รหัสแหล่ง','แหล่งจัดเก็บ','ราคาปัจจุบัน','Link','ราคาเปรียบเทียบ','ภาวะ (ผู้บันทึก)','ภาวะ (ผู้ตรวจ)'];
-    const rows=state.results['03_ราคากลาง'].filter(r=>toNum(r.Link)===0).map(r=>({...r,'ราคาปัจจุบัน':r['ราคากลาง']}));
-    const wb=XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb,aoaSheet(rows,cols),'Monthly_Report');
+    const cols=[C.code,C.spec,C.sourceCode,C.source,C.cur,C.link,C.compare,C.recorder,C.inspector];
+    const rows=monthlyImportRows(state.results);
+    const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,aoaSheet(rows,cols),'Monthly_Report');
     XLSX.writeFile(wb,'Import_Monthly.xlsx',{compression:true});
   }
 
+  function exportWeekly() {
+    if(!state.results)return;
+    const rows=weeklyImportRows(state.results);
+    const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,aoaSheet(rows,weeklyImportCols),'Weekly_Report');
+    XLSX.writeFile(wb,'Import_Weekly.xlsx',{compression:true});
+  }
+
   async function process() {
-    try{
-      state.logs=[]; logEl.innerHTML=''; logEl.hidden=false;
-      setStatus('กำลังประมวลผล...', 'warn');
-      const dataFiles=state.files.filter(x=>x.role==='data');
-      const masterRec=state.files.find(x=>x.role==='master');
-      const centralRec=state.files.find(x=>x.role==='central');
-      if(!dataFiles.length) throw new Error('ยังไม่มีไฟล์ข้อมูลราคาที่จะตรวจ');
-      if(!masterRec) log('ไม่พบ Real_Master_CPI — ผู้ดูแลจะว่าง และร้านจะถูกจัดเป็นร้านอื่นๆ', 'warn');
-      if(!centralRec) log('ไม่พบไฟล์ราคากลาง — Sheet ราคากลางจะว่าง', 'warn');
-      const {shopRules,userMap}=parseMaster(masterRec);
-      log(`โหลดกฎร้าน ${shopRules.length.toLocaleString()} กลุ่ม / mapping ผู้ดูแล ${userMap.size.toLocaleString()} CODE7`, shopRules.length?'ok':'warn');
-      const centralMap=parseCentral(centralRec);
-      log(`โหลดราคากลาง ${centralMap.size.toLocaleString()} คู่ รหัส+ร้าน`, centralMap.size?'ok':'warn');
-      const rows=parseDataFiles(dataFiles,shopRules,userMap);
-      if(!rows.length) throw new Error('ไม่พบแถวข้อมูลราคาในไฟล์ที่เลือก');
-      log(`รวมข้อมูลสำหรับตรวจ ${rows.length.toLocaleString()} แถว`, 'ok');
-      state.results=buildResults(rows,centralMap); state.activeKey='01_RELไม่ตรง';
-      Object.entries(state.results).forEach(([k,v])=>log(`${k}: ${v.length.toLocaleString()} รายการ`,'ok'));
-      renderResults(); setStatus(`ประมวลผลสำเร็จ ${rows.length.toLocaleString()} แถว`, 'ok');
-    }catch(e){ console.error(e); setStatus(`เกิดข้อผิดพลาด: ${e.message||e}`, 'err'); log(String(e.stack||e),'err'); }
+    if(state.busy)return;
+    invalidateResults();state.busy=true;renderFiles();
+    try {
+      state.logs=[];logEl.innerHTML='';logEl.hidden=false;
+      setStatus('กำลังประมวลผล...','warn');
+      await new Promise(resolve=>setTimeout(resolve,0));
+      const dataFiles=state.files.filter(x=>x.role==='data'),weeklyFiles=state.files.filter(x=>x.role==='weekly');
+      const masters=state.files.filter(x=>x.role==='master');
+      const centralFiles=state.files.filter(x=>x.role==='central'),centralWeeklyFiles=state.files.filter(x=>x.role==='centralWeekly');
+      if(!dataFiles.length&&!weeklyFiles.length)throw new Error('ยังไม่มีไฟล์ข้อมูลราคา (df / dfw)');
+      if(masters.length!==1)throw new Error('กรุณาเลือก Real_Master_CPI จำนวน 1 ไฟล์');
+      const master=masters[0];
+      if(!master.wb.Sheets['shop_manual_cleansing']||!master.wb.Sheets['ข้อมูล_รายการ_ผู้ดูแล'])throw new Error('Real_Master_CPI: ชีต mapping ที่จำเป็นไม่ครบ');
+      const {shopRules,userMap}=parseMaster(master);
+      if(!shopRules.length)throw new Error('shop_manual_cleansing: ไม่พบกฎจัดร้านที่ใช้ได้');
+      log(`Master: ${shopRules.length} rules / ${userMap.size.toLocaleString()} CODE7`);
+      const centralMap=parseCentral(centralFiles,shopRules),weeklyMap=parseWeeklyCentral(centralWeeklyFiles,shopRules);
+      const rows=parseDataFiles(dataFiles,shopRules,userMap),weeklyRows=parseDataFiles(weeklyFiles,shopRules,userMap);
+      if(!rows.length&&!weeklyRows.length)throw new Error('ไม่พบแถวข้อมูลราคา');
+      state.monthlyCount=rows.length;state.weeklyCount=weeklyRows.length;
+      const centralMatched=rows.filter(r=>Number.isFinite(centralMap.get(r[C.code]+'\u001f'+r[C.shop]))).length;
+      log(`ราคากลาง ${centralMap.size.toLocaleString()} คู่รหัส+ร้าน | จับคู่ได้ ${centralMatched.toLocaleString()} / ${rows.length.toLocaleString()} แถว`,centralMatched||!rows.length?'ok':'warn');
+      if(rows.length&&!centralFiles.length)log('ยังไม่มีไฟล์ราคากลางรายเดือน (cenPrice) จึงยังไม่ได้ตรวจเทียบราคากลาง','warn');
+      if(centralMap.diagnostics.duplicates)log(`cenPrice: duplicate keys ${centralMap.diagnostics.duplicates}; keep last (including missing prices)`,'warn');
+      if(centralMap.diagnostics.excluded)log(`cenPrice: ${centralMap.diagnostics.excluded} rows excluded by shop.py (${C.other})`,'warn');
+      state.results=buildResults(rows,centralMap);
+      const weekly=conditionWeekly(weeklyRows,weeklyMap);
+      state.results[WKEY]=weekly.rows;state.weeklyStats=weekly.stats;
+      if(weeklyRows.length) {
+        log(`dfw: ${weeklyRows.length.toLocaleString()} | matched: ${weekly.stats.matchedRows.toLocaleString()} | incomplete pairs: ${weekly.stats.incomplete} | different pairs: ${weekly.rows.length.toLocaleString()}`,weekly.stats.matchedRows?'ok':'warn');
+        if(!centralWeeklyFiles.length)log('ยังไม่มีไฟล์ราคากลางรายสัปดาห์ (cenPriceW) จึงยังไม่ได้ตรวจเทียบราคารายสัปดาห์','warn');
+      }
+      if(weeklyMap.diagnostics.duplicates)log(`cenPriceW: ${weeklyMap.diagnostics.duplicates} duplicate keys; preserve all merge matches (notebook cell 56)`,'warn');
+      Object.entries(state.results).forEach(([k,v])=>log(`${k}: ${v.length.toLocaleString()}`));
+      state.activeKey=rows.length?KEYS[0]:WKEY;
+      renderResults();
+      setStatus(`ประมวลผลสำเร็จ | df ${rows.length.toLocaleString()} | dfw ${weeklyRows.length.toLocaleString()}`,'ok');
+    } catch(e) {
+      invalidateResults();console.error(e);setStatus(String(e.message||e),'err');log(String(e.message||e),'err');
+    } finally {state.busy=false;renderFiles();}
+  }
+
+  async function loadDefaultMaster() {
+    // Browser file:// cannot recursively scan local disks. Upload remains available.
+    if(!window.XLSX||!/^https?:$/.test(location.protocol))return;
+    for(const relative of ['./Real_Master_CPI.xlsx','../Real_Master_CPI.xlsx','../../Real_Master_CPI.xlsx']) {
+      if(state.files.some(r=>r.role==='master'))return;
+      try {
+        const response=await fetch(new URL(relative,location.href),{cache:'no-store',signal:AbortSignal.timeout(2500)});
+        if(!response.ok)continue;
+        const buf=await response.arrayBuffer();
+        const wb=XLSX.read(buf,{type:'array',cellDates:false,dense:false});
+        if(!wb.Sheets['shop_manual_cleansing'])continue;
+        if(state.files.some(r=>r.role==='master')||state.busy)return;
+        state.files.push({id:'default-master',file:{name:'Real_Master_CPI.xlsx'},wb,role:'master',info:'Default | '+relative});
+        invalidateResults();renderFiles();log('โหลด Real_Master_CPI.xlsx อัตโนมัติแล้ว');return;
+      } catch(e) { /* Missing defaults must never prevent an explicit upload. */ }
+    }
   }
 
   dropZone.addEventListener('click',()=>fileInput.click());
@@ -586,14 +794,14 @@
   ['dragenter','dragover'].forEach(ev=>dropZone.addEventListener(ev,e=>{e.preventDefault();dropZone.classList.add('drag');}));
   ['dragleave','drop'].forEach(ev=>dropZone.addEventListener(ev,e=>{e.preventDefault();dropZone.classList.remove('drag');}));
   dropZone.addEventListener('drop',e=>addFiles([...e.dataTransfer.files].filter(f=>/\.xls[xm]?$/i.test(f.name))));
-  $('clearBtn').addEventListener('click',()=>{state.files=[];state.results=null;state.logs=[];renderFiles();$('results').hidden=true;logEl.hidden=true;setStatus('');});
+  $('clearBtn').addEventListener('click',()=>{state.files=[];invalidateResults();state.logs=[];renderFiles();$('results').hidden=true;logEl.hidden=true;setStatus('');});
   processBtn.addEventListener('click',process);
   $('searchBox').addEventListener('input',renderTable);
-  $('exportAllBtn').addEventListener('click',exportAll);
-  $('exportImportBtn').addEventListener('click',exportImport);
+  $('exportAllBtn').addEventListener('click',exportAll);$('exportImportBtn').addEventListener('click',exportImport);$('exportWeeklyBtn').addEventListener('click',exportWeekly);
 
+  renderFiles();invalidateResults();setStatus('');logEl.innerHTML='';logEl.hidden=true;
+  loadDefaultMaster();
   if(!window.XLSX) setStatus('ไม่สามารถโหลด SheetJS ได้ — ไฟล์ HTML นี้ต้องเชื่อมต่ออินเทอร์เน็ตอย่างน้อยตอนเปิดใช้งาน', 'err');
 })();
 </script>
-</body>
-</html>
+</body></html>
