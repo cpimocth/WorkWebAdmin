@@ -718,105 +718,6 @@ thead th.sticky-product-col{background:#eef9ff!important;color:#173d5d!important
 }
 </style>
 
-
-<style id="cpi-stock-heatmap-style">
-    #cpi-stock-heatmap-section{
-        background:linear-gradient(180deg,rgba(255,255,255,.99),rgba(246,252,255,.98));
-        border:1px solid #cfe3ef;
-        box-shadow:0 18px 46px rgba(47,101,132,.12);
-    }
-    .cpi-heat-toolbar{
-        display:flex;flex-wrap:wrap;gap:10px;align-items:center;
-        padding:12px 14px;border:1px solid #d7e8f2;border-radius:18px;background:#f7fcff;
-    }
-    .cpi-heat-cat-btn{
-        border:1px solid #c9d9e7;background:#fff;color:#355269;border-radius:12px;
-        padding:9px 12px;font-size:12px;font-weight:900;line-height:1.1;white-space:nowrap;
-        box-shadow:0 3px 10px rgba(47,101,132,.05);cursor:pointer;
-        transition:all .15s ease;
-    }
-    .cpi-heat-cat-btn:hover{border-color:#8fc8e6;background:#eef9ff;color:#0f628f;transform:translateY(-1px);}
-    .cpi-heat-cat-btn.active{
-        border-color:#1679bd;background:#1679bd;color:#fff;
-        box-shadow:0 7px 18px rgba(22,121,189,.22);
-    }
-    .cpi-heat-help{
-        display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;
-        color:#62748a;font-size:12px;font-weight:800;
-    }
-    .cpi-heat-help b{color:#142033;}
-    .cpi-heat-legend-card{
-        display:grid;grid-template-columns:auto minmax(160px,1fr) auto;gap:12px;align-items:center;
-        padding:12px 14px;border-radius:16px;border:1px solid #dbe7ee;background:#fff;
-    }
-    .cpi-heat-legend-side{font-size:12px;font-weight:900;white-space:nowrap;}
-    .cpi-heat-legend-side.down{color:#b91c1c}.cpi-heat-legend-side.up{color:#087a47}
-    #cpi-stock-heatmap-canvas{
-        position:relative;width:100%;height:760px;min-height:560px;
-        background:#f6fafc;border:1px solid #dbe7ee;border-radius:1.25rem;
-        overflow:hidden;user-select:none;
-    }
-    .cpi-heat-group{
-        position:absolute;overflow:hidden;border:3px solid #fff;background:#fff;
-        box-shadow:inset 0 0 0 1px rgba(100,116,139,.18);
-    }
-    .cpi-heat-group-head{
-        position:absolute;left:0;right:0;top:0;height:38px;
-        display:flex;align-items:center;justify-content:space-between;gap:10px;padding:0 12px;
-        background:rgba(255,255,255,.98);border-bottom:1px solid #d7e8f2;color:#142033;
-        font-size:13px;font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
-        z-index:3;cursor:pointer;
-    }
-    .cpi-heat-group-head:hover{background:#eaf7fd;color:#0c2d58;}
-    .cpi-heat-group-count{
-        display:inline-flex;align-items:center;justify-content:center;min-width:28px;height:22px;
-        padding:0 7px;border-radius:999px;background:#eaf7fd;color:#1679bd;font-size:10px;font-weight:900;
-        flex:0 0 auto;
-    }
-    .cpi-heat-group-body{position:absolute;left:0;right:0;top:38px;bottom:0;overflow:hidden;}
-    .cpi-heat-tile{
-        position:absolute;border:1.5px solid rgba(255,255,255,.96);overflow:hidden;
-        display:flex;align-items:center;justify-content:center;text-align:center;padding:6px;
-        transition:filter .14s ease, transform .14s ease, z-index .14s ease, box-shadow .14s ease;
-        cursor:help;
-    }
-    .cpi-heat-tile:hover{
-        filter:brightness(1.04) saturate(1.04);z-index:8;
-        box-shadow:0 0 0 3px #fff,0 10px 24px rgba(15,23,42,.24);
-    }
-    .cpi-heat-tile-inner{width:100%;min-width:0;line-height:1.12;}
-    .cpi-heat-code{display:none;font-size:10px;font-weight:900;opacity:.78;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-    .cpi-heat-name{font-size:15px;font-weight:900;line-height:1.15;white-space:normal;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;}
-    .cpi-heat-value{font-size:20px;font-weight:900;margin-top:5px;white-space:nowrap;letter-spacing:-.02em;}
-    .cpi-heat-weight{display:none;font-size:10px;font-weight:800;margin-top:4px;opacity:.82;white-space:nowrap;}
-    .cpi-heat-tile.large .cpi-heat-code,.cpi-heat-tile.large .cpi-heat-weight{display:block;}
-    .cpi-heat-tile.compact .cpi-heat-name{font-size:12px;-webkit-line-clamp:1;}
-    .cpi-heat-tile.compact .cpi-heat-value{font-size:15px;margin-top:3px;}
-    .cpi-heat-tile.tiny .cpi-heat-name,.cpi-heat-tile.tiny .cpi-heat-code,.cpi-heat-tile.tiny .cpi-heat-weight{display:none;}
-    .cpi-heat-tile.tiny .cpi-heat-value{font-size:11px;margin-top:0;}
-    .cpi-heat-tile.micro .cpi-heat-tile-inner{display:none;}
-    .cpi-heat-empty{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#7b91a4;font-size:16px;font-weight:900;}
-    .cpi-heat-legend-gradient{
-        height:13px;border-radius:999px;
-        background:linear-gradient(90deg,#b91c1c 0%,#ef4444 24%,#d8dde3 50%,#28b86e 76%,#067a3e 100%);
-        border:1px solid rgba(148,163,184,.24);
-    }
-    #cpi-heat-tooltip{
-        position:fixed;z-index:9999;display:none;pointer-events:none;min-width:260px;max-width:360px;
-        padding:13px 14px;border-radius:14px;background:rgba(7,34,67,.96);color:#fff;
-        box-shadow:0 16px 38px rgba(7,34,67,.28);border:1px solid rgba(255,255,255,.16);
-        backdrop-filter:blur(10px);font-family:'Sarabun',sans-serif;
-    }
-    #cpi-heat-tooltip .tt-name{font-size:14px;font-weight:900;line-height:1.3;margin-bottom:7px;}
-    #cpi-heat-tooltip .tt-grid{display:grid;grid-template-columns:auto 1fr;gap:4px 10px;font-size:11px;line-height:1.35;}
-    #cpi-heat-tooltip .tt-k{color:#a9d8f3;font-weight:800;}#cpi-heat-tooltip .tt-v{font-weight:900;text-align:right;}
-    @media (max-width:1024px){#cpi-stock-heatmap-canvas{height:660px}.cpi-heat-name{font-size:13px}.cpi-heat-value{font-size:17px}}
-    @media (max-width:640px){
-        #cpi-stock-heatmap-canvas{height:600px}.cpi-heat-group-head{font-size:11px;height:32px;padding:0 8px}.cpi-heat-group-body{top:32px}
-        .cpi-heat-cat-btn{font-size:11px;padding:8px 10px}.cpi-heat-legend-card{grid-template-columns:1fr}.cpi-heat-legend-side.up{text-align:right}
-    }
-</style>
-
 </head>
 
 <body class="p-4 md:p-6 pb-20">
@@ -894,139 +795,96 @@ thead th.sticky-product-col{background:#eef9ff!important;color:#173d5d!important
                     <div id="input-status-sub" class="text-[11px] font-bold text-slate-500 mt-1 leading-relaxed">-</div>
                 </div>
 
-                <!-- Quick controls: keep the most-used CPI workflow first -->
-                <div class="rounded-2xl border border-cyan-200 bg-cyan-50/60 p-3.5 shadow-sm space-y-4">
-                    <div class="flex items-center justify-between gap-3">
-                        <div>
-                            <div class="text-[11px] font-black uppercase tracking-[0.14em] text-cyan-800">⚡ ใช้งานบ่อย</div>
-                            <div class="text-[10px] font-bold text-slate-500 mt-0.5">MoM / YoY / AoA</div>
-                        </div>
-                        <span class="rounded-full border border-cyan-200 bg-white px-2.5 py-1 text-[9px] font-black text-cyan-700">QUICK</span>
-                    </div>
-
-                    <div>
-                        <div class="flex items-end justify-between gap-2 mb-2">
-                            <label class="block text-[11px] font-black text-slate-700 uppercase">ไฮไลต์การเปรียบเทียบ</label>
-                            <span class="text-[9px] font-bold text-slate-400">เลือกทีละ 1 ค่า</span>
-                        </div>
-                        <div class="grid grid-cols-3 bg-white/90 rounded-xl p-2 gap-2 border border-cyan-100">
-                            <label data-focus-wrap="mom"
-                                class="text-center py-2 text-[12px] font-black cursor-pointer bg-white rounded-lg shadow-sm border border-slate-200 hover:border-cyan-300 hover:bg-cyan-50 transition">
-                                <input type="checkbox" class="f-check mr-1" value="mom" onchange="handleFocusSelect(this)"> MOM
-                            </label>
-                            <label data-focus-wrap="yoy"
-                                class="text-center py-2 text-[12px] font-black cursor-pointer bg-white rounded-lg shadow-sm border border-slate-200 hover:border-cyan-300 hover:bg-cyan-50 transition">
-                                <input type="checkbox" class="f-check mr-1" value="yoy" checked onchange="handleFocusSelect(this)"> YOY
-                            </label>
-                            <label data-focus-wrap="aoa"
-                                class="text-center py-2 text-[12px] font-black cursor-pointer bg-white rounded-lg shadow-sm border border-slate-200 hover:border-cyan-300 hover:bg-cyan-50 transition">
-                                <input type="checkbox" class="f-check mr-1" value="aoa" onchange="handleFocusSelect(this)"> AOA
-                            </label>
-                        </div>
-                    </div>
-
+                <div>
+                    <label class="block text-[11px] font-black text-rose-600 uppercase mb-2">โหมดการดู</label>
+                    <select id="cpiTypeFilter" onchange="triggerDraw()"
+                        class="cat-filter border-rose-200 text-rose-700">
+                        <option value="headline">แสดงสินค้าทั้งหมด (Normal)</option>
+                        <option value="compare_all">เปรียบเทียบ 4 ดัชนีหลัก (Aggregate)</option>
+                    </select>
                 </div>
 
-                <!-- Lower-frequency controls moved to the bottom -->
-                <div class="rounded-2xl border border-slate-200 bg-slate-50/80 p-3.5 space-y-4">
-                    <div class="flex items-center justify-between gap-3">
-                        <div>
-                            <div class="text-[11px] font-black uppercase tracking-[0.14em] text-slate-600">⚙️ ตัวเลือกเพิ่มเติม</div>
-                            <div class="text-[10px] font-bold text-slate-400 mt-0.5">โหมด ตัวชี้วัดเสริม และตัวกรองเชิงลึก</div>
-                        </div>
-                        <span class="rounded-full border border-slate-200 bg-white px-2.5 py-1 text-[9px] font-black text-slate-500">ADVANCED</span>
+                <div>
+                    <label class="block text-[11px] font-black text-indigo-600 uppercase mb-2">หมวดพิเศษ
+                        (กรองรหัส)</label>
+                    <select id="catFilter" onchange="triggerDraw()" class="cat-filter text-indigo-900">
+                        <option value="all">-- แสดงทุกหมวดสินค้า --</option>
+                        <option value="00">00* ดัชนีราคาผู้บริโภคทั่วไป</option>
+                        <option value="1">1* หมวดอาหารและเครื่องดื่มไม่มีแอลกอฮอล์</option>
+                        <option value="111">111* ข้าว แป้งและผลิตภัณฑ์จากแป้ง</option>
+                        <option value="112">112* เนื้อสัตว์ เป็ดไก่ และสัตว์น้ำ</option>
+                        <option value="113">113* ไข่และผลิตภัณฑ์นม</option>
+                        <option value="114">114* ผักและผลไม้</option>
+                        <option value="11411">11411* ผักสด</option>
+                        <option value="11421">11421* ผลไม้สด</option>
+                        <option value="115">115* เครื่องประกอบอาหาร</option>
+                        <option value="116">116* เครื่องดื่มไม่มีแอลกอฮอล์</option>
+                        <option value="117">117* ผลิตภัณฑ์น้ำตาล</option>
+                        <option value="12">12* อาหารสำเร็จรูป</option>
+                        <option value="123">123* อาหารพร้อมทาน</option>
+                        <option value="124">124* อาหารจากร้านยอดนิยม</option>
+                        <option value="125">125* อาหารฟาสต์ฟู้ด/Delivery</option>
+                        <option value="8">8* หมวดอื่น ๆ ไม่ใช่อาหาร และเครื่องดื่ม</option>
+                        <option value="2">2* หมวดเครื่องนุ่งห่มและรองเท้า</option>
+                        <option value="3">3* หมวดเคหสถาน</option>
+                        <option value="4">4* หมวดการตรวจรักษาและบริการส่วนบุคคล</option>
+                        <option value="5">5* หมวดพาหนะ การขนส่ง และการสื่อสาร</option>
+                        <option value="51">51* ค่าโดยสารสาธารณะ</option>
+                        <option value="522">522* น้ำมันเชื้อเพลิง</option>
+                        <option value="54">54* การสื่อสาร</option>
+                        <option value="6">6* หมวดการบันเทิงการอ่าน การศึกษา และการศาสนา</option>
+                        <option value="7">7* หมวดยาสูบและเครื่องดื่มมีแอลกอฮอล์</option>
+                        <option value="9">9* กลุ่มอาหารสดและพลังงาน</option>
+                        <option value="91">91* อาหารสด</option>
+                        <option value="92">92* พลังงาน</option>
+                        <option value="93">93* ดัชนีราคาผู้บริโภคพื้นฐาน</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-[11px] font-black text-slate-500 uppercase mb-2">ระดับสินค้า</label>
+                    <div id="level-container" class="flex flex-wrap gap-2"></div>
+                </div>
+
+                <div>
+                    <label
+                        class="block text-[11px] font-black text-indigo-600 uppercase mb-2 italic">ไฮไลต์การเปรียบเทียบ
+                        (เลือกได้ทีละอัน / หรือกดดูทั้งหมด)</label>
+                    <div class="grid grid-cols-5 bg-slate-100 rounded-xl p-2 gap-2">
+                        <label data-focus-wrap="mom"
+                            class="text-center py-1.5 text-[11px] font-black cursor-pointer bg-white rounded-lg shadow-sm border border-slate-200 hover:bg-slate-50 transition">
+                            <input type="checkbox" class="f-check mr-1" value="mom" onchange="handleFocusSelect(this)"> MOM
+                        </label>
+                        <label data-focus-wrap="yoy"
+                            class="text-center py-1.5 text-[11px] font-black cursor-pointer bg-white rounded-lg shadow-sm border border-slate-200 hover:bg-slate-50 transition">
+                            <input type="checkbox" class="f-check mr-1" value="yoy" checked onchange="handleFocusSelect(this)"> YOY
+                        </label>
+                        <label data-focus-wrap="aoa"
+                            class="text-center py-1.5 text-[11px] font-black cursor-pointer bg-white rounded-lg shadow-sm border border-slate-200 hover:bg-slate-50 transition">
+                            <input type="checkbox" class="f-check mr-1" value="aoa" onchange="handleFocusSelect(this)"> AOA
+                        </label>
+                        <label data-focus-wrap="qoq"
+                            class="text-center py-1.5 text-[11px] font-black cursor-pointer bg-white rounded-lg shadow-sm border border-slate-200 hover:bg-slate-50 transition">
+                            <input type="checkbox" class="f-check mr-1" value="qoq" onchange="handleFocusSelect(this)"> QoQ
+                        </label>
+                        <label data-focus-wrap="hoh"
+                            class="text-center py-1.5 text-[11px] font-black cursor-pointer bg-white rounded-lg shadow-sm border border-slate-200 hover:bg-slate-50 transition">
+                            <input type="checkbox" class="f-check mr-1" value="hoh" onchange="handleFocusSelect(this)"> HoH
+                        </label>
+                        <label
+                            class="col-span-5 text-center py-2 text-[12px] font-black cursor-pointer bg-indigo-100 text-indigo-700 rounded-lg shadow-sm border border-indigo-200 hover:bg-indigo-200 transition">
+                            <input type="checkbox" id="checkAllFocus" class="mr-1" onchange="toggleAllFocus(this)"> 👁️ ดูข้อมูลทั้งหมดที่มีในไฟล์
+                        </label>
                     </div>
+                </div>
 
-                    <div>
-                        <label class="block text-[11px] font-black text-slate-500 uppercase mb-2">โหมดการดู</label>
-                        <select id="cpiTypeFilter" onchange="triggerDraw()"
-                            class="cat-filter border-slate-200 text-slate-700 bg-white">
-                            <option value="headline">แสดงสินค้าทั้งหมด (Normal)</option>
-                            <option value="compare_all">เปรียบเทียบ 4 ดัชนีหลัก (Aggregate)</option>
-                        </select>
-                    </div>
-
-                    <div>
-                        <div class="flex items-end justify-between gap-2 mb-2">
-                            <label class="block text-[11px] font-black text-slate-500 uppercase">ตัวชี้วัดเพิ่มเติม</label>
-                            <span class="text-[9px] font-bold text-slate-400">ใช้เมื่อจำเป็น</span>
-                        </div>
-                        <div class="grid grid-cols-2 gap-2">
-                            <label data-focus-wrap="qoq"
-                                class="text-center py-2 text-[11px] font-black cursor-pointer bg-white rounded-lg border border-slate-200 hover:bg-slate-100 transition">
-                                <input type="checkbox" class="f-check mr-1" value="qoq" onchange="handleFocusSelect(this)"> QoQ
-                            </label>
-                            <label data-focus-wrap="hoh"
-                                class="text-center py-2 text-[11px] font-black cursor-pointer bg-white rounded-lg border border-slate-200 hover:bg-slate-100 transition">
-                                <input type="checkbox" class="f-check mr-1" value="hoh" onchange="handleFocusSelect(this)"> HoH
-                            </label>
-                        </div>
-                    </div>
-
-                    <label class="flex items-center gap-2 text-[11px] font-black text-slate-600 cursor-pointer bg-white p-2.5 rounded-xl border border-slate-200 hover:bg-slate-100 transition-colors">
-                        <input type="checkbox" id="checkAllFocus" class="w-4 h-4 rounded border-slate-300" onchange="toggleAllFocus(this)">
-                        👁️ ดูข้อมูลทั้งหมดที่มีในไฟล์
-                    </label>
-
-                    <label class="flex items-center gap-2 text-[11px] font-black text-slate-600 cursor-pointer bg-white p-2.5 rounded-xl border border-slate-200 hover:bg-slate-100 transition-colors">
+                <div class="pt-3 border-t border-slate-200">
+                    <label
+                        class="flex items-center gap-2 text-[12px] font-black text-slate-700 cursor-pointer bg-slate-100 p-2.5 rounded-xl hover:bg-slate-200 transition-colors">
                         <input type="checkbox" id="showRawData" onchange="triggerDraw()"
                             class="w-4 h-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500">
                         🔬 ดูข้อมูลเบื้องหลัง (Weight/Index/Rel)
                     </label>
-
-
-                    <div class="pt-3 mt-1 border-t border-slate-200">
-                        <div class="flex items-center justify-between gap-2 mb-3">
-                            <div>
-                                <div class="text-[11px] font-black uppercase tracking-[0.12em] text-slate-500">ตัวกรองเชิงลึก</div>
-                                <div class="text-[9px] font-bold text-slate-400 mt-0.5">ใช้เมื่อต้องการเจาะเฉพาะหมวดหรือระดับสินค้า</div>
-                            </div>
-                            <span class="rounded-full border border-slate-200 bg-white px-2 py-1 text-[8px] font-black text-slate-400">OPTIONAL</span>
-                        </div>
-
-                        <div class="space-y-4">
-                            <div>
-                                <label class="block text-[11px] font-black text-indigo-600 uppercase mb-2">หมวดสินค้า (กรองรหัส)</label>
-                                <select id="catFilter" onchange="triggerDraw()" class="cat-filter text-indigo-900 bg-white">
-                                    <option value="all">-- แสดงทุกหมวดสินค้า --</option>
-                                    <option value="00">00* ดัชนีราคาผู้บริโภคทั่วไป</option>
-                                    <option value="1">1* หมวดอาหารและเครื่องดื่มไม่มีแอลกอฮอล์</option>
-                                    <option value="111">111* ข้าว แป้งและผลิตภัณฑ์จากแป้ง</option>
-                                    <option value="112">112* เนื้อสัตว์ เป็ดไก่ และสัตว์น้ำ</option>
-                                    <option value="113">113* ไข่และผลิตภัณฑ์นม</option>
-                                    <option value="114">114* ผักและผลไม้</option>
-                                    <option value="11411">11411* ผักสด</option>
-                                    <option value="11421">11421* ผลไม้สด</option>
-                                    <option value="115">115* เครื่องประกอบอาหาร</option>
-                                    <option value="116">116* เครื่องดื่มไม่มีแอลกอฮอล์</option>
-                                    <option value="117">117* ผลิตภัณฑ์น้ำตาล</option>
-                                    <option value="12">12* อาหารสำเร็จรูป</option>
-                                    <option value="123">123* อาหารพร้อมทาน</option>
-                                    <option value="124">124* อาหารจากร้านยอดนิยม</option>
-                                    <option value="125">125* อาหารฟาสต์ฟู้ด/Delivery</option>
-                                    <option value="8">8* หมวดอื่น ๆ ไม่ใช่อาหาร และเครื่องดื่ม</option>
-                                    <option value="2">2* หมวดเครื่องนุ่งห่มและรองเท้า</option>
-                                    <option value="3">3* หมวดเคหสถาน</option>
-                                    <option value="4">4* หมวดการตรวจรักษาและบริการส่วนบุคคล</option>
-                                    <option value="5">5* หมวดพาหนะ การขนส่ง และการสื่อสาร</option>
-                                    <option value="51">51* ค่าโดยสารสาธารณะ</option>
-                                    <option value="522">522* น้ำมันเชื้อเพลิง</option>
-                                    <option value="54">54* การสื่อสาร</option>
-                                    <option value="6">6* หมวดการบันเทิงการอ่าน การศึกษา และการศาสนา</option>
-                                    <option value="7">7* หมวดยาสูบและเครื่องดื่มมีแอลกอฮอล์</option>
-                                    <option value="9">9* กลุ่มอาหารสดและพลังงาน</option>
-                                    <option value="91">91* อาหารสด</option>
-                                    <option value="92">92* พลังงาน</option>
-                                    <option value="93">93* ดัชนีราคาผู้บริโภคพื้นฐาน</option>
-                                </select>
-                            </div>
-
-                            <div>
-                                <label class="block text-[11px] font-black text-slate-600 uppercase mb-2">ระดับสินค้า</label>
-                                <div id="level-container" class="flex flex-wrap gap-2"></div>
-                            </div>
-                        </div>
-                    </div>
                 </div>
 
                 <div class="pt-4 border-t border-slate-100 space-y-3">
@@ -1283,74 +1141,6 @@ thead th.sticky-product-col{background:#eef9ff!important;color:#173d5d!important
                         </div>
                     </div>
                 </div>
-
-
-                <section id="cpi-stock-heatmap-section" class="rounded-[2.5rem] p-6 md:p-8 mt-6">
-                    <div class="flex flex-col xl:flex-row xl:items-start xl:justify-between gap-5 mb-5">
-                        <div class="max-w-4xl">
-                            <div class="text-[12px] uppercase tracking-[0.18em] font-black text-[#1679bd] mb-2">CPI MARKET MAP</div>
-                            <h2 class="text-2xl md:text-[2rem] font-black text-slate-900 leading-tight">Heatmap โครงสร้างสินค้าและการเปลี่ยนแปลงราคา</h2>
-                            <p class="text-base font-bold text-slate-600 mt-2 leading-relaxed">ดูภาพรวมได้ในครั้งเดียว: <b class="text-slate-900">กล่องใหญ่ = น้ำหนักมาก</b> • <b class="text-emerald-700">เขียว = ราคาสูงขึ้น</b> • <b class="text-red-700">แดง = ราคาลดลง</b></p>
-                        </div>
-                        <div class="flex flex-col sm:flex-row xl:flex-col gap-3 min-w-[180px]">
-                            <div class="rounded-2xl border border-sky-200 bg-sky-50 px-5 py-3 text-center shadow-sm flex-1">
-                                <div class="text-[10px] uppercase tracking-[0.14em] font-black text-slate-500">ตัวชี้วัดที่ดู</div>
-                                <div id="cpi-heat-focus" class="text-2xl font-black text-[#1679bd] mt-1">YOY</div>
-                            </div>
-                            <label class="rounded-2xl border border-slate-200 bg-white px-4 py-3 shadow-sm flex items-center justify-center gap-3 cursor-pointer select-none hover:border-sky-300 transition-colors">
-                                <input id="cpi-heat-contribution-focus" type="checkbox" onchange="triggerDraw()"
-                                    class="w-5 h-5 rounded border-slate-300 text-[#1679bd] focus:ring-[#1679bd]">
-                                <span class="text-sm font-black text-slate-700">Focus Contribution</span>
-                            </label>
-                        </div>
-                    </div>
-
-                    <div class="mb-4">
-                        <div class="flex items-center justify-between gap-3 mb-2">
-                            <div class="text-sm font-black text-slate-800">เลือกหมวดที่ต้องการดู</div>
-                            <div class="text-[11px] font-bold text-slate-500">คลิกหัวหมวดในแผนที่เพื่อเจาะดูเฉพาะหมวดได้เช่นกัน</div>
-                        </div>
-                        <div class="cpi-heat-toolbar overflow-x-auto custom-scrollbar">
-                            <button type="button" class="cpi-heat-cat-btn" data-cpi-heat-cat="all" onclick="setCpiHeatmapCategory('all')">ทั้งหมด</button>
-                            <button type="button" class="cpi-heat-cat-btn active" data-cpi-heat-cat="1-7" onclick="setCpiHeatmapCategory('1-7')">หมวด 1–7</button>
-                            <button type="button" class="cpi-heat-cat-btn" data-cpi-heat-cat="1" onclick="setCpiHeatmapCategory('1')">1 อาหารฯ</button>
-                            <button type="button" class="cpi-heat-cat-btn" data-cpi-heat-cat="2" onclick="setCpiHeatmapCategory('2')">2 เครื่องนุ่งห่ม</button>
-                            <button type="button" class="cpi-heat-cat-btn" data-cpi-heat-cat="3" onclick="setCpiHeatmapCategory('3')">3 เคหสถาน</button>
-                            <button type="button" class="cpi-heat-cat-btn" data-cpi-heat-cat="4" onclick="setCpiHeatmapCategory('4')">4 รักษา/ส่วนบุคคล</button>
-                            <button type="button" class="cpi-heat-cat-btn" data-cpi-heat-cat="5" onclick="setCpiHeatmapCategory('5')">5 ขนส่ง/สื่อสาร</button>
-                            <button type="button" class="cpi-heat-cat-btn" data-cpi-heat-cat="6" onclick="setCpiHeatmapCategory('6')">6 บันเทิง/ศึกษา</button>
-                            <button type="button" class="cpi-heat-cat-btn" data-cpi-heat-cat="7" onclick="setCpiHeatmapCategory('7')">7 ยาสูบ/แอลกอฮอล์</button>
-                            <button type="button" class="cpi-heat-cat-btn" data-cpi-heat-cat="8" onclick="setCpiHeatmapCategory('8')">8 อื่น ๆ</button>
-                            <button type="button" class="cpi-heat-cat-btn" data-cpi-heat-cat="9" onclick="setCpiHeatmapCategory('9')">9 สด+พลังงาน</button>
-                        </div>
-                        <select id="cpi-heat-category" onchange="setCpiHeatmapCategory(this.value)" class="hidden">
-                            <option value="all">ทั้งหมด</option><option value="1-7" selected>หมวด 1–7</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option>
-                        </select>
-                    </div>
-
-                    <div class="grid grid-cols-1 xl:grid-cols-[minmax(0,1fr)_auto] gap-4 items-center mb-4">
-                        <div class="cpi-heat-legend-card">
-                            <span class="cpi-heat-legend-side down">▼ ลดลง</span>
-                            <div>
-                                <div class="cpi-heat-legend-gradient"></div>
-                                <div class="flex items-center justify-between text-[10px] font-black text-slate-500 mt-1.5"><span id="cpi-heat-min-label">-</span><span>ใกล้ 0</span><span id="cpi-heat-max-label">+</span></div>
-                            </div>
-                            <span class="cpi-heat-legend-side up">▲ สูงขึ้น</span>
-                        </div>
-                        <div id="cpi-heat-summary" class="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-black text-slate-600 shadow-sm xl:text-right">-</div>
-                    </div>
-
-                    <div class="cpi-heat-help mb-3 px-1">
-                        <span><b>วิธีอ่าน:</b> ขนาดกล่องตาม Weight</span>
-                        <span id="cpi-heat-color-help">สีเข้มขึ้น = เปลี่ยนแปลงมากขึ้น</span>
-                        <span>วางเมาส์บนกล่องเพื่อดูชื่อเต็ม รหัส Weight ค่าเปลี่ยนแปลง และ Contribution</span>
-                    </div>
-
-                    <div id="cpi-stock-heatmap-canvas">
-                        <div class="cpi-heat-empty">อัปโหลดข้อมูลเพื่อแสดง Heatmap</div>
-                    </div>
-                    <div id="cpi-heat-tooltip"></div>
-                </section>
 
                 <div id="hero-section" class="hero-card shadow-2xl">
                     <div class="flex flex-col lg:flex-row justify-between items-center gap-10">
@@ -5101,264 +4891,7 @@ function getRegionAccentClasses(idx) {
             ];
             return palette[idx % palette.length];
         }
-
-        // =========================================================================
-        // CPI Stock-style Treemap Heatmap (visual only; existing calculations unchanged)
-        // =========================================================================
-        const CPI_HEAT_CATEGORY_NAMES = {
-            '1': 'อาหารและเครื่องดื่มไม่มีแอลกอฮอล์',
-            '2': 'เครื่องนุ่งห่มและรองเท้า',
-            '3': 'เคหสถาน',
-            '4': 'การตรวจรักษาและบริการส่วนบุคคล',
-            '5': 'พาหนะ การขนส่ง และการสื่อสาร',
-            '6': 'การบันเทิง การอ่าน การศึกษา และการศาสนา',
-            '7': 'ยาสูบและเครื่องดื่มมีแอลกอฮอล์',
-            '8': 'อื่น ๆ ไม่ใช่อาหารและเครื่องดื่ม',
-            '9': 'กลุ่มอาหารสดและพลังงาน'
-        };
-
-        function getCpiHeatCategory(code) {
-            const digits = String(code || '').replace(/\D/g, '');
-            if (!digits) return '';
-            const direct = digits[0];
-            if (/^[1-9]$/.test(direct)) return direct;
-            const m = digits.match(/[1-9]/);
-            return m ? m[0] : '';
-        }
-
-        function escapeCpiHeatHtml(value) {
-            return String(value ?? '')
-                .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
-                .replace(/"/g, '&quot;').replace(/'/g, '&#039;');
-        }
-
-        function splitTreemap(items, rect, depth = 0) {
-            if (!items.length || rect.w <= 0 || rect.h <= 0) return [];
-            if (items.length === 1) return [{ item: items[0], ...rect }];
-
-            const sorted = [...items].sort((a, b) => Number(b.value || 0) - Number(a.value || 0));
-            const total = sorted.reduce((s, x) => s + Math.max(0.000001, Number(x.value || 0)), 0);
-            let acc = 0, cut = 1;
-            for (let i = 0; i < sorted.length - 1; i++) {
-                acc += Math.max(0.000001, Number(sorted[i].value || 0));
-                cut = i + 1;
-                if (acc >= total / 2) break;
-            }
-            const a = sorted.slice(0, cut);
-            const b = sorted.slice(cut);
-            const sumA = a.reduce((s, x) => s + Math.max(0.000001, Number(x.value || 0)), 0);
-            const ratio = Math.max(0.08, Math.min(0.92, sumA / total));
-            const splitVertical = rect.w >= rect.h;
-
-            if (splitVertical) {
-                const w1 = rect.w * ratio;
-                return [
-                    ...splitTreemap(a, { x: rect.x, y: rect.y, w: w1, h: rect.h }, depth + 1),
-                    ...splitTreemap(b, { x: rect.x + w1, y: rect.y, w: rect.w - w1, h: rect.h }, depth + 1)
-                ];
-            }
-            const h1 = rect.h * ratio;
-            return [
-                ...splitTreemap(a, { x: rect.x, y: rect.y, w: rect.w, h: h1 }, depth + 1),
-                ...splitTreemap(b, { x: rect.x, y: rect.y + h1, w: rect.w, h: rect.h - h1 }, depth + 1)
-            ];
-        }
-
-        function cpiHeatColor(value, maxAbs) {
-            const v = Number(value) || 0;
-            const denom = Math.max(0.0001, Number(maxAbs) || 0.0001);
-            const t = Math.min(1, Math.abs(v) / denom);
-            if (Math.abs(v) < denom * 0.025) return { bg: '#cfd4da', fg: '#334155' };
-            if (v > 0) {
-                const light = [105, 214, 157], dark = [4, 120, 62];
-                const mix = 0.22 + 0.78 * t;
-                const rgb = light.map((c, i) => Math.round(c + (dark[i] - c) * mix));
-                return { bg: `rgb(${rgb.join(',')})`, fg: t > 0.35 ? '#ffffff' : '#083b23' };
-            }
-            const light = [255, 137, 145], dark = [185, 28, 28];
-            const mix = 0.22 + 0.78 * t;
-            const rgb = light.map((c, i) => Math.round(c + (dark[i] - c) * mix));
-            return { bg: `rgb(${rgb.join(',')})`, fg: t > 0.35 ? '#ffffff' : '#5b1111' };
-        }
-
-        function refreshCpiHeatCategoryButtons(selected) {
-            const value = String(selected || 'all');
-            document.querySelectorAll('[data-cpi-heat-cat]').forEach(btn => {
-                btn.classList.toggle('active', btn.dataset.cpiHeatCat === value);
-            });
-        }
-
-        function setCpiHeatmapCategory(cat) {
-            const value = String(cat || 'all');
-            const sel = document.getElementById('cpi-heat-category');
-            if (sel) sel.value = value;
-            refreshCpiHeatCategoryButtons(value);
-            triggerDraw();
-        }
-
-        function bindCpiHeatmapTooltip(canvas) {
-            if (!canvas || canvas.dataset.tooltipBound === '1') return;
-            canvas.dataset.tooltipBound = '1';
-            const tooltip = document.getElementById('cpi-heat-tooltip');
-            if (!tooltip) return;
-
-            const hide = () => { tooltip.style.display = 'none'; };
-            canvas.addEventListener('mouseleave', hide);
-            canvas.addEventListener('mousemove', (e) => {
-                const tile = e.target.closest('.cpi-heat-tile');
-                if (!tile || !canvas.contains(tile)) { hide(); return; }
-                const name = tile.dataset.name || '-';
-                const code = tile.dataset.code || '-';
-                const weight = tile.dataset.weight || '-';
-                const focus = tile.dataset.focus || '-';
-                const change = tile.dataset.change || '-';
-                const contribution = tile.dataset.contribution || '-';
-                const category = tile.dataset.category || '-';
-                tooltip.innerHTML = `<div class="tt-name">${escapeCpiHeatHtml(name)}</div><div class="tt-grid"><span class="tt-k">หมวด</span><span class="tt-v">${escapeCpiHeatHtml(category)}</span><span class="tt-k">รหัส</span><span class="tt-v">${escapeCpiHeatHtml(code)}</span><span class="tt-k">Weight</span><span class="tt-v">${escapeCpiHeatHtml(weight)}</span><span class="tt-k">${escapeCpiHeatHtml(focus)}</span><span class="tt-v">${escapeCpiHeatHtml(change)}</span><span class="tt-k">Contribution</span><span class="tt-v">${escapeCpiHeatHtml(contribution)}</span></div>`;
-                tooltip.style.display = 'block';
-                const pad = 16;
-                const tw = tooltip.offsetWidth || 300;
-                const th = tooltip.offsetHeight || 120;
-                let x = e.clientX + 16, y = e.clientY + 16;
-                if (x + tw + pad > window.innerWidth) x = e.clientX - tw - 16;
-                if (y + th + pad > window.innerHeight) y = e.clientY - th - 16;
-                tooltip.style.left = `${Math.max(pad, x)}px`;
-                tooltip.style.top = `${Math.max(pad, y)}px`;
-            });
-        }
-
-        function getCpiHeatLeafRows(currP, displayReg, primaryFocus, cat) {
-            const rows = scopedDb().filter(d =>
-                d.p === currP && d.region === displayReg && getCpiHeatCategory(d.code) === cat &&
-                Number.isFinite(Number(d[primaryFocus])) && Number(d.weight || 0) > 0
-            );
-            if (!rows.length) return [];
-            const levels = rows.map(d => Number(d.level)).filter(Number.isFinite);
-            const maxLevel = levels.length ? Math.max(...levels) : 0;
-            let leaf = rows.filter(d => Number(d.level) === maxLevel);
-            if (!leaf.length) leaf = rows;
-            return leaf;
-        }
-
-        function renderCpiStockHeatmap(currP, displayReg, primaryFocus) {
-            const section = document.getElementById('cpi-stock-heatmap-section');
-            const canvas = document.getElementById('cpi-stock-heatmap-canvas');
-            if (!section || !canvas) return;
-
-            const contributionFocus = !!document.getElementById('cpi-heat-contribution-focus')?.checked;
-            const contributionKey = 'c_' + primaryFocus;
-            const focusEl = document.getElementById('cpi-heat-focus');
-            if (focusEl) focusEl.innerText = contributionFocus
-                ? `${String(primaryFocus || 'yoy').toUpperCase()} • C`
-                : String(primaryFocus || 'yoy').toUpperCase();
-
-            const colorHelp = document.getElementById('cpi-heat-color-help');
-            if (colorHelp) colorHelp.innerText = contributionFocus
-                ? 'สีเข้มขึ้น = Contribution มีขนาดผลกระทบมากขึ้น'
-                : 'สีเข้มขึ้น = เปลี่ยนแปลงมากขึ้น';
-
-            const selected = document.getElementById('cpi-heat-category')?.value || '1-7';
-            refreshCpiHeatCategoryButtons(selected);
-            bindCpiHeatmapTooltip(canvas);
-            const categories = selected === 'all'
-                ? ['1','2','3','4','5','6','7','8','9']
-                : selected === '1-7'
-                    ? ['1','2','3','4','5','6','7']
-                    : [selected];
-
-            const groups = categories.map(cat => {
-                const rows = getCpiHeatLeafRows(currP, displayReg, primaryFocus, cat);
-                const items = rows.map(d => {
-                    const change = Number(d[primaryFocus] || 0);
-                    const contribution = Number(d[contributionKey] || 0);
-                    return {
-                        row: d,
-                        value: Math.max(0.000001, Number(d.weight || 0)),
-                        change,
-                        contribution,
-                        heatValue: contributionFocus ? contribution : change
-                    };
-                }).sort((a,b) => b.value - a.value);
-                return { cat, name: CPI_HEAT_CATEGORY_NAMES[cat] || `หมวด ${cat}`, items, value: items.reduce((s,x) => s + x.value, 0) };
-            }).filter(g => g.items.length > 0 && g.value > 0);
-
-            if (!groups.length) {
-                canvas.innerHTML = '<div class="cpi-heat-empty">ไม่พบข้อมูล Weight และค่าการเปลี่ยนแปลงสำหรับหมวดที่เลือก</div>';
-                const summary = document.getElementById('cpi-heat-summary');
-                if (summary) summary.innerText = '0 รายการ';
-                return;
-            }
-
-            const allItems = groups.flatMap(g => g.items);
-            const maxAbs = Math.max(
-                contributionFocus ? 0.0001 : 0.01,
-                ...allItems.map(x => Math.abs(Number(x.heatValue || 0))).filter(Number.isFinite)
-            );
-            const minLabel = document.getElementById('cpi-heat-min-label');
-            const maxLabel = document.getElementById('cpi-heat-max-label');
-            if (contributionFocus) {
-                if (minLabel) minLabel.innerText = `-${maxAbs.toFixed(4)}`;
-                if (maxLabel) maxLabel.innerText = `+${maxAbs.toFixed(4)}`;
-            } else {
-                if (minLabel) minLabel.innerText = `-${maxAbs.toFixed(2)}%`;
-                if (maxLabel) maxLabel.innerText = `+${maxAbs.toFixed(2)}%`;
-            }
-
-            const summary = document.getElementById('cpi-heat-summary');
-            if (summary) {
-                const regionName = getRegionLabelTH(displayReg, currentDatasetType);
-                const catText = selected === 'all'
-                    ? `ทั้งหมด ${groups.length} หมวด`
-                    : selected === '1-7'
-                        ? `หมวด 1–7 (${groups.length} หมวด)`
-                        : `หมวด ${selected}`;
-                const modeText = contributionFocus ? 'สี: Contribution' : `สี: ${String(primaryFocus).toUpperCase()}`;
-                summary.innerText = `${catText} • ${allItems.length} รายการ • ${regionName} • ${currP} • ${modeText}`;
-            }
-
-            const groupLayout = splitTreemap(groups.map(g => ({ ...g, value: Math.max(0.000001, g.value) })), { x: 0, y: 0, w: 100, h: 100 });
-            const groupHtml = groupLayout.map(gl => {
-                const g = gl.item;
-                const itemLayout = splitTreemap(g.items, { x: 0, y: 0, w: 100, h: 100 });
-                const itemsHtml = itemLayout.map(il => {
-                    const d = il.item.row;
-                    const change = Number(il.item.change || 0);
-                    const contribution = Number(il.item.contribution || 0);
-                    const heatValue = Number(il.item.heatValue || 0);
-                    const weight = Number(d.weight || 0);
-                    const color = cpiHeatColor(heatValue, maxAbs);
-                    const area = il.w * il.h;
-                    const cls = area < 0.28 ? 'micro' : area < 1.0 ? 'tiny' : area < 3.0 ? 'compact' : 'large';
-                    const code = String(d.code || '');
-                    const code7 = code.slice(0, 7);
-                    const signed = change > 0 ? `+${change.toFixed(2)}%` : `${change.toFixed(2)}%`;
-                    const signedContribution = contribution > 0 ? `+${contribution.toFixed(4)}` : contribution.toFixed(4);
-                    const primaryDisplay = contributionFocus ? `C ${signedContribution}` : signed;
-                    const title = `${d.name || '-'} | ${code} | Weight ${weight.toFixed(4)} | ${String(primaryFocus).toUpperCase()} ${signed} | Contribution ${signedContribution}`;
-                    return `<div class="cpi-heat-tile ${cls}" style="left:${il.x}%;top:${il.y}%;width:${il.w}%;height:${il.h}%;background:${color.bg};color:${color.fg};" title="${escapeCpiHeatHtml(title)}" data-name="${escapeCpiHeatHtml(d.name || '-')}" data-code="${escapeCpiHeatHtml(code)}" data-weight="${weight.toFixed(4)}" data-focus="${escapeCpiHeatHtml(String(primaryFocus).toUpperCase())}" data-change="${escapeCpiHeatHtml(signed)}" data-contribution="${escapeCpiHeatHtml(signedContribution)}" data-category="${escapeCpiHeatHtml(`หมวด ${g.cat} • ${g.name}`)}">
-                        <div class="cpi-heat-tile-inner">
-                            <div class="cpi-heat-code">${escapeCpiHeatHtml(code7)}</div>
-                            <div class="cpi-heat-name">${escapeCpiHeatHtml(d.name || '-')}</div>
-                            <div class="cpi-heat-value">${primaryDisplay}</div>
-                            <div class="cpi-heat-weight">Weight ${weight.toFixed(3)}</div>
-                        </div>
-                    </div>`;
-                }).join('');
-                const groupTitle = `หมวด ${g.cat} • ${g.name}`;
-                return `<div class="cpi-heat-group" style="left:${gl.x}%;top:${gl.y}%;width:${gl.w}%;height:${gl.h}%;">
-                    <div class="cpi-heat-group-head" onclick="setCpiHeatmapCategory('${g.cat}')" title="คลิกเพื่อดูเฉพาะหมวด ${g.cat}">
-                        <span class="truncate">${escapeCpiHeatHtml(groupTitle)}</span>
-                        <span class="cpi-heat-group-count">${g.items.length}</span>
-                    </div>
-                    <div class="cpi-heat-group-body">${itemsHtml}</div>
-                </div>`;
-            }).join('');
-
-            canvas.innerHTML = groupHtml;
-        }
-
-
-        function draw() {
+function draw() {
             log('Drawing...');
             const q = document.getElementById('search').value.toLowerCase();
             const pSelect = document.getElementById('periodFilter');
@@ -5391,7 +4924,6 @@ function getRegionAccentClasses(idx) {
             updatePremiumTopbar(currP, displayReg);
             generateCombinedSummary(currP, displayReg, primaryFocus);
             renderCharts(displayReg, primaryFocus, lvls);
-            renderCpiStockHeatmap(currP, displayReg, primaryFocus);
             renderRegionalExtendedSection(currP, primaryFocus);
             renderHistoricalMatrixSection(displayReg, primaryFocus);
 
@@ -6613,36 +6145,6 @@ function getRegionAccentClasses(idx) {
             display: table-cell;
         }
     </style>
-
-
-<style id="single-chart-fullscreen-style">
-.single-chart-fullscreen-card{position:relative!important}
-/* Fullscreen control is embedded inside each chart card */
-.single-chart-fullscreen-actionbar{position:absolute;top:14px;right:14px;z-index:70;display:flex;align-items:center;justify-content:center;margin:0!important;min-height:0!important;pointer-events:none}
-.single-chart-fullscreen-btn{pointer-events:auto;display:inline-flex;align-items:center;justify-content:center;gap:.38rem;min-height:32px;padding:.42rem .68rem;border-radius:999px;border:1px solid rgba(143,215,247,.72);background:rgba(255,255,255,.93);color:#0c2d58;font-family:'Sarabun',sans-serif;font-size:11px;font-weight:900;line-height:1;box-shadow:0 7px 18px rgba(12,45,88,.12);backdrop-filter:blur(10px);cursor:pointer;transition:all .16s ease}
-.single-chart-fullscreen-btn:hover{background:#0c2d58;color:#fff;border-color:#0c2d58;transform:translateY(-1px);box-shadow:0 10px 22px rgba(12,45,88,.22)}
-.single-chart-fullscreen-btn .fs-icon{font-size:15px;line-height:1}
-/* keep chart/card titles readable underneath the embedded control */
-.single-chart-fullscreen-card>h3:first-of-type{padding-right:96px}
-.single-chart-fullscreen-stage{min-height:0}
-.single-chart-fullscreen-card:fullscreen{width:100vw!important;height:100vh!important;max-width:none!important;max-height:none!important;margin:0!important;padding:24px 28px!important;border-radius:0!important;border:0!important;background:#f8fcff!important;overflow:auto!important;box-shadow:none!important}
-.single-chart-fullscreen-card:fullscreen .single-chart-fullscreen-actionbar{position:fixed;top:18px;right:22px;z-index:9999;margin:0!important;padding:0;background:transparent}
-.single-chart-fullscreen-card:fullscreen .single-chart-fullscreen-btn{background:#0c2d58;color:#fff;border-color:#0c2d58;box-shadow:0 10px 24px rgba(12,45,88,.18)}
-.single-chart-fullscreen-card:fullscreen .single-chart-fullscreen-stage{height:calc(100vh - 175px)!important;min-height:520px!important;max-height:none!important}
-.single-chart-fullscreen-card:fullscreen canvas{width:100%!important;height:100%!important;max-height:none!important}
-.single-chart-fullscreen-card:fullscreen #topImpactScroll{max-height:none!important;overflow:visible!important}
-.single-chart-fullscreen-card:fullscreen #topImpactChartWrap{min-height:calc(100vh - 240px)!important;max-height:none!important}
-#cpi-stock-heatmap-section:fullscreen{background:#f8fcff!important;color:#142033!important}
-#cpi-stock-heatmap-section:fullscreen #cpi-stock-heatmap-canvas{height:calc(100vh - 360px)!important;min-height:520px!important;max-height:none!important}
-.single-chart-fullscreen-card.single-chart-pseudo-fullscreen{position:fixed!important;inset:0!important;z-index:99999!important;width:100vw!important;height:100vh!important;max-width:none!important;max-height:none!important;margin:0!important;padding:24px 28px!important;border-radius:0!important;overflow:auto!important;background:#f8fcff!important}
-.single-chart-fullscreen-card.single-chart-pseudo-fullscreen .single-chart-fullscreen-actionbar{position:fixed;top:18px;right:22px;z-index:100000}
-.single-chart-fullscreen-card.single-chart-pseudo-fullscreen .single-chart-fullscreen-stage{height:calc(100vh - 175px)!important;min-height:520px!important}
-.single-chart-fullscreen-card.single-chart-pseudo-fullscreen canvas{width:100%!important;height:100%!important}
-#cpi-stock-heatmap-section.single-chart-pseudo-fullscreen #cpi-stock-heatmap-canvas{height:calc(100vh - 360px)!important;min-height:520px!important}
-body.single-chart-lock-scroll{overflow:hidden!important}
-@media (max-width:768px){.single-chart-fullscreen-card:fullscreen,.single-chart-fullscreen-card.single-chart-pseudo-fullscreen{padding:16px!important}.single-chart-fullscreen-card:fullscreen .single-chart-fullscreen-stage,.single-chart-fullscreen-card.single-chart-pseudo-fullscreen .single-chart-fullscreen-stage{height:calc(100vh - 190px)!important;min-height:420px!important}#cpi-stock-heatmap-section:fullscreen #cpi-stock-heatmap-canvas,#cpi-stock-heatmap-section.single-chart-pseudo-fullscreen #cpi-stock-heatmap-canvas{height:calc(100vh - 430px)!important;min-height:440px!important}}
-</style>
-
 </head>
 <body>
     <table class="sheet">
@@ -6829,118 +6331,5 @@ body.single-chart-lock-scroll{overflow:hidden!important}
         }, 0);
 
 </script>
-
-
-<script id="single-chart-fullscreen-script">
-(function(){
-    const CHART_FULLSCREEN_IDS = ['trendChart','compareChart','weightChart','regionBarChart','topImpactChart','radarInsightChart','bubbleInsightChart','stackedDriverChart'];
-
-    function getChartCard(canvas){
-        if(!canvas) return null;
-        let node=canvas.parentElement;
-        while(node && node.id!=='dashboard-content'){
-            const cls=typeof node.className==='string'?node.className:'';
-            if(cls.includes('bg-white') && (cls.includes('rounded-') || cls.includes('shadow-'))) return node;
-            node=node.parentElement;
-        }
-        return canvas.parentElement;
-    }
-
-    function findStage(canvas,card){
-        if(!canvas||!card) return null;
-        if(canvas.id==='topImpactChart') return document.getElementById('topImpactChartWrap')||canvas.parentElement;
-        let node=canvas.parentElement;
-        while(node && node!==card){
-            const cls=typeof node.className==='string'?node.className:'';
-            if(/\bh-(64|72|80|96)\b/.test(cls)||cls.includes('min-h-[')) return node;
-            node=node.parentElement;
-        }
-        return canvas.parentElement;
-    }
-
-    function cardContains(card,id){const el=document.getElementById(id);return !!(el&&card&&card.contains(el));}
-
-    function makeActionBar(card,stage,label){
-        if(!card||!stage||card.querySelector('.single-chart-fullscreen-actionbar')) return;
-        card.classList.add('single-chart-fullscreen-card');
-        stage.classList.add('single-chart-fullscreen-stage');
-        const bar=document.createElement('div');
-        bar.className='single-chart-fullscreen-actionbar';
-        const btn=document.createElement('button');
-        btn.type='button';
-        btn.className='single-chart-fullscreen-btn';
-        btn.setAttribute('aria-label','ดู '+(label||'กราฟ')+' แบบเต็มหน้าจอ');
-        btn.innerHTML='<span class="fs-icon">⛶</span><span class="fs-text">เต็มหน้าจอ</span>';
-        btn.addEventListener('click',function(ev){ev.preventDefault();ev.stopPropagation();toggleSingleFullscreen(card);});
-        bar.appendChild(btn);
-        /* Embed the control directly inside the chart card. */
-        card.appendChild(bar);
-    }
-
-    async function toggleSingleFullscreen(card){
-        const nativeActive=document.fullscreenElement;
-        if(nativeActive===card){try{await document.exitFullscreen();}catch(e){}return;}
-        if(nativeActive&&document.exitFullscreen){try{await document.exitFullscreen();}catch(e){}}
-        if(card.requestFullscreen){
-            try{await card.requestFullscreen();return;}catch(e){}
-        }
-        document.querySelectorAll('.single-chart-pseudo-fullscreen').forEach(el=>{if(el!==card)el.classList.remove('single-chart-pseudo-fullscreen');});
-        card.classList.toggle('single-chart-pseudo-fullscreen');
-        document.body.classList.toggle('single-chart-lock-scroll',card.classList.contains('single-chart-pseudo-fullscreen'));
-        updateFullscreenButtons();resizeDashboardChartsSoon();
-    }
-
-    function updateFullscreenButtons(){
-        document.querySelectorAll('.single-chart-fullscreen-card').forEach(card=>{
-            const btn=card.querySelector('.single-chart-fullscreen-btn');if(!btn)return;
-            const active=document.fullscreenElement===card||card.classList.contains('single-chart-pseudo-fullscreen');
-            const icon=btn.querySelector('.fs-icon');const txt=btn.querySelector('.fs-text');
-            if(icon)icon.textContent=active?'✕':'⛶';
-            if(txt)txt.textContent=active?'ออกจากเต็มหน้าจอ':'เต็มหน้าจอ';
-            btn.setAttribute('aria-label',active?'ออกจากโหมดเต็มหน้าจอ':'ดูกราฟแบบเต็มหน้าจอ');
-        });
-    }
-
-    function resizeDashboardChartsSoon(){
-        const refs=[];
-        try{if(typeof myTrendChart!=='undefined')refs.push(myTrendChart);}catch(e){}
-        try{if(typeof myCompareChart!=='undefined')refs.push(myCompareChart);}catch(e){}
-        try{if(typeof myWeightChart!=='undefined')refs.push(myWeightChart);}catch(e){}
-        try{if(typeof myRegionBarChart!=='undefined')refs.push(myRegionBarChart);}catch(e){}
-        try{if(typeof myTopImpactChart!=='undefined')refs.push(myTopImpactChart);}catch(e){}
-        try{if(typeof myRadarInsightChart!=='undefined')refs.push(myRadarInsightChart);}catch(e){}
-        try{if(typeof myBubbleInsightChart!=='undefined')refs.push(myBubbleInsightChart);}catch(e){}
-        try{if(typeof myStackedDriverChart!=='undefined')refs.push(myStackedDriverChart);}catch(e){}
-        [80,220,450].forEach(delay=>setTimeout(()=>refs.forEach(ch=>{try{if(ch&&typeof ch.resize==='function')ch.resize();}catch(e){}}),delay));
-    }
-
-    function initSingleChartFullscreen(){
-        CHART_FULLSCREEN_IDS.forEach(id=>{
-            const canvas=document.getElementById(id);if(!canvas)return;
-            const card=getChartCard(canvas);const stage=findStage(canvas,card);if(!card||!stage)return;
-            const heading=card.querySelector('h3');
-            const label=heading?heading.textContent.replace(/\s+/g,' ').trim():id;
-            makeActionBar(card,stage,label);
-        });
-        const heat=document.getElementById('cpi-stock-heatmap-section');
-        const heatStage=document.getElementById('cpi-stock-heatmap-canvas');
-        if(heat&&heatStage&&!heat.querySelector('.single-chart-fullscreen-actionbar')){
-            heat.classList.add('single-chart-fullscreen-card');heatStage.classList.add('single-chart-fullscreen-stage');
-            const bar=document.createElement('div');bar.className='single-chart-fullscreen-actionbar';
-            const btn=document.createElement('button');btn.type='button';btn.className='single-chart-fullscreen-btn';
-            btn.setAttribute('aria-label','ดู Heatmap แบบเต็มหน้าจอ');
-            btn.innerHTML='<span class="fs-icon">⛶</span><span class="fs-text">เต็มหน้าจอ</span>';
-            btn.addEventListener('click',function(ev){ev.preventDefault();ev.stopPropagation();toggleSingleFullscreen(heat);});
-            bar.appendChild(btn);heat.appendChild(bar);
-        }
-        updateFullscreenButtons();
-    }
-
-    document.addEventListener('fullscreenchange',function(){if(!document.fullscreenElement)document.body.classList.remove('single-chart-lock-scroll');updateFullscreenButtons();resizeDashboardChartsSoon();});
-    document.addEventListener('keydown',function(e){if(e.key!=='Escape')return;const pseudo=document.querySelector('.single-chart-pseudo-fullscreen');if(pseudo){pseudo.classList.remove('single-chart-pseudo-fullscreen');document.body.classList.remove('single-chart-lock-scroll');updateFullscreenButtons();resizeDashboardChartsSoon();}});
-    if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',initSingleChartFullscreen);else initSingleChartFullscreen();
-})();
-</script>
-
 </body>
 </html>

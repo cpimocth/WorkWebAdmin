@@ -894,139 +894,96 @@ thead th.sticky-product-col{background:#eef9ff!important;color:#173d5d!important
                     <div id="input-status-sub" class="text-[11px] font-bold text-slate-500 mt-1 leading-relaxed">-</div>
                 </div>
 
-                <!-- Quick controls: keep the most-used CPI workflow first -->
-                <div class="rounded-2xl border border-cyan-200 bg-cyan-50/60 p-3.5 shadow-sm space-y-4">
-                    <div class="flex items-center justify-between gap-3">
-                        <div>
-                            <div class="text-[11px] font-black uppercase tracking-[0.14em] text-cyan-800">⚡ ใช้งานบ่อย</div>
-                            <div class="text-[10px] font-bold text-slate-500 mt-0.5">MoM / YoY / AoA</div>
-                        </div>
-                        <span class="rounded-full border border-cyan-200 bg-white px-2.5 py-1 text-[9px] font-black text-cyan-700">QUICK</span>
-                    </div>
-
-                    <div>
-                        <div class="flex items-end justify-between gap-2 mb-2">
-                            <label class="block text-[11px] font-black text-slate-700 uppercase">ไฮไลต์การเปรียบเทียบ</label>
-                            <span class="text-[9px] font-bold text-slate-400">เลือกทีละ 1 ค่า</span>
-                        </div>
-                        <div class="grid grid-cols-3 bg-white/90 rounded-xl p-2 gap-2 border border-cyan-100">
-                            <label data-focus-wrap="mom"
-                                class="text-center py-2 text-[12px] font-black cursor-pointer bg-white rounded-lg shadow-sm border border-slate-200 hover:border-cyan-300 hover:bg-cyan-50 transition">
-                                <input type="checkbox" class="f-check mr-1" value="mom" onchange="handleFocusSelect(this)"> MOM
-                            </label>
-                            <label data-focus-wrap="yoy"
-                                class="text-center py-2 text-[12px] font-black cursor-pointer bg-white rounded-lg shadow-sm border border-slate-200 hover:border-cyan-300 hover:bg-cyan-50 transition">
-                                <input type="checkbox" class="f-check mr-1" value="yoy" checked onchange="handleFocusSelect(this)"> YOY
-                            </label>
-                            <label data-focus-wrap="aoa"
-                                class="text-center py-2 text-[12px] font-black cursor-pointer bg-white rounded-lg shadow-sm border border-slate-200 hover:border-cyan-300 hover:bg-cyan-50 transition">
-                                <input type="checkbox" class="f-check mr-1" value="aoa" onchange="handleFocusSelect(this)"> AOA
-                            </label>
-                        </div>
-                    </div>
-
+                <div>
+                    <label class="block text-[11px] font-black text-rose-600 uppercase mb-2">โหมดการดู</label>
+                    <select id="cpiTypeFilter" onchange="triggerDraw()"
+                        class="cat-filter border-rose-200 text-rose-700">
+                        <option value="headline">แสดงสินค้าทั้งหมด (Normal)</option>
+                        <option value="compare_all">เปรียบเทียบ 4 ดัชนีหลัก (Aggregate)</option>
+                    </select>
                 </div>
 
-                <!-- Lower-frequency controls moved to the bottom -->
-                <div class="rounded-2xl border border-slate-200 bg-slate-50/80 p-3.5 space-y-4">
-                    <div class="flex items-center justify-between gap-3">
-                        <div>
-                            <div class="text-[11px] font-black uppercase tracking-[0.14em] text-slate-600">⚙️ ตัวเลือกเพิ่มเติม</div>
-                            <div class="text-[10px] font-bold text-slate-400 mt-0.5">โหมด ตัวชี้วัดเสริม และตัวกรองเชิงลึก</div>
-                        </div>
-                        <span class="rounded-full border border-slate-200 bg-white px-2.5 py-1 text-[9px] font-black text-slate-500">ADVANCED</span>
+                <div>
+                    <label class="block text-[11px] font-black text-indigo-600 uppercase mb-2">หมวดพิเศษ
+                        (กรองรหัส)</label>
+                    <select id="catFilter" onchange="triggerDraw()" class="cat-filter text-indigo-900">
+                        <option value="all">-- แสดงทุกหมวดสินค้า --</option>
+                        <option value="00">00* ดัชนีราคาผู้บริโภคทั่วไป</option>
+                        <option value="1">1* หมวดอาหารและเครื่องดื่มไม่มีแอลกอฮอล์</option>
+                        <option value="111">111* ข้าว แป้งและผลิตภัณฑ์จากแป้ง</option>
+                        <option value="112">112* เนื้อสัตว์ เป็ดไก่ และสัตว์น้ำ</option>
+                        <option value="113">113* ไข่และผลิตภัณฑ์นม</option>
+                        <option value="114">114* ผักและผลไม้</option>
+                        <option value="11411">11411* ผักสด</option>
+                        <option value="11421">11421* ผลไม้สด</option>
+                        <option value="115">115* เครื่องประกอบอาหาร</option>
+                        <option value="116">116* เครื่องดื่มไม่มีแอลกอฮอล์</option>
+                        <option value="117">117* ผลิตภัณฑ์น้ำตาล</option>
+                        <option value="12">12* อาหารสำเร็จรูป</option>
+                        <option value="123">123* อาหารพร้อมทาน</option>
+                        <option value="124">124* อาหารจากร้านยอดนิยม</option>
+                        <option value="125">125* อาหารฟาสต์ฟู้ด/Delivery</option>
+                        <option value="8">8* หมวดอื่น ๆ ไม่ใช่อาหาร และเครื่องดื่ม</option>
+                        <option value="2">2* หมวดเครื่องนุ่งห่มและรองเท้า</option>
+                        <option value="3">3* หมวดเคหสถาน</option>
+                        <option value="4">4* หมวดการตรวจรักษาและบริการส่วนบุคคล</option>
+                        <option value="5">5* หมวดพาหนะ การขนส่ง และการสื่อสาร</option>
+                        <option value="51">51* ค่าโดยสารสาธารณะ</option>
+                        <option value="522">522* น้ำมันเชื้อเพลิง</option>
+                        <option value="54">54* การสื่อสาร</option>
+                        <option value="6">6* หมวดการบันเทิงการอ่าน การศึกษา และการศาสนา</option>
+                        <option value="7">7* หมวดยาสูบและเครื่องดื่มมีแอลกอฮอล์</option>
+                        <option value="9">9* กลุ่มอาหารสดและพลังงาน</option>
+                        <option value="91">91* อาหารสด</option>
+                        <option value="92">92* พลังงาน</option>
+                        <option value="93">93* ดัชนีราคาผู้บริโภคพื้นฐาน</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-[11px] font-black text-slate-500 uppercase mb-2">ระดับสินค้า</label>
+                    <div id="level-container" class="flex flex-wrap gap-2"></div>
+                </div>
+
+                <div>
+                    <label
+                        class="block text-[11px] font-black text-indigo-600 uppercase mb-2 italic">ไฮไลต์การเปรียบเทียบ
+                        (เลือกได้ทีละอัน / หรือกดดูทั้งหมด)</label>
+                    <div class="grid grid-cols-5 bg-slate-100 rounded-xl p-2 gap-2">
+                        <label data-focus-wrap="mom"
+                            class="text-center py-1.5 text-[11px] font-black cursor-pointer bg-white rounded-lg shadow-sm border border-slate-200 hover:bg-slate-50 transition">
+                            <input type="checkbox" class="f-check mr-1" value="mom" onchange="handleFocusSelect(this)"> MOM
+                        </label>
+                        <label data-focus-wrap="yoy"
+                            class="text-center py-1.5 text-[11px] font-black cursor-pointer bg-white rounded-lg shadow-sm border border-slate-200 hover:bg-slate-50 transition">
+                            <input type="checkbox" class="f-check mr-1" value="yoy" checked onchange="handleFocusSelect(this)"> YOY
+                        </label>
+                        <label data-focus-wrap="aoa"
+                            class="text-center py-1.5 text-[11px] font-black cursor-pointer bg-white rounded-lg shadow-sm border border-slate-200 hover:bg-slate-50 transition">
+                            <input type="checkbox" class="f-check mr-1" value="aoa" onchange="handleFocusSelect(this)"> AOA
+                        </label>
+                        <label data-focus-wrap="qoq"
+                            class="text-center py-1.5 text-[11px] font-black cursor-pointer bg-white rounded-lg shadow-sm border border-slate-200 hover:bg-slate-50 transition">
+                            <input type="checkbox" class="f-check mr-1" value="qoq" onchange="handleFocusSelect(this)"> QoQ
+                        </label>
+                        <label data-focus-wrap="hoh"
+                            class="text-center py-1.5 text-[11px] font-black cursor-pointer bg-white rounded-lg shadow-sm border border-slate-200 hover:bg-slate-50 transition">
+                            <input type="checkbox" class="f-check mr-1" value="hoh" onchange="handleFocusSelect(this)"> HoH
+                        </label>
+                        <label
+                            class="col-span-5 text-center py-2 text-[12px] font-black cursor-pointer bg-indigo-100 text-indigo-700 rounded-lg shadow-sm border border-indigo-200 hover:bg-indigo-200 transition">
+                            <input type="checkbox" id="checkAllFocus" class="mr-1" onchange="toggleAllFocus(this)"> 👁️ ดูข้อมูลทั้งหมดที่มีในไฟล์
+                        </label>
                     </div>
+                </div>
 
-                    <div>
-                        <label class="block text-[11px] font-black text-slate-500 uppercase mb-2">โหมดการดู</label>
-                        <select id="cpiTypeFilter" onchange="triggerDraw()"
-                            class="cat-filter border-slate-200 text-slate-700 bg-white">
-                            <option value="headline">แสดงสินค้าทั้งหมด (Normal)</option>
-                            <option value="compare_all">เปรียบเทียบ 4 ดัชนีหลัก (Aggregate)</option>
-                        </select>
-                    </div>
-
-                    <div>
-                        <div class="flex items-end justify-between gap-2 mb-2">
-                            <label class="block text-[11px] font-black text-slate-500 uppercase">ตัวชี้วัดเพิ่มเติม</label>
-                            <span class="text-[9px] font-bold text-slate-400">ใช้เมื่อจำเป็น</span>
-                        </div>
-                        <div class="grid grid-cols-2 gap-2">
-                            <label data-focus-wrap="qoq"
-                                class="text-center py-2 text-[11px] font-black cursor-pointer bg-white rounded-lg border border-slate-200 hover:bg-slate-100 transition">
-                                <input type="checkbox" class="f-check mr-1" value="qoq" onchange="handleFocusSelect(this)"> QoQ
-                            </label>
-                            <label data-focus-wrap="hoh"
-                                class="text-center py-2 text-[11px] font-black cursor-pointer bg-white rounded-lg border border-slate-200 hover:bg-slate-100 transition">
-                                <input type="checkbox" class="f-check mr-1" value="hoh" onchange="handleFocusSelect(this)"> HoH
-                            </label>
-                        </div>
-                    </div>
-
-                    <label class="flex items-center gap-2 text-[11px] font-black text-slate-600 cursor-pointer bg-white p-2.5 rounded-xl border border-slate-200 hover:bg-slate-100 transition-colors">
-                        <input type="checkbox" id="checkAllFocus" class="w-4 h-4 rounded border-slate-300" onchange="toggleAllFocus(this)">
-                        👁️ ดูข้อมูลทั้งหมดที่มีในไฟล์
-                    </label>
-
-                    <label class="flex items-center gap-2 text-[11px] font-black text-slate-600 cursor-pointer bg-white p-2.5 rounded-xl border border-slate-200 hover:bg-slate-100 transition-colors">
+                <div class="pt-3 border-t border-slate-200">
+                    <label
+                        class="flex items-center gap-2 text-[12px] font-black text-slate-700 cursor-pointer bg-slate-100 p-2.5 rounded-xl hover:bg-slate-200 transition-colors">
                         <input type="checkbox" id="showRawData" onchange="triggerDraw()"
                             class="w-4 h-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500">
                         🔬 ดูข้อมูลเบื้องหลัง (Weight/Index/Rel)
                     </label>
-
-
-                    <div class="pt-3 mt-1 border-t border-slate-200">
-                        <div class="flex items-center justify-between gap-2 mb-3">
-                            <div>
-                                <div class="text-[11px] font-black uppercase tracking-[0.12em] text-slate-500">ตัวกรองเชิงลึก</div>
-                                <div class="text-[9px] font-bold text-slate-400 mt-0.5">ใช้เมื่อต้องการเจาะเฉพาะหมวดหรือระดับสินค้า</div>
-                            </div>
-                            <span class="rounded-full border border-slate-200 bg-white px-2 py-1 text-[8px] font-black text-slate-400">OPTIONAL</span>
-                        </div>
-
-                        <div class="space-y-4">
-                            <div>
-                                <label class="block text-[11px] font-black text-indigo-600 uppercase mb-2">หมวดสินค้า (กรองรหัส)</label>
-                                <select id="catFilter" onchange="triggerDraw()" class="cat-filter text-indigo-900 bg-white">
-                                    <option value="all">-- แสดงทุกหมวดสินค้า --</option>
-                                    <option value="00">00* ดัชนีราคาผู้บริโภคทั่วไป</option>
-                                    <option value="1">1* หมวดอาหารและเครื่องดื่มไม่มีแอลกอฮอล์</option>
-                                    <option value="111">111* ข้าว แป้งและผลิตภัณฑ์จากแป้ง</option>
-                                    <option value="112">112* เนื้อสัตว์ เป็ดไก่ และสัตว์น้ำ</option>
-                                    <option value="113">113* ไข่และผลิตภัณฑ์นม</option>
-                                    <option value="114">114* ผักและผลไม้</option>
-                                    <option value="11411">11411* ผักสด</option>
-                                    <option value="11421">11421* ผลไม้สด</option>
-                                    <option value="115">115* เครื่องประกอบอาหาร</option>
-                                    <option value="116">116* เครื่องดื่มไม่มีแอลกอฮอล์</option>
-                                    <option value="117">117* ผลิตภัณฑ์น้ำตาล</option>
-                                    <option value="12">12* อาหารสำเร็จรูป</option>
-                                    <option value="123">123* อาหารพร้อมทาน</option>
-                                    <option value="124">124* อาหารจากร้านยอดนิยม</option>
-                                    <option value="125">125* อาหารฟาสต์ฟู้ด/Delivery</option>
-                                    <option value="8">8* หมวดอื่น ๆ ไม่ใช่อาหาร และเครื่องดื่ม</option>
-                                    <option value="2">2* หมวดเครื่องนุ่งห่มและรองเท้า</option>
-                                    <option value="3">3* หมวดเคหสถาน</option>
-                                    <option value="4">4* หมวดการตรวจรักษาและบริการส่วนบุคคล</option>
-                                    <option value="5">5* หมวดพาหนะ การขนส่ง และการสื่อสาร</option>
-                                    <option value="51">51* ค่าโดยสารสาธารณะ</option>
-                                    <option value="522">522* น้ำมันเชื้อเพลิง</option>
-                                    <option value="54">54* การสื่อสาร</option>
-                                    <option value="6">6* หมวดการบันเทิงการอ่าน การศึกษา และการศาสนา</option>
-                                    <option value="7">7* หมวดยาสูบและเครื่องดื่มมีแอลกอฮอล์</option>
-                                    <option value="9">9* กลุ่มอาหารสดและพลังงาน</option>
-                                    <option value="91">91* อาหารสด</option>
-                                    <option value="92">92* พลังงาน</option>
-                                    <option value="93">93* ดัชนีราคาผู้บริโภคพื้นฐาน</option>
-                                </select>
-                            </div>
-
-                            <div>
-                                <label class="block text-[11px] font-black text-slate-600 uppercase mb-2">ระดับสินค้า</label>
-                                <div id="level-container" class="flex flex-wrap gap-2"></div>
-                            </div>
-                        </div>
-                    </div>
                 </div>
 
                 <div class="pt-4 border-t border-slate-100 space-y-3">
