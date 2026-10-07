@@ -199,6 +199,25 @@
     @media print{
       .appbar,.statusbar,.toast,.loading{display:none!important}.shell{max-width:none;padding:0;background:#fff}.report-page{box-shadow:none;border:0;border-radius:0;margin:0;page-break-after:always;break-after:page}.report-page:last-child{page-break-after:auto}body{background:#fff}
     }
+
+    /* Export controls follow the existing report theme; not part of print/PNG. */
+    .excel-btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;
+      color:#076144;background:#f1fbf7;border:1px solid #9dd3bd;white-space:nowrap;
+      font-size:12px;padding:8px 11px;border-radius:9px;line-height:1.3;flex:0 0 auto}
+    .excel-btn::before{content:"X";display:inline-grid;place-items:center;width:18px;height:19px;
+      border-radius:4px;background:#147d58;color:#fff;font-family:Arial,sans-serif;font-size:11px;font-weight:900}
+    .excel-btn:hover{background:#dff4e9;border-color:#4baf88}
+    .excel-btn:focus-visible{outline:3px solid #67bde5;outline-offset:3px}
+    .excel-btn.excel-all{background:#147d58;color:#fff;border-color:#147d58}
+    .excel-btn.excel-all:hover{background:#0b6244}
+    .table-export-actions{display:flex;justify-content:flex-end;align-items:center;gap:8px;margin:0 0 9px}
+    .component-header{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+    .component-header .excel-btn{margin-left:auto}
+    .mini-rate-card .excel-btn{font-size:10px;padding:5px 8px}
+    .mini-rate-card .table-export-actions{margin-bottom:5px}
+    .mini-rate-card .excel-btn::before{width:15px;height:16px;font-size:10px}
+    .weight-legend .table-export-actions{grid-column:1/-1}
+    @media print{.table-export-actions,.export-action,.table-toolbar{display:none!important}}
   </style>
 </head>
 <body>
@@ -212,7 +231,7 @@
         <input id="fileInput" type="file" accept=".xlsx,.xls" multiple="" hidden="">
         <button class="tool-btn" onclick="document.getElementById('fileInput').click()">📂 นำเข้า Excel 6.1.7</button>
         <select id="periodSelect" class="tool-select" onchange="onPeriodChange()" title="งวดข้อมูล"><option value="256909">กันยายน 2569</option></select>
-        <select id="datasetSelect" class="tool-select" onchange="onDatasetChange()" title="ชุดดัชนี"><option value="G">G • ชุดทั่วไป</option></select>
+        <select id="datasetSelect" class="tool-select" onchange="onDatasetChange()" title="ชุดดัชนี"><option value="G">G ชุดทั่วไป</option></select>
         <select id="regionSelect" class="tool-select" onchange="renderAll()" title="พื้นที่"><option value="NATIONAL">ภาพรวมประเทศ</option></select>
         <button class="tool-btn" onclick="window.print()">🖨️ พิมพ์ / PDF</button>
       </div>
@@ -229,23 +248,24 @@
         <h1>CPI Report Builder</h1>
         <p>รองรับไฟล์ <b>6.1.7 รายงานค่าสัมพัทธ์ผู้บริโภค.xlsx</b> โครงสร้างใหม่ โดยระบบจะอ่านหัวตารางจากแถว <b>รหัส / หมวด/รายการ / ดัชนี / MoM / YoY / AoA / Contribute</b> อัตโนมัติ แล้วจัดการนำเสนอเรียงตามรายงาน Cpig</p>
         <button class="primary-btn" onclick="document.getElementById('fileInput').click()">เลือก Excel (เลือกได้หลายเดือน / หลายภาค)</button>
-        <div class="subnote"><b>ระบบอ่านทั้ง “ชุดดัชนี” และ “พื้นที่” จากหัวไฟล์ Excel โดยตรง</b><br>ชุดทั่วไป = <b>G</b> • ชุดรายได้น้อย = <b>L</b> • ชุดนอกเขต = <b>U</b> และวิเคราะห์แยกจากกันทุกหน้า<br>พื้นที่รองรับ ประเทศไทย / กรุงเทพฯและปริมณฑล / ภาคกลาง / ภาคเหนือ / ภาคตะวันออกเฉียงเหนือ / ภาคใต้ / พื้นที่อื่น ๆ โดย <b>ไม่ใช้ (GM) เป็นตัวตัดสินว่าเป็นกรุงเทพฯหรือเป็นชนิดชุด</b><br>ถ้าอัปโหลดหลายไฟล์ในงวดเดียวกัน ระบบจะรวมหน้า “จำแนกรายภาค” เฉพาะชุดที่เลือก และถ้าอัปโหลดหลายเดือน กราฟแนวโน้มจะต่อเฉพาะชุดเดียวกัน</div>
+        <div class="subnote"><b>ระบบอ่านทั้ง “ชุดดัชนี” และ “พื้นที่” จากหัวไฟล์ Excel โดยตรง</b><br>ชุดทั่วไป = <b>G</b> ชุดรายได้น้อย = <b>L</b> ชุดนอกเขต = <b>U</b> และวิเคราะห์แยกจากกันทุกหน้า<br>พื้นที่รองรับ ประเทศไทย / กรุงเทพฯและปริมณฑล / ภาคกลาง / ภาคเหนือ / ภาคตะวันออกเฉียงเหนือ / ภาคใต้ / พื้นที่อื่น ๆ โดย <b>ไม่ใช้ (GM) เป็นตัวตัดสินว่าเป็นกรุงเทพฯหรือเป็นชนิดชุด</b><br>ถ้าอัปโหลดหลายไฟล์ในงวดเดียวกัน ระบบจะรวมหน้า “จำแนกรายภาค” เฉพาะชุดที่เลือก และถ้าอัปโหลดหลายเดือน กราฟแนวโน้มจะต่อเฉพาะชุดเดียวกัน</div>
       </div>
     </section>
 
     <div id="report" style="display: none;">
       <div class="statusbar">
-        <div class="meta" id="statusMeta">กันยายน 2569 • ชุดทั่วไป (G) • ภาพรวมประเทศ • 639 แถว • โหลดแล้ว 1 ไฟล์ (1 พื้นที่ของชุดนี้ในงวดนี้)</div>
+        <div class="meta" id="statusMeta">กันยายน 2569 ชุดทั่วไป (G) ภาพรวมประเทศ 639 แถว โหลดแล้ว 1 ไฟล์ (1 พื้นที่ของชุดนี้ในงวดนี้)</div>
         <div class="actions">
           <button class="mini-btn" onclick="capturePage('page-1')">📷 PNG หน้า 1</button>
           <button class="mini-btn" onclick="capturePage('page-9')">📷 PNG Poster</button>
-          <button class="mini-btn" onclick="exportCurrentExcel()">📥 Export ตาราง</button>
+          <button id="exportAllTablesButton" class="mini-btn excel-btn excel-all" type="button" onclick="exportAllTablesExcel()">Export ทุกตาราง</button>
+          <button id="exportRawButton" class="mini-btn" type="button" onclick="exportCurrentExcel()">Export ข้อมูล CPI ทั้งหมด</button>
         </div>
       </div>
 
       <section class="report-page" id="page-1">
         <div class="page-topline"></div>
-        <div class="page-head"><div><h2 class="page-title" id="p1Title">ดัชนีราคาผู้บริโภคชุดทั่วไป • ภาพรวมประเทศ</h2><p class="page-subtitle" id="p1Sub">เดือนกันยายน 2569 • ปีฐาน 2566 = 100 • G</p></div><div class="page-no">1</div></div>
+        <div class="page-head"><div><h2 class="page-title" id="p1Title">ดัชนีราคาผู้บริโภคชุดทั่วไป ภาพรวมประเทศ</h2><p class="page-subtitle" id="p1Sub">เดือนกันยายน 2569 ปีฐาน 2566 = 100 G</p></div><div class="page-no">1</div></div>
         <div class="page-body">
           <div class="ribbon" id="headlineRibbon">ดัชนีราคาผู้บริโภคชุดทั่วไป เดือนกันยายน 2569 เท่ากับ 102.93</div>
           <table class="compare-table">
@@ -254,12 +274,12 @@
           </table>
           <div class="highlights"><h3>Highlights</h3><p id="highlightsText">ดัชนีราคาผู้บริโภคชุดทั่วไป ของประเทศ เดือนกันยายน 2569 เท่ากับ 102.93 เมื่อเทียบกับเดือนเดียวกันของปีก่อน สูงขึ้นร้อยละ 2.82 (YoY) โดยหมวดที่มีส่วนผลักดันสำคัญ ได้แก่ พาหนะ การขนส่ง และการสื่อสาร, อาหารสำเร็จรูป, ข้าว  แป้งและผลิตภัณฑ์จากแป้ง ขณะที่หมวดที่ช่วยชะลอ ได้แก่ เคหสถาน, เครื่องนุ่งห่มและรองเท้า เมื่อเทียบกับเดือนก่อน สูงขึ้นร้อยละ 0.25 (MoM) ด้านรายการที่ผลักดันขึ้นในเดือนนี้ ได้แก่ พาหนะ การขนส่ง และการสื่อสาร, เนื้อสัตว์ เป็ดไก่ และสัตว์น้ำ, ผลไม้สด ส่วนแรงกดดันลงสำคัญ ได้แก่ เคหสถาน, ไข่และผลิตภัณฑ์นม, ผักสด และเฉลี่ย 9 เดือนแรก สูงขึ้นร้อยละ 1.54 (AoA) สำหรับเงินเฟ้อพื้นฐาน สูงขึ้นร้อยละ 1.50 (YoY), สูงขึ้นร้อยละ 0.01 (MoM) และ สูงขึ้นร้อยละ 1.01 (AoA) .</p></div>
         </div>
-        <div class="footer">กองดัชนีเศรษฐกิจการค้า • สำนักงานนโยบายและยุทธศาสตร์การค้า</div>
+        <div class="footer">กองดัชนีเศรษฐกิจการค้า สำนักงานนโยบายและยุทธศาสตร์การค้า</div>
       </section>
 
       <section class="report-page" id="page-2">
         <div class="page-topline"></div>
-        <div class="page-head"><div><h2 class="page-title" id="p2Title">สถิติอัตราการเปลี่ยนแปลงและภาพรวมดัชนีราคาผู้บริโภคชุดทั่วไป</h2><p class="page-subtitle" id="p2Sub">เดือนกันยายน 2569 • ชุดทั่วไป (G) • ภาพรวมประเทศ</p></div><div class="page-no">2</div></div>
+        <div class="page-head"><div><h2 class="page-title" id="p2Title">สถิติอัตราการเปลี่ยนแปลงและภาพรวมดัชนีราคาผู้บริโภคชุดทั่วไป</h2><p class="page-subtitle" id="p2Sub">เดือนกันยายน 2569 ชุดทั่วไป (G) ภาพรวมประเทศ</p></div><div class="page-no">2</div></div>
         <div class="page-body">
           <div class="grid-3" id="headlineKpis"><div class="kpi"><div class="label">ดัชนี</div><div class="value">102.93</div><div class="hint">ชุดทั่วไป (G)</div></div><div class="kpi"><div class="label">YoY ชุดทั่วไป</div><div class="value positive">+2.82%</div><div class="hint">เทียบเดือนเดียวกันปีก่อน</div></div><div class="kpi"><div class="label">เงินเฟ้อพื้นฐาน YoY</div><div class="value positive">+1.50%</div><div class="hint">ไม่รวมอาหารสดและพลังงาน</div></div></div>
           <div class="chart-card" style="margin-top:16px"><div class="chart-wrap"><canvas id="trendChart" width="1055" height="330" style="display: block; box-sizing: border-box; height: 330px; width: 1055px;"></canvas></div></div>
@@ -272,27 +292,27 @@
       <section class="report-page" id="page-3">
         <div class="page-topline"></div>
         <div class="page-head"><div><h2 class="page-title" id="p3Title">อัตราการเปลี่ยนแปลงดัชนีราคาผู้บริโภคชุดทั่วไป</h2><p class="page-subtitle" id="p3Sub">เดือนกันยายน 2568 (YoY) <b class="positive">สูงขึ้นร้อยละ 2.82</b></p></div><div class="page-no">3</div></div>
-        <div class="page-body"><div class="table-toolbar"><span class="limit-label">สินค้าสำคัญต่อกลุ่ม</span><select id="yoyLimitSelect" class="table-limit-select" onchange="renderAll()"><option value="3" selected="">3</option><option value="6">6</option><option value="9">9</option><option value="12">12</option><option value="15">15</option><option value="20">20</option><option value="30">30</option></select><span class="limit-label">รายการ</span></div><div id="yoyComponents"><div class="component-header">หมวดอาหารและเครื่องดื่มไม่มีแอลกอฮอล์ <span class="positive">สูงขึ้นร้อยละ 3.07</span></div><table class="component-table"><thead><tr><th>กลุ่มสินค้า</th><th>ทิศทาง</th><th>สินค้าสำคัญที่ส่งผลกระทบ</th></tr></thead><tbody><tr><td>ข้าว แป้ง และผลิตภัณฑ์จากแป้ง</td><td class="positive">+ ร้อยละ 4.87</td><td>จากการสูงขึ้นของราคาข้าวสารเจ้า • ขนมปังปอนด์ • วุ้นเส้น</td></tr><tr><td>เนื้อสัตว์ เป็ด ไก่ และสัตว์น้ำ</td><td class="positive">+ ร้อยละ 1.47</td><td>จากการสูงขึ้นของราคาไก่สด • เนื้อสุกร • ปลาทู</td></tr><tr><td>ไข่และผลิตภัณฑ์นม</td><td class="positive">+ ร้อยละ 3.76</td><td>จากการสูงขึ้นของราคาไข่ไก่ • นมผง • นมเปรี้ยว</td></tr><tr><td>ผักสด</td><td class="positive">+ ร้อยละ 4.62</td><td>จากการสูงขึ้นของราคามะนาว • ต้นหอม • ผักกาดขาว</td></tr><tr><td>ผลไม้สด</td><td class="positive">+ ร้อยละ 1.34</td><td>จากการสูงขึ้นของราคาฝรั่ง • ส้มเขียวหวาน • มะละกอสุก</td></tr><tr><td>เครื่องประกอบอาหาร</td><td class="positive">+ ร้อยละ 0.54</td><td>จากการสูงขึ้นของราคาน้ำปลา • กะปิ • น้ำพริกแกง</td></tr><tr><td>เครื่องดื่มไม่มีแอลกอฮอล์</td><td class="positive">+ ร้อยละ 1.60</td><td>จากการสูงขึ้นของราคาน้ำดื่มบริสุทธิ์ • กาแฟผงสำเร็จรูป • น้ำอัดลม</td></tr><tr><td>ผลิตภัณฑ์น้ำตาล</td><td class="positive">+ ร้อยละ 2.48</td><td>จากการสูงขึ้นของราคาขนมหวาน • ไอศกรีม • น้ำตาลทรายแดง</td></tr><tr><td>อาหารสำเร็จรูป</td><td class="positive">+ ร้อยละ 3.82</td><td>จากการสูงขึ้นของราคาก๋วยเตี๋ยว • กับข้าวสำเร็จรูป • ข้าวราดแกง</td></tr></tbody></table><div class="component-header">หมวดอื่น ๆ ที่ไม่ใช่อาหารและเครื่องดื่ม <span class="positive">สูงขึ้นร้อยละ 2.67</span></div><table class="component-table"><thead><tr><th>กลุ่มสินค้า</th><th>ทิศทาง</th><th>สินค้าสำคัญที่ส่งผลกระทบ</th></tr></thead><tbody><tr><td>เครื่องนุ่งห่มและรองเท้า</td><td class="negative">− ร้อยละ 0.43</td><td>จากการลดลงของราคาเสื้อเชิ้ตสตรี • กางเกงขายาวสตรี • รองเท้าผ้าใบบุรุษ</td></tr><tr><td>เคหสถาน</td><td class="negative">− ร้อยละ 1.10</td><td>จากการลดลงของราคาค่ากระแสไฟฟ้า • ค่าจ้างเหมาซ่อมแซมบ้าน (ค่าแรงพร้อมวัสดุก่อสร้าง) • ผ้าปูที่นอน</td></tr><tr><td>การตรวจรักษาและบริการส่วนบุคคล</td><td class="positive">+ ร้อยละ 0.81</td><td>จากการสูงขึ้นของราคากระดาษชำระ/กระดาษสำหรับเช็ดหน้า • ค่าเบี้ยประกันสุขภาพ (ไม่รวมประเภทสะสมทรัพย์) • แชมพู</td></tr><tr><td>พาหนะ การขนส่ง และการสื่อสาร</td><td class="positive">+ ร้อยละ 8.01</td><td>จากการสูงขึ้นของราคาน้ำมันดีเซล • แก๊สโซฮอล์ 95 • แก๊สโซฮอล์ 91</td></tr><tr><td>การบันเทิง การอ่าน การศึกษา และการศาสนา</td><td class="positive">+ ร้อยละ 1.38</td><td>จากการสูงขึ้นของราคาค่าทัศนาจรต่างประเทศ • อาหารสัตว์เลี้ยง • ค่าเดินทางไปเยี่ยมญาติและทำบุญ</td></tr><tr><td>ยาสูบและเครื่องดื่มมีแอลกอฮอล์</td><td class="positive">+ ร้อยละ 0.01</td><td>จากการสูงขึ้นของราคาเบียร์</td></tr></tbody></table></div></div>
+        <div class="page-body"><div class="table-toolbar"><span class="limit-label">สินค้าสำคัญต่อกลุ่ม</span><select id="yoyLimitSelect" class="table-limit-select" onchange="renderAll()"><option value="3" selected="">3</option><option value="6">6</option><option value="9">9</option><option value="12">12</option><option value="15">15</option><option value="20">20</option><option value="30">30</option></select><span class="limit-label">รายการ</span></div><div id="yoyComponents"><div class="component-header">หมวดอาหารและเครื่องดื่มไม่มีแอลกอฮอล์ <span class="positive">สูงขึ้นร้อยละ 3.07</span></div><table class="component-table"><thead><tr><th>กลุ่มสินค้า</th><th>ทิศทาง</th><th>สินค้าสำคัญที่ส่งผลกระทบ</th></tr></thead><tbody><tr><td>ข้าว แป้ง และผลิตภัณฑ์จากแป้ง</td><td class="positive">+ ร้อยละ 4.87</td><td>จากการสูงขึ้นของราคาข้าวสารเจ้า ขนมปังปอนด์ วุ้นเส้น</td></tr><tr><td>เนื้อสัตว์ เป็ด ไก่ และสัตว์น้ำ</td><td class="positive">+ ร้อยละ 1.47</td><td>จากการสูงขึ้นของราคาไก่สด เนื้อสุกร ปลาทู</td></tr><tr><td>ไข่และผลิตภัณฑ์นม</td><td class="positive">+ ร้อยละ 3.76</td><td>จากการสูงขึ้นของราคาไข่ไก่ นมผง นมเปรี้ยว</td></tr><tr><td>ผักสด</td><td class="positive">+ ร้อยละ 4.62</td><td>จากการสูงขึ้นของราคามะนาว ต้นหอม ผักกาดขาว</td></tr><tr><td>ผลไม้สด</td><td class="positive">+ ร้อยละ 1.34</td><td>จากการสูงขึ้นของราคาฝรั่ง ส้มเขียวหวาน มะละกอสุก</td></tr><tr><td>เครื่องประกอบอาหาร</td><td class="positive">+ ร้อยละ 0.54</td><td>จากการสูงขึ้นของราคาน้ำปลา กะปิ น้ำพริกแกง</td></tr><tr><td>เครื่องดื่มไม่มีแอลกอฮอล์</td><td class="positive">+ ร้อยละ 1.60</td><td>จากการสูงขึ้นของราคาน้ำดื่มบริสุทธิ์ กาแฟผงสำเร็จรูป น้ำอัดลม</td></tr><tr><td>ผลิตภัณฑ์น้ำตาล</td><td class="positive">+ ร้อยละ 2.48</td><td>จากการสูงขึ้นของราคาขนมหวาน ไอศกรีม น้ำตาลทรายแดง</td></tr><tr><td>อาหารสำเร็จรูป</td><td class="positive">+ ร้อยละ 3.82</td><td>จากการสูงขึ้นของราคาก๋วยเตี๋ยว กับข้าวสำเร็จรูป ข้าวราดแกง</td></tr></tbody></table><div class="component-header">หมวดอื่น ๆ ที่ไม่ใช่อาหารและเครื่องดื่ม <span class="positive">สูงขึ้นร้อยละ 2.67</span></div><table class="component-table"><thead><tr><th>กลุ่มสินค้า</th><th>ทิศทาง</th><th>สินค้าสำคัญที่ส่งผลกระทบ</th></tr></thead><tbody><tr><td>เครื่องนุ่งห่มและรองเท้า</td><td class="negative">− ร้อยละ 0.43</td><td>จากการลดลงของราคาเสื้อเชิ้ตสตรี กางเกงขายาวสตรี รองเท้าผ้าใบบุรุษ</td></tr><tr><td>เคหสถาน</td><td class="negative">− ร้อยละ 1.10</td><td>จากการลดลงของราคาค่ากระแสไฟฟ้า ค่าจ้างเหมาซ่อมแซมบ้าน (ค่าแรงพร้อมวัสดุก่อสร้าง) ผ้าปูที่นอน</td></tr><tr><td>การตรวจรักษาและบริการส่วนบุคคล</td><td class="positive">+ ร้อยละ 0.81</td><td>จากการสูงขึ้นของราคากระดาษชำระ/กระดาษสำหรับเช็ดหน้า ค่าเบี้ยประกันสุขภาพ (ไม่รวมประเภทสะสมทรัพย์) แชมพู</td></tr><tr><td>พาหนะ การขนส่ง และการสื่อสาร</td><td class="positive">+ ร้อยละ 8.01</td><td>จากการสูงขึ้นของราคาน้ำมันดีเซล แก๊สโซฮอล์ 95 แก๊สโซฮอล์ 91</td></tr><tr><td>การบันเทิง การอ่าน การศึกษา และการศาสนา</td><td class="positive">+ ร้อยละ 1.38</td><td>จากการสูงขึ้นของราคาค่าทัศนาจรต่างประเทศ อาหารสัตว์เลี้ยง ค่าเดินทางไปเยี่ยมญาติและทำบุญ</td></tr><tr><td>ยาสูบและเครื่องดื่มมีแอลกอฮอล์</td><td class="positive">+ ร้อยละ 0.01</td><td>จากการสูงขึ้นของราคาเบียร์</td></tr></tbody></table></div></div>
         <div class="footer">สินค้าสำคัญที่ส่งผลกระทบคัดจากรายการย่อยตาม Contribution ของ YoY</div>
       </section>
 
       <section class="report-page" id="page-4">
         <div class="page-topline"></div>
         <div class="page-head"><div><h2 class="page-title" id="p4Title">อัตราการเปลี่ยนแปลงดัชนีราคาผู้บริโภคชุดทั่วไป</h2><p class="page-subtitle" id="p4Sub">เดือนสิงหาคม 2569 (MoM) <b class="positive">สูงขึ้นร้อยละ 0.25</b></p></div><div class="page-no">4</div></div>
-        <div class="page-body"><div class="table-toolbar"><span class="limit-label">สินค้าสำคัญต่อกลุ่ม</span><select id="momLimitSelect" class="table-limit-select" onchange="renderAll()"><option value="3" selected="">3</option><option value="6">6</option><option value="9">9</option><option value="12">12</option><option value="15">15</option><option value="20">20</option><option value="30">30</option></select><span class="limit-label">รายการ</span></div><div id="momComponents"><div class="component-header">หมวดอาหารและเครื่องดื่มไม่มีแอลกอฮอล์ <span class="positive">สูงขึ้นร้อยละ 0.18</span></div><table class="component-table"><thead><tr><th>กลุ่มสินค้า</th><th>ทิศทาง</th><th>สินค้าสำคัญที่ส่งผลกระทบ</th></tr></thead><tbody><tr><td>ข้าว แป้ง และผลิตภัณฑ์จากแป้ง</td><td class="positive">+ ร้อยละ 0.53</td><td>จากการสูงขึ้นของราคาข้าวสารเจ้า • ข้าวสารเหนียว • อาหารธัญพืช</td></tr><tr><td>เนื้อสัตว์ เป็ด ไก่ และสัตว์น้ำ</td><td class="positive">+ ร้อยละ 0.44</td><td>จากการสูงขึ้นของราคาเนื้อสุกร • ไก่สด • กระดูกซี่โครงหมู</td></tr><tr><td>ไข่และผลิตภัณฑ์นม</td><td class="negative">− ร้อยละ 1.28</td><td>จากการลดลงของราคานมสด • นมถั่วเหลือง • นมข้นหวาน</td></tr><tr><td>ผักสด</td><td class="negative">− ร้อยละ 0.58</td><td>จากการลดลงของราคาแตงกวา • ฟักทอง • มะละกอดิบ</td></tr><tr><td>ผลไม้สด</td><td class="positive">+ ร้อยละ 1.13</td><td>จากการสูงขึ้นของราคาส้มเขียวหวาน • มะละกอสุก • มะม่วง</td></tr><tr><td>เครื่องประกอบอาหาร</td><td class="negative">− ร้อยละ 0.05</td><td>จากการลดลงของราคาซอสหอยนางรม • เกลือป่น • กะทิสำเร็จรูป</td></tr><tr><td>เครื่องดื่มไม่มีแอลกอฮอล์</td><td class="positive">+ ร้อยละ 0.37</td><td>จากการสูงขึ้นของราคาน้ำดื่มบริสุทธิ์ • ผลิตภัณฑ์เสริมอาหาร • น้ำอัดลม</td></tr><tr><td>ผลิตภัณฑ์น้ำตาล</td><td class="negative">− ร้อยละ 0.07</td><td>จากการลดลงของราคาน้ำตาลทราย</td></tr><tr><td>อาหารสำเร็จรูป</td><td class="positive">+ ร้อยละ 0.08</td><td>จากการสูงขึ้นของราคาก๋วยเตี๋ยว • โจ๊ก/ข้าวต้มทรงเครื่อง • ข้าวหมูแดง</td></tr></tbody></table><div class="component-header">หมวดอื่น ๆ ที่ไม่ใช่อาหารและเครื่องดื่ม <span class="positive">สูงขึ้นร้อยละ 0.30</span></div><table class="component-table"><thead><tr><th>กลุ่มสินค้า</th><th>ทิศทาง</th><th>สินค้าสำคัญที่ส่งผลกระทบ</th></tr></thead><tbody><tr><td>เครื่องนุ่งห่มและรองเท้า</td><td class="positive">+ ร้อยละ 0.02</td><td>จากการสูงขึ้นของราคารองเท้าแตะหนังสตรี • รองเท้าผ้าใบบุรุษ • กางเกงขายาวบุรุษ</td></tr><tr><td>เคหสถาน</td><td class="negative">− ร้อยละ 1.45</td><td>จากการลดลงของราคาค่ากระแสไฟฟ้า • ผลิตภัณฑ์ซักผ้า • ผลิตภัณฑ์ทำความสะอาดพื้น (น้ำยาถูพื้น)</td></tr><tr><td>การตรวจรักษาและบริการส่วนบุคคล</td><td class="positive">+ ร้อยละ 0.15</td><td>จากการสูงขึ้นของราคาน้ำหอม • แชมพู • ครีมนวดผม</td></tr><tr><td>พาหนะ การขนส่ง และการสื่อสาร</td><td class="positive">+ ร้อยละ 2.22</td><td>จากการสูงขึ้นของราคาน้ำมันดีเซล • แก๊สโซฮอล์ 95 • แก๊สโซฮอล์ 91</td></tr><tr><td>การบันเทิง การอ่าน การศึกษา และการศาสนา</td><td class="positive">+ ร้อยละ 0.29</td><td>จากการสูงขึ้นของราคาค่าทัศนาจรต่างประเทศ • ค่าห้องพักโรงแรม • เครื่องถวายพระ</td></tr><tr><td>ยาสูบและเครื่องดื่มมีแอลกอฮอล์</td><td class="positive">+ ร้อยละ 0.02</td><td>จากการสูงขึ้นของราคาเบียร์ • ไวน์</td></tr></tbody></table></div></div>
+        <div class="page-body"><div class="table-toolbar"><span class="limit-label">สินค้าสำคัญต่อกลุ่ม</span><select id="momLimitSelect" class="table-limit-select" onchange="renderAll()"><option value="3" selected="">3</option><option value="6">6</option><option value="9">9</option><option value="12">12</option><option value="15">15</option><option value="20">20</option><option value="30">30</option></select><span class="limit-label">รายการ</span></div><div id="momComponents"><div class="component-header">หมวดอาหารและเครื่องดื่มไม่มีแอลกอฮอล์ <span class="positive">สูงขึ้นร้อยละ 0.18</span></div><table class="component-table"><thead><tr><th>กลุ่มสินค้า</th><th>ทิศทาง</th><th>สินค้าสำคัญที่ส่งผลกระทบ</th></tr></thead><tbody><tr><td>ข้าว แป้ง และผลิตภัณฑ์จากแป้ง</td><td class="positive">+ ร้อยละ 0.53</td><td>จากการสูงขึ้นของราคาข้าวสารเจ้า ข้าวสารเหนียว อาหารธัญพืช</td></tr><tr><td>เนื้อสัตว์ เป็ด ไก่ และสัตว์น้ำ</td><td class="positive">+ ร้อยละ 0.44</td><td>จากการสูงขึ้นของราคาเนื้อสุกร ไก่สด กระดูกซี่โครงหมู</td></tr><tr><td>ไข่และผลิตภัณฑ์นม</td><td class="negative">− ร้อยละ 1.28</td><td>จากการลดลงของราคานมสด นมถั่วเหลือง นมข้นหวาน</td></tr><tr><td>ผักสด</td><td class="negative">− ร้อยละ 0.58</td><td>จากการลดลงของราคาแตงกวา ฟักทอง มะละกอดิบ</td></tr><tr><td>ผลไม้สด</td><td class="positive">+ ร้อยละ 1.13</td><td>จากการสูงขึ้นของราคาส้มเขียวหวาน มะละกอสุก มะม่วง</td></tr><tr><td>เครื่องประกอบอาหาร</td><td class="negative">− ร้อยละ 0.05</td><td>จากการลดลงของราคาซอสหอยนางรม เกลือป่น กะทิสำเร็จรูป</td></tr><tr><td>เครื่องดื่มไม่มีแอลกอฮอล์</td><td class="positive">+ ร้อยละ 0.37</td><td>จากการสูงขึ้นของราคาน้ำดื่มบริสุทธิ์ ผลิตภัณฑ์เสริมอาหาร น้ำอัดลม</td></tr><tr><td>ผลิตภัณฑ์น้ำตาล</td><td class="negative">− ร้อยละ 0.07</td><td>จากการลดลงของราคาน้ำตาลทราย</td></tr><tr><td>อาหารสำเร็จรูป</td><td class="positive">+ ร้อยละ 0.08</td><td>จากการสูงขึ้นของราคาก๋วยเตี๋ยว โจ๊ก/ข้าวต้มทรงเครื่อง ข้าวหมูแดง</td></tr></tbody></table><div class="component-header">หมวดอื่น ๆ ที่ไม่ใช่อาหารและเครื่องดื่ม <span class="positive">สูงขึ้นร้อยละ 0.30</span></div><table class="component-table"><thead><tr><th>กลุ่มสินค้า</th><th>ทิศทาง</th><th>สินค้าสำคัญที่ส่งผลกระทบ</th></tr></thead><tbody><tr><td>เครื่องนุ่งห่มและรองเท้า</td><td class="positive">+ ร้อยละ 0.02</td><td>จากการสูงขึ้นของราคารองเท้าแตะหนังสตรี รองเท้าผ้าใบบุรุษ กางเกงขายาวบุรุษ</td></tr><tr><td>เคหสถาน</td><td class="negative">− ร้อยละ 1.45</td><td>จากการลดลงของราคาค่ากระแสไฟฟ้า ผลิตภัณฑ์ซักผ้า ผลิตภัณฑ์ทำความสะอาดพื้น (น้ำยาถูพื้น)</td></tr><tr><td>การตรวจรักษาและบริการส่วนบุคคล</td><td class="positive">+ ร้อยละ 0.15</td><td>จากการสูงขึ้นของราคาน้ำหอม แชมพู ครีมนวดผม</td></tr><tr><td>พาหนะ การขนส่ง และการสื่อสาร</td><td class="positive">+ ร้อยละ 2.22</td><td>จากการสูงขึ้นของราคาน้ำมันดีเซล แก๊สโซฮอล์ 95 แก๊สโซฮอล์ 91</td></tr><tr><td>การบันเทิง การอ่าน การศึกษา และการศาสนา</td><td class="positive">+ ร้อยละ 0.29</td><td>จากการสูงขึ้นของราคาค่าทัศนาจรต่างประเทศ ค่าห้องพักโรงแรม เครื่องถวายพระ</td></tr><tr><td>ยาสูบและเครื่องดื่มมีแอลกอฮอล์</td><td class="positive">+ ร้อยละ 0.02</td><td>จากการสูงขึ้นของราคาเบียร์ ไวน์</td></tr></tbody></table></div></div>
         <div class="footer">สินค้าสำคัญที่ส่งผลกระทบคัดจากรายการย่อยตาม Contribution ของ MoM</div>
       </section>
 
       <section class="report-page" id="page-5">
         <div class="page-topline"></div>
         <div class="page-head"><div><h2 class="page-title" id="p5Title">อัตราการเปลี่ยนแปลงดัชนีราคาผู้บริโภคชุดทั่วไป</h2><p class="page-subtitle" id="p5Sub">เฉลี่ย 9 เดือน (ม.ค.–ก.ย.) ปี 2569 เทียบช่วงเดียวกันปีก่อน (AoA) <b class="positive">สูงขึ้นร้อยละ 1.54</b></p></div><div class="page-no">5</div></div>
-        <div class="page-body"><div class="table-toolbar"><span class="limit-label">สินค้าสำคัญต่อกลุ่ม</span><select id="aoaLimitSelect" class="table-limit-select" onchange="renderAll()"><option value="3" selected="">3</option><option value="6">6</option><option value="9">9</option><option value="12">12</option><option value="15">15</option><option value="20">20</option><option value="30">30</option></select><span class="limit-label">รายการ</span></div><div id="aoaComponents"><div class="component-header">หมวดอาหารและเครื่องดื่มไม่มีแอลกอฮอล์ <span class="positive">สูงขึ้นร้อยละ 1.41</span></div><table class="component-table"><thead><tr><th>กลุ่มสินค้า</th><th>ทิศทาง</th><th>สินค้าสำคัญที่ส่งผลกระทบ</th></tr></thead><tbody><tr><td>ข้าว แป้ง และผลิตภัณฑ์จากแป้ง</td><td class="positive">+ ร้อยละ 1.72</td><td>จากการสูงขึ้นของราคาข้าวสารเจ้า • เต้าหู้ • วุ้นเส้น</td></tr><tr><td>เนื้อสัตว์ เป็ด ไก่ และสัตว์น้ำ</td><td class="negative">− ร้อยละ 1.08</td><td>จากการลดลงของราคาเนื้อสุกร • เนื้อสุกรบด • กระดูกซี่โครงหมู</td></tr><tr><td>ไข่และผลิตภัณฑ์นม</td><td class="positive">+ ร้อยละ 1.22</td><td>จากการสูงขึ้นของราคาไข่ไก่ • นมสด • นมถั่วเหลือง</td></tr><tr><td>ผักสด</td><td class="positive">+ ร้อยละ 5.15</td><td>จากการสูงขึ้นของราคามะนาว • พริกสด • ต้นหอม</td></tr><tr><td>ผลไม้สด</td><td class="negative">− ร้อยละ 1.41</td><td>จากการลดลงของราคาทุเรียน • มะม่วง • เงาะ</td></tr><tr><td>เครื่องประกอบอาหาร</td><td class="negative">− ร้อยละ 2.44</td><td>จากการลดลงของราคาน้ำมันพืช • มะพร้าว (ผลแห้ง/ขูด) • ซอสหอยนางรม</td></tr><tr><td>เครื่องดื่มไม่มีแอลกอฮอล์</td><td class="positive">+ ร้อยละ 1.66</td><td>จากการสูงขึ้นของราคากาแฟผงสำเร็จรูป • น้ำดื่มบริสุทธิ์ • น้ำปั่นผลไม้/ผัก</td></tr><tr><td>ผลิตภัณฑ์น้ำตาล</td><td class="positive">+ ร้อยละ 1.51</td><td>จากการสูงขึ้นของราคาขนมหวาน • ไอศกรีม • น้ำตาลมะพร้าว</td></tr><tr><td>อาหารสำเร็จรูป</td><td class="positive">+ ร้อยละ 2.64</td><td>จากการสูงขึ้นของราคากับข้าวสำเร็จรูป • ข้าวราดแกง • ก๋วยเตี๋ยว</td></tr></tbody></table><div class="component-header">หมวดอื่น ๆ ที่ไม่ใช่อาหารและเครื่องดื่ม <span class="positive">สูงขึ้นร้อยละ 1.62</span></div><table class="component-table"><thead><tr><th>กลุ่มสินค้า</th><th>ทิศทาง</th><th>สินค้าสำคัญที่ส่งผลกระทบ</th></tr></thead><tbody><tr><td>เครื่องนุ่งห่มและรองเท้า</td><td class="negative">− ร้อยละ 1.06</td><td>จากการลดลงของราคาเสื้อเชิ้ตสตรี • เสื้อยืดสตรี • กางเกงขายาวสตรี</td></tr><tr><td>เคหสถาน</td><td class="negative">− ร้อยละ 0.33</td><td>จากการลดลงของราคาค่ากระแสไฟฟ้า • ค่าจ้างเหมาซ่อมแซมบ้าน (ค่าแรงพร้อมวัสดุก่อสร้าง) • ค่าจ้างเหมาช่างไฟฟ้า (ค่าแรงพร้อมค่าอุปกรณ์ระบบไฟฟ้าทุกชนิด)</td></tr><tr><td>การตรวจรักษาและบริการส่วนบุคคล</td><td class="negative">− ร้อยละ 0.40</td><td>จากการลดลงของราคาแชมพู • ครีมนวดผม • โฟมล้างหน้า</td></tr><tr><td>พาหนะ การขนส่ง และการสื่อสาร</td><td class="positive">+ ร้อยละ 4.82</td><td>จากการสูงขึ้นของราคาน้ำมันดีเซล • แก๊สโซฮอล์ 95 • แก๊สโซฮอล์ 91</td></tr><tr><td>การบันเทิง การอ่าน การศึกษา และการศาสนา</td><td class="positive">+ ร้อยละ 0.86</td><td>จากการสูงขึ้นของราคาค่าทัศนาจรต่างประเทศ • ค่าเดินทางไปเยี่ยมญาติและทำบุญ • ค่าเล่าเรียน -  ค่าธรรมเนียมประถมศึกษาภาคเอกชน</td></tr><tr><td>ยาสูบและเครื่องดื่มมีแอลกอฮอล์</td><td class="negative">− ร้อยละ 0.06</td><td>จากการลดลงของราคาเบียร์ • สุรา • ไวน์</td></tr></tbody></table></div></div>
+        <div class="page-body"><div class="table-toolbar"><span class="limit-label">สินค้าสำคัญต่อกลุ่ม</span><select id="aoaLimitSelect" class="table-limit-select" onchange="renderAll()"><option value="3" selected="">3</option><option value="6">6</option><option value="9">9</option><option value="12">12</option><option value="15">15</option><option value="20">20</option><option value="30">30</option></select><span class="limit-label">รายการ</span></div><div id="aoaComponents"><div class="component-header">หมวดอาหารและเครื่องดื่มไม่มีแอลกอฮอล์ <span class="positive">สูงขึ้นร้อยละ 1.41</span></div><table class="component-table"><thead><tr><th>กลุ่มสินค้า</th><th>ทิศทาง</th><th>สินค้าสำคัญที่ส่งผลกระทบ</th></tr></thead><tbody><tr><td>ข้าว แป้ง และผลิตภัณฑ์จากแป้ง</td><td class="positive">+ ร้อยละ 1.72</td><td>จากการสูงขึ้นของราคาข้าวสารเจ้า เต้าหู้ วุ้นเส้น</td></tr><tr><td>เนื้อสัตว์ เป็ด ไก่ และสัตว์น้ำ</td><td class="negative">− ร้อยละ 1.08</td><td>จากการลดลงของราคาเนื้อสุกร เนื้อสุกรบด กระดูกซี่โครงหมู</td></tr><tr><td>ไข่และผลิตภัณฑ์นม</td><td class="positive">+ ร้อยละ 1.22</td><td>จากการสูงขึ้นของราคาไข่ไก่ นมสด นมถั่วเหลือง</td></tr><tr><td>ผักสด</td><td class="positive">+ ร้อยละ 5.15</td><td>จากการสูงขึ้นของราคามะนาว พริกสด ต้นหอม</td></tr><tr><td>ผลไม้สด</td><td class="negative">− ร้อยละ 1.41</td><td>จากการลดลงของราคาทุเรียน มะม่วง เงาะ</td></tr><tr><td>เครื่องประกอบอาหาร</td><td class="negative">− ร้อยละ 2.44</td><td>จากการลดลงของราคาน้ำมันพืช มะพร้าว (ผลแห้ง/ขูด) ซอสหอยนางรม</td></tr><tr><td>เครื่องดื่มไม่มีแอลกอฮอล์</td><td class="positive">+ ร้อยละ 1.66</td><td>จากการสูงขึ้นของราคากาแฟผงสำเร็จรูป น้ำดื่มบริสุทธิ์ น้ำปั่นผลไม้/ผัก</td></tr><tr><td>ผลิตภัณฑ์น้ำตาล</td><td class="positive">+ ร้อยละ 1.51</td><td>จากการสูงขึ้นของราคาขนมหวาน ไอศกรีม น้ำตาลมะพร้าว</td></tr><tr><td>อาหารสำเร็จรูป</td><td class="positive">+ ร้อยละ 2.64</td><td>จากการสูงขึ้นของราคากับข้าวสำเร็จรูป ข้าวราดแกง ก๋วยเตี๋ยว</td></tr></tbody></table><div class="component-header">หมวดอื่น ๆ ที่ไม่ใช่อาหารและเครื่องดื่ม <span class="positive">สูงขึ้นร้อยละ 1.62</span></div><table class="component-table"><thead><tr><th>กลุ่มสินค้า</th><th>ทิศทาง</th><th>สินค้าสำคัญที่ส่งผลกระทบ</th></tr></thead><tbody><tr><td>เครื่องนุ่งห่มและรองเท้า</td><td class="negative">− ร้อยละ 1.06</td><td>จากการลดลงของราคาเสื้อเชิ้ตสตรี เสื้อยืดสตรี กางเกงขายาวสตรี</td></tr><tr><td>เคหสถาน</td><td class="negative">− ร้อยละ 0.33</td><td>จากการลดลงของราคาค่ากระแสไฟฟ้า ค่าจ้างเหมาซ่อมแซมบ้าน (ค่าแรงพร้อมวัสดุก่อสร้าง) ค่าจ้างเหมาช่างไฟฟ้า (ค่าแรงพร้อมค่าอุปกรณ์ระบบไฟฟ้าทุกชนิด)</td></tr><tr><td>การตรวจรักษาและบริการส่วนบุคคล</td><td class="negative">− ร้อยละ 0.40</td><td>จากการลดลงของราคาแชมพู ครีมนวดผม โฟมล้างหน้า</td></tr><tr><td>พาหนะ การขนส่ง และการสื่อสาร</td><td class="positive">+ ร้อยละ 4.82</td><td>จากการสูงขึ้นของราคาน้ำมันดีเซล แก๊สโซฮอล์ 95 แก๊สโซฮอล์ 91</td></tr><tr><td>การบันเทิง การอ่าน การศึกษา และการศาสนา</td><td class="positive">+ ร้อยละ 0.86</td><td>จากการสูงขึ้นของราคาค่าทัศนาจรต่างประเทศ ค่าเดินทางไปเยี่ยมญาติและทำบุญ ค่าเล่าเรียน -  ค่าธรรมเนียมประถมศึกษาภาคเอกชน</td></tr><tr><td>ยาสูบและเครื่องดื่มมีแอลกอฮอล์</td><td class="negative">− ร้อยละ 0.06</td><td>จากการลดลงของราคาเบียร์ สุรา ไวน์</td></tr></tbody></table></div></div>
         <div class="footer">สินค้าสำคัญที่ส่งผลกระทบคัดจากรายการย่อยตาม Contribution ของ AoA</div>
       </section>
 
       <section class="report-page" id="page-6">
         <div class="page-topline"></div>
-        <div class="page-head"><div><h2 class="page-title" id="p6Title">อัตราการเปลี่ยนแปลงของเงินเฟ้อ (YoY) จำแนกรายภาค • ชุดทั่วไป</h2><p class="page-subtitle" id="p6Sub">เดือนกันยายน 2568 (YoY) • เดือนกันยายน 2569 • G</p></div><div class="page-no">6</div></div>
+        <div class="page-head"><div><h2 class="page-title" id="p6Title">อัตราการเปลี่ยนแปลงของเงินเฟ้อ (YoY) จำแนกรายภาค ชุดทั่วไป</h2><p class="page-subtitle" id="p6Sub">เดือนกันยายน 2568 (YoY) เดือนกันยายน 2569 G</p></div><div class="page-no">6</div></div>
         <div class="page-body">
           <div id="regionalNote" class="section-note" style="display: block; margin-bottom: 14px;">ขณะนี้มีข้อมูลรายภาค 0 พื้นที่สำหรับ ชุดทั่วไป (G) ในงวดนี้ — อัปโหลดไฟล์ชุดเดียวกันของ กรุงเทพฯ/ปริมณฑล ภาคกลาง ภาคเหนือ ภาคตะวันออกเฉียงเหนือ และภาคใต้ เพื่อให้ครบตามรูปแบบรายงาน</div>
           <div class="table-toolbar">
@@ -309,7 +329,7 @@
 
       <section class="report-page" id="page-7">
         <div class="page-topline"></div>
-        <div class="page-head"><div><h2 class="page-title" id="p7Title">แนวโน้มอัตราเงินเฟ้อทั่วไป</h2><p class="page-subtitle" id="p7Sub">แนวโน้มเดือนตุลาคม 2569 • ชุดทั่วไป (G) • อ้างอิงงวดล่าสุด กันยายน 2569</p></div><div class="page-no">7</div></div>
+        <div class="page-head"><div><h2 class="page-title" id="p7Title">แนวโน้มอัตราเงินเฟ้อทั่วไป</h2><p class="page-subtitle" id="p7Sub">แนวโน้มเดือนตุลาคม 2569 ชุดทั่วไป (G) อ้างอิงงวดล่าสุด กันยายน 2569</p></div><div class="page-no">7</div></div>
         <div class="page-body">
           <div class="outlook-layout">
             <div class="chart-card"><div class="chart-wrap" style="height:360px"><canvas id="outlookChart" width="529" height="360" style="display: block; box-sizing: border-box; height: 360px; width: 529px;"></canvas></div><div class="section-note" style="margin-top:10px">เส้นกราฟเป็นข้อมูลจริงจาก Excel ที่อัปโหลด ไม่ใช่ค่าคาดการณ์ล่วงหน้า</div></div>
@@ -335,7 +355,7 @@
 
  <section class="report-page" id="page-8">
 <div class="page-topline"></div>
-<div class="page-head"><div><h2 class="page-title" id="p8Title">ตารางแสดงดัชนีราคาผู้บริโภคชุดทั่วไปและอัตราการเปลี่ยนแปลง</h2><p class="page-subtitle" id="p8Sub">เดือนกันยายน 2569 • ปีฐาน 2566 = 100 • ชุดทั่วไป (G) • ภาพรวมประเทศ</p></div><div class="page-no">8</div></div>
+<div class="page-head"><div><h2 class="page-title" id="p8Title">ตารางแสดงดัชนีราคาผู้บริโภคชุดทั่วไปและอัตราการเปลี่ยนแปลง</h2><p class="page-subtitle" id="p8Sub">เดือนกันยายน 2569 ปีฐาน 2566 = 100 ชุดทั่วไป (G) ภาพรวมประเทศ</p></div><div class="page-no">8</div></div>
 <div class="page-body"><div class="table-toolbar"><span class="limit-label">แสดงรายการในตาราง</span><select class="table-limit-select" id="detailLimitSelect" onchange="renderAll()"><option value="3">3</option><option value="6">6</option><option value="9">9</option><option value="12">12</option><option value="15">15</option><option value="20">20</option><option selected="" value="30">30</option></select><span class="limit-label">รายการ</span></div><div class="detail-wrap"><table class="detail-table"><thead id="detailHead"><tr><th rowspan="2">รหัส</th><th rowspan="2">รายการ</th><th rowspan="2">สัดส่วนน้ำหนัก</th><th colspan="5">กันยายน 2569</th><th colspan="4">สิงหาคม 2569</th></tr><tr><th>ดัชนี</th><th class="prior-year-index">ดัชนีปีก่อน<br/><small>กันยายน 2568</small></th><th>MoM</th><th>YoY</th><th>AoA</th><th>ดัชนี</th><th>MoM</th><th>YoY</th><th>AoA</th></tr></thead><tbody id="detailBody"><tr class="major"><td>0000000</td><td>ดัชนีราคาผู้บริโภคชุดทั่วไป</td><td>100.00</td><td>102.93</td><td class="prior-year-index">—</td><td class="positive">0.25</td><td class="positive">2.82</td><td class="positive">1.54</td><td>102.67</td><td class="neutral">—</td><td class="neutral">—</td><td class="neutral">—</td></tr><tr class="major"><td>1000000</td><td>หมวดอาหารและเครื่องดื่มไม่มีแอลกอฮอล์</td><td>39.53</td><td>104.94</td><td class="prior-year-index">—</td><td class="positive">0.18</td><td class="positive">3.07</td><td class="positive">1.41</td><td>104.75</td><td class="neutral">—</td><td class="neutral">—</td><td class="neutral">—</td></tr><tr class=""><td>1110000</td><td>ข้าว แป้งและผลิตภัณฑ์จากแป้ง</td><td>3.50</td><td>107.62</td><td class="prior-year-index">—</td><td class="positive">0.53</td><td class="positive">4.87</td><td class="positive">1.72</td><td>107.05</td><td class="neutral">—</td><td class="neutral">—</td><td class="neutral">—</td></tr><tr class=""><td>1120000</td><td>เนื้อสัตว์ เป็ดไก่และสัตว์น้ำ</td><td>7.14</td><td>100.53</td><td class="prior-year-index">—</td><td class="positive">0.44</td><td class="positive">1.47</td><td class="negative">-1.08</td><td>100.09</td><td class="neutral">—</td><td class="neutral">—</td><td class="neutral">—</td></tr><tr class=""><td>1130000</td><td>ไข่และผลิตภัณฑ์นม</td><td>1.76</td><td>104.19</td><td class="prior-year-index">—</td><td class="negative">-1.28</td><td class="positive">3.76</td><td class="positive">1.22</td><td>105.54</td><td class="neutral">—</td><td class="neutral">—</td><td class="neutral">—</td></tr><tr class=""><td>1140000</td><td>ผักและผลไม้</td><td>4.84</td><td>99.01</td><td class="prior-year-index">—</td><td class="positive">0.38</td><td class="positive">3.06</td><td class="positive">1.43</td><td>98.64</td><td class="neutral">—</td><td class="neutral">—</td><td class="neutral">—</td></tr><tr class="sub"><td>1141100</td><td>- ผักสด</td><td>2.23</td><td>98.69</td><td class="prior-year-index">—</td><td class="negative">-0.58</td><td class="positive">4.62</td><td class="positive">5.15</td><td>99.27</td><td class="neutral">—</td><td class="neutral">—</td><td class="neutral">—</td></tr><tr class="sub"><td>1142100</td><td>- ผลไม้สด</td><td>2.19</td><td>100.65</td><td class="prior-year-index">—</td><td class="positive">1.13</td><td class="positive">1.34</td><td class="negative">-1.41</td><td>99.53</td><td class="neutral">—</td><td class="neutral">—</td><td class="neutral">—</td></tr><tr class=""><td>1150000</td><td>เครื่องประกอบอาหาร</td><td>1.15</td><td>102.07</td><td class="prior-year-index">—</td><td class="negative">-0.05</td><td class="positive">0.54</td><td class="negative">-2.44</td><td>102.12</td><td class="neutral">—</td><td class="neutral">—</td><td class="neutral">—</td></tr><tr class=""><td>1160000</td><td>เครื่องดื่มไม่มีแอลกอฮอล์</td><td>3.35</td><td>108.40</td><td class="prior-year-index">—</td><td class="positive">0.37</td><td class="positive">1.60</td><td class="positive">1.66</td><td>108.00</td><td class="neutral">—</td><td class="neutral">—</td><td class="neutral">—</td></tr><tr class=""><td>1170000</td><td>ผลิตภัณฑ์น้ำตาล</td><td>0.85</td><td>107.41</td><td class="prior-year-index">—</td><td class="negative">-0.07</td><td class="positive">2.48</td><td class="positive">1.51</td><td>107.48</td><td class="neutral">—</td><td class="neutral">—</td><td class="neutral">—</td></tr><tr class=""><td>1200000</td><td>อาหารสำเร็จรูป</td><td>16.95</td><td>108.39</td><td class="prior-year-index">—</td><td class="positive">0.08</td><td class="positive">3.82</td><td class="positive">2.64</td><td>108.30</td><td class="neutral">—</td><td class="neutral">—</td><td class="neutral">—</td></tr><tr class="sub"><td>1230000</td><td>- อาหารพร้อมทาน</td><td>15.27</td><td>108.55</td><td class="prior-year-index">—</td><td class="positive">0.17</td><td class="positive">4.00</td><td class="positive">2.85</td><td>108.37</td><td class="neutral">—</td><td class="neutral">—</td><td class="neutral">—</td></tr><tr class="sub"><td>1240000</td><td>- อาหารจากร้านยอดนิยม</td><td>1.10</td><td>104.23</td><td class="prior-year-index">—</td><td class="positive">0.08</td><td class="positive">1.54</td><td class="positive">0.96</td><td>104.15</td><td class="neutral">—</td><td class="neutral">—</td><td class="neutral">—</td></tr><tr class="sub"><td>1250000</td><td>- อาหารฟาสต์ฟู้ด/delivery</td><td>0.58</td><td>107.01</td><td class="prior-year-index">—</td><td class="negative">-2.20</td><td class="positive">3.44</td><td class="positive">0.67</td><td>109.42</td><td class="neutral">—</td><td class="neutral">—</td><td class="neutral">—</td></tr><tr class="major"><td>8000000</td><td>หมวดอื่น ๆ ที่ไม่ใช่อาหารและเครื่องดื่ม</td><td>60.47</td><td>101.62</td><td class="prior-year-index">—</td><td class="positive">0.30</td><td class="positive">2.67</td><td class="positive">1.62</td><td>101.32</td><td class="neutral">—</td><td class="neutral">—</td><td class="neutral">—</td></tr><tr class=""><td>2000000</td><td>หมวดเครื่องนุ่งห่มและรองเท้า</td><td>2.02</td><td>97.70</td><td class="prior-year-index">—</td><td class="positive">0.02</td><td class="negative">-0.43</td><td class="negative">-1.06</td><td>97.68</td><td class="neutral">—</td><td class="neutral">—</td><td class="neutral">—</td></tr><tr class=""><td>3000000</td><td>หมวดเคหสถาน</td><td>23.67</td><td>98.32</td><td class="prior-year-index">—</td><td class="negative">-1.45</td><td class="negative">-1.10</td><td class="negative">-0.33</td><td>99.77</td><td class="neutral">—</td><td class="neutral">—</td><td class="neutral">—</td></tr><tr class=""><td>4000000</td><td>หมวดการตรวจรักษาและบริการส่วนบุคคล</td><td>6.20</td><td>99.49</td><td class="prior-year-index">—</td><td class="positive">0.15</td><td class="positive">0.81</td><td class="negative">-0.40</td><td>99.34</td><td class="neutral">—</td><td class="neutral">—</td><td class="neutral">—</td></tr><tr class=""><td>5000000</td><td>หมวดพาหนะการขนส่งและการสื่อสาร</td><td>23.37</td><td>105.98</td><td class="prior-year-index">—</td><td class="positive">2.22</td><td class="positive">8.01</td><td class="positive">4.82</td><td>103.68</td><td class="neutral">—</td><td class="neutral">—</td><td class="neutral">—</td></tr><tr class="sub"><td>5100000</td><td>- ค่าโดยสารสาธารณะ</td><td>1.64</td><td>108.59</td><td class="prior-year-index">—</td><td class="positive">0.56</td><td class="positive">7.85</td><td class="positive">6.54</td><td>107.98</td><td class="neutral">—</td><td class="neutral">—</td><td class="neutral">—</td></tr><tr class="sub"><td>5220000</td><td>- น้ำมันเชื้อเพลิง</td><td>8.93</td><td>113.51</td><td class="prior-year-index">—</td><td class="positive">5.95</td><td class="positive">20.69</td><td class="positive">11.39</td><td>107.14</td><td class="neutral">—</td><td class="neutral">—</td><td class="neutral">—</td></tr><tr class="sub"><td>5400000</td><td>- การสื่อสาร</td><td>3.97</td><td>101.13</td><td class="prior-year-index">—</td><td class="positive">0.23</td><td class="positive">0.75</td><td class="positive">0.40</td><td>100.90</td><td class="neutral">—</td><td class="neutral">—</td><td class="neutral">—</td></tr><tr class=""><td>6000000</td><td>หมวดการบันเทิง การอ่าน การศึกษาฯ</td><td>4.00</td><td>102.57</td><td class="prior-year-index">—</td><td class="positive">0.29</td><td class="positive">1.38</td><td class="positive">0.86</td><td>102.27</td><td class="neutral">—</td><td class="neutral">—</td><td class="neutral">—</td></tr><tr class=""><td>7000000</td><td>หมวดยาสูบและเครื่องดื่มมีแอลกอฮอล์</td><td>1.21</td><td>101.28</td><td class="prior-year-index">—</td><td class="positive">0.02</td><td class="positive">0.01</td><td class="negative">-0.06</td><td>101.26</td><td class="neutral">—</td><td class="neutral">—</td><td class="neutral">—</td></tr><tr class="major"><td>9300000</td><td>ดัชนีราคาผู้บริโภคพื้นฐาน</td><td>69.67</td><td>102.98</td><td class="prior-year-index">—</td><td class="positive">0.01</td><td class="positive">1.50</td><td class="positive">1.01</td><td>102.97</td><td class="neutral">—</td><td class="neutral">—</td><td class="neutral">—</td></tr><tr class="major"><td>9000000</td><td>กลุ่มอาหารสดและพลังงาน</td><td>30.33</td><td>103.07</td><td class="prior-year-index">—</td><td class="positive">0.79</td><td class="positive">6.00</td><td class="positive">2.79</td><td>102.26</td><td class="neutral">—</td><td class="neutral">—</td><td class="neutral">—</td></tr><tr class="sub"><td>9100000</td><td>- อาหารสด</td><td>17.24</td><td>101.77</td><td class="prior-year-index">—</td><td class="positive">0.27</td><td class="positive">2.83</td><td class="positive">0.40</td><td>101.50</td><td class="neutral">—</td><td class="neutral">—</td><td class="neutral">—</td></tr><tr class="sub"><td>9200000</td><td>- พลังงาน</td><td>13.09</td><td>104.87</td><td class="prior-year-index">—</td><td class="positive">1.49</td><td class="positive">10.45</td><td class="positive">6.11</td><td>103.33</td><td class="neutral">—</td><td class="neutral">—</td><td class="neutral">—</td></tr></tbody></table></div><div class="section-note" id="detailIndexNote" style="margin-top:12px">ดัชนีปีก่อน = เดือนเดียวกันของปีก่อน: อ่านจากไฟล์ปัจจุบัน หรือไฟล์งวดเดียวกันปีก่อนที่อัปโหลด (ชุด/พื้นที่/ปีฐานเดียวกัน) หากไม่พบแสดง — โดยไม่คำนวณย้อนจาก YoY; อัตรา MoM/YoY/AoA ของเดือนก่อนยังต้องใช้ไฟล์เดือนก่อน</div></div>
 <div class="footer">ชุดดัชนี ปีฐาน และชื่อพื้นที่อ่านจากหัวรายงานใน Excel</div>
 </section>
@@ -346,15 +366,15 @@
         <div class="poster" id="posterArea">
           <div class="poster-head">
             <div>
-              <div class="poster-brand">TPSO • Trade Policy and Strategy Office</div>
+              <div class="poster-brand">TPSO Trade Policy and Strategy Office</div>
               <h2 id="posterMainTitle">อัตราเงินเฟ้อทั่วไป</h2>
-              <div class="poster-period" id="posterPeriod">เดือนกันยายน 2569 • G</div>
+              <div class="poster-period" id="posterPeriod">เดือนกันยายน 2569 G</div>
               <div class="poster-yoy">เปลี่ยนแปลง <b id="posterYoy">สูงขึ้นร้อยละ 2.82</b> (YoY)</div>
-              <div style="margin-top:8px;font-size:14px;color:#b8d8ef;font-weight:800" id="posterRegion">ชุดทั่วไป • ภาพรวมประเทศ</div>
+              <div style="margin-top:8px;font-size:14px;color:#b8d8ef;font-weight:800" id="posterRegion">ชุดทั่วไป ภาพรวมประเทศ</div>
             </div>
             <div>
               <div class="mini-rate-card" id="posterHeadlineCard"><h4>ดัชนีราคาผู้บริโภคชุดทั่วไป</h4><div class="mini-rate-grid"><div class="hdr">งวด</div><div class="hdr">ดัชนี</div><div class="hdr">%MoM</div><div class="hdr">%YoY</div><div class="hdr">%AoA</div><div>ปัจจุบัน</div><div>102.93</div><div class="positive">0.25</div><div class="positive">2.82</div><div class="positive">1.54</div><div>เดือนก่อน</div><div>102.67</div><div>—</div><div>—</div><div>—</div></div></div>
-              <div class="mini-rate-card" id="posterCoreCard"><h4>เงินเฟ้อพื้นฐาน • Core CPI</h4><div class="mini-rate-grid"><div class="hdr">งวด</div><div class="hdr">ดัชนี</div><div class="hdr">%MoM</div><div class="hdr">%YoY</div><div class="hdr">%AoA</div><div>ปัจจุบัน</div><div>102.98</div><div class="positive">0.01</div><div class="positive">1.50</div><div class="positive">1.01</div><div>เดือนก่อน</div><div>102.97</div><div>—</div><div>—</div><div>—</div></div></div>
+              <div class="mini-rate-card" id="posterCoreCard"><h4>เงินเฟ้อพื้นฐาน Core CPI</h4><div class="mini-rate-grid"><div class="hdr">งวด</div><div class="hdr">ดัชนี</div><div class="hdr">%MoM</div><div class="hdr">%YoY</div><div class="hdr">%AoA</div><div>ปัจจุบัน</div><div>102.98</div><div class="positive">0.01</div><div class="positive">1.50</div><div class="positive">1.01</div><div>เดือนก่อน</div><div>102.97</div><div>—</div><div>—</div><div>—</div></div></div>
             </div>
           </div>
           <div class="poster-summary" id="posterSummary">ดัชนีราคาผู้บริโภคชุดทั่วไป ของประเทศ เดือนกันยายน 2569 เท่ากับ 102.93 เมื่อเทียบกับเดือนเดียวกันของปีก่อน สูงขึ้นร้อยละ 2.82 (YoY) โดยหมวดที่มีส่วนผลักดันสำคัญ ได้แก่ พาหนะ การขนส่ง และการสื่อสาร, อาหารสำเร็จรูป, ข้าว  แป้งและผลิตภัณฑ์จากแป้ง ขณะที่หมวดที่ช่วยชะลอ ได้แก่ เคหสถาน, เครื่องนุ่งห่มและรองเท้า เมื่อเทียบกับเดือนก่อน สูงขึ้นร้อยละ 0.25 (MoM) ด้านรายการที่ผลักดันขึ้นในเดือนนี้ ได้แก่ พาหนะ การขนส่ง และการสื่อสาร, เนื้อสัตว์ เป็ดไก่ และสัตว์น้ำ, ผลไม้สด ส่วนแรงกดดันลงสำคัญ ได้แก่ เคหสถาน, ไข่และผลิตภัณฑ์นม, ผักสด และเฉลี่ย 9 เดือนแรก สูงขึ้นร้อยละ 1.54 (AoA) สำหรับเงินเฟ้อพื้นฐาน สูงขึ้นร้อยละ 1.50 (YoY), สูงขึ้นร้อยละ 0.01 (MoM) และ สูงขึ้นร้อยละ 1.01 (AoA) .</div>
@@ -366,7 +386,7 @@
             <div class="poster-card poster-outlook"><h3 id="posterOutlookTitle">แนวโน้มอัตราเงินเฟ้อทั่วไป</h3><ul id="posterOutlookUp"><li>ยังไม่มีข้อความ — กด “แก้ไขข้อความแนวโน้มสำหรับงวดนี้” เพื่อเพิ่ม</li></ul><div class="downh">ปัจจัยที่ช่วยชะลอเงินเฟ้อ</div><ul id="posterOutlookDown"><li>ยังไม่มีข้อความ — กด “แก้ไขข้อความแนวโน้มสำหรับงวดนี้” เพื่อเพิ่ม</li></ul><div class="forecast-strip" style="grid-template-columns:1fr 1fr;margin-top:14px"><div class="f"><strong id="posterForecastRange">—</strong><span>กรอบคาดการณ์ทั้งปี</span></div><div class="f"><strong id="posterForecastMid">—</strong><span>ค่ากลาง</span></div></div></div>
           </div>
         </div>
-        <div class="footer">One-page infographic ตามแนวทาง PowerPoint ที่แนบมา • กด “PNG Poster” ด้านบนเพื่อบันทึก</div>
+        <div class="footer">One-page infographic ตามแนวทาง PowerPoint ที่แนบมา กด “PNG Poster” ด้านบนเพื่อบันทึก</div>
       </section>
     </div>
   </main>
@@ -618,7 +638,7 @@
         state.reports.sort((a,b)=>b.key-a.key || datasetOrderIndex(a.datasetType)-datasetOrderIndex(b.datasetType) || regionOrderIndex(a.regionId)-regionOrderIndex(b.regionId));
         rebuildSelectors();
         document.getElementById('dropzone').style.display='none'; document.getElementById('report').style.display='block';
-        renderAll(); toast(`นำเข้าสำเร็จ ${ok} ไฟล์${fail.length?` • ไม่สำเร็จ ${fail.length} ไฟล์`:''}`);
+        renderAll(); toast(`นำเข้าสำเร็จ ${ok} ไฟล์${fail.length?` ไม่สำเร็จ ${fail.length} ไฟล์`:''}`);
       }
       if(fail.length)console.warn(fail.join('\n'));
     }finally{setLoading(false)}
@@ -636,7 +656,7 @@
     const ds=document.getElementById('datasetSelect');
     const old=ds.value;
     const types=[...new Set(state.reports.filter(r=>r.key===key).map(r=>r.datasetType))].sort((a,b)=>datasetOrderIndex(a)-datasetOrderIndex(b));
-    ds.innerHTML=types.map(t=>`<option value="${escapeHtml(t)}">${escapeHtml(t)} • ${escapeHtml(DATASET_LABEL[t]||DATASET_LABEL.UNKNOWN)}</option>`).join('');
+    ds.innerHTML=types.map(t=>`<option value="${escapeHtml(t)}">${escapeHtml(t)} ${escapeHtml(DATASET_LABEL[t]||DATASET_LABEL.UNKNOWN)}</option>`).join('');
     if(types.includes(old))ds.value=old;else if(types.includes('G'))ds.value='G';else if(types.length)ds.value=types[0];
     rebuildRegionSelector();
   }
@@ -713,8 +733,8 @@
 
   function renderPage1(report){
     const h=findRow(report,'0000000'),core=findRow(report,'9300000');
-    document.getElementById('p1Title').textContent=`${datasetFullLabel(report)} • ${report.regionLabel}`;
-    document.getElementById('p1Sub').textContent=`เดือน${MONTHS_FULL[report.month]} ${report.year}${report.baseYear?` • ปีฐาน ${report.baseYear} = 100`:''} • ${report.datasetType}`;
+    document.getElementById('p1Title').textContent=`${datasetFullLabel(report)} ${report.regionLabel}`;
+    document.getElementById('p1Sub').textContent=`เดือน${MONTHS_FULL[report.month]} ${report.year}${report.baseYear?` ปีฐาน ${report.baseYear} = 100`:''} ${report.datasetType}`;
     document.getElementById('headlineRibbon').textContent=`${datasetFullLabel(report)} เดือน${MONTHS_FULL[report.month]} ${report.year} เท่ากับ ${fmt(h?.index)}`;
     document.getElementById('summaryHeadlineHead').textContent=datasetFullLabel(report);
     const rows=[['yoy',metricLabel(report,'yoy')],['mom',metricLabel(report,'mom')],['aoa',metricLabel(report,'aoa')]];
@@ -740,16 +760,16 @@
   }
   function renderPage2(report){
     const h=findRow(report,'0000000'),core=findRow(report,'9300000');
-    document.getElementById('p2Title').textContent=`สถิติอัตราการเปลี่ยนแปลงและภาพรวม${datasetFullLabel(report)}`;document.getElementById('p2Sub').textContent=`เดือน${MONTHS_FULL[report.month]} ${report.year} • ${datasetLabel(report)} (${report.datasetType}) • ${report.regionLabel}`;
+    document.getElementById('p2Title').textContent=`สถิติอัตราการเปลี่ยนแปลงและภาพรวม${datasetFullLabel(report)}`;document.getElementById('p2Sub').textContent=`เดือน${MONTHS_FULL[report.month]} ${report.year} ${datasetLabel(report)} (${report.datasetType}) ${report.regionLabel}`;
     document.getElementById('headlineKpis').innerHTML=`<div class="kpi"><div class="label">ดัชนี</div><div class="value">${fmt(h?.index)}</div><div class="hint">${escapeHtml(datasetLabel(report))} (${escapeHtml(report.datasetType)})</div></div><div class="kpi"><div class="label">YoY ${escapeHtml(datasetLabel(report))}</div><div class="value ${cls(h?.yoy)}">${fmtSigned(h?.yoy)}%</div><div class="hint">เทียบเดือนเดียวกันปีก่อน</div></div><div class="kpi"><div class="label">เงินเฟ้อพื้นฐาน YoY</div><div class="value ${cls(core?.yoy)}">${fmtSigned(core?.yoy)}%</div><div class="hint">ไม่รวมอาหารสดและพลังงาน</div></div>`;
     renderTrend(report);renderMetricBoard(report);
   }
 
   function componentTable(report,metric,codes,titleCode,titleFallback,driverLimit=3){
     const root=findRow(report,titleCode);const direction=root?.[metric];
-    let html=`<div class="component-header">${escapeHtml(titleFallback)} <span class="${cls(direction)}">${ratePhrase(direction)}</span></div><table class="component-table"><thead><tr><th>กลุ่มสินค้า</th><th>ทิศทาง</th><th>สินค้าสำคัญที่ส่งผลกระทบ</th></tr></thead><tbody>`;
-    for(const [code,label] of codes){const row=findRow(report,code);const v=row?.[metric];const names=row?topChildNames(report,code,metric,Math.sign(v||0),driverLimit):[];let desc='—';if(v>0)desc=`จากการสูงขึ้นของราคา${names.length?names.join(' • '):'รายการย่อยในกลุ่ม'}`;else if(v<0)desc=`จากการลดลงของราคา${names.length?names.join(' • '):'รายการย่อยในกลุ่ม'}`;else if(v===0)desc='ราคาเฉลี่ยไม่เปลี่ยนแปลง';
-      html+=`<tr><td>${escapeHtml(label)}</td><td class="${cls(v)}">${v===null?'—':`${v>0?'+':v<0?'−':''} ร้อยละ ${fmt(Math.abs(v))}`}</td><td>${escapeHtml(desc)}</td></tr>`;
+    let html=`<div class="component-header">${escapeHtml(titleFallback)} <span class="${cls(direction)}">${ratePhrase(direction)}</span></div><table id="component-${metric}-${titleCode}" class="component-table"><thead><tr><th>กลุ่มสินค้า</th><th>ทิศทาง</th><th>สินค้าสำคัญที่ส่งผลกระทบ</th></tr></thead><tbody>`;
+    for(const [code,label] of codes){const row=findRow(report,code);const v=row?.[metric];const names=row?topChildNames(report,code,metric,Math.sign(v||0),driverLimit):[];let desc='—';if(v>0)desc=`จากการสูงขึ้นของราคา${names.length?names.join(' '):'รายการย่อยในกลุ่ม'}`;else if(v<0)desc=`จากการลดลงของราคา${names.length?names.join(' '):'รายการย่อยในกลุ่ม'}`;else if(v===0)desc='ราคาเฉลี่ยไม่เปลี่ยนแปลง';
+      html+=`<tr><td>${escapeHtml(label)}</td><td class="${cls(v)}">${v==null?'—':`${v>0?'+':v<0?'−':''} ร้อยละ ${fmt(Math.abs(v))}`}</td><td>${escapeHtml(desc)}</td></tr>`;
     }
     return html+'</tbody></table>';
   }
@@ -783,8 +803,8 @@
       return `${base} <span class="driver-contrib">(${fmtSigned(v,4)})</span>`;
     };
 
-    document.getElementById('p6Title').textContent=`อัตราการเปลี่ยนแปลงของเงินเฟ้อ (${metricName}) จำแนกรายภาค • ${datasetLabel(report)}`;
-    document.getElementById('p6Sub').textContent=`${metricLabel(report,metric)} • เดือน${MONTHS_FULL[report.month]} ${report.year} • ${report.datasetType}`;
+    document.getElementById('p6Title').textContent=`อัตราการเปลี่ยนแปลงของเงินเฟ้อ (${metricName}) จำแนกรายภาค ${datasetLabel(report)}`;
+    document.getElementById('p6Sub').textContent=`${metricLabel(report,metric)} เดือน${MONTHS_FULL[report.month]} ${report.year} ${report.datasetType}`;
     const note=document.getElementById('regionalNote');
     if(reps.length<5){
       note.style.display='block';
@@ -811,7 +831,7 @@
       const sorted=[...tableData].sort((a,b)=>(b.h?.[metric]??-999)-(a.h?.[metric]??-999));
       const commonUp=intersectionNames(cardReps.map(r=>topDrivers(r,metric,true,12).map(x=>x.name))).slice(0,5);
       const commonDown=intersectionNames(cardReps.map(r=>topDrivers(r,metric,false,12).map(x=>x.name))).slice(0,5);
-      let p=`${metricLabel(report,metric)} ${sorted.map(x=>`${x.r.regionLabel} ${ratePhrase(x.h?.[metric])}`).join(' • ')}`;
+      let p=`${metricLabel(report,metric)} ${sorted.map(x=>`${x.r.regionLabel} ${ratePhrase(x.h?.[metric])}`).join(' ')}`;
       if(commonUp.length)p+=` สินค้าที่เป็นแรงผลักดันร่วมหลายพื้นที่ ได้แก่ ${commonUp.join(', ')}`;
       if(commonDown.length)p+=` ส่วนสินค้าที่ช่วยชะลอร่วม ได้แก่ ${commonDown.join(', ')}`;
       if(showContribution)p+=` โดยตัวเลข Contribute แสดงสัดส่วนผลกระทบของรายการต่ออัตราการเปลี่ยนแปลง ${metricName}`;
@@ -834,18 +854,18 @@
     return {up:[],down:[],range:'',mid:'',next:''};
   }
   function getOutlook(report){let v=null;try{v=JSON.parse(localStorage.getItem(outlookStorageKey(report)))}catch(e){}return v||defaultOutlook(report)}
-  function saveOutlook(){const r=currentReport();if(!r)return;const val={up:document.getElementById('outlookUpInput').value.split('\n').map(s=>s.trim()).filter(Boolean),down:document.getElementById('outlookDownInput').value.split('\n').map(s=>s.trim()).filter(Boolean),range:document.getElementById('forecastRangeInput').value.trim(),mid:document.getElementById('forecastMidInput').value.trim(),next:document.getElementById('nextReleaseInput').value.trim()};localStorage.setItem(outlookStorageKey(r),JSON.stringify(val));renderPage7(r);renderPage9(r);toast('บันทึกข้อความแนวโน้มแล้ว')}
+  function saveOutlook(){const r=currentReport();if(!r)return;const val={up:document.getElementById('outlookUpInput').value.split('\n').map(s=>s.trim()).filter(Boolean),down:document.getElementById('outlookDownInput').value.split('\n').map(s=>s.trim()).filter(Boolean),range:document.getElementById('forecastRangeInput').value.trim(),mid:document.getElementById('forecastMidInput').value.trim(),next:document.getElementById('nextReleaseInput').value.trim()};localStorage.setItem(outlookStorageKey(r),JSON.stringify(val));renderPage7(r);renderPage9(r);installTableExportButtons();toast('บันทึกข้อความแนวโน้มแล้ว')}
   function renderOutlookList(id,items){document.getElementById(id).innerHTML=(items?.length?items:['ยังไม่มีข้อความ — กด “แก้ไขข้อความแนวโน้มสำหรับงวดนี้” เพื่อเพิ่ม']).map(x=>`<li>${escapeHtml(x)}</li>`).join('')}
   function renderOutlookChart(report){
     const reps=state.reports.filter(r=>r.regionId===report.regionId&&r.datasetType===report.datasetType).sort((a,b)=>a.key-b.key);const labels=reps.map(r=>periodShort(r.year,r.month));const vals=reps.map(r=>findRow(r,'0000000')?.yoy??null);
     const ctx=document.getElementById('outlookChart');if(state.outlookChart)state.outlookChart.destroy();state.outlookChart=new Chart(ctx,{type:'line',data:{labels,datasets:[{label:`${datasetLabel(report)} YoY`,data:vals,borderColor:'#1f5f91',backgroundColor:'rgba(75,165,219,.18)',fill:true,tension:.28,pointRadius:4,pointBackgroundColor:'#1f5f91'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{title:{display:true,text:'%'},grid:{color:'rgba(0,0,0,.08)'}},x:{grid:{color:'rgba(0,0,0,.05)'}}}}})
   }
-  function renderPage7(report){const o=getOutlook(report);const nextM=report.month===12?1:report.month+1,nextY=report.month===12?report.year+1:report.year;document.getElementById('p7Title').textContent=report.datasetType==='G'?'แนวโน้มอัตราเงินเฟ้อทั่วไป':`แนวโน้ม${datasetFullLabel(report)}`;document.getElementById('p7Sub').textContent=`แนวโน้มเดือน${MONTHS_FULL[nextM]} ${nextY} • ${datasetLabel(report)} (${report.datasetType}) • อ้างอิงงวดล่าสุด ${MONTHS_FULL[report.month]} ${report.year}`;renderOutlookChart(report);renderOutlookList('outlookUpList',o.up);renderOutlookList('outlookDownList',o.down);document.getElementById('forecastRange').textContent=o.range||'—';document.getElementById('forecastMid').textContent=o.mid||'—';document.getElementById('nextRelease').textContent=o.next||'—';document.getElementById('outlookUpInput').value=(o.up||[]).join('\n');document.getElementById('outlookDownInput').value=(o.down||[]).join('\n');document.getElementById('forecastRangeInput').value=o.range||'';document.getElementById('forecastMidInput').value=o.mid||'';document.getElementById('nextReleaseInput').value=o.next||''}
+  function renderPage7(report){const o=getOutlook(report);const nextM=report.month===12?1:report.month+1,nextY=report.month===12?report.year+1:report.year;document.getElementById('p7Title').textContent=report.datasetType==='G'?'แนวโน้มอัตราเงินเฟ้อทั่วไป':`แนวโน้ม${datasetFullLabel(report)}`;document.getElementById('p7Sub').textContent=`แนวโน้มเดือน${MONTHS_FULL[nextM]} ${nextY} ${datasetLabel(report)} (${report.datasetType}) อ้างอิงงวดล่าสุด ${MONTHS_FULL[report.month]} ${report.year}`;renderOutlookChart(report);renderOutlookList('outlookUpList',o.up);renderOutlookList('outlookDownList',o.down);document.getElementById('forecastRange').textContent=o.range||'—';document.getElementById('forecastMid').textContent=o.mid||'—';document.getElementById('nextRelease').textContent=o.next||'—';document.getElementById('outlookUpInput').value=(o.up||[]).join('\n');document.getElementById('outlookDownInput').value=(o.down||[]).join('\n');document.getElementById('forecastRangeInput').value=o.range||'';document.getElementById('forecastMidInput').value=o.mid||'';document.getElementById('nextReleaseInput').value=o.next||''}
 
   function renderPage8(report){
     const prev=previousReport(report),priorYear=previousYearReport(report),p=prevPeriod(report.year,report.month);
     document.getElementById('p8Title').textContent=`ตารางแสดง${datasetFullLabel(report)}และอัตราการเปลี่ยนแปลง`;
-    document.getElementById('p8Sub').textContent=`เดือน${MONTHS_FULL[report.month]} ${report.year}${report.baseYear?` • ปีฐาน ${report.baseYear} = 100`:''} • ${datasetLabel(report)} (${report.datasetType}) • ${report.regionLabel}`;
+    document.getElementById('p8Sub').textContent=`เดือน${MONTHS_FULL[report.month]} ${report.year}${report.baseYear?` ปีฐาน ${report.baseYear} = 100`:''} ${datasetLabel(report)} (${report.datasetType}) ${report.regionLabel}`;
     document.getElementById('detailHead').innerHTML=`<tr><th rowspan="2" scope="col">รหัส</th><th rowspan="2" scope="col">รายการ</th><th rowspan="2" scope="col">สัดส่วนน้ำหนัก</th><th colspan="5" scope="colgroup">${MONTHS_FULL[report.month]} ${report.year}</th><th colspan="4" scope="colgroup">${MONTHS_FULL[p.m]} ${p.y}</th></tr><tr><th scope="col">ดัชนี</th><th scope="col" class="prior-year-index">ดัชนีปีก่อน<br><small>${periodLabel(report.year-1,report.month)}</small></th><th scope="col">MoM</th><th scope="col">YoY</th><th scope="col">AoA</th><th scope="col">ดัชนี</th><th scope="col">MoM</th><th scope="col">YoY</th><th scope="col">AoA</th></tr>`;
     const detailLimit=getTableLimit('detailLimitSelect',30);
     document.getElementById('detailBody').innerHTML=DETAIL_CODES.slice(0,detailLimit).map(([c,label,type])=>{
@@ -859,29 +879,455 @@
 
   function posterRateCard(title,row,prevRow){return `<h4>${escapeHtml(title)}</h4><div class="mini-rate-grid"><div class="hdr">งวด</div><div class="hdr">ดัชนี</div><div class="hdr">%MoM</div><div class="hdr">%YoY</div><div class="hdr">%AoA</div><div>ปัจจุบัน</div><div>${fmt(row?.index)}</div><div class="${cls(row?.mom)}">${fmt(row?.mom)}</div><div class="${cls(row?.yoy)}">${fmt(row?.yoy)}</div><div class="${cls(row?.aoa)}">${fmt(row?.aoa)}</div><div>เดือนก่อน</div><div>${fmt(row?.indexPrev)}</div><div>${fmt(prevRow?.mom)}</div><div>${fmt(prevRow?.yoy)}</div><div>${fmt(prevRow?.aoa)}</div></div>`}
   function renderPosterWeight(report){
-    const parts=WEIGHT_CODES.map(([c,label])=>({label,row:findRow(report,c)})).filter(x=>x.row?.weightShare!==null);const colors=['#e9e5e2','#7bb5dd','#c5eef0','#d4f3f1','#ffd041','#ffe487','#d4d0d9'];
+    const parts=WEIGHT_CODES.map(([c,label])=>({label,row:findRow(report,c)})).filter(x=>x.row?.weightShare!=null);const colors=['#e9e5e2','#7bb5dd','#c5eef0','#d4f3f1','#ffd041','#ffe487','#d4d0d9'];
     if(state.posterWeightChart)state.posterWeightChart.destroy();state.posterWeightChart=new Chart(document.getElementById('posterWeightChart'),{type:'doughnut',data:{labels:parts.map(x=>x.label),datasets:[{data:parts.map(x=>x.row.weightShare),backgroundColor:colors,borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,cutout:'48%',plugins:{legend:{display:false},tooltip:{callbacks:{label:(ctx)=>`${ctx.label}: ${fmt(ctx.raw)}%`}}}}});
     document.getElementById('weightLegend').innerHTML=parts.map((x,i)=>`<div><span><i style="display:inline-block;width:9px;height:9px;border-radius:2px;background:${colors[i]};margin-right:5px"></i>${escapeHtml(x.label)}</span><b>${fmt(x.row.weightShare)}%</b></div>`).join('');
   }
   function renderPage9(report){
     const h=findRow(report,'0000000'),core=findRow(report,'9300000'),prev=previousReport(report);const ph=prev?findRow(prev,'0000000'):null,pc=prev?findRow(prev,'9300000'):null;const o=getOutlook(report);
-    document.getElementById('posterMainTitle').textContent=report.datasetType==='G'?'อัตราเงินเฟ้อทั่วไป':datasetFullLabel(report);document.getElementById('posterOutlookTitle').textContent=report.datasetType==='G'?'แนวโน้มอัตราเงินเฟ้อทั่วไป':`แนวโน้ม${datasetFullLabel(report)}`;document.getElementById('posterPeriod').textContent=`เดือน${MONTHS_FULL[report.month]} ${report.year} • ${report.datasetType}`;document.getElementById('posterYoy').textContent=`${ratePhrase(h?.yoy)}`;document.getElementById('posterRegion').textContent=`${datasetLabel(report)} • ${report.regionLabel}`;
-    document.getElementById('posterHeadlineCard').innerHTML=posterRateCard(datasetFullLabel(report),h,ph);document.getElementById('posterCoreCard').innerHTML=posterRateCard('เงินเฟ้อพื้นฐาน • Core CPI',core,pc);document.getElementById('posterSummary').textContent=generateSummary(report);
+    document.getElementById('posterMainTitle').textContent=report.datasetType==='G'?'อัตราเงินเฟ้อทั่วไป':datasetFullLabel(report);document.getElementById('posterOutlookTitle').textContent=report.datasetType==='G'?'แนวโน้มอัตราเงินเฟ้อทั่วไป':`แนวโน้ม${datasetFullLabel(report)}`;document.getElementById('posterPeriod').textContent=`เดือน${MONTHS_FULL[report.month]} ${report.year} ${report.datasetType}`;document.getElementById('posterYoy').textContent=`${ratePhrase(h?.yoy)}`;document.getElementById('posterRegion').textContent=`${datasetLabel(report)} ${report.regionLabel}`;
+    document.getElementById('posterHeadlineCard').innerHTML=posterRateCard(datasetFullLabel(report),h,ph);document.getElementById('posterCoreCard').innerHTML=posterRateCard('เงินเฟ้อพื้นฐาน Core CPI',core,pc);document.getElementById('posterSummary').textContent=generateSummary(report);
     renderPosterWeight(report);document.getElementById('posterKpiList').innerHTML=`${escapeHtml(datasetLabel(report))} <b>${fmt(h?.index)}</b><br>YoY <b class="${cls(h?.yoy)}">${fmtSigned(h?.yoy)}%</b><br>MoM <b class="${cls(h?.mom)}">${fmtSigned(h?.mom)}%</b><br>AoA <b class="${cls(h?.aoa)}">${fmtSigned(h?.aoa)}%</b><br>Core YoY <b class="${cls(core?.yoy)}">${fmtSigned(core?.yoy)}%</b>`;
     renderOutlookList('posterOutlookUp',o.up);renderOutlookList('posterOutlookDown',o.down);document.getElementById('posterForecastRange').textContent=o.range||'—';document.getElementById('posterForecastMid').textContent=o.mid||'—';
   }
 
-  function renderAll(){const report=currentReport();if(!report)return;const total=state.reports.length,setFiles=state.reports.filter(r=>r.key===report.key&&r.datasetType===report.datasetType).length;document.getElementById('statusMeta').textContent=`${periodLabel(report.year,report.month)} • ${datasetLabel(report)} (${report.datasetType}) • ${report.regionLabel} • ${report.rows.length.toLocaleString('th-TH')} แถว • โหลดแล้ว ${total} ไฟล์ (${setFiles} พื้นที่ของชุดนี้ในงวดนี้)`;const componentTitle=`อัตราการเปลี่ยนแปลง${datasetFullLabel(report)}`;document.getElementById('p3Title').textContent=componentTitle;document.getElementById('p4Title').textContent=componentTitle;document.getElementById('p5Title').textContent=componentTitle;renderPage1(report);renderPage2(report);renderComponents(report,'yoy','yoyComponents','p3Sub');renderComponents(report,'mom','momComponents','p4Sub');renderComponents(report,'aoa','aoaComponents','p5Sub');renderPage6(report);renderPage7(report);renderPage8(report);renderPage9(report)}
+  function renderAll(){const report=currentReport();if(!report)return;const total=state.reports.length,setFiles=state.reports.filter(r=>r.key===report.key&&r.datasetType===report.datasetType).length;document.getElementById('statusMeta').textContent=`${periodLabel(report.year,report.month)} ${datasetLabel(report)} (${report.datasetType}) ${report.regionLabel} ${report.rows.length.toLocaleString('th-TH')} แถว โหลดแล้ว ${total} ไฟล์ (${setFiles} พื้นที่ของชุดนี้ในงวดนี้)`;const componentTitle=`อัตราการเปลี่ยนแปลง${datasetFullLabel(report)}`;document.getElementById('p3Title').textContent=componentTitle;document.getElementById('p4Title').textContent=componentTitle;document.getElementById('p5Title').textContent=componentTitle;renderPage1(report);renderPage2(report);renderComponents(report,'yoy','yoyComponents','p3Sub');renderComponents(report,'mom','momComponents','p4Sub');renderComponents(report,'aoa','aoaComponents','p5Sub');renderPage6(report);renderPage7(report);renderPage8(report);renderPage9(report);installTableExportButtons()}
 
-  async function capturePage(id){const el=document.getElementById(id);if(!el)return;setLoading(true);try{const canvas=await html2canvas(el,{scale:2,backgroundColor:'#ffffff',useCORS:true});const a=document.createElement('a');const r=currentReport();a.download=`CPI_${id}_${r?.year||''}${String(r?.month||'').padStart(2,'0')}_${r?.datasetType||''}_${r?.regionId||''}.png`;a.href=canvas.toDataURL('image/png');a.click()}catch(e){console.error(e);toast('บันทึก PNG ไม่สำเร็จ: '+e.message)}finally{setLoading(false)}}
+  async function capturePage(id){const el=document.getElementById(id);if(!el)return;setLoading(true);try{const canvas=await html2canvas(el,{scale:2,backgroundColor:'#ffffff',useCORS:true,ignoreElements:el=>el.classList?.contains('export-action')||el.classList?.contains('table-export-actions')});const a=document.createElement('a');const r=currentReport();a.download=`CPI_${id}_${r?.year||''}${String(r?.month||'').padStart(2,'0')}_${r?.datasetType||''}_${r?.regionId||''}.png`;a.href=canvas.toDataURL('image/png');a.click()}catch(e){console.error(e);toast('บันทึก PNG ไม่สำเร็จ: '+e.message)}finally{setLoading(false)}}
+  // Dependency-free OOXML writer for report exports. Import still uses SheetJS.
+  // Strings are inline text, never formulas; ZIP entries use STORE and CRC-32.
+  const CPIExcel=(()=>{
+    const encoder=new TextEncoder();
+    const xml=s=>String(s??'').replace(/[\x00-\x08\x0b\x0c\x0e-\x1f\ufffe\uffff]/g,'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&apos;'}[c]));
+    const column=c=>{let s='';for(c++;c>0;c=Math.floor((c-1)/26))s=String.fromCharCode(65+(c-1)%26)+s;return s;};
+    const encode_cell=({r,c})=>column(c)+(r+1);
+    const decode_cell=address=>{const m=address.match(/^([A-Z]+)(\d+)$/);if(!m)throw new Error('Invalid cell: '+address);let c=0;for(const ch of m[1])c=c*26+ch.charCodeAt(0)-64;return {r:Number(m[2])-1,c:c-1};};
+    const encode_range=range=>encode_cell(range.s)+':'+encode_cell(range.e);
+    const aoa_to_sheet=rows=>{
+      if(rows.length>1048576)throw new Error('Excel row limit exceeded');
+      const ws={};let columns=1;
+      rows.forEach((row,r)=>{columns=Math.max(columns,row.length);row.forEach((v,c)=>{
+        if(v===null||v===undefined)return;
+        if(typeof v==='number'&&!Number.isFinite(v))return;
+        ws[encode_cell({r,c})]={v,t:typeof v==='number'?'n':'s'};
+      });});
+      if(columns>16384)throw new Error('Excel column limit exceeded');
+      ws['!ref']=encode_range({s:{r:0,c:0},e:{r:Math.max(0,rows.length-1),c:columns-1}});return ws;
+    };
+    const book_new=()=>({SheetNames:[],Sheets:{}});
+    const book_append_sheet=(wb,ws,name)=>{
+      if(!name||name.length>31||/[\\/?*\[\]:]/.test(name)||wb.SheetNames.includes(name))throw new Error('Invalid or duplicate sheet name: '+name);
+      wb.SheetNames.push(name);wb.Sheets[name]=ws;
+    };
+    const crcTable=Uint32Array.from({length:256},(_,n)=>{for(let i=0;i<8;i++)n=(n&1)?0xedb88320^(n>>>1):n>>>1;return n>>>0;});
+    function crc32(data){let crc=0xffffffff;for(const byte of data)crc=crcTable[(crc^byte)&255]^(crc>>>8);return (crc^0xffffffff)>>>0;}
+    function zip(entries){
+      const chunks=[],central=[];let offset=0,centralSize=0;
+      for(const [path,text] of entries){
+        const name=encoder.encode(path),data=typeof text==='string'?encoder.encode(text):text;
+        const crc=crc32(data),head=new Uint8Array(30+name.length),h=new DataView(head.buffer);
+        h.setUint32(0,0x04034b50,true);h.setUint16(4,20,true);h.setUint16(6,0x0800,true);h.setUint16(12,33,true);
+        h.setUint32(14,crc,true);h.setUint32(18,data.length,true);h.setUint32(22,data.length,true);h.setUint16(26,name.length,true);head.set(name,30);
+        chunks.push(head,data);
+        const entry=new Uint8Array(46+name.length),v=new DataView(entry.buffer);
+        v.setUint32(0,0x02014b50,true);v.setUint16(4,20,true);v.setUint16(6,20,true);v.setUint16(8,0x0800,true);v.setUint16(14,33,true);
+        v.setUint32(16,crc,true);v.setUint32(20,data.length,true);v.setUint32(24,data.length,true);v.setUint16(28,name.length,true);
+        v.setUint32(42,offset,true);entry.set(name,46);central.push(entry);centralSize+=entry.length;offset+=head.length+data.length;
+      }
+      const end=new Uint8Array(22),e=new DataView(end.buffer);
+      e.setUint32(0,0x06054b50,true);e.setUint16(8,entries.length,true);e.setUint16(10,entries.length,true);e.setUint32(12,centralSize,true);e.setUint32(16,offset,true);
+      const out=new Uint8Array(offset+centralSize+22);let position=0;
+      for(const chunk of [...chunks,...central,end]){out.set(chunk,position);position+=chunk.length;}return out;
+    }
+    const NS='http://schemas.openxmlformats.org/spreadsheetml/2006/main';
+    const REL='http://schemas.openxmlformats.org/officeDocument/2006/relationships';
+    const PKG='http://schemas.openxmlformats.org/package/2006/relationships';
+    const declaration='<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
+    const styles=declaration+`<styleSheet xmlns="${NS}">
+      <numFmts count="4"><numFmt numFmtId="164" formatCode="0.00"/><numFmt numFmtId="165" formatCode="0.0000"/><numFmt numFmtId="166" formatCode="+0.00;-0.00;0.00"/><numFmt numFmtId="167" formatCode="+0.0000;-0.0000;0.0000"/></numFmts>
+      <fonts count="5"><font><sz val="11"/><color rgb="FF172D44"/><name val="Tahoma"/></font><font><b/><sz val="11"/><color rgb="FFFFFFFF"/><name val="Tahoma"/></font><font><b/><sz val="16"/><color rgb="FF0C2D58"/><name val="Tahoma"/></font><font><sz val="10"/><color rgb="FF62748A"/><name val="Tahoma"/></font><font><sz val="11"/><color rgb="FF008000"/><name val="Tahoma"/></font></fonts>
+      <fills count="3"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill><fill><patternFill patternType="solid"><fgColor rgb="FF0C2D58"/><bgColor indexed="64"/></patternFill></fill></fills>
+      <borders count="1"><border><left/><right/><top/><bottom/><diagonal/></border></borders>
+      <cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs>
+      <cellXfs count="10">
+        <xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0" applyAlignment="1"><alignment vertical="center" wrapText="1"/></xf>
+        <xf numFmtId="0" fontId="2" fillId="0" borderId="0" xfId="0" applyFont="1" applyAlignment="1"><alignment vertical="center" wrapText="1"/></xf>
+        <xf numFmtId="0" fontId="3" fillId="0" borderId="0" xfId="0" applyFont="1" applyAlignment="1"><alignment vertical="top" wrapText="1"/></xf>
+        <xf numFmtId="0" fontId="1" fillId="2" borderId="0" xfId="0" applyFont="1" applyFill="1" applyAlignment="1"><alignment vertical="center" wrapText="1"/></xf>
+        <xf numFmtId="164" fontId="4" fillId="0" borderId="0" xfId="0" applyNumberFormat="1" applyFont="1" applyAlignment="1"><alignment horizontal="right" vertical="center"/></xf>
+        <xf numFmtId="165" fontId="4" fillId="0" borderId="0" xfId="0" applyNumberFormat="1" applyFont="1" applyAlignment="1"><alignment horizontal="right" vertical="center"/></xf>
+        <xf numFmtId="166" fontId="4" fillId="0" borderId="0" xfId="0" applyNumberFormat="1" applyFont="1" applyAlignment="1"><alignment horizontal="right" vertical="center"/></xf>
+        <xf numFmtId="167" fontId="4" fillId="0" borderId="0" xfId="0" applyNumberFormat="1" applyFont="1" applyAlignment="1"><alignment horizontal="right" vertical="center"/></xf>
+        <xf numFmtId="49" fontId="0" fillId="0" borderId="0" xfId="0" applyNumberFormat="1" applyAlignment="1"><alignment horizontal="left" vertical="center"/></xf>
+        <xf numFmtId="1" fontId="0" fillId="0" borderId="0" xfId="0" applyNumberFormat="1" applyAlignment="1"><alignment horizontal="right" vertical="center"/></xf>
+      </cellXfs><cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles></styleSheet>`;
+    function workbookBytes(wb){
+      const entries=[];let extraTypes='';
+      const add=(path,content)=>entries.push([path,declaration+content]);
+      add('_rels/.rels',`<Relationships xmlns="${PKG}"><Relationship Id="rId1" Type="${REL}/officeDocument" Target="xl/workbook.xml"/></Relationships>`);
+      entries.push(['xl/styles.xml',styles]);
+      let workbookRels=`<Relationship Id="rId${wb.SheetNames.length+1}" Type="${REL}/styles" Target="styles.xml"/>`;
+      const sheetTags=[];
+      wb.SheetNames.forEach((name,i)=>{
+        const id=i+1,ws=wb.Sheets[name],head=ws['!exportHeaderRow']??0;
+        sheetTags.push(`<sheet name="${xml(name)}" sheetId="${id}" r:id="rId${id}"/>`);
+        workbookRels+=`<Relationship Id="rId${id}" Type="${REL}/worksheet" Target="worksheets/sheet${id}.xml"/>`;
+        const byRow=new Map(),comments=[];
+        for(const [address,cell] of Object.entries(ws)){
+          if(address[0]==='!')continue;
+          const {r,c}=decode_cell(address);let style=r===head?3:head>0&&r<head?(r===0?1:2):0;
+          if(r>head){
+            if(cell.t==='n')style=({'0.0000':5,'+0.00;-0.00;0.00':6,'+0.0000;-0.0000;0.0000':7,'0':9}[cell.z]??4);
+            else if(cell.z==='@')style=8;
+          }
+          const body=cell.t==='n'?`<c r="${address}" s="${style}" t="n"><v>${cell.v}</v></c>`:
+            `<c r="${address}" s="${style}" t="inlineStr"><is><t xml:space="preserve">${xml(cell.v)}</t></is></c>`;
+          if(!byRow.has(r))byRow.set(r,[]);byRow.get(r).push({c,body});
+          if(cell.c?.length)comments.push({address,r,c,text:cell.c.map(note=>note.t).join('\n')});
+        }
+        const rows=[...byRow].sort((a,b)=>a[0]-b[0]).map(([r,cells])=>{
+          const height=ws['!rows']?.[r]?.hpt||(r===head?42:r===0&&head>0?30:22);
+          return `<row r="${r+1}" ht="${height}" customHeight="1">${cells.sort((a,b)=>a.c-b.c).map(x=>x.body).join('')}</row>`;
+        }).join('');
+        const cols=(ws['!cols']||[]).map((col,c)=>`<col min="${c+1}" max="${c+1}" width="${col.wch||18}" customWidth="1"/>`).join('');
+        const merges=(ws['!merges']||[]).map(m=>`<mergeCell ref="${encode_range(m)}"/>`).join('');
+        const filter=ws['!autofilter']?`<autoFilter ref="${xml(ws['!autofilter'].ref)}"/>`:'';
+        const pane=`<pane ySplit="${head+1}" topLeftCell="A${head+2}" activePane="bottomLeft" state="frozen"/><selection pane="bottomLeft" activeCell="A${head+2}" sqref="A${head+2}"/>`;
+        let drawing='';
+        if(comments.length){
+          extraTypes+=`<Override PartName="/xl/comments/comment${id}.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.comments+xml"/>`;
+          add(`xl/comments/comment${id}.xml`,`<comments xmlns="${NS}"><authors><author>CPI Report</author></authors><commentList>${comments.map(c=>`<comment ref="${c.address}" authorId="0"><text><t xml:space="preserve">${xml(c.text)}</t></text></comment>`).join('')}</commentList></comments>`);
+          entries.push([`xl/drawings/commentsDrawing${id}.vml`,`<xml xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel"><o:shapelayout v:ext="edit"><o:idmap v:ext="edit" data="1"/></o:shapelayout><v:shapetype id="_x0000_t202" coordsize="21600,21600" o:spt="202" path="m,l,21600r21600,l21600,xe"><v:stroke joinstyle="miter"/><v:path gradientshapeok="t" o:connecttype="rect"/></v:shapetype>${comments.map((c,j)=>`<v:shape id="_x0000_s${1025+j}" type="#_x0000_t202" style="position:absolute;margin-left:80pt;margin-top:5pt;width:240pt;height:90pt;z-index:1;visibility:hidden" fillcolor="#ffffe1" o:insetmode="auto"><v:fill color2="#ffffe1"/><v:shadow on="t" color="black" obscured="t"/><v:path o:connecttype="none"/><v:textbox style="mso-direction-alt:auto"><div style="text-align:left"/></v:textbox><x:ClientData ObjectType="Note"><x:MoveWithCells/><x:SizeWithCells/><x:AutoFill>False</x:AutoFill><x:Row>${c.r}</x:Row><x:Column>${c.c}</x:Column></x:ClientData></v:shape>`).join('')}</xml>`]);
+          add(`xl/worksheets/_rels/sheet${id}.xml.rels`,`<Relationships xmlns="${PKG}"><Relationship Id="rIdComments" Type="${REL}/comments" Target="../comments/comment${id}.xml"/><Relationship Id="rIdDrawing" Type="${REL}/vmlDrawing" Target="../drawings/commentsDrawing${id}.vml"/></Relationships>`);
+          drawing='<legacyDrawing r:id="rIdDrawing"/>';
+        }
+        add(`xl/worksheets/sheet${id}.xml`,`<worksheet xmlns="${NS}" xmlns:r="${REL}"><dimension ref="${xml(ws['!ref'])}"/><sheetViews><sheetView showGridLines="0" workbookViewId="0">${pane}</sheetView></sheetViews><sheetFormatPr defaultRowHeight="22"/>${cols?'<cols>'+cols+'</cols>':''}<sheetData>${rows}</sheetData>${filter}${merges?`<mergeCells count="${ws['!merges'].length}">${merges}</mergeCells>`:''}<pageMargins left="0.3" right="0.3" top="0.5" bottom="0.5" header="0.2" footer="0.2"/>${drawing}</worksheet>`);
+      });
+      add('xl/workbook.xml',`<workbook xmlns="${NS}" xmlns:r="${REL}"><bookViews><workbookView/></bookViews><sheets>${sheetTags.join('')}</sheets></workbook>`);
+      add('xl/_rels/workbook.xml.rels',`<Relationships xmlns="${PKG}">${workbookRels}</Relationships>`);
+      add('[Content_Types].xml',`<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Default Extension="vml" ContentType="application/vnd.openxmlformats-officedocument.vmlDrawing"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/>${wb.SheetNames.map((_,i)=>`<Override PartName="/xl/worksheets/sheet${i+1}.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>`).join('')}${extraTypes}</Types>`);
+      return zip(entries);
+    }
+    function writeFile(wb,filename){
+      const bytes=workbookBytes(wb),blob=new Blob([bytes],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+      const url=URL.createObjectURL(blob),link=document.createElement('a');
+      link.href=url;link.download=filename;link.hidden=true;document.body.append(link);link.click();link.remove();
+      setTimeout(()=>URL.revokeObjectURL(url),60000);
+    }
+    return {utils:{encode_cell,encode_range,aoa_to_sheet,book_new,book_append_sheet},writeFile,workbookBytes};
+  })();
+
   function exportCurrentExcel(){
-    const r=currentReport();if(!r)return;
-    const prior=previousYearReport(r);
-    const priorYearColumn=`ดัชนีปีก่อน (${periodLabel(r.year-1,r.month)})`;
-    const rows=r.rows.map(x=>({รหัส:x.code,'หมวด/รายการ':x.name,'สัดส่วนน้ำหนัก':x.weightShare,'ดัชนี':x.index,[priorYearColumn]:previousYearIndexInfo(r,x,prior).value,MoM:x.mom,YoY:x.yoy,AoA:x.aoa,ContributeMoM:x.cMom,ContributeYoY:x.cYoy,ContributeAoA:x.cAoa}));
-    const ws=XLSX.utils.json_to_sheet(rows),wb=XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb,ws,'CPI');
-    XLSX.writeFile(wb,`CPI_${r.year}${String(r.month).padStart(2,'0')}_${r.datasetType}_${r.regionId}.xlsx`);
+    if(!requireExcelExport())return;
+    try{
+      const report=currentReport(),prior=previousYearReport(report);
+      const headers=['\u0e23\u0e2b\u0e31\u0e2a','\u0e2b\u0e21\u0e27\u0e14/\u0e23\u0e32\u0e22\u0e01\u0e32\u0e23','\u0e2a\u0e31\u0e14\u0e2a\u0e48\u0e27\u0e19\u0e19\u0e49\u0e33\u0e2b\u0e19\u0e31\u0e01','\u0e14\u0e31\u0e0a\u0e19\u0e35',`\u0e14\u0e31\u0e0a\u0e19\u0e35\u0e1b\u0e35\u0e01\u0e48\u0e2d\u0e19 (${periodLabel(report.year-1,report.month)})`,'MoM','YoY','AoA','ContributeMoM','ContributeYoY','ContributeAoA'];
+      const rows=report.rows.map(x=>[x.code,x.name,x.weightShare,x.index,previousYearIndexInfo(report,x,prior).value,x.mom,x.yoy,x.aoa,x.cMom,x.cYoy,x.cAoa]);
+      const ws=CPIExcel.utils.aoa_to_sheet([headers,...rows]);
+      ws['!cols']=headers.map((_,c)=>({wch:c===1?65:c===0?22:20}));
+      ws['!autofilter']={ref:ws['!ref']};
+      rows.forEach((row,r)=>row.forEach((v,c)=>{
+        const cell=ws[CPIExcel.utils.encode_cell({r:r+1,c})];if(!cell)return;
+        if(c===0){cell.t='s';cell.v=String(v);cell.z='@';}
+        else if(typeof v==='number')cell.z=c>=8?'0.0000':'0.00';
+      }));
+      const wb=CPIExcel.utils.book_new();CPIExcel.utils.book_append_sheet(wb,ws,'CPI');
+      CPIExcel.writeFile(wb,safeExcelFileName(`CPI_${report.key}_${report.datasetType}_${report.regionId}_Full_Data`)+'.xlsx',{compression:true});
+      toast(EXPORT_UI.done);
+    }catch(error){console.error(error);toast(EXPORT_UI.failed+': '+error.message);}
+  }
+
+  // Export displayed tables only. No rates or missing indices are reconstructed.
+  const EXPORT_UI = {
+    all: 'Export \u0e17\u0e38\u0e01\u0e15\u0e32\u0e23\u0e32\u0e07',
+    full: 'Export \u0e02\u0e49\u0e2d\u0e21\u0e39\u0e25 CPI \u0e17\u0e31\u0e49\u0e07\u0e2b\u0e21\u0e14',
+    noData: '\u0e01\u0e23\u0e38\u0e13\u0e32\u0e19\u0e33\u0e40\u0e02\u0e49\u0e32 Excel \u0e01\u0e48\u0e2d\u0e19\u0e2a\u0e48\u0e07\u0e2d\u0e2d\u0e01',
+    missingLib: '\u0e44\u0e21\u0e48\u0e1e\u0e1a\u0e15\u0e31\u0e27\u0e2a\u0e48\u0e07\u0e2d\u0e2d\u0e01 Excel \u0e01\u0e23\u0e38\u0e13\u0e32\u0e40\u0e0a\u0e37\u0e48\u0e2d\u0e21\u0e15\u0e48\u0e2d\u0e2d\u0e34\u0e19\u0e40\u0e17\u0e2d\u0e23\u0e4c\u0e40\u0e19\u0e47\u0e15\u0e41\u0e25\u0e49\u0e27\u0e40\u0e1b\u0e34\u0e14\u0e44\u0e1f\u0e25\u0e4c\u0e43\u0e2b\u0e21\u0e48',
+    done: '\u0e2a\u0e48\u0e07\u0e2d\u0e2d\u0e01 Excel \u0e41\u0e25\u0e49\u0e27',
+    failed: '\u0e2a\u0e48\u0e07\u0e2d\u0e2d\u0e01 Excel \u0e44\u0e21\u0e48\u0e2a\u0e33\u0e40\u0e23\u0e47\u0e08',
+    settings: '\u0e2a\u0e48\u0e07\u0e2d\u0e2d\u0e01\u0e15\u0e32\u0e21\u0e07\u0e27\u0e14 \u0e0a\u0e38\u0e14 \u0e1e\u0e37\u0e49\u0e19\u0e17\u0e35\u0e48 \u0e41\u0e25\u0e30\u0e08\u0e33\u0e19\u0e27\u0e19\u0e23\u0e32\u0e22\u0e01\u0e32\u0e23\u0e17\u0e35\u0e48\u0e41\u0e2a\u0e14\u0e07',
+    numericNote: '\u0e2d\u0e31\u0e15\u0e23\u0e32\u0e40\u0e1b\u0e47\u0e19\u0e23\u0e49\u0e2d\u0e22\u0e25\u0e30 (2.82 = 2.82%) \u0e15\u0e31\u0e27\u0e40\u0e25\u0e02\u0e15\u0e32\u0e21\u0e2b\u0e19\u0e49\u0e32\u0e08\u0e2d \u0e0a\u0e48\u0e2d\u0e07\u0e27\u0e48\u0e32\u0e07 = \u0e44\u0e21\u0e48\u0e1e\u0e1a\u0e02\u0e49\u0e2d\u0e21\u0e39\u0e25 \u0e44\u0e21\u0e48\u0e43\u0e0a\u0e48\u0e28\u0e39\u0e19\u0e22\u0e4c',
+    source: '\u0e44\u0e1f\u0e25\u0e4c\u0e2d\u0e49\u0e32\u0e07\u0e2d\u0e34\u0e07',
+    rows: '\u0e41\u0e16\u0e27',
+    up: '\u0e2a\u0e39\u0e07\u0e02\u0e36\u0e49\u0e19', down: '\u0e25\u0e14\u0e25\u0e07',
+    area: '\u0e1e\u0e37\u0e49\u0e19\u0e17\u0e35\u0e48', direction: '\u0e17\u0e34\u0e28\u0e17\u0e32\u0e07',
+    rank: '\u0e25\u0e33\u0e14\u0e31\u0e1a', item: '\u0e23\u0e32\u0e22\u0e01\u0e32\u0e23',
+    weight: '\u0e2a\u0e31\u0e14\u0e2a\u0e48\u0e27\u0e19\u0e19\u0e49\u0e33\u0e2b\u0e19\u0e31\u0e01 (%)',
+    value: '\u0e04\u0e48\u0e32',
+    drivers: '\u0e2a\u0e34\u0e19\u0e04\u0e49\u0e32\u0e2a\u0e33\u0e04\u0e31\u0e0d\u0e23\u0e32\u0e22\u0e20\u0e32\u0e04'
+  };
+  function exportText(el){
+    if(!el)return '';
+    const copy=el.cloneNode(true);
+    copy.querySelectorAll('button,.table-export-actions,.export-action').forEach(x=>x.remove());
+    copy.querySelectorAll('br').forEach(x=>x.replaceWith(document.createTextNode(' ')));
+    return copy.textContent.replace(/\u2022/g,' ').replace(/\s+/g,' ').trim();
+  }
+  function exportNumber(value){
+    if(typeof value==='number')return Number.isFinite(value)?value:null;
+    let s=String(value??'').trim();
+    if(!s||/^[\u2014\u2013-]$/.test(s))return null;
+    s=s.replace(/[\u2212\u2013]/g,'-').replace(/\u0e23\u0e49\u0e2d\u0e22\u0e25\u0e30/g,'').replace(/[,\s%]/g,'');
+    s=s.replace(/[\u0e50-\u0e59]/g,c=>String(c.charCodeAt(0)-0x0e50));
+    return /^[+-]?(?:\d+(?:\.\d*)?|\.\d+)$/.test(s)&&Number.isFinite(Number(s))?Number(s):null;
+  }
+  function exportCellNumber(el){return exportNumber(exportText(el));}
+  function tableHeaders(table){
+    const grid=[];
+    Array.from(table.tHead?.rows||[]).forEach((tr,r)=>{
+      grid[r]??=[];let c=0;
+      Array.from(tr.cells).forEach(cell=>{
+        while(grid[r][c]!==undefined)c++;
+        for(let dr=0;dr<cell.rowSpan;dr++)for(let dc=0;dc<cell.colSpan;dc++){
+          grid[r+dr]??=[];grid[r+dr][c+dc]=exportText(cell);
+        }
+        c+=cell.colSpan;
+      });
+    });
+    const width=Math.max(0,...grid.map(row=>row.length));
+    return Array.from({length:width},(_,c)=>[...new Set(grid.map(row=>row[c]).filter(Boolean))].join(' / '));
+  }
+  function exportDomTable(el,def){
+    let headers=tableHeaders(el);
+    const rows=Array.from(el.tBodies).flatMap(body=>Array.from(body.rows)).map(tr=>
+      Array.from(tr.cells).map((cell,c)=>def.numeric.includes(c)?exportCellNumber(cell):exportText(cell)));
+    if(def.metric)headers[1]=`${def.metric} (%)`;
+    const formats={};def.numeric.forEach(c=>formats[c]=def.metric||def.key==='summary'?'+0.00;-0.00;0.00':'0.00');
+    return {headers,rows,formats};
+  }
+  function exportGrid(el,columns){
+    const cells=Array.from(el.children),headers=cells.slice(0,columns).map(exportText),rows=[];
+    for(let r=columns;r<cells.length;r+=columns){
+      const row=cells.slice(r,r+columns);if(row.length!==columns)continue;
+      rows.push(row.map((cell,c)=>c===0?exportText(cell):exportCellNumber(cell.querySelector('.num')||cell)));
+    }
+    return {headers,rows};
+  }
+  function exportRegionalTable(table){
+    const show=Boolean(document.getElementById('regionalContributionToggle')?.checked);
+    const baseHeaders=tableHeaders(table),headers=[baseHeaders[0]],rows=[];
+    for(let c=1;c<baseHeaders.length;c++){
+      const label=baseHeaders[c].replace(/\s*\+\s*Contribute/,'');
+      headers.push(label+' (%)');if(show)headers.push(label+' / Contribute');
+    }
+    Array.from(table.tBodies).flatMap(b=>Array.from(b.rows)).forEach(tr=>{
+      const cells=Array.from(tr.cells),row=[exportText(cells[0])];
+      cells.slice(1).forEach(cell=>{
+        row.push(exportCellNumber(cell.querySelector('b')||cell));
+        if(show)row.push(exportNumber(exportText(cell.querySelector('.contrib-inline')).replace(/^Contribute\s*/,'')));
+      });rows.push(row);
+    });
+    const formats={};headers.forEach((h,c)=>{if(c)formats[c]=h.includes('/ Contribute')?'+0.0000;-0.0000;0.0000':'+0.00;-0.00;0.00';});
+    return {headers,rows,formats};
+  }
+  function exportRegionalDrivers(el){
+    const show=Boolean(document.getElementById('regionalContributionToggle')?.checked);
+    const headers=[EXPORT_UI.area,EXPORT_UI.direction,EXPORT_UI.rank,EXPORT_UI.item];
+    if(show)headers.push('Contribute');
+    const rows=[];
+    el.querySelectorAll('.region-card').forEach(card=>{
+      const area=exportText(card.querySelector('.rh'));
+      [['.up-list',EXPORT_UI.up],['.down-list',EXPORT_UI.down]].forEach(([selector,direction])=>{
+        const source=card.querySelector(selector);if(!source)return;
+        source.innerHTML.split(/<br\s*\/?\s*>/i).forEach((fragment,i)=>{
+          const part=document.createElement('div');part.innerHTML=fragment;
+          const contribution=part.querySelector('.driver-contrib');
+          const value=exportNumber(exportText(contribution).replace(/[()]/g,''));
+          contribution?.remove();
+          const name=exportText(part).replace(/^[\u25b2\u25bc]\s*/,'');
+          if(!name||name==='\u2014')return;
+          const row=[area,direction,i+1,name];if(show)row.push(value);rows.push(row);
+        });
+      });
+    });
+    return {headers,rows,formats:{2:'0',4:'+0.0000;-0.0000;0.0000'}};
+  }
+  function exportWeightLegend(el){
+    return {headers:[EXPORT_UI.item,EXPORT_UI.weight],rows:Array.from(el.children).map(row=>[
+      exportText(row.querySelector('span')),exportCellNumber(row.querySelector('b'))])};
+  }
+  function exportPosterKpis(el){
+    const rows=[];
+    el.innerHTML.split(/<br\s*\/?\s*>/i).forEach(fragment=>{
+      const part=document.createElement('div');part.innerHTML=fragment;
+      const number=part.querySelector('b');if(!number)return;
+      const value=exportCellNumber(number);number.remove();
+      rows.push([exportText(part),value]);
+    });
+    return {headers:[EXPORT_UI.item,EXPORT_UI.value],rows};
+  }
+  function exportDefinitions(){
+    const definitions=[
+      {key:'summary',sheet:'01_Summary',selector:'#page-1 .compare-table',numeric:[1,2]},
+      {key:'overview',sheet:'02_Overview',selector:'#metricBoard',kind:'grid',columns:4},
+    ];
+    ['yoy','mom','aoa'].forEach((metric,i)=>['1000000','8000000'].forEach((code,j)=>definitions.push({
+      key:`${metric}_${code}`,sheet:`0${i+3}_${metric.toUpperCase()}_${j?'Nonfood':'Food'}`,
+      selector:`#component-${metric}-${code}`,numeric:[1],metric:metric.toUpperCase(),component:true
+    })));
+    definitions.push(
+      {key:'regional_drivers',sheet:'06_Regional_Drivers',selector:'#regionCards',kind:'drivers',title:EXPORT_UI.drivers},
+      {key:'regional',sheet:'06_Regional_Table',selector:'#regionalTableWrap table',kind:'regional'},
+      {key:'detail',sheet:'08_Detail',selector:'#page-8 .detail-table',numeric:[2,3,4,5,6,7,8,9,10,11]},
+      {key:'poster_headline',sheet:'09_Poster_Headline',selector:'#posterHeadlineCard .mini-rate-grid',kind:'grid',columns:5},
+      {key:'poster_core',sheet:'09_Poster_Core',selector:'#posterCoreCard .mini-rate-grid',kind:'grid',columns:5},
+      {key:'poster_weights',sheet:'09_Poster_Weights',selector:'#weightLegend',kind:'weights'},
+      {key:'poster_kpis',sheet:'09_Poster_KPIs',selector:'#posterKpiList',kind:'kpis'}
+    );
+    return definitions;
+  }
+  function exportDefinitionTitle(def,el){
+    if(def.title)return def.title;
+    if(def.component){
+      const header=el.previousElementSibling;
+      return `${def.metric} / ${exportText(header)}`;
+    }
+    return exportText(el.closest('.mini-rate-card')?.querySelector('h4'))||
+      exportText(el.closest('.poster-card')?.querySelector('h3'))||
+      exportText(el.closest('.report-page')?.querySelector('.page-title'))||def.sheet;
+  }
+  function readExportDefinition(def){
+    const el=document.querySelector(def.selector);if(!el)return null;
+    let data;
+    switch(def.kind){
+      case 'grid':data=exportGrid(el,def.columns);break;
+      case 'regional':data=exportRegionalTable(el);break;
+      case 'drivers':data=exportRegionalDrivers(el);break;
+      case 'weights':data=exportWeightLegend(el);break;
+      case 'kpis':data=exportPosterKpis(el);break;
+      default:data=exportDomTable(el,def);
+    }
+    data.title=exportDefinitionTitle(def,el);data.definition=def;
+    data.subtitle=exportText(el.closest('.report-page')?.querySelector('.page-subtitle'));
+    if(def.key==='detail'){
+      data.comments=[];
+      Array.from(el.tBodies[0]?.rows||[]).forEach((tr,r)=>{
+        const source=tr.cells[4]?.getAttribute('title');if(source)data.comments.push({r,c:4,text:source});
+      });
+    }
+    return data;
+  }
+  function exportSources(report,def){
+    const related=[report];
+    if(def.kind==='regional'||def.kind==='drivers'){
+      const reps=regionalReports(report);if(reps.length)related.splice(0,1,...reps);
+    }
+    if(def.key==='detail')related.push(previousReport(report),previousYearReport(report));
+    if(def.key==='poster_headline'||def.key==='poster_core')related.push(previousReport(report));
+    return [...new Set(related.filter(Boolean).map(r=>r.fileName).filter(Boolean))].join(' | ');
+  }
+  function exportSettings(){
+    const values=['overviewLimitSelect','yoyLimitSelect','momLimitSelect','aoaLimitSelect','detailLimitSelect'].map(id=>document.getElementById(id)?.value||'');
+    const metric=document.getElementById('regionalMetricSelect')?.value?.toUpperCase()||'YoY';
+    const contribute=document.getElementById('regionalContributionToggle')?.checked?'ON':'OFF';
+    return `Overview ${values[0]} | YoY ${values[1]} | MoM ${values[2]} | AoA ${values[3]} | Detail ${values[4]} | Regional ${metric} | Contribute ${contribute}`;
+  }
+  function safeExcelFileName(value){return String(value).replace(/[<>:"/\\|?*\x00-\x1f]/g,'_').replace(/[. ]+$/,'').slice(0,180);}
+  function makeTableWorksheet(data,report){
+    const source=data.sources??exportSources(report,data.definition);
+    const meta=[
+      [data.title],
+      [`${periodLabel(report.year,report.month)} | ${datasetLabel(report)} (${report.datasetType}) | ${report.regionLabel} | Base ${report.baseYear??'\u2014'}`],
+      [`${EXPORT_UI.source}: ${source}`],
+      [EXPORT_UI.settings+' | '+exportSettings()],
+      [data.note||EXPORT_UI.numericNote],
+      []
+    ];
+    const headerRow=meta.length,bodyStart=headerRow+1;
+    const ws=CPIExcel.utils.aoa_to_sheet([...meta,data.headers,...data.rows]);
+    ws['!exportHeaderRow']=headerRow;
+    const width=Math.max(1,data.headers.length);
+    if(width>1)ws['!merges']=meta.slice(0,5).map((_,r)=>({s:{r,c:0},e:{r,c:width-1}}));
+    const codeColumn=c=>/\u0e23\u0e2b\u0e31\u0e2a|\bcode\b/i.test(data.headers[c]||'');
+    data.rows.forEach((row,r)=>row.forEach((value,c)=>{
+      const address=CPIExcel.utils.encode_cell({r:bodyStart+r,c});
+      if(value===null||value===undefined){delete ws[address];return;}
+      const cell=ws[address];if(!cell)return;
+      if(codeColumn(c)||typeof value==='string'){
+        cell.t='s';cell.v=String(value);delete cell.f;
+        if(codeColumn(c))cell.z='@';
+      }else if(typeof value==='number'){
+        cell.t='n';cell.z=data.formats?.[c]||'0.00';
+      }
+    }));
+    if(data.rows.length)ws['!autofilter']={ref:CPIExcel.utils.encode_range({s:{r:headerRow,c:0},e:{r:bodyStart+data.rows.length-1,c:width-1}})};
+    ws['!cols']=data.headers.map((h,c)=>{
+      const textValues=data.rows.slice(0,150).map(row=>row[c]).filter(v=>typeof v==='string');
+      if(codeColumn(c))return {wch:20};
+      if(textValues.length){const longest=Math.max(h.length,...textValues.map(v=>v.length));return {wch:Math.min(85,Math.max(25,Math.round(longest*.75))) };}
+      return {wch:Math.min(28,Math.max(16,Math.round(h.length*.6)))};
+    });
+    const lineWidth=Math.max(35,ws['!cols'].reduce((sum,col)=>sum+col.wch,0)*.8);
+    ws['!rows']=meta.map(row=>({hpt:Math.max(22,Math.ceil(String(row[0]||'').length/lineWidth)*16)}));
+    ws['!rows'][headerRow]={hpt:42};
+    data.rows.forEach((row,r)=>{
+      const lines=Math.max(1,...row.map((v,c)=>typeof v==='string'?Math.ceil(v.length/(ws['!cols'][c]?.wch||25)):1));
+      ws['!rows'][bodyStart+r]={hpt:Math.min(150,Math.max(22,lines*15))};
+    });
+    for(const comment of data.comments||[]){
+      const address=CPIExcel.utils.encode_cell({r:bodyStart+comment.r,c:comment.c});
+      ws[address]??={t:'s',v:''};
+      ws[address].c=[{a:'CPI Report',t:comment.text}];
+    }
+    return ws;
+  }
+  function requireExcelExport(){
+    if(!currentReport()){toast(EXPORT_UI.noData);return false;}
+    return true;
+  }
+  function buildTablesWorkbook(keys=null){
+    const report=currentReport();
+    if(!report)throw new Error(EXPORT_UI.noData);
+    const definitions=exportDefinitions().filter(d=>!keys||keys.includes(d.key));
+    const tables=definitions.map(readExportDefinition).filter(Boolean);
+    if(!tables.length)throw new Error('No tables available');
+    const wb=CPIExcel.utils.book_new();
+    wb.Props={Title:'TPSO CPI Report - Table Export',Subject:`${report.key} ${report.datasetType} ${report.regionLabel}`,Author:'TPSO CPI Report'};
+    if(!keys){
+      const manifest={title:EXPORT_UI.all,definition:{key:'manifest'},sources:[...new Set(tables.map(t=>exportSources(report,t.definition)))].join(' | '),
+        headers:['Sheet',EXPORT_UI.item,EXPORT_UI.rows],rows:tables.map(t=>[t.definition.sheet,t.title,t.rows.length]),formats:{2:'0'}};
+      CPIExcel.utils.book_append_sheet(wb,makeTableWorksheet(manifest,report),'00_Readme');
+    }
+    tables.forEach(data=>CPIExcel.utils.book_append_sheet(wb,makeTableWorksheet(data,report),data.definition.sheet));
+    return wb;
+  }
+  function exportTableExcel(key){
+    if(!requireExcelExport())return;
+    try{
+      const report=currentReport(),def=exportDefinitions().find(d=>d.key===key);
+      if(!def)throw new Error('Table not found');
+      const wb=buildTablesWorkbook([key]);
+      CPIExcel.writeFile(wb,safeExcelFileName(`CPI_${report.key}_${report.datasetType}_${report.regionId}_${def.sheet}`)+'.xlsx',{compression:true});
+      toast(EXPORT_UI.done+' / '+def.sheet);
+    }catch(error){console.error(error);toast(EXPORT_UI.failed+': '+error.message);}
+  }
+  function exportAllTablesExcel(){
+    if(!requireExcelExport())return;
+    try{
+      const report=currentReport(),wb=buildTablesWorkbook();
+      CPIExcel.writeFile(wb,safeExcelFileName(`CPI_${report.key}_${report.datasetType}_${report.regionId}_All_Tables`)+'.xlsx',{compression:true});
+      toast(EXPORT_UI.done+' / '+(wb.SheetNames.length-1)+' '+EXPORT_UI.item);
+    }catch(error){console.error(error);toast(EXPORT_UI.failed+': '+error.message);}
+  }
+  function installTableExportButtons(){
+    document.querySelectorAll('.export-action,.table-export-actions').forEach(x=>x.remove());
+    for(const def of exportDefinitions()){
+      const el=document.querySelector(def.selector);if(!el)continue;
+      const button=document.createElement('button');button.type='button';
+      button.className='mini-btn excel-btn export-action';button.dataset.exportKey=def.key;
+      button.setAttribute('data-html2canvas-ignore','true');
+      button.textContent=def.kind==='drivers'?'Export Excel \u2191 / \u2193':'Export Excel';
+      button.title=exportDefinitionTitle(def,el)+' | '+EXPORT_UI.settings;
+      button.setAttribute('aria-label',button.textContent+' '+exportDefinitionTitle(def,el));
+      button.addEventListener('click',()=>exportTableExcel(def.key));
+      let target=el;
+      if(def.key==='detail')target=el.closest('.detail-wrap');
+      const prev=target.previousElementSibling;
+      if(def.component&&prev?.classList.contains('component-header')){prev.append(button);continue;}
+      if(prev?.classList.contains('table-toolbar')){prev.append(button);continue;}
+      const bar=document.createElement('div');bar.className='table-export-actions';
+      bar.setAttribute('data-html2canvas-ignore','true');bar.append(button);target.before(bar);
+    }
   }
 
   document.getElementById('fileInput').addEventListener('change',e=>importFiles([...e.target.files]));
