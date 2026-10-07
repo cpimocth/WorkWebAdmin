@@ -609,214 +609,6 @@
         }
 
     </style>
-
-<style id="tpso-theme-override">
-/* TPSO palette override - visual only, logic untouched */
-:root{
-  --tpso-navy:#0c2d58;
-  --tpso-navy2:#123d72;
-  --tpso-blue:#1679bd;
-  --tpso-sky:#dff4ff;
-  --tpso-sky2:#eef9ff;
-  --tpso-cyan:#8fd7f7;
-  --tpso-green:#08a45b;
-  --tpso-red:#e02020;
-  --tpso-orange:#f3a61c;
-  --tpso-yellow:#ffd44d;
-  --tpso-ink:#142033;
-  --tpso-muted:#62748a;
-  --tpso-line:#c9d9e7;
-  --tpso-paper:#ffffff;
-  --tpso-bg:#eaf7fd;
-}
-body{
-  color:var(--tpso-ink)!important;
-  background:radial-gradient(circle at 10% 0%,rgba(68,173,224,.18),transparent 24%),linear-gradient(180deg,#eefaff 0%,#e8f4fb 45%,#f5fbff 100%)!important;
-}
-body::before{background-image:linear-gradient(rgba(255,255,255,.20) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.20) 1px,transparent 1px)!important;}
-.w-full.xl\:w-\[360px\]{background:linear-gradient(180deg,rgba(255,255,255,.94),rgba(245,251,255,.90))!important;border-color:#c9e2ef!important;box-shadow:0 18px 46px rgba(47,101,132,.12)!important;}
-.cat-filter,input[type="text"]{border-color:#9fc8df!important;background:#fff!important;color:#17324a!important;}
-button.bg-indigo-600,button.bg-slate-900,.bg-indigo-600{background:linear-gradient(135deg,#0d6eaf,#1496d4)!important;color:#fff!important;}
-button.bg-indigo-600:hover,button.bg-slate-900:hover{filter:brightness(.96)!important;}
-.text-indigo-600,.text-indigo-700,.text-indigo-900{color:#1679bd!important;}
-.bg-indigo-50,.bg-indigo-100{background:#eaf7ff!important;}
-.border-indigo-100,.border-indigo-200,.border-indigo-500{border-color:#9fc8df!important;}
-#exec-summary-section,#hero-section,#core-cpi-section,#regional-section{background:linear-gradient(145deg,#061b46,#0b2e68 56%,#08214d)!important;border-color:rgba(255,255,255,.10)!important;}
-#exec-summary-section h2,#core-cpi-title,#map-main-title,.hero-title{color:#ffd44d!important;}
-.hero-val-box{background:linear-gradient(135deg,#1679bd,#0d6eaf)!important;box-shadow:0 15px 30px -10px rgba(12,109,174,.45)!important;}
-#charts-section .bg-white,#infographic-area .bg-white,#regional-static-table-section,#reg-products-section,#regional-yoy-extended-section,#historical-matrix-section,#bottom-charts-section .bg-white,#dynamic-summary-container>div,.outer-wrapper,#welcome-screen{background:linear-gradient(180deg,rgba(255,255,255,.96),rgba(248,253,255,.94))!important;border-color:#d7e8f2!important;box-shadow:0 18px 46px rgba(47,101,132,.12)!important;}
-thead th{background:linear-gradient(180deg,#eef9ff,#dff4ff)!important;color:#173d5d!important;border-bottom-color:#bdd8e8!important;}
-thead th.sticky-product-col{background:#eef9ff!important;color:#173d5d!important;}
-.sticky-product-col{border-right-color:#d7e8f2!important;}
-.val-card{border-color:#d2e9f6!important;background:linear-gradient(180deg,#fff,#f5fbff)!important;box-shadow:0 8px 20px rgba(53,117,150,.08)!important;}
-.is-top{background:#fff8dc!important;border-color:#f0db89!important;}
-.is-bot{background:#fff1f1!important;border-color:#f3b8b8!important;}
-.up,.text-emerald-600,.text-emerald-700,.text-emerald-900{color:#08a45b!important;}
-.down,.text-rose-500,.text-rose-600,.text-rose-700,.text-red-700{color:#e02020!important;}
-.stable{color:#62748a!important;}
-.bg-emerald-600{background:#08a45b!important;}
-.bg-rose-400,.bg-rose-500,.bg-rose-600{background:#e02020!important;}
-.bg-yellow-300,.bg-yellow-400,.bg-amber-500{background:#ffd44d!important;}
-.text-yellow-200,.text-yellow-300,.text-amber-600,.text-yellow-600{color:#d89a00!important;}
-.bg-blue-50,.bg-cyan-50\/80,.bg-slate-50{background:#eef9ff!important;}
-.border-blue-100,.border-blue-200,.border-cyan-200,.border-slate-200,.border-slate-300{border-color:#c9d9e7!important;}
-.premium-topbar-inner{background:rgba(255,255,255,.9)!important;border-color:#d7e8f2!important;box-shadow:0 8px 20px rgba(53,117,150,.08)!important;}
-.premium-pill-nav a{background:#eaf7ff!important;color:#0f628f!important;border-color:#c8e5f4!important;}
-.premium-kpi{background:#f5fbff!important;border-color:#d2e9f6!important;}
-.premium-kpi .value{color:#0c2d58!important;}
-#debug-console{background:rgba(7,34,67,.94)!important;color:#a9d8f3!important;}
-#loading-overlay{background:rgba(7,34,67,.82)!important;}
-.historical-chip.active{background:linear-gradient(135deg,#eaf7ff,#dff4ff)!important;border-color:#67bde5!important;color:#0f628f!important;}
-.historical-chip.active .historical-chip-dot{background:#1679bd!important;}
-/* Regional accent harmonisation */
-#regProductsTable thead th:nth-child(2){background:#59697c!important;}
-#regProductsTable thead th:nth-child(3){background:#1dbf94!important;}
-#regProductsTable thead th:nth-child(4){background:#ef7777!important;}
-#regProductsTable thead th:nth-child(5){background:#f3a61c!important;}
-#regProductsTable thead th:nth-child(6){background:#27889d!important;}
-</style>
-
-
-
-<style id="universal-table-excel-style">
-/* ===== Universal Excel export controls (visual/utility only) ===== */
-.table-excel-toolbar{
-    display:flex;
-    justify-content:flex-end;
-    align-items:center;
-    gap:.5rem;
-    margin:0 0 .65rem 0;
-    position:relative;
-    z-index:5;
-}
-.table-excel-btn{
-    display:inline-flex;
-    align-items:center;
-    justify-content:center;
-    gap:.45rem;
-    padding:.55rem .85rem;
-    border-radius:.8rem;
-    border:1px solid rgba(8,164,91,.24);
-    background:linear-gradient(180deg,#ffffff,#eefaf5);
-    color:#087a47;
-    font-family:'Sarabun',sans-serif;
-    font-size:12px;
-    font-weight:800;
-    line-height:1;
-    box-shadow:0 6px 16px rgba(8,164,91,.08);
-    cursor:pointer;
-    white-space:nowrap;
-}
-.table-excel-btn:hover{
-    transform:translateY(-1px);
-    border-color:rgba(8,164,91,.40);
-    box-shadow:0 9px 20px rgba(8,164,91,.12);
-}
-.table-excel-btn:active{ transform:translateY(0); }
-@media (max-width:640px){
-    .table-excel-toolbar{justify-content:flex-start;}
-}
-</style>
-
-
-<style id="cpi-stock-heatmap-style">
-    #cpi-stock-heatmap-section{
-        background:linear-gradient(180deg,rgba(255,255,255,.99),rgba(246,252,255,.98));
-        border:1px solid #cfe3ef;
-        box-shadow:0 18px 46px rgba(47,101,132,.12);
-    }
-    .cpi-heat-toolbar{
-        display:flex;flex-wrap:wrap;gap:10px;align-items:center;
-        padding:12px 14px;border:1px solid #d7e8f2;border-radius:18px;background:#f7fcff;
-    }
-    .cpi-heat-cat-btn{
-        border:1px solid #c9d9e7;background:#fff;color:#355269;border-radius:12px;
-        padding:9px 12px;font-size:12px;font-weight:900;line-height:1.1;white-space:nowrap;
-        box-shadow:0 3px 10px rgba(47,101,132,.05);cursor:pointer;
-        transition:all .15s ease;
-    }
-    .cpi-heat-cat-btn:hover{border-color:#8fc8e6;background:#eef9ff;color:#0f628f;transform:translateY(-1px);}
-    .cpi-heat-cat-btn.active{
-        border-color:#1679bd;background:#1679bd;color:#fff;
-        box-shadow:0 7px 18px rgba(22,121,189,.22);
-    }
-    .cpi-heat-help{
-        display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;
-        color:#62748a;font-size:12px;font-weight:800;
-    }
-    .cpi-heat-help b{color:#142033;}
-    .cpi-heat-legend-card{
-        display:grid;grid-template-columns:auto minmax(160px,1fr) auto;gap:12px;align-items:center;
-        padding:12px 14px;border-radius:16px;border:1px solid #dbe7ee;background:#fff;
-    }
-    .cpi-heat-legend-side{font-size:12px;font-weight:900;white-space:nowrap;}
-    .cpi-heat-legend-side.down{color:#b91c1c}.cpi-heat-legend-side.up{color:#087a47}
-    #cpi-stock-heatmap-canvas{
-        position:relative;width:100%;height:760px;min-height:560px;
-        background:#f6fafc;border:1px solid #dbe7ee;border-radius:1.25rem;
-        overflow:hidden;user-select:none;
-    }
-    .cpi-heat-group{
-        position:absolute;overflow:hidden;border:3px solid #fff;background:#fff;
-        box-shadow:inset 0 0 0 1px rgba(100,116,139,.18);
-    }
-    .cpi-heat-group-head{
-        position:absolute;left:0;right:0;top:0;height:38px;
-        display:flex;align-items:center;justify-content:space-between;gap:10px;padding:0 12px;
-        background:rgba(255,255,255,.98);border-bottom:1px solid #d7e8f2;color:#142033;
-        font-size:13px;font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
-        z-index:3;cursor:pointer;
-    }
-    .cpi-heat-group-head:hover{background:#eaf7fd;color:#0c2d58;}
-    .cpi-heat-group-count{
-        display:inline-flex;align-items:center;justify-content:center;min-width:28px;height:22px;
-        padding:0 7px;border-radius:999px;background:#eaf7fd;color:#1679bd;font-size:10px;font-weight:900;
-        flex:0 0 auto;
-    }
-    .cpi-heat-group-body{position:absolute;left:0;right:0;top:38px;bottom:0;overflow:hidden;}
-    .cpi-heat-tile{
-        position:absolute;border:1.5px solid rgba(255,255,255,.96);overflow:hidden;
-        display:flex;align-items:center;justify-content:center;text-align:center;padding:6px;
-        transition:filter .14s ease, transform .14s ease, z-index .14s ease, box-shadow .14s ease;
-        cursor:help;
-    }
-    .cpi-heat-tile:hover{
-        filter:brightness(1.04) saturate(1.04);z-index:8;
-        box-shadow:0 0 0 3px #fff,0 10px 24px rgba(15,23,42,.24);
-    }
-    .cpi-heat-tile-inner{width:100%;min-width:0;line-height:1.12;}
-    .cpi-heat-code{display:none;font-size:10px;font-weight:900;opacity:.78;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-    .cpi-heat-name{font-size:15px;font-weight:900;line-height:1.15;white-space:normal;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;}
-    .cpi-heat-value{font-size:20px;font-weight:900;margin-top:5px;white-space:nowrap;letter-spacing:-.02em;}
-    .cpi-heat-weight{display:none;font-size:10px;font-weight:800;margin-top:4px;opacity:.82;white-space:nowrap;}
-    .cpi-heat-tile.large .cpi-heat-code,.cpi-heat-tile.large .cpi-heat-weight{display:block;}
-    .cpi-heat-tile.compact .cpi-heat-name{font-size:12px;-webkit-line-clamp:1;}
-    .cpi-heat-tile.compact .cpi-heat-value{font-size:15px;margin-top:3px;}
-    .cpi-heat-tile.tiny .cpi-heat-name,.cpi-heat-tile.tiny .cpi-heat-code,.cpi-heat-tile.tiny .cpi-heat-weight{display:none;}
-    .cpi-heat-tile.tiny .cpi-heat-value{font-size:11px;margin-top:0;}
-    .cpi-heat-tile.micro .cpi-heat-tile-inner{display:none;}
-    .cpi-heat-empty{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#7b91a4;font-size:16px;font-weight:900;}
-    .cpi-heat-legend-gradient{
-        height:13px;border-radius:999px;
-        background:linear-gradient(90deg,#b91c1c 0%,#ef4444 24%,#d8dde3 50%,#28b86e 76%,#067a3e 100%);
-        border:1px solid rgba(148,163,184,.24);
-    }
-    #cpi-heat-tooltip{
-        position:fixed;z-index:9999;display:none;pointer-events:none;min-width:260px;max-width:360px;
-        padding:13px 14px;border-radius:14px;background:rgba(7,34,67,.96);color:#fff;
-        box-shadow:0 16px 38px rgba(7,34,67,.28);border:1px solid rgba(255,255,255,.16);
-        backdrop-filter:blur(10px);font-family:'Sarabun',sans-serif;
-    }
-    #cpi-heat-tooltip .tt-name{font-size:14px;font-weight:900;line-height:1.3;margin-bottom:7px;}
-    #cpi-heat-tooltip .tt-grid{display:grid;grid-template-columns:auto 1fr;gap:4px 10px;font-size:11px;line-height:1.35;}
-    #cpi-heat-tooltip .tt-k{color:#a9d8f3;font-weight:800;}#cpi-heat-tooltip .tt-v{font-weight:900;text-align:right;}
-    @media (max-width:1024px){#cpi-stock-heatmap-canvas{height:660px}.cpi-heat-name{font-size:13px}.cpi-heat-value{font-size:17px}}
-    @media (max-width:640px){
-        #cpi-stock-heatmap-canvas{height:600px}.cpi-heat-group-head{font-size:11px;height:32px;padding:0 8px}.cpi-heat-group-body{top:32px}
-        .cpi-heat-cat-btn{font-size:11px;padding:8px 10px}.cpi-heat-legend-card{grid-template-columns:1fr}.cpi-heat-legend-side.up{text-align:right}
-    }
-</style>
-
 </head>
 
 <body class="p-4 md:p-6 pb-20">
@@ -894,139 +686,96 @@ thead th.sticky-product-col{background:#eef9ff!important;color:#173d5d!important
                     <div id="input-status-sub" class="text-[11px] font-bold text-slate-500 mt-1 leading-relaxed">-</div>
                 </div>
 
-                <!-- Quick controls: keep the most-used CPI workflow first -->
-                <div class="rounded-2xl border border-cyan-200 bg-cyan-50/60 p-3.5 shadow-sm space-y-4">
-                    <div class="flex items-center justify-between gap-3">
-                        <div>
-                            <div class="text-[11px] font-black uppercase tracking-[0.14em] text-cyan-800">⚡ ใช้งานบ่อย</div>
-                            <div class="text-[10px] font-bold text-slate-500 mt-0.5">MoM / YoY / AoA</div>
-                        </div>
-                        <span class="rounded-full border border-cyan-200 bg-white px-2.5 py-1 text-[9px] font-black text-cyan-700">QUICK</span>
-                    </div>
-
-                    <div>
-                        <div class="flex items-end justify-between gap-2 mb-2">
-                            <label class="block text-[11px] font-black text-slate-700 uppercase">ไฮไลต์การเปรียบเทียบ</label>
-                            <span class="text-[9px] font-bold text-slate-400">เลือกทีละ 1 ค่า</span>
-                        </div>
-                        <div class="grid grid-cols-3 bg-white/90 rounded-xl p-2 gap-2 border border-cyan-100">
-                            <label data-focus-wrap="mom"
-                                class="text-center py-2 text-[12px] font-black cursor-pointer bg-white rounded-lg shadow-sm border border-slate-200 hover:border-cyan-300 hover:bg-cyan-50 transition">
-                                <input type="checkbox" class="f-check mr-1" value="mom" onchange="handleFocusSelect(this)"> MOM
-                            </label>
-                            <label data-focus-wrap="yoy"
-                                class="text-center py-2 text-[12px] font-black cursor-pointer bg-white rounded-lg shadow-sm border border-slate-200 hover:border-cyan-300 hover:bg-cyan-50 transition">
-                                <input type="checkbox" class="f-check mr-1" value="yoy" checked onchange="handleFocusSelect(this)"> YOY
-                            </label>
-                            <label data-focus-wrap="aoa"
-                                class="text-center py-2 text-[12px] font-black cursor-pointer bg-white rounded-lg shadow-sm border border-slate-200 hover:border-cyan-300 hover:bg-cyan-50 transition">
-                                <input type="checkbox" class="f-check mr-1" value="aoa" onchange="handleFocusSelect(this)"> AOA
-                            </label>
-                        </div>
-                    </div>
-
+                <div>
+                    <label class="block text-[11px] font-black text-rose-600 uppercase mb-2">โหมดการดู</label>
+                    <select id="cpiTypeFilter" onchange="triggerDraw()"
+                        class="cat-filter border-rose-200 text-rose-700">
+                        <option value="headline">แสดงสินค้าทั้งหมด (Normal)</option>
+                        <option value="compare_all">เปรียบเทียบ 4 ดัชนีหลัก (Aggregate)</option>
+                    </select>
                 </div>
 
-                <!-- Lower-frequency controls moved to the bottom -->
-                <div class="rounded-2xl border border-slate-200 bg-slate-50/80 p-3.5 space-y-4">
-                    <div class="flex items-center justify-between gap-3">
-                        <div>
-                            <div class="text-[11px] font-black uppercase tracking-[0.14em] text-slate-600">⚙️ ตัวเลือกเพิ่มเติม</div>
-                            <div class="text-[10px] font-bold text-slate-400 mt-0.5">โหมด ตัวชี้วัดเสริม และตัวกรองเชิงลึก</div>
-                        </div>
-                        <span class="rounded-full border border-slate-200 bg-white px-2.5 py-1 text-[9px] font-black text-slate-500">ADVANCED</span>
+                <div>
+                    <label class="block text-[11px] font-black text-indigo-600 uppercase mb-2">หมวดพิเศษ
+                        (กรองรหัส)</label>
+                    <select id="catFilter" onchange="triggerDraw()" class="cat-filter text-indigo-900">
+                        <option value="all">-- แสดงทุกหมวดสินค้า --</option>
+                        <option value="00">00* ดัชนีราคาผู้บริโภคทั่วไป</option>
+                        <option value="1">1* หมวดอาหารและเครื่องดื่มไม่มีแอลกอฮอล์</option>
+                        <option value="111">111* ข้าว แป้งและผลิตภัณฑ์จากแป้ง</option>
+                        <option value="112">112* เนื้อสัตว์ เป็ดไก่ และสัตว์น้ำ</option>
+                        <option value="113">113* ไข่และผลิตภัณฑ์นม</option>
+                        <option value="114">114* ผักและผลไม้</option>
+                        <option value="11411">11411* ผักสด</option>
+                        <option value="11421">11421* ผลไม้สด</option>
+                        <option value="115">115* เครื่องประกอบอาหาร</option>
+                        <option value="116">116* เครื่องดื่มไม่มีแอลกอฮอล์</option>
+                        <option value="117">117* ผลิตภัณฑ์น้ำตาล</option>
+                        <option value="12">12* อาหารสำเร็จรูป</option>
+                        <option value="123">123* อาหารพร้อมทาน</option>
+                        <option value="124">124* อาหารจากร้านยอดนิยม</option>
+                        <option value="125">125* อาหารฟาสต์ฟู้ด/Delivery</option>
+                        <option value="8">8* หมวดอื่น ๆ ไม่ใช่อาหาร และเครื่องดื่ม</option>
+                        <option value="2">2* หมวดเครื่องนุ่งห่มและรองเท้า</option>
+                        <option value="3">3* หมวดเคหสถาน</option>
+                        <option value="4">4* หมวดการตรวจรักษาและบริการส่วนบุคคล</option>
+                        <option value="5">5* หมวดพาหนะ การขนส่ง และการสื่อสาร</option>
+                        <option value="51">51* ค่าโดยสารสาธารณะ</option>
+                        <option value="522">522* น้ำมันเชื้อเพลิง</option>
+                        <option value="54">54* การสื่อสาร</option>
+                        <option value="6">6* หมวดการบันเทิงการอ่าน การศึกษา และการศาสนา</option>
+                        <option value="7">7* หมวดยาสูบและเครื่องดื่มมีแอลกอฮอล์</option>
+                        <option value="9">9* กลุ่มอาหารสดและพลังงาน</option>
+                        <option value="91">91* อาหารสด</option>
+                        <option value="92">92* พลังงาน</option>
+                        <option value="93">93* ดัชนีราคาผู้บริโภคพื้นฐาน</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-[11px] font-black text-slate-500 uppercase mb-2">ระดับสินค้า</label>
+                    <div id="level-container" class="flex flex-wrap gap-2"></div>
+                </div>
+
+                <div>
+                    <label
+                        class="block text-[11px] font-black text-indigo-600 uppercase mb-2 italic">ไฮไลต์การเปรียบเทียบ
+                        (เลือกได้ทีละอัน / หรือกดดูทั้งหมด)</label>
+                    <div class="grid grid-cols-5 bg-slate-100 rounded-xl p-2 gap-2">
+                        <label data-focus-wrap="mom"
+                            class="text-center py-1.5 text-[11px] font-black cursor-pointer bg-white rounded-lg shadow-sm border border-slate-200 hover:bg-slate-50 transition">
+                            <input type="checkbox" class="f-check mr-1" value="mom" onchange="handleFocusSelect(this)"> MOM
+                        </label>
+                        <label data-focus-wrap="yoy"
+                            class="text-center py-1.5 text-[11px] font-black cursor-pointer bg-white rounded-lg shadow-sm border border-slate-200 hover:bg-slate-50 transition">
+                            <input type="checkbox" class="f-check mr-1" value="yoy" checked onchange="handleFocusSelect(this)"> YOY
+                        </label>
+                        <label data-focus-wrap="aoa"
+                            class="text-center py-1.5 text-[11px] font-black cursor-pointer bg-white rounded-lg shadow-sm border border-slate-200 hover:bg-slate-50 transition">
+                            <input type="checkbox" class="f-check mr-1" value="aoa" onchange="handleFocusSelect(this)"> AOA
+                        </label>
+                        <label data-focus-wrap="qoq"
+                            class="text-center py-1.5 text-[11px] font-black cursor-pointer bg-white rounded-lg shadow-sm border border-slate-200 hover:bg-slate-50 transition">
+                            <input type="checkbox" class="f-check mr-1" value="qoq" onchange="handleFocusSelect(this)"> QoQ
+                        </label>
+                        <label data-focus-wrap="hoh"
+                            class="text-center py-1.5 text-[11px] font-black cursor-pointer bg-white rounded-lg shadow-sm border border-slate-200 hover:bg-slate-50 transition">
+                            <input type="checkbox" class="f-check mr-1" value="hoh" onchange="handleFocusSelect(this)"> HoH
+                        </label>
+                        <label
+                            class="col-span-5 text-center py-2 text-[12px] font-black cursor-pointer bg-indigo-100 text-indigo-700 rounded-lg shadow-sm border border-indigo-200 hover:bg-indigo-200 transition">
+                            <input type="checkbox" id="checkAllFocus" class="mr-1" onchange="toggleAllFocus(this)"> 👁️ ดูข้อมูลทั้งหมดที่มีในไฟล์
+                        </label>
                     </div>
+                </div>
 
-                    <div>
-                        <label class="block text-[11px] font-black text-slate-500 uppercase mb-2">โหมดการดู</label>
-                        <select id="cpiTypeFilter" onchange="triggerDraw()"
-                            class="cat-filter border-slate-200 text-slate-700 bg-white">
-                            <option value="headline">แสดงสินค้าทั้งหมด (Normal)</option>
-                            <option value="compare_all">เปรียบเทียบ 4 ดัชนีหลัก (Aggregate)</option>
-                        </select>
-                    </div>
-
-                    <div>
-                        <div class="flex items-end justify-between gap-2 mb-2">
-                            <label class="block text-[11px] font-black text-slate-500 uppercase">ตัวชี้วัดเพิ่มเติม</label>
-                            <span class="text-[9px] font-bold text-slate-400">ใช้เมื่อจำเป็น</span>
-                        </div>
-                        <div class="grid grid-cols-2 gap-2">
-                            <label data-focus-wrap="qoq"
-                                class="text-center py-2 text-[11px] font-black cursor-pointer bg-white rounded-lg border border-slate-200 hover:bg-slate-100 transition">
-                                <input type="checkbox" class="f-check mr-1" value="qoq" onchange="handleFocusSelect(this)"> QoQ
-                            </label>
-                            <label data-focus-wrap="hoh"
-                                class="text-center py-2 text-[11px] font-black cursor-pointer bg-white rounded-lg border border-slate-200 hover:bg-slate-100 transition">
-                                <input type="checkbox" class="f-check mr-1" value="hoh" onchange="handleFocusSelect(this)"> HoH
-                            </label>
-                        </div>
-                    </div>
-
-                    <label class="flex items-center gap-2 text-[11px] font-black text-slate-600 cursor-pointer bg-white p-2.5 rounded-xl border border-slate-200 hover:bg-slate-100 transition-colors">
-                        <input type="checkbox" id="checkAllFocus" class="w-4 h-4 rounded border-slate-300" onchange="toggleAllFocus(this)">
-                        👁️ ดูข้อมูลทั้งหมดที่มีในไฟล์
-                    </label>
-
-                    <label class="flex items-center gap-2 text-[11px] font-black text-slate-600 cursor-pointer bg-white p-2.5 rounded-xl border border-slate-200 hover:bg-slate-100 transition-colors">
+                <div class="pt-3 border-t border-slate-200">
+                    <label
+                        class="flex items-center gap-2 text-[12px] font-black text-slate-700 cursor-pointer bg-slate-100 p-2.5 rounded-xl hover:bg-slate-200 transition-colors">
                         <input type="checkbox" id="showRawData" onchange="triggerDraw()"
                             class="w-4 h-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500">
                         🔬 ดูข้อมูลเบื้องหลัง (Weight/Index/Rel)
                     </label>
-
-
-                    <div class="pt-3 mt-1 border-t border-slate-200">
-                        <div class="flex items-center justify-between gap-2 mb-3">
-                            <div>
-                                <div class="text-[11px] font-black uppercase tracking-[0.12em] text-slate-500">ตัวกรองเชิงลึก</div>
-                                <div class="text-[9px] font-bold text-slate-400 mt-0.5">ใช้เมื่อต้องการเจาะเฉพาะหมวดหรือระดับสินค้า</div>
-                            </div>
-                            <span class="rounded-full border border-slate-200 bg-white px-2 py-1 text-[8px] font-black text-slate-400">OPTIONAL</span>
-                        </div>
-
-                        <div class="space-y-4">
-                            <div>
-                                <label class="block text-[11px] font-black text-indigo-600 uppercase mb-2">หมวดสินค้า (กรองรหัส)</label>
-                                <select id="catFilter" onchange="triggerDraw()" class="cat-filter text-indigo-900 bg-white">
-                                    <option value="all">-- แสดงทุกหมวดสินค้า --</option>
-                                    <option value="00">00* ดัชนีราคาผู้บริโภคทั่วไป</option>
-                                    <option value="1">1* หมวดอาหารและเครื่องดื่มไม่มีแอลกอฮอล์</option>
-                                    <option value="111">111* ข้าว แป้งและผลิตภัณฑ์จากแป้ง</option>
-                                    <option value="112">112* เนื้อสัตว์ เป็ดไก่ และสัตว์น้ำ</option>
-                                    <option value="113">113* ไข่และผลิตภัณฑ์นม</option>
-                                    <option value="114">114* ผักและผลไม้</option>
-                                    <option value="11411">11411* ผักสด</option>
-                                    <option value="11421">11421* ผลไม้สด</option>
-                                    <option value="115">115* เครื่องประกอบอาหาร</option>
-                                    <option value="116">116* เครื่องดื่มไม่มีแอลกอฮอล์</option>
-                                    <option value="117">117* ผลิตภัณฑ์น้ำตาล</option>
-                                    <option value="12">12* อาหารสำเร็จรูป</option>
-                                    <option value="123">123* อาหารพร้อมทาน</option>
-                                    <option value="124">124* อาหารจากร้านยอดนิยม</option>
-                                    <option value="125">125* อาหารฟาสต์ฟู้ด/Delivery</option>
-                                    <option value="8">8* หมวดอื่น ๆ ไม่ใช่อาหาร และเครื่องดื่ม</option>
-                                    <option value="2">2* หมวดเครื่องนุ่งห่มและรองเท้า</option>
-                                    <option value="3">3* หมวดเคหสถาน</option>
-                                    <option value="4">4* หมวดการตรวจรักษาและบริการส่วนบุคคล</option>
-                                    <option value="5">5* หมวดพาหนะ การขนส่ง และการสื่อสาร</option>
-                                    <option value="51">51* ค่าโดยสารสาธารณะ</option>
-                                    <option value="522">522* น้ำมันเชื้อเพลิง</option>
-                                    <option value="54">54* การสื่อสาร</option>
-                                    <option value="6">6* หมวดการบันเทิงการอ่าน การศึกษา และการศาสนา</option>
-                                    <option value="7">7* หมวดยาสูบและเครื่องดื่มมีแอลกอฮอล์</option>
-                                    <option value="9">9* กลุ่มอาหารสดและพลังงาน</option>
-                                    <option value="91">91* อาหารสด</option>
-                                    <option value="92">92* พลังงาน</option>
-                                    <option value="93">93* ดัชนีราคาผู้บริโภคพื้นฐาน</option>
-                                </select>
-                            </div>
-
-                            <div>
-                                <label class="block text-[11px] font-black text-slate-600 uppercase mb-2">ระดับสินค้า</label>
-                                <div id="level-container" class="flex flex-wrap gap-2"></div>
-                            </div>
-                        </div>
-                    </div>
                 </div>
 
                 <div class="pt-4 border-t border-slate-100 space-y-3">
@@ -1090,6 +839,7 @@ thead th.sticky-product-col{background:#eef9ff!important;color:#173d5d!important
                         </div>
                     </div>
                 </div>
+
                 <div id="exec-summary-section"
                     class="relative overflow-hidden rounded-[2.5rem] border border-slate-700/80 bg-gradient-to-br from-slate-900 via-[#13254b] to-slate-900 text-white shadow-2xl">
                     <div
@@ -1098,78 +848,30 @@ thead th.sticky-product-col{background:#eef9ff!important;color:#173d5d!important
                     <div class="absolute -right-10 -top-8 h-40 w-40 rounded-full bg-yellow-300/10 blur-3xl"></div>
                     <div class="absolute -left-12 bottom-0 h-40 w-40 rounded-full bg-cyan-400/10 blur-3xl"></div>
                     <div class="relative p-7 md:p-9 lg:p-10">
-                        <!-- Executive Intelligence Header: data-first, no decorative banner -->
-                        <div class="grid grid-cols-1 xl:grid-cols-12 gap-5 md:gap-6 items-stretch mb-7">
-                            <div class="xl:col-span-5 rounded-[2rem] border border-white/10 bg-white/[0.055] p-6 md:p-7 backdrop-blur-sm">
-                                <div class="flex items-center gap-3 mb-5">
-                                    <div class="h-10 w-1.5 rounded-full bg-[#ffd44d]"></div>
+                        <div class="flex flex-col gap-4 md:flex-row md:items-end md:justify-between mb-7">
+                            <div>
+                                <div
+                                    class="inline-flex items-center gap-3 rounded-2xl border border-yellow-300/20 bg-white/5 px-4 py-2 shadow-lg backdrop-blur-sm mb-4">
+                                    <span
+                                        class="inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-yellow-300 to-amber-500 text-slate-900 text-2xl shadow-lg">💡</span>
                                     <div>
-                                        <div class="text-[10px] md:text-[11px] uppercase tracking-[0.22em] text-[#8fd7f7] font-black">TPSO CPI INTELLIGENCE</div>
-                                        <h2 class="mt-1 text-[2rem] md:text-[2.45rem] leading-none font-black text-white tracking-[-0.035em]">สรุปภาวะเงินเฟ้อ</h2>
+                                        <div
+                                            class="text-[12px] md:text-[13px] font-bold uppercase tracking-[0.24em] text-yellow-200/80">
+                                            TPSO Insight</div>
+                                        <div class="text-[13px] md:text-sm text-slate-300">
+                                            สรุปสาระสำคัญให้อ่านจบได้ในบล็อกเดียว</div>
                                     </div>
                                 </div>
-
-                                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                                    <div class="rounded-2xl border border-white/10 bg-black/10 px-4 py-3">
-                                        <div class="text-[9px] uppercase tracking-[0.16em] text-slate-400 font-black">งวดข้อมูล</div>
-                                        <div id="exec-period-label" class="mt-1 text-base font-black text-white">-</div>
-                                    </div>
-                                    <div class="rounded-2xl border border-white/10 bg-black/10 px-4 py-3">
-                                        <div class="text-[9px] uppercase tracking-[0.16em] text-slate-400 font-black">พื้นที่</div>
-                                        <div id="exec-region-label" class="mt-1 text-base font-black text-white">-</div>
-                                    </div>
-                                    <div class="rounded-2xl border border-white/10 bg-black/10 px-4 py-3">
-                                        <div class="text-[9px] uppercase tracking-[0.16em] text-slate-400 font-black">ชุดดัชนี</div>
-                                        <div id="exec-dataset-label" class="mt-1 text-base font-black text-white">-</div>
-                                    </div>
-                                </div>
+                                <h2
+                                    class="text-[2rem] leading-tight md:text-[2.35rem] font-black text-yellow-300 drop-shadow-sm">
+                                    สรุปผู้บริหาร2 <span class="text-white/95">(Executive Summary)</span></h2>
                             </div>
-
-                            <div class="xl:col-span-4 rounded-[2rem] border border-[#8fd7f7]/25 bg-gradient-to-br from-[#123d72]/90 to-[#0c2d58]/90 p-6 md:p-7 flex flex-col justify-between shadow-xl">
-                                <div class="flex items-start justify-between gap-4">
-                                    <div>
-                                        <div class="text-[10px] uppercase tracking-[0.2em] text-[#8fd7f7] font-black">Headline CPI</div>
-                                        <div class="mt-1 text-sm font-bold text-slate-300">เงินเฟ้อทั่วไป</div>
-                                    </div>
-                                    <div class="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-right">
-                                        <div id="exec-focus-label" class="text-lg font-black text-[#ffd44d]">YOY</div>
-                                        <div id="exec-focus-description" class="text-[9px] font-bold text-slate-400 whitespace-nowrap">เทียบเดือนเดียวกันปีก่อน</div>
-                                    </div>
-                                </div>
-
-                                <div class="mt-6 flex items-end justify-between gap-4">
-                                    <div>
-                                        <div id="exec-headline-status" class="text-sm font-black text-slate-300">-</div>
-                                        <div class="mt-1 flex items-baseline gap-2">
-                                            <span id="exec-headline-arrow" class="text-2xl font-black">•</span>
-                                            <span id="exec-headline-value" class="text-5xl md:text-6xl font-black tracking-[-0.045em]">0.00%</span>
-                                        </div>
-                                    </div>
-                                    <div class="text-right text-[10px] leading-relaxed font-bold text-slate-400">ตัวเลขหลัก<br>ตาม Focus ที่เลือก</div>
-                                </div>
-                            </div>
-
-                            <div class="xl:col-span-3 rounded-[2rem] bg-white p-6 md:p-7 text-[#142033] shadow-xl flex flex-col justify-between">
-                                <div>
-                                    <div class="text-[10px] uppercase tracking-[0.2em] text-[#62748a] font-black">Core CPI</div>
-                                    <div class="mt-1 text-sm font-bold text-[#62748a]">เงินเฟ้อพื้นฐาน</div>
-                                </div>
-                                <div class="mt-6">
-                                    <div id="exec-core-status" class="text-xs font-black text-[#62748a]">-</div>
-                                    <div id="exec-core-value" class="mt-1 text-4xl md:text-5xl font-black tracking-[-0.04em] text-[#1679bd]">0.00%</div>
-                                    <div class="mt-2 text-[10px] font-bold text-[#62748a]">ไม่รวมอาหารสดและพลังงาน</div>
-                                </div>
+                            <div
+                                class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm md:text-base text-slate-200 backdrop-blur-sm shadow-lg">
+                                <div class="text-[11px] uppercase tracking-[0.2em] text-slate-400">Summary focus</div>
+                                <div class="font-bold text-white">Headline • Core • Food • Non-Food • Energy</div>
                             </div>
                         </div>
-
-                        <div class="mb-6 flex flex-wrap items-center gap-x-5 gap-y-2 rounded-2xl border border-white/10 bg-black/10 px-5 py-3 text-[11px] font-bold text-slate-300">
-                            <span class="text-white font-black">อ่านสถานการณ์:</span>
-                            <span><b class="text-[#08a45b]">▲</b> ปัจจัยผลักดัน</span>
-                            <span><b class="text-[#e02020]">▼</b> ปัจจัยชะลอ</span>
-                            <span><b class="text-[#ffd44d]">●</b> Contribution</span>
-                            <span><b class="text-[#8fd7f7]">●</b> Food / Non-Food / Energy</span>
-                        </div>
-
                         <ul id="exec-summary-list" class="grid grid-cols-1 xl:grid-cols-2 gap-4 md:gap-5"></ul>
                     </div>
                 </div>
@@ -1186,30 +888,12 @@ thead th.sticky-product-col{background:#eef9ff!important;color:#173d5d!important
                             <div class="h-64"><canvas id="compareChart"></canvas></div>
                         </div>
                         <div class="bg-white rounded-[3rem] p-6 md:p-8 shadow-xl border border-slate-200">
-                            <div class="flex flex-col gap-3 mb-4">
-                                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                                    <h3 class="text-xl font-black text-slate-800 text-center sm:text-left" id="weight-chart-title">🍩
-                                        <span id="weight-count-title">โครงสร้างสัดส่วนน้ำหนัก Top 10</span></h3>
-                                    <label class="flex items-center gap-2 text-[12px] font-black text-slate-600 bg-slate-100 px-3 py-2 rounded-xl border border-slate-200 shadow-sm w-fit shrink-0">
-                                        แสดง
-                                        <select id="weightChartLimit" onchange="triggerDraw()" class="bg-white border border-slate-300 rounded-lg px-2 py-1 text-[12px] font-black">
-                                            <option value="10" selected>10</option>
-                                            <option value="20">20</option>
-                                            <option value="30">30</option>
-                                            <option value="all">ทั้งหมด</option>
-                                        </select>
-                                    </label>
-                                </div>
-                                <div class="relative">
-                                    <input id="weightChartSearch" type="text" oninput="triggerDraw()"
-                                        placeholder="🔎 ค้นหาชื่อ/รหัส เช่น 16* = รหัสขึ้นต้นด้วย 16"
-                                        class="w-full px-4 py-2.5 rounded-xl border border-slate-300 bg-white text-[13px] font-bold text-slate-700 outline-none focus:border-[#1679bd] focus:ring-2 focus:ring-[#8fd7f7]/30">
-                                </div>
-                            </div>
+                            <h3 class="text-xl font-black text-slate-800 mb-4 text-center" id="weight-chart-title">🍩
+                                โครงสร้างสัดส่วนน้ำหนัก</h3>
                             <div class="h-64 relative">
                                 <canvas id="weightChart"></canvas>
-                                <p id="weight-chart-note" class="text-[10px] text-slate-400 text-center mt-2 absolute -bottom-4 w-full">*
-                                    แสดงตามจำนวนและคำค้นหาที่เลือก</p>
+                                <p class="text-[10px] text-slate-400 text-center mt-2 absolute -bottom-4 w-full">*
+                                    แสดงสัดส่วนน้ำหนัก 10 อันดับแรกของสินค้าที่เลือก</p>
                             </div>
                         </div>
                     </div>
@@ -1221,29 +905,9 @@ thead th.sticky-product-col{background:#eef9ff!important;color:#173d5d!important
                             <div class="h-64"><canvas id="regionBarChart"></canvas></div>
                         </div>
                         <div class="bg-white rounded-[3rem] p-6 md:p-8 shadow-xl border border-slate-200">
-                            <div class="flex flex-col gap-3 mb-4">
-                                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                                    <h3 class="text-xl font-black text-slate-800 text-center sm:text-left">🔥 <span id="top-impact-count-title">Top 10 สินค้าผลกระทบสูงสุด</span>
-                                        (<span id="top-impact-label"></span>)</h3>
-                                    <label class="flex items-center gap-2 text-[12px] font-black text-slate-600 bg-slate-100 px-3 py-2 rounded-xl border border-slate-200 shadow-sm w-fit shrink-0">
-                                        แสดง
-                                        <select id="topImpactLimit" onchange="triggerDraw()" class="bg-white border border-slate-300 rounded-lg px-2 py-1 text-[12px] font-black">
-                                            <option value="10" selected>10</option>
-                                            <option value="20">20</option>
-                                            <option value="30">30</option>
-                                            <option value="all">ทั้งหมด</option>
-                                        </select>
-                                    </label>
-                                </div>
-                                <div class="relative">
-                                    <input id="topImpactSearch" type="text" oninput="triggerDraw()"
-                                        placeholder="🔎 ค้นหาชื่อ/รหัส เช่น 16* = รหัสขึ้นต้นด้วย 16"
-                                        class="w-full px-4 py-2.5 pr-10 rounded-xl border border-slate-300 bg-white text-[13px] font-bold text-slate-700 outline-none focus:border-[#1679bd] focus:ring-2 focus:ring-[#8fd7f7]/30">
-                                </div>
-                            </div>
-                            <div id="topImpactScroll" class="max-h-[720px] overflow-y-auto custom-scrollbar pr-1">
-                                <div id="topImpactChartWrap" class="h-64"><canvas id="topImpactChart"></canvas></div>
-                            </div>
+                            <h3 class="text-xl font-black text-slate-800 mb-4 text-center">🔥 Top 10 สินค้าผลกระทบสูงสุด
+                                (<span id="top-impact-label"></span>)</h3>
+                            <div class="h-64"><canvas id="topImpactChart"></canvas></div>
                         </div>
                     </div>
 
@@ -1254,25 +918,7 @@ thead th.sticky-product-col{background:#eef9ff!important;color:#173d5d!important
                             <p class="text-[10px] text-slate-400 text-center mt-2">* ช่วยเห็นสมดุลแรงกดดันของหมวดหลักในงวดล่าสุด</p>
                         </div>
                         <div class="bg-white rounded-[3rem] p-6 md:p-8 shadow-xl border border-slate-200">
-                            <div class="flex flex-col gap-3 mb-4">
-                                <h3 class="text-xl font-black text-slate-800 text-center">🫧 Bubble chart: น้ำหนัก vs การเปลี่ยนแปลง vs ขนาดผลกระทบ</h3>
-                                <div class="flex flex-col sm:flex-row sm:items-center gap-3">
-                                    <div class="relative flex-1">
-                                        <input id="bubbleImpactSearch" type="text" oninput="triggerDraw()"
-                                            placeholder="🔎 ค้นหาชื่อ/รหัส เช่น 16* = รหัสขึ้นต้นด้วย 16"
-                                            class="w-full px-4 py-2.5 rounded-xl border border-slate-300 bg-white text-[13px] font-bold text-slate-700 outline-none focus:border-[#1679bd] focus:ring-2 focus:ring-[#8fd7f7]/30">
-                                    </div>
-                                    <label class="flex items-center gap-2 text-[12px] font-black text-slate-600 bg-slate-100 px-3 py-2 rounded-xl border border-slate-200 shadow-sm w-fit shrink-0">
-                                        แสดง
-                                        <select id="bubbleImpactLimit" onchange="triggerDraw()" class="bg-white border border-slate-300 rounded-lg px-2 py-1 text-[12px] font-black">
-                                            <option value="10" selected>10</option>
-                                            <option value="20">20</option>
-                                            <option value="30">30</option>
-                                            <option value="all">ทั้งหมด</option>
-                                        </select>
-                                    </label>
-                                </div>
-                            </div>
+                            <h3 class="text-xl font-black text-slate-800 mb-4 text-center">🫧 Bubble chart: น้ำหนัก vs การเปลี่ยนแปลง vs ขนาดผลกระทบ</h3>
                             <div class="h-72"><canvas id="bubbleInsightChart"></canvas></div>
                             <p class="text-[10px] text-slate-400 text-center mt-2">* เห็นน้ำหนักสินค้า ทิศทางราคา และผลกระทบในภาพเดียว</p>
                         </div>
@@ -1283,74 +929,6 @@ thead th.sticky-product-col{background:#eef9ff!important;color:#173d5d!important
                         </div>
                     </div>
                 </div>
-
-
-                <section id="cpi-stock-heatmap-section" class="rounded-[2.5rem] p-6 md:p-8 mt-6">
-                    <div class="flex flex-col xl:flex-row xl:items-start xl:justify-between gap-5 mb-5">
-                        <div class="max-w-4xl">
-                            <div class="text-[12px] uppercase tracking-[0.18em] font-black text-[#1679bd] mb-2">CPI MARKET MAP</div>
-                            <h2 class="text-2xl md:text-[2rem] font-black text-slate-900 leading-tight">Heatmap โครงสร้างสินค้าและการเปลี่ยนแปลงราคา</h2>
-                            <p class="text-base font-bold text-slate-600 mt-2 leading-relaxed">ดูภาพรวมได้ในครั้งเดียว: <b class="text-slate-900">กล่องใหญ่ = น้ำหนักมาก</b> • <b class="text-emerald-700">เขียว = ราคาสูงขึ้น</b> • <b class="text-red-700">แดง = ราคาลดลง</b></p>
-                        </div>
-                        <div class="flex flex-col sm:flex-row xl:flex-col gap-3 min-w-[180px]">
-                            <div class="rounded-2xl border border-sky-200 bg-sky-50 px-5 py-3 text-center shadow-sm flex-1">
-                                <div class="text-[10px] uppercase tracking-[0.14em] font-black text-slate-500">ตัวชี้วัดที่ดู</div>
-                                <div id="cpi-heat-focus" class="text-2xl font-black text-[#1679bd] mt-1">YOY</div>
-                            </div>
-                            <label class="rounded-2xl border border-slate-200 bg-white px-4 py-3 shadow-sm flex items-center justify-center gap-3 cursor-pointer select-none hover:border-sky-300 transition-colors">
-                                <input id="cpi-heat-contribution-focus" type="checkbox" onchange="triggerDraw()"
-                                    class="w-5 h-5 rounded border-slate-300 text-[#1679bd] focus:ring-[#1679bd]">
-                                <span class="text-sm font-black text-slate-700">Focus Contribution</span>
-                            </label>
-                        </div>
-                    </div>
-
-                    <div class="mb-4">
-                        <div class="flex items-center justify-between gap-3 mb-2">
-                            <div class="text-sm font-black text-slate-800">เลือกหมวดที่ต้องการดู</div>
-                            <div class="text-[11px] font-bold text-slate-500">คลิกหัวหมวดในแผนที่เพื่อเจาะดูเฉพาะหมวดได้เช่นกัน</div>
-                        </div>
-                        <div class="cpi-heat-toolbar overflow-x-auto custom-scrollbar">
-                            <button type="button" class="cpi-heat-cat-btn" data-cpi-heat-cat="all" onclick="setCpiHeatmapCategory('all')">ทั้งหมด</button>
-                            <button type="button" class="cpi-heat-cat-btn active" data-cpi-heat-cat="1-7" onclick="setCpiHeatmapCategory('1-7')">หมวด 1–7</button>
-                            <button type="button" class="cpi-heat-cat-btn" data-cpi-heat-cat="1" onclick="setCpiHeatmapCategory('1')">1 อาหารฯ</button>
-                            <button type="button" class="cpi-heat-cat-btn" data-cpi-heat-cat="2" onclick="setCpiHeatmapCategory('2')">2 เครื่องนุ่งห่ม</button>
-                            <button type="button" class="cpi-heat-cat-btn" data-cpi-heat-cat="3" onclick="setCpiHeatmapCategory('3')">3 เคหสถาน</button>
-                            <button type="button" class="cpi-heat-cat-btn" data-cpi-heat-cat="4" onclick="setCpiHeatmapCategory('4')">4 รักษา/ส่วนบุคคล</button>
-                            <button type="button" class="cpi-heat-cat-btn" data-cpi-heat-cat="5" onclick="setCpiHeatmapCategory('5')">5 ขนส่ง/สื่อสาร</button>
-                            <button type="button" class="cpi-heat-cat-btn" data-cpi-heat-cat="6" onclick="setCpiHeatmapCategory('6')">6 บันเทิง/ศึกษา</button>
-                            <button type="button" class="cpi-heat-cat-btn" data-cpi-heat-cat="7" onclick="setCpiHeatmapCategory('7')">7 ยาสูบ/แอลกอฮอล์</button>
-                            <button type="button" class="cpi-heat-cat-btn" data-cpi-heat-cat="8" onclick="setCpiHeatmapCategory('8')">8 อื่น ๆ</button>
-                            <button type="button" class="cpi-heat-cat-btn" data-cpi-heat-cat="9" onclick="setCpiHeatmapCategory('9')">9 สด+พลังงาน</button>
-                        </div>
-                        <select id="cpi-heat-category" onchange="setCpiHeatmapCategory(this.value)" class="hidden">
-                            <option value="all">ทั้งหมด</option><option value="1-7" selected>หมวด 1–7</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option>
-                        </select>
-                    </div>
-
-                    <div class="grid grid-cols-1 xl:grid-cols-[minmax(0,1fr)_auto] gap-4 items-center mb-4">
-                        <div class="cpi-heat-legend-card">
-                            <span class="cpi-heat-legend-side down">▼ ลดลง</span>
-                            <div>
-                                <div class="cpi-heat-legend-gradient"></div>
-                                <div class="flex items-center justify-between text-[10px] font-black text-slate-500 mt-1.5"><span id="cpi-heat-min-label">-</span><span>ใกล้ 0</span><span id="cpi-heat-max-label">+</span></div>
-                            </div>
-                            <span class="cpi-heat-legend-side up">▲ สูงขึ้น</span>
-                        </div>
-                        <div id="cpi-heat-summary" class="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-black text-slate-600 shadow-sm xl:text-right">-</div>
-                    </div>
-
-                    <div class="cpi-heat-help mb-3 px-1">
-                        <span><b>วิธีอ่าน:</b> ขนาดกล่องตาม Weight</span>
-                        <span id="cpi-heat-color-help">สีเข้มขึ้น = เปลี่ยนแปลงมากขึ้น</span>
-                        <span>วางเมาส์บนกล่องเพื่อดูชื่อเต็ม รหัส Weight ค่าเปลี่ยนแปลง และ Contribution</span>
-                    </div>
-
-                    <div id="cpi-stock-heatmap-canvas">
-                        <div class="cpi-heat-empty">อัปโหลดข้อมูลเพื่อแสดง Heatmap</div>
-                    </div>
-                    <div id="cpi-heat-tooltip"></div>
-                </section>
 
                 <div id="hero-section" class="hero-card shadow-2xl">
                     <div class="flex flex-col lg:flex-row justify-between items-center gap-10">
@@ -1388,7 +966,7 @@ thead th.sticky-product-col{background:#eef9ff!important;color:#173d5d!important
                                 class="w-12 h-12 rounded-xl flex items-center justify-center text-white font-bold text-xl">
                                 ▼</div>
                             <div class="flex-1">
-                                <div class="flex justify-between"><span class="text-[20px] font-bold" id="inf-curr-p">ม.ค.
+                                <div class="flex justify-between"><span class="font-bold" id="inf-curr-p">ม.ค.
                                         69</span><span class="text-2xl font-black text-rose-500"
                                         id="inf-curr-v">0.00</span></div>
                                 <div class="flex justify-between opacity-50 border-t pt-1"><span class="text-sm"
@@ -1398,18 +976,18 @@ thead th.sticky-product-col{background:#eef9ff!important;color:#173d5d!important
                         </div>
                         <div class="space-y-3 border-t pt-4">
                             <div class="flex justify-between items-end">
-                                <span class="text-[20px] font-black">FOOD</span>
+                                <span class="text-[10px] font-black">FOOD</span>
                                 <div class="text-right">
                                     <div class="font-black text-indigo-600" id="inf-f-curr">0.00</div>
-                                    <div class="text-[20px] opacity-50 font-bold mt-0.5" id="inf-f-prev-box">เดือนก่อน:
+                                    <div class="text-[9px] opacity-50 font-bold mt-0.5" id="inf-f-prev-box">เดือนก่อน:
                                         0.00</div>
                                 </div>
                             </div>
                             <div class="flex justify-between items-end">
-                                <span class="text-[20px] font-black">NON-FOOD</span>
+                                <span class="text-[10px] font-black">NON-FOOD</span>
                                 <div class="text-right">
                                     <div class="font-black text-rose-500" id="inf-nf-curr">0.00</div>
-                                    <div class="text-[20px] opacity-50 font-bold mt-0.5" id="inf-nf-prev-box">เดือนก่อน:
+                                    <div class="text-[9px] opacity-50 font-bold mt-0.5" id="inf-nf-prev-box">เดือนก่อน:
                                         0.00</div>
                                 </div>
                             </div>
@@ -1431,26 +1009,19 @@ thead th.sticky-product-col{background:#eef9ff!important;color:#173d5d!important
                                 <h2 class="text-lg font-black uppercase" id="top-contribution-title">Top 15 Contribution
                                     Impact</h2>
                             </div>
-                            <div class="flex items-center gap-2 flex-wrap justify-end">
-                                <label class="flex items-center gap-2 text-[12px] font-black text-slate-600 bg-slate-100 px-3 py-2 rounded-xl border border-slate-200 shadow-sm w-fit">
-                                    🔢 แสดง
-                                    <select id="impact-limit-select" onchange="setDisplayLimit('impact', this.value)" class="bg-white border border-slate-300 rounded-lg px-2 py-1 text-[12px] font-black">
-                                        <option value="3">3</option>
-                                        <option value="5">5</option>
-                                        <option value="10">10</option>
-                                        <option value="15" selected>15</option>
-                                        <option value="20">20</option>
-                                        <option value="30">30</option>
-                                        <option value="50">50</option>
-                                    </select>
-                                    รายการต่อกลุ่ม
-                                </label>
-                                <button type="button" onclick="exportAllContributionImpactTGExcel()"
-                                    class="bg-emerald-600 text-white px-3 py-2 rounded-xl font-black hover:bg-emerald-700 transition-all shadow-sm active:scale-95 text-[12px] flex items-center gap-2"
-                                    title="ดาวน์โหลด Contribution Impact (TG) ทุกรายการ พร้อม Weight">
-                                    📥 Excel ทั้งหมด + Weight
-                                </button>
-                            </div>
+                            <label class="flex items-center gap-2 text-[12px] font-black text-slate-600 bg-slate-100 px-3 py-2 rounded-xl border border-slate-200 shadow-sm w-fit">
+                                🔢 แสดง
+                                <select id="impact-limit-select" onchange="setDisplayLimit('impact', this.value)" class="bg-white border border-slate-300 rounded-lg px-2 py-1 text-[12px] font-black">
+                                    <option value="3">3</option>
+                                    <option value="5">5</option>
+                                    <option value="10">10</option>
+                                    <option value="15" selected>15</option>
+                                    <option value="20">20</option>
+                                    <option value="30">30</option>
+                                    <option value="50">50</option>
+                                </select>
+                                รายการต่อกลุ่ม
+                            </label>
                         </div>
 
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -1458,20 +1029,20 @@ thead th.sticky-product-col{background:#eef9ff!important;color:#173d5d!important
                                 <div class="flex justify-between mb-4 border-b border-slate-200 pb-2"><span
                                         class="text-blue-600 font-bold">▲ ขึ้น</span><span id="rank-up-count"
                                         class="font-black text-blue-600">0</span></div>
-                                <div id="list-up" class="text-[15px] h-64 overflow-y-auto custom-scrollbar pr-2"></div>
+                                <div id="list-up" class="text-[10px] h-64 overflow-y-auto custom-scrollbar pr-2"></div>
                             </div>
                             <div class="bg-slate-50 border border-slate-100 p-4 rounded-3xl shadow-sm">
                                 <div class="flex justify-between mb-4 border-b border-slate-200 pb-2"><span
                                         class="text-yellow-600 font-bold">= คงที่</span><span id="rank-stable-count"
                                         class="font-black text-yellow-600">0</span></div>
-                                <div id="list-stable" class="text-[15px] h-64 overflow-y-auto custom-scrollbar pr-2">
+                                <div id="list-stable" class="text-[10px] h-64 overflow-y-auto custom-scrollbar pr-2">
                                 </div>
                             </div>
                             <div class="bg-slate-50 border border-slate-100 p-4 rounded-3xl shadow-sm">
                                 <div class="flex justify-between mb-4 border-b border-slate-200 pb-2"><span
                                         class="text-rose-600 font-bold">▼ ลดลง</span><span id="rank-down-count"
                                         class="font-black text-rose-600">0</span></div>
-                                <div id="list-down" class="text-[15px] h-64 overflow-y-auto custom-scrollbar pr-2">
+                                <div id="list-down" class="text-[10px] h-64 overflow-y-auto custom-scrollbar pr-2">
                                 </div>
                             </div>
                         </div>
@@ -1556,95 +1127,103 @@ thead th.sticky-product-col{background:#eef9ff!important;color:#173d5d!important
                 </div>
 
 
-                <div id="extra-infographics" class="mt-6 hidden fade-in">
-                    <div class="bg-white rounded-[2.5rem] p-7 md:p-8 shadow-2xl border border-slate-200 relative overflow-hidden">
-                        <div class="absolute right-0 top-0 w-72 h-72 bg-sky-50 rounded-bl-full -z-10"></div>
-                        <div class="absolute -left-24 -bottom-24 w-72 h-72 bg-blue-50 rounded-full -z-10"></div>
+                <div id="extra-infographics" class="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6 hidden fade-in">
+                    <div
+                        class="bg-gradient-to-br from-slate-800 to-slate-900 rounded-[2.5rem] p-8 shadow-2xl border border-slate-700 text-white lg:col-span-2 relative overflow-hidden">
+                        <div class="absolute -right-20 -top-20 h-64 w-64 rounded-full bg-indigo-500/20 blur-[80px]">
+                        </div>
+                        <div class="relative z-10">
+                            <div class="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
+                                <h3 class="text-2xl font-black text-white flex items-center gap-3">
+                                    <span class="text-3xl">💓</span> Market Pulse <span
+                                        class="text-lg font-bold text-slate-400">ชีพจรราคาสินค้า</span>
+                                </h3>
+                                <span
+                                    class="bg-white/10 text-slate-300 text-sm font-bold px-4 py-1.5 rounded-xl border border-white/10 backdrop-blur-sm"
+                                    id="pulse-total-items">รวม 0 รายการ</span>
+                            </div>
 
-                        <div class="flex flex-col xl:flex-row xl:items-start xl:justify-between gap-5 mb-6">
-                            <div>
-                                <div class="flex items-center gap-3 flex-wrap">
-                                    <span class="text-4xl">🎢</span>
-                                    <div>
-                                        <h3 class="text-3xl md:text-4xl font-black text-slate-900 leading-tight">Extreme Movers</h3>
-                                        <p class="text-sm md:text-base font-bold text-slate-500 mt-1">Heatmap สินค้าที่มีการเปลี่ยนแปลงสูงสุดตามตัวชี้วัดที่เลือก</p>
+                            <div
+                                class="relative h-8 w-full bg-slate-800/80 rounded-full overflow-hidden flex shadow-inner border border-slate-700/50 mb-6">
+                                <div id="pulse-bar-up"
+                                    class="h-full bg-gradient-to-r from-emerald-600 to-emerald-400 flex items-center justify-center text-xs font-black shadow-[0_0_15px_rgba(52,211,153,0.5)] transition-all duration-1000"
+                                    style="width: 0%"></div>
+                                <div id="pulse-bar-stable"
+                                    class="h-full bg-slate-500/80 flex items-center justify-center text-xs font-black transition-all duration-1000"
+                                    style="width: 0%"></div>
+                                <div id="pulse-bar-down"
+                                    class="h-full bg-gradient-to-r from-rose-400 to-rose-600 flex items-center justify-center text-xs font-black shadow-[0_0_15px_rgba(244,63,94,0.5)] transition-all duration-1000"
+                                    style="width: 0%"></div>
+                            </div>
+
+                            <div class="grid grid-cols-3 gap-4 text-center">
+                                <div
+                                    class="bg-emerald-500/10 border border-emerald-500/20 rounded-[1.5rem] p-4 backdrop-blur-sm">
+                                    <div class="text-emerald-400 text-sm font-black uppercase mb-1">▲ ราคาสูงขึ้น</div>
+                                    <div class="text-3xl font-black text-emerald-300 mb-1" id="pulse-txt-up">0%</div>
+                                    <div class="text-xs font-bold text-emerald-500/80" id="pulse-count-up">0 รายการ
                                     </div>
+                                </div>
+                                <div
+                                    class="bg-slate-500/10 border border-slate-500/20 rounded-[1.5rem] p-4 backdrop-blur-sm">
+                                    <div class="text-slate-400 text-sm font-black uppercase mb-1">= ราคาคงที่</div>
+                                    <div class="text-3xl font-black text-slate-300 mb-1" id="pulse-txt-stable">0%</div>
+                                    <div class="text-xs font-bold text-slate-500/80" id="pulse-count-stable">0 รายการ
+                                    </div>
+                                </div>
+                                <div
+                                    class="bg-rose-500/10 border border-rose-500/20 rounded-[1.5rem] p-4 backdrop-blur-sm">
+                                    <div class="text-rose-400 text-sm font-black uppercase mb-1">▼ ราคาลดลง</div>
+                                    <div class="text-3xl font-black text-rose-300 mb-1" id="pulse-txt-down">0%</div>
+                                    <div class="text-xs font-bold text-rose-500/80" id="pulse-count-down">0 รายการ</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div
+                        class="bg-white rounded-[2.5rem] p-8 shadow-2xl border border-slate-200 relative overflow-hidden">
+                        <div class="absolute right-0 top-0 w-32 h-32 bg-indigo-50 rounded-bl-full -z-10"></div>
+                        <h3 class="text-2xl font-black text-slate-800 mb-6 flex items-center gap-3">
+                            <span class="text-3xl">🎢</span> Extreme Movers
+                        </h3>
+                        <div
+                            class="text-sm font-bold text-slate-500 mb-4 bg-slate-100 inline-block px-3 py-1 rounded-lg">
+                            เปลี่ยนแปลงสูงสุด (<span id="extreme-focus-label" class="text-indigo-600">YOY</span>)</div>
+
+                        <div class="space-y-4">
+                            <div
+                                class="relative overflow-hidden bg-gradient-to-r from-emerald-50 to-white rounded-[1.5rem] p-5 border border-emerald-100 shadow-sm group">
+                                <div class="absolute right-0 top-0 bottom-0 w-1 bg-emerald-400"></div>
+                                <div
+                                    class="text-[11px] font-black text-emerald-600 uppercase tracking-widest mb-1 opacity-80">
+                                    🚀 พุ่งแรงสุด (Max Up)</div>
+                                <div class="text-base font-bold text-slate-800 line-clamp-1 mb-2 group-hover:text-emerald-700 transition-colors"
+                                    id="extreme-up-name">-</div>
+                                <div class="flex items-end justify-between mt-2">
+                                    <div
+                                        class="text-xs text-slate-500 font-bold bg-white px-2 py-1 rounded-md shadow-sm border border-slate-100">
+                                        Index: <span id="extreme-up-idx" class="font-mono text-slate-700">-</span></div>
+                                    <div class="text-3xl font-black text-emerald-600" id="extreme-up-val">+0.00%</div>
                                 </div>
                             </div>
 
-                            <div class="flex flex-wrap items-center gap-3">
-                                <div class="rounded-2xl border border-sky-200 bg-sky-50 px-4 py-2.5 min-w-[112px]">
-                                    <div class="text-[9px] uppercase tracking-[0.16em] font-black text-slate-400">Focus</div>
-                                    <div id="extreme-focus-label" class="text-xl font-black text-[#1679bd]">YOY</div>
-                                </div>
-
-                                <label class="rounded-2xl border border-sky-200 bg-sky-50 px-4 py-2.5 shadow-sm min-w-[190px] cursor-pointer">
-                                    <div class="text-[9px] uppercase tracking-[0.16em] font-black text-slate-400 mb-1">Ranking Focus</div>
-                                    <div class="flex items-center gap-2">
-                                        <input id="extreme-contribution-focus" type="checkbox" onchange="triggerDraw()"
-                                            class="w-4 h-4 rounded border-sky-300 text-[#1679bd] focus:ring-[#1679bd]">
-                                        <span class="text-sm font-black text-slate-800">Focus Contribution</span>
+                            <div
+                                class="relative overflow-hidden bg-gradient-to-r from-rose-50 to-white rounded-[1.5rem] p-5 border border-rose-100 shadow-sm group">
+                                <div class="absolute right-0 top-0 bottom-0 w-1 bg-rose-400"></div>
+                                <div
+                                    class="text-[11px] font-black text-rose-600 uppercase tracking-widest mb-1 opacity-80">
+                                    🪂 ร่วงแรงสุด (Max Down)</div>
+                                <div class="text-base font-bold text-slate-800 line-clamp-1 mb-2 group-hover:text-rose-700 transition-colors"
+                                    id="extreme-down-name">-</div>
+                                <div class="flex items-end justify-between mt-2">
+                                    <div
+                                        class="text-xs text-slate-500 font-bold bg-white px-2 py-1 rounded-md shadow-sm border border-slate-100">
+                                        Index: <span id="extreme-down-idx" class="font-mono text-slate-700">-</span>
                                     </div>
-                                    <div class="text-[9px] font-bold text-slate-400 mt-1">ไม่เลือก = เรียงตาม % การเปลี่ยนแปลง</div>
-                                </label>
-
-                                <label class="rounded-2xl border border-slate-200 bg-white px-4 py-2.5 shadow-sm min-w-[180px]">
-                                    <div class="text-[9px] uppercase tracking-[0.16em] font-black text-slate-400 mb-1">จำนวนที่แสดงต่อฝั่ง</div>
-                                    <select id="extreme-limit-select" onchange="triggerDraw()"
-                                        class="w-full bg-transparent outline-none text-sm font-black text-slate-800 cursor-pointer">
-                                        <option value="10" selected>10 รายการ</option>
-                                        <option value="20">20 รายการ</option>
-                                        <option value="30">30 รายการ</option>
-                                        <option value="50">50 รายการ</option>
-                                        <option value="100">100 รายการ</option>
-                                        <option value="all">ทุกตัว</option>
-                                    </select>
-                                </label>
+                                    <div class="text-3xl font-black text-rose-600" id="extreme-down-val">-0.00%</div>
+                                </div>
                             </div>
-                        </div>
-
-                        <div class="grid grid-cols-1 xl:grid-cols-[auto_1fr] gap-3 xl:gap-5 items-center mb-7 rounded-2xl border border-slate-100 bg-slate-50/80 px-4 py-3">
-                            <div class="text-[11px] font-black text-slate-500 whitespace-nowrap">ระดับความเข้มของ Heatmap</div>
-                            <div class="flex items-center gap-3 text-[10px] font-bold text-slate-500">
-                                <span>น้อย</span>
-                                <div class="flex-1 h-2.5 rounded-full overflow-hidden flex border border-slate-100 shadow-inner">
-                                    <span class="flex-1 bg-emerald-50"></span>
-                                    <span class="flex-1 bg-emerald-100"></span>
-                                    <span class="flex-1 bg-emerald-300"></span>
-                                    <span class="flex-1 bg-emerald-500"></span>
-                                    <span class="flex-1 bg-emerald-700"></span>
-                                </div>
-                                <span>มาก</span>
-                            </div>
-                        </div>
-
-                        <div class="space-y-8">
-                            <section>
-                                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-4">
-                                    <div>
-                                        <div class="text-lg md:text-xl font-black text-[#08a45b]">▲ สินค้าปรับสูงขึ้นแรง</div>
-                                        <div id="extreme-up-sort-note" class="text-[11px] font-bold text-slate-400 mt-0.5">เรียงจากการเปลี่ยนแปลงสูงสุดลงมา</div>
-                                    </div>
-                                    <div id="extreme-up-count" class="text-xs font-black text-[#08a45b] bg-emerald-50 border border-emerald-100 px-3 py-1.5 rounded-full w-fit">0 รายการ</div>
-                                </div>
-                                <div id="extreme-heatmap-up" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-3 max-h-[920px] overflow-y-auto custom-scrollbar pr-1"></div>
-                            </section>
-
-                            <section class="pt-7 border-t border-slate-200">
-                                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-4">
-                                    <div>
-                                        <div class="text-lg md:text-xl font-black text-[#e02020]">▼ สินค้าปรับลดลงแรง</div>
-                                        <div id="extreme-down-sort-note" class="text-[11px] font-bold text-slate-400 mt-0.5">เรียงจากการลดลงมากที่สุดขึ้นมา</div>
-                                    </div>
-                                    <div id="extreme-down-count" class="text-xs font-black text-[#e02020] bg-rose-50 border border-rose-100 px-3 py-1.5 rounded-full w-fit">0 รายการ</div>
-                                </div>
-                                <div id="extreme-heatmap-down" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-3 max-h-[920px] overflow-y-auto custom-scrollbar pr-1"></div>
-                            </section>
-                        </div>
-
-                        <div class="mt-7 pt-4 border-t border-slate-100 flex flex-wrap items-center justify-between gap-3 text-[10px] leading-relaxed text-slate-400 font-bold">
-                            <span id="extreme-heatmap-note">สีเข้มกว่า = ขนาดการเปลี่ยนแปลงมากกว่า โดยเทียบภายในรายการที่ผ่านตัวกรองปัจจุบัน</span>
-                            <span>เลือก 10 / 20 / 30 / 50 / 100 / ทุกตัวได้จากด้านบน</span>
                         </div>
                     </div>
                 </div>
@@ -2004,7 +1583,24 @@ thead th.sticky-product-col{background:#eef9ff!important;color:#173d5d!important
                     </div>
                 </div>
 
-                
+                <div class="outer-wrapper mt-8">
+                    <table id="mainTable">
+                        <thead>
+                            <tr id="header-row">
+                                <th class="sticky-product-col px-8" onclick="setSort('name')">
+                                    <div class="sortable-header">
+                                        <span class="text-slate-400 uppercase text-[10px] font-black">Product
+                                            Info</span>
+                                        <div class="text-slate-900 text-[14px] font-black mt-1">ชื่อรายการ <span
+                                                id="s-name" class="text-indigo-600"></span></div>
+                                    </div>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableBody"></tbody>
+                    </table>
+                </div>
+
                 <div id="bottom-charts-section" class="grid grid-cols-1 xl:grid-cols-2 gap-6 mt-8 hidden">
                     <div class="bg-white rounded-[3rem] p-6 md:p-10 shadow-xl border border-slate-200 flex flex-col">
                         <h3 class="text-2xl font-black text-slate-800 mb-6 text-center leading-snug">📈
@@ -2036,7 +1632,7 @@ thead th.sticky-product-col{background:#eef9ff!important;color:#173d5d!important
                             <p id="historical-matrix-subtitle" class="text-base md:text-lg font-bold text-slate-500 mt-2">-</p>
                         </div>
                         <button onclick="exportHistoricalMatrixExcel()" class="bg-emerald-600 text-white px-5 py-3 rounded-2xl font-black hover:bg-emerald-700 transition-all shadow-md active:scale-95 text-sm flex items-center gap-2">
-                            📥 Download Excel ตารางนี้
+                            📥 Export ตารางประวัติ (Excel)
                         </button>
                     </div>
 
@@ -2059,7 +1655,7 @@ thead th.sticky-product-col{background:#eef9ff!important;color:#173d5d!important
                         <div class="bg-amber-50 rounded-[2rem] p-6 shadow-sm border border-amber-100">
                             <div class="text-[11px] uppercase tracking-[0.22em] text-amber-600 font-black">จำนวนหมวดที่เลือก</div>
                             <div id="historical-matrix-groups" class="text-3xl font-black text-slate-900 mt-3">-</div>
-                            <div class="text-sm text-slate-500 mt-2">เลือกได้อิสระ ไม่จำกัดจำนวน</div>
+                            <div class="text-sm text-slate-500 mt-2">เลือกได้อิสระ แต่ต้องไม่น้อยกว่า 3 หมวด</div>
                         </div>
                     </div>
 
@@ -2068,13 +1664,12 @@ thead th.sticky-product-col{background:#eef9ff!important;color:#173d5d!important
                             <div>
                                 <div class="text-[11px] uppercase tracking-[0.22em] text-slate-500 font-black">Category selector</div>
                                 <h3 class="text-xl font-black text-slate-900 mt-2">เลือกหมวดที่ต้องการแสดงในตารางและกราฟ</h3>
-                                <p class="text-sm text-slate-500 mt-2">ระบบไม่บังคับจำนวนหมวดที่เลือก และทั้งตารางกับกราฟจะอ้างอิงชุดหมวดเดียวกัน</p>
+                                <p class="text-sm text-slate-500 mt-2">ระบบจะบังคับให้คงอย่างน้อย 3 หมวดเสมอ และทั้งตารางกับกราฟจะอ้างอิงชุดหมวดเดียวกัน</p>
                             </div>
                             <div class="flex items-center gap-3 flex-wrap">
-                                <button onclick="selectHistoricalPreset('preset1')" class="bg-[#1679bd] text-white px-4 py-2 rounded-xl font-black border border-[#1679bd] hover:bg-[#0f628f] transition" title="Preset 1">Preset 1</button>
-                                <button onclick="selectHistoricalPreset('preset2')" class="bg-[#1679bd] text-white px-4 py-2 rounded-xl font-black border border-[#1679bd] hover:bg-[#0f628f] transition" title="Preset 2">Preset 2</button>
-                                <button onclick="selectHistoricalPreset('preset3')" class="bg-[#1679bd] text-white px-4 py-2 rounded-xl font-black border border-[#1679bd] hover:bg-[#0f628f] transition" title="Preset 3">Preset 3</button>
-                                <button onclick="selectHistoricalPreset('all')" class="bg-[#0c2d58] text-white px-4 py-2 rounded-xl font-black hover:bg-[#123d72] transition" title="Preset All">Preset All</button>
+                                <button onclick="selectHistoricalPreset('core')" class="bg-white text-slate-700 px-4 py-2 rounded-xl font-black border border-slate-200 hover:bg-slate-100 transition">Preset: Core</button>
+                                <button onclick="selectHistoricalPreset('broad')" class="bg-white text-slate-700 px-4 py-2 rounded-xl font-black border border-slate-200 hover:bg-slate-100 transition">Preset: Broad</button>
+                                <button onclick="selectHistoricalPreset('all')" class="bg-indigo-600 text-white px-4 py-2 rounded-xl font-black hover:bg-indigo-700 transition">Preset: All</button>
                             </div>
                         </div>
                         <div id="historical-category-selector" class="mt-5 historical-chip-wrap"></div>
@@ -2120,26 +1715,7 @@ thead th.sticky-product-col{background:#eef9ff!important;color:#173d5d!important
                 </div>
 
             </div>
-            <div class="outer-wrapper mt-8">
-                    <table id="mainTable">
-                        <thead>
-                            <tr id="header-row">
-                                <th class="sticky-product-col px-8" onclick="setSort('name')">
-                                    <div class="sortable-header">
-                                        <span class="text-slate-400 uppercase text-[10px] font-black">Product
-                                            Info</span>
-                                        <div class="text-slate-900 text-[14px] font-black mt-1">ชื่อรายการ <span
-                                                id="s-name" class="text-indigo-600"></span></div>
-                                    </div>
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody id="tableBody"></tbody>
-                    </table>
-                </div>
-
         </div>
-        
     </div>
 
     <div id="debug-console">Status: Waiting for file...</div>
@@ -2191,7 +1767,7 @@ thead th.sticky-product-col{background:#eef9ff!important;color:#173d5d!important
         let myRadarInsightChart = null;
         let myBubbleInsightChart = null;
         let myStackedDriverChart = null;
-        let selectedHistoricalCategories = ['\u0e23\u0e27\u0e21\u0e17\u0e38\u0e01\u0e23\u0e32\u0e22\u0e01\u0e32\u0e23', '\u0e2b\u0e21\u0e27\u0e14\u0e2d\u0e32\u0e2b\u0e32\u0e23\u0e41\u0e25\u0e30\u0e40\u0e04\u0e23\u0e37\u0e48\u0e2d\u0e07\u0e14\u0e37\u0e48\u0e21\u0e2f', '\u0e2b\u0e21\u0e27\u0e14\u0e2d\u0e37\u0e48\u0e19\u0e46 \u0e44\u0e21\u0e48\u0e43\u0e0a\u0e48\u0e2d\u0e32\u0e2b\u0e32\u0e23\u0e2f'];
+        let selectedHistoricalCategories = ['รวมทุกรายการ', 'ดัชนีผู้บริโภคทั่วไป', 'ดัชนีผู้บริโภคพื้นฐาน'];
 
         // 🚀 ตัวแปรเก็บกราฟใหม่ 🚀
         let myRegionBarChart = null;
@@ -2371,35 +1947,6 @@ thead th.sticky-product-col{background:#eef9ff!important;color:#173d5d!important
         function toNumber(v, fallback = 0) {
             const n = toNumberOrNull(v);
             return n === null ? fallback : n;
-        }
-
-        // Excel-style search for chart controls:
-        // 16*  => starts with 16, *16 => ends with 16, *16* => contains 16, ? => one character.
-        // Without wildcards, keep the previous contains-search behaviour.
-        function matchesChartSearch(row, rawSearch) {
-            const query = String(rawSearch || '').trim().toLowerCase();
-            if (!query) return true;
-
-            const code = String(row?.code || '').trim().toLowerCase();
-            const code7 = code.slice(0, 7);
-            const name = String(row?.name || '').trim().toLowerCase();
-            const fields = [name, code, code7];
-
-            if (!query.includes('*') && !query.includes('?')) {
-                return fields.some(v => v.includes(query));
-            }
-
-            // ถ้าเป็น pattern ตัวเลข เช่น 16* ให้ค้นเฉพาะรหัส ไม่ให้ชื่อสินค้ามาปะปน
-            const wildcardFields = /^[0-9*?]+$/.test(query) ? [code, code7] : fields;
-            const escaped = query.replace(/[.+^${}()|[\]\\]/g, '\\$&');
-            const pattern = '^' + escaped.replace(/\*/g, '.*').replace(/\?/g, '.') + '$';
-            let re;
-            try {
-                re = new RegExp(pattern, 'i');
-            } catch (_) {
-                return fields.some(v => v.includes(query.replace(/[?*]/g, '')));
-            }
-            return wildcardFields.some(v => re.test(v));
         }
 
         function normalizeCode16(v) {
@@ -3308,68 +2855,27 @@ thead th.sticky-product-col{background:#eef9ff!important;color:#173d5d!important
                 options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { font: { family: 'Sarabun', weight: 'bold' } } } } }
             });
 
-            // 4. Weight Chart: search + 10 / 20 / 30 / all
+            // 4. Weight Chart
             let maxLevel = Math.max(...lvls);
             let weightItems = scopedDb().filter(d => d.p === currP && d.region === displayReg && d.level === maxLevel);
             const catPrefix = document.getElementById('catFilter').value;
             if (catPrefix !== 'all') {
                 weightItems = weightItems.filter(d => d.code.startsWith(catPrefix) && d.code !== catPrefix.padEnd(16, '0') && d.code !== catPrefix.padEnd(7, '0'));
             }
-
-            const weightSearchText = document.getElementById('weightChartSearch').value || '';
-            if (weightSearchText.trim()) {
-                weightItems = weightItems.filter(d => matchesChartSearch(d, weightSearchText));
-            }
-
-            weightItems.sort((a, b) => Number(b.weight || 0) - Number(a.weight || 0));
-            const weightLimitRaw = document.getElementById('weightChartLimit').value || '10';
-            const weightLimit = weightLimitRaw === 'all' ? Infinity : Math.max(1, parseInt(weightLimitRaw, 10) || 10);
-            const shownWeightItems = Number.isFinite(weightLimit) ? weightItems.slice(0, weightLimit) : weightItems;
-            const wLabels = shownWeightItems.map(d => d.name);
-            const wData = shownWeightItems.map(d => Number(d.weight || 0));
-
-            const weightCountTitle = document.getElementById('weight-count-title');
-            if (weightCountTitle) {
-                weightCountTitle.innerText = weightLimitRaw === 'all'
-                    ? `โครงสร้างสัดส่วนน้ำหนักทั้งหมด (${shownWeightItems.length})`
-                    : `โครงสร้างสัดส่วนน้ำหนัก Top ${weightLimit}`;
-            }
-            const weightNote = document.getElementById('weight-chart-note');
-            if (weightNote) {
-                weightNote.innerText = weightSearchText.trim()
-                    ? `* พบ ${weightItems.length} รายการจากคำค้นหา และกำลังแสดง ${shownWeightItems.length} รายการ`
-                    : `* แสดง ${shownWeightItems.length} รายการ เรียงตามน้ำหนักจากมากไปน้อย`;
-            }
+            weightItems.sort((a, b) => b.weight - a.weight);
+            const topW = weightItems.slice(0, 10);
+            const wLabels = topW.map(d => d.name);
+            const wData = topW.map(d => d.weight);
 
             if (myWeightChart) myWeightChart.destroy();
             const ctxW = document.getElementById('weightChart').getContext('2d');
-            const weightPalette = ['#3b82f6', '#10b981', '#f59e0b', '#f43f5e', '#8b5cf6', '#06b6d4', '#d946ef', '#f97316', '#84cc16', '#64748b'];
             myWeightChart = new Chart(ctxW, {
                 type: 'doughnut',
                 data: {
                     labels: wLabels,
-                    datasets: [{
-                        data: wData,
-                        backgroundColor: shownWeightItems.map((_, i) => weightPalette[i % weightPalette.length]),
-                        borderWidth: 2
-                    }]
+                    datasets: [{ data: wData, backgroundColor: ['#3b82f6', '#10b981', '#f59e0b', '#f43f5e', '#8b5cf6', '#06b6d4', '#d946ef', '#f97316', '#84cc16', '#64748b'], borderWidth: 2 }]
                 },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { display: false },
-                        tooltip: {
-                            callbacks: {
-                                label: function (context) {
-                                    const row = shownWeightItems[context.dataIndex];
-                                    const code = String(row?.code || '');
-                                    return `${row?.name || ''} | ${code} | Weight: ${Number(context.raw || 0).toFixed(4)}%`;
-                                }
-                            }
-                        }
-                    }
-                }
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { callbacks: { label: function (context) { return ' Weight: ' + context.raw.toFixed(4) + '%'; } } } } }
             });
 
             // 📌 5. Category Chart (แนวนอน) 📌
@@ -3504,49 +3010,17 @@ thead th.sticky-product-col{background:#eef9ff!important;color:#173d5d!important
                 }
             });
 
-            // 🚀 7. สินค้าผลกระทบสูงสุด: เลือกจำนวน 10 / 20 / 30 / ทั้งหมด 🚀
+            // 🚀 7. Top 10 สินค้าผลกระทบสูงสุด (NEW CHART) 🚀
             const rootRegion = currentDatasetType === 'L' ? 'TL' : currentDatasetType === 'U' ? 'TU' : 'TG';
             document.getElementById('top-impact-label').innerText = displayReg === rootRegion ? 'ทั่วประเทศ' : regNamesTH[displayReg];
-
-            // ดึงข้อมูล Level ย่อยสุดเท่าที่เลือก โดยคงตรรกะ Contribution เดิม
+            // ดึงข้อมูล Level ย่อยสุดเท่าที่เลือก
             let impactItems = scopedDb().filter(d => d.p === currP && d.region === displayReg && d.level === maxLevel);
-            const topImpactSearchText = document.getElementById('topImpactSearch').value || '';
-            if (topImpactSearchText.trim()) {
-                impactItems = impactItems.filter(d => matchesChartSearch(d, topImpactSearchText));
-            }
-            impactItems.sort((a, b) => Number(b['c_' + primaryFocus] || 0) - Number(a['c_' + primaryFocus] || 0));
+            impactItems.sort((a, b) => b['c_' + primaryFocus] - a['c_' + primaryFocus]);
 
-            const impactLimitRaw = document.getElementById('topImpactLimit').value || '10';
-            const impactLimit = impactLimitRaw === 'all' ? Infinity : Math.max(1, parseInt(impactLimitRaw, 10) || 10);
-            const positiveImpacts = impactItems.filter(d => Number(d['c_' + primaryFocus] || 0) > 0);
-            const negativeImpacts = impactItems.filter(d => Number(d['c_' + primaryFocus] || 0) < 0)
-                .sort((a, b) => Number(a['c_' + primaryFocus] || 0) - Number(b['c_' + primaryFocus] || 0));
-
-            let combinedImpact;
-            if (impactLimitRaw === 'all') {
-                combinedImpact = [...impactItems];
-            } else {
-                const topCount = Math.ceil(impactLimit / 2);
-                const bottomCount = Math.floor(impactLimit / 2);
-                const picked = [...positiveImpacts.slice(0, topCount), ...negativeImpacts.slice(0, bottomCount)];
-
-                // หากด้านบวก/ลบด้านใดมีรายการไม่พอ ให้เติมจากรายการผลกระทบสูงสุดที่เหลือจนได้จำนวนที่เลือก
-                if (picked.length < impactLimit) {
-                    const pickedSet = new Set(picked);
-                    const remaining = impactItems
-                        .filter(d => Number(d['c_' + primaryFocus] || 0) !== 0 && !pickedSet.has(d))
-                        .sort((a, b) => Math.abs(Number(b['c_' + primaryFocus] || 0)) - Math.abs(Number(a['c_' + primaryFocus] || 0)));
-                    picked.push(...remaining.slice(0, impactLimit - picked.length));
-                }
-                combinedImpact = picked;
-            }
-            combinedImpact.sort((a, b) => Number(b['c_' + primaryFocus] || 0) - Number(a['c_' + primaryFocus] || 0));
-
-            document.getElementById('top-impact-count-title').innerText = impactLimitRaw === 'all' ? 'สินค้าผลกระทบทั้งหมด' : `Top ${impactLimit} สินค้าผลกระทบสูงสุด`;
-            const topImpactChartWrap = document.getElementById('topImpactChartWrap');
-            if (topImpactChartWrap) {
-                topImpactChartWrap.style.height = `${Math.max(256, combinedImpact.length * 28)}px`;
-            }
+            // เอาบนสุด 5 และล่างสุด 5
+            let topImpacts = impactItems.slice(0, 5).filter(d => d['c_' + primaryFocus] > 0);
+            let botImpacts = impactItems.slice(-5).filter(d => d['c_' + primaryFocus] < 0);
+            let combinedImpact = [...topImpacts, ...botImpacts].sort((a, b) => b['c_' + primaryFocus] - a['c_' + primaryFocus]);
 
             if (myTopImpactChart) myTopImpactChart.destroy();
             const ctxTopImpact = document.getElementById('topImpactChart').getContext('2d');
@@ -3625,14 +3099,7 @@ thead th.sticky-product-col{background:#eef9ff!important;color:#173d5d!important
             });
 
             let bubbleItems = scopedDb().filter(d => d.p === currP && d.region === displayReg && d.level === maxLevel);
-            const bubbleImpactSearchText = document.getElementById('bubbleImpactSearch').value || '';
-            if (bubbleImpactSearchText.trim()) {
-                bubbleItems = bubbleItems.filter(d => matchesChartSearch(d, bubbleImpactSearchText));
-            }
-            bubbleItems = bubbleItems.sort((a, b) => Math.abs(Number(b['c_' + primaryFocus] || 0)) - Math.abs(Number(a['c_' + primaryFocus] || 0)));
-            const bubbleLimitRaw = document.getElementById('bubbleImpactLimit').value || '10';
-            const bubbleLimit = bubbleLimitRaw === 'all' ? Infinity : Math.max(1, parseInt(bubbleLimitRaw, 10) || 10);
-            if (Number.isFinite(bubbleLimit)) bubbleItems = bubbleItems.slice(0, bubbleLimit);
+            bubbleItems = bubbleItems.sort((a, b) => Math.abs(Number(b['c_' + primaryFocus] || 0)) - Math.abs(Number(a['c_' + primaryFocus] || 0))).slice(0, 12);
             const bubblePositive = bubbleItems.filter(d => Number(d[primaryFocus] || 0) >= 0).map(d => ({
                 x: Number(d.weight || 0),
                 y: Number(d[primaryFocus] || 0),
@@ -4122,55 +3589,6 @@ thead th.sticky-product-col{background:#eef9ff!important;color:#173d5d!important
         }
 
         
-function updateExecutiveIntelligenceHeader(currP, targetRegion, primaryFocus, headline, core) {
-            const datasetNames = { G: 'ชุดทั่วไป', L: 'ชุดรายได้น้อย', U: 'ชุดนอกเขต' };
-            const focusDescriptions = {
-                mom: 'เทียบเดือนก่อน',
-                yoy: 'เทียบเดือนเดียวกันปีก่อน',
-                aoa: 'เฉลี่ยสะสมเทียบปีก่อน',
-                qoq: 'เทียบไตรมาสก่อน',
-                hoh: 'เทียบครึ่งปีก่อน'
-            };
-            const valueInfo = (raw) => {
-                const v = Number(raw);
-                if (!Number.isFinite(v)) return { value: '—', status: 'ไม่พบข้อมูล', arrow: '•', color: '#8fd7f7' };
-                if (v > 0) return { value: `+${v.toFixed(2)}%`, status: 'สูงขึ้น', arrow: '▲', color: '#5ee6a5' };
-                if (v < 0) return { value: `${v.toFixed(2)}%`, status: 'ลดลง', arrow: '▼', color: '#ff7b7b' };
-                return { value: '0.00%', status: 'ทรงตัว', arrow: '●', color: '#ffd44d' };
-            };
-
-            const periodText = headline && headline.m && headline.y
-                ? `${monthFull[headline.m]} ${headline.y}`
-                : (currP || '-');
-            const regionText = getRegionLabelTH(targetRegion, currentDatasetType) || regNamesTH[targetRegion] || targetRegion || '-';
-            const datasetText = datasetNames[currentDatasetType] || `ชุด ${currentDatasetType || '-'}`;
-            const headlineInfo = valueInfo(headline ? headline[primaryFocus] : null);
-            const coreInfo = valueInfo(core ? core[primaryFocus] : null);
-
-            const setText = (id, text) => {
-                const el = __realGetElementById(id);
-                if (el) el.textContent = text;
-            };
-            setText('exec-period-label', periodText);
-            setText('exec-region-label', regionText);
-            setText('exec-dataset-label', datasetText);
-            setText('exec-focus-label', String(primaryFocus || 'yoy').toUpperCase());
-            setText('exec-focus-description', focusDescriptions[primaryFocus] || 'อัตราการเปลี่ยนแปลง');
-            setText('exec-headline-status', headlineInfo.status);
-            setText('exec-headline-arrow', headlineInfo.arrow);
-            setText('exec-headline-value', headlineInfo.value);
-            setText('exec-core-status', coreInfo.status);
-            setText('exec-core-value', coreInfo.value);
-
-            const hArrow = __realGetElementById('exec-headline-arrow');
-            const hValue = __realGetElementById('exec-headline-value');
-            const cValue = __realGetElementById('exec-core-value');
-            if (hArrow) hArrow.style.color = headlineInfo.color;
-            if (hValue) hValue.style.color = headlineInfo.color;
-            if (cValue) cValue.style.color = coreInfo.color === '#5ee6a5' ? '#08a45b' : coreInfo.color === '#ff7b7b' ? '#e02020' : coreInfo.color;
-        }
-
-        
 function generateCombinedSummary(currP, targetRegion, primaryFocus) {
             const container = document.getElementById('dynamic-summary-container');
             const execList = document.getElementById('exec-summary-list');
@@ -4204,7 +3622,6 @@ function generateCombinedSummary(currP, targetRegion, primaryFocus) {
 
                 // --- 📝 สร้าง Executive Summary (โฉมใหม่ สวยงามระดับ Premium) ---
                 document.getElementById('exec-summary-section').classList.remove('hidden');
-                updateExecutiveIntelligenceHeader(currP, targetRegion, primaryFocus, headline, core);
 
                 const focusName = primaryFocus.toUpperCase();
 
@@ -4575,74 +3992,74 @@ function generateCombinedSummary(currP, targetRegion, primaryFocus) {
             }
         }
 
+
         function getHistoricalMatrixCategories() {
             return [
-                { code: "0000000", name: "\u0e23\u0e27\u0e21\u0e17\u0e38\u0e01\u0e23\u0e32\u0e22\u0e01\u0e32\u0e23", chartCode: "0000000" },
-                { code: "0000000", name: "\u0e14\u0e31\u0e0a\u0e19\u0e35\u0e1c\u0e39\u0e49\u0e1a\u0e23\u0e34\u0e42\u0e20\u0e04\u0e17\u0e31\u0e48\u0e27\u0e44\u0e1b", chartCode: "0000000" },
-                { code: "9300000", name: "\u0e14\u0e31\u0e0a\u0e19\u0e35\u0e1c\u0e39\u0e49\u0e1a\u0e23\u0e34\u0e42\u0e20\u0e04\u0e1e\u0e37\u0e49\u0e19\u0e10\u0e32\u0e19", chartCode: "9300000" },
-                { code: "9000000000000000", name: "\u0e01\u0e25\u0e38\u0e48\u0e21\u0e2d\u0e32\u0e2b\u0e32\u0e23\u0e2a\u0e14\u0e41\u0e25\u0e30\u0e1e\u0e25\u0e31\u0e07\u0e07\u0e32\u0e19", chartCode: "9000000000000000" },
-                { code: "1000000", name: "\u0e2b\u0e21\u0e27\u0e14\u0e2d\u0e32\u0e2b\u0e32\u0e23\u0e41\u0e25\u0e30\u0e40\u0e04\u0e23\u0e37\u0e48\u0e2d\u0e07\u0e14\u0e37\u0e48\u0e21\u0e2f", chartCode: "1000000" },
-                { code: "9100000", name: "- \u0e2d\u0e32\u0e2b\u0e32\u0e23\u0e2a\u0e14", chartCode: "9100000" },
-                { code: "8000000", name: "\u0e2b\u0e21\u0e27\u0e14\u0e2d\u0e37\u0e48\u0e19\u0e46 \u0e44\u0e21\u0e48\u0e43\u0e0a\u0e48\u0e2d\u0e32\u0e2b\u0e32\u0e23\u0e2f", chartCode: "8000000" },
-                { code: "2000000", name: "- \u0e2b\u0e21\u0e27\u0e14\u0e40\u0e04\u0e23\u0e37\u0e48\u0e2d\u0e07\u0e19\u0e38\u0e48\u0e07\u0e2b\u0e48\u0e21\u0e41\u0e25\u0e30\u0e23\u0e2d\u0e07\u0e40\u0e17\u0e49\u0e32", chartCode: "2000000" },
-                { code: "3000000", name: "- \u0e2b\u0e21\u0e27\u0e14\u0e40\u0e04\u0e2b\u0e2a\u0e16\u0e32\u0e19", chartCode: "3000000" },
-                { code: "4000000", name: "- \u0e2b\u0e21\u0e27\u0e14\u0e01\u0e32\u0e23\u0e15\u0e23\u0e27\u0e08\u0e23\u0e31\u0e01\u0e29\u0e32\u0e41\u0e25\u0e30\u0e1a\u0e23\u0e34\u0e01\u0e32\u0e23\u0e2f", chartCode: "4000000" },
-                { code: "5000000", name: "- \u0e2b\u0e21\u0e27\u0e14\u0e1e\u0e32\u0e2b\u0e19\u0e30 \u0e01\u0e32\u0e23\u0e02\u0e19\u0e2a\u0e48\u0e07 \u0e41\u0e25\u0e30\u0e2a\u0e37\u0e48\u0e2d\u0e2a\u0e32\u0e23", chartCode: "5000000" },
-                { code: "9200000", name: "- \u0e1e\u0e25\u0e31\u0e07\u0e07\u0e32\u0e19 (Energy)", chartCode: "9200000" },
-                { code: "6000000", name: "- \u0e2b\u0e21\u0e27\u0e14\u0e01\u0e32\u0e23\u0e1a\u0e31\u0e19\u0e40\u0e17\u0e34\u0e07 \u0e01\u0e32\u0e23\u0e2d\u0e48\u0e32\u0e19\u0e2f", chartCode: "6000000" },
-                { code: "7000000", name: "- \u0e2b\u0e21\u0e27\u0e14\u0e22\u0e32\u0e2a\u0e39\u0e1a\u0e41\u0e25\u0e30\u0e40\u0e04\u0e23\u0e37\u0e48\u0e2d\u0e07\u0e14\u0e37\u0e48\u0e21\u0e21\u0e35\u0e41\u0e2d\u0e25\u0e01\u0e2d\u0e2e\u0e2d\u0e25\u0e4c", chartCode: "7000000" }
+                { code: "0000000", name: "รวมทุกรายการ", chartCode: "0000000" },
+                { code: "0000000", name: "ดัชนีผู้บริโภคทั่วไป", chartCode: "0000000" },
+                { code: "9300000", name: "ดัชนีผู้บริโภคพื้นฐาน", chartCode: "9300000" },
+                { code: "1000000", name: "หมวดอาหารและเครื่องดื่มฯ", chartCode: "1000000" },
+                { code: "9100000", name: "- อาหารสด", chartCode: "9100000" },
+                { code: "8000000", name: "หมวดอื่นๆ ไม่ใช่อาหารฯ", chartCode: "8000000" },
+                { code: "2000000", name: "- หมวดเครื่องนุ่งห่มและรองเท้า", chartCode: "2000000" },
+                { code: "3000000", name: "- หมวดเคหสถาน", chartCode: "3000000" },
+                { code: "4000000", name: "- หมวดการตรวจรักษาและบริการฯ", chartCode: "4000000" },
+                { code: "5000000", name: "- หมวดพาหนะ การขนส่ง และสื่อสาร", chartCode: "5000000" },
+                { code: "9200000", name: "- พลังงาน (Energy)", chartCode: "9200000" },
+                { code: "6000000", name: "- หมวดการบันเทิง การอ่านฯ", chartCode: "6000000" },
+                { code: "7000000", name: "- หมวดยาสูบและเครื่องดื่มมีแอลกอฮอล์", chartCode: "7000000" }
             ];
         }
 
-        function normalizeHistoricalSelection() {
-            const all = new Set(getHistoricalMatrixCategories().map(c => c.name));
-            selectedHistoricalCategories = Array.isArray(selectedHistoricalCategories)
-                ? selectedHistoricalCategories.filter(name => all.has(name))
-                : [];
+        function ensureHistoricalMinSelection() {
+            const all = getHistoricalMatrixCategories().map(c => c.name);
+            selectedHistoricalCategories = Array.isArray(selectedHistoricalCategories) ? selectedHistoricalCategories.filter(name => all.includes(name)) : [];
+            for (const name of all) {
+                if (selectedHistoricalCategories.length >= 3) break;
+                if (!selectedHistoricalCategories.includes(name)) selectedHistoricalCategories.push(name);
+            }
         }
 
         function toggleHistoricalCategory(name) {
-            normalizeHistoricalSelection();
+            ensureHistoricalMinSelection();
             if (selectedHistoricalCategories.includes(name)) {
+                if (selectedHistoricalCategories.length <= 3) return;
                 selectedHistoricalCategories = selectedHistoricalCategories.filter(item => item !== name);
             } else {
                 selectedHistoricalCategories.push(name);
             }
+            ensureHistoricalMinSelection();
             triggerDraw();
         }
 
         function selectHistoricalPreset(preset) {
-            if (preset === 'all') {
-                selectedHistoricalCategories = getHistoricalMatrixCategories().map(cat => cat.name);
-                normalizeHistoricalSelection();
-                triggerDraw();
-                return;
-            }
+            const allCategories = getHistoricalMatrixCategories().map(c => c.name);
             const presets = {
-                preset1: ["\u0e23\u0e27\u0e21\u0e17\u0e38\u0e01\u0e23\u0e32\u0e22\u0e01\u0e32\u0e23", "\u0e2b\u0e21\u0e27\u0e14\u0e2d\u0e32\u0e2b\u0e32\u0e23\u0e41\u0e25\u0e30\u0e40\u0e04\u0e23\u0e37\u0e48\u0e2d\u0e07\u0e14\u0e37\u0e48\u0e21\u0e2f", "\u0e2b\u0e21\u0e27\u0e14\u0e2d\u0e37\u0e48\u0e19\u0e46 \u0e44\u0e21\u0e48\u0e43\u0e0a\u0e48\u0e2d\u0e32\u0e2b\u0e32\u0e23\u0e2f"],
-                preset2: ["\u0e14\u0e31\u0e0a\u0e19\u0e35\u0e1c\u0e39\u0e49\u0e1a\u0e23\u0e34\u0e42\u0e20\u0e04\u0e17\u0e31\u0e48\u0e27\u0e44\u0e1b", "\u0e14\u0e31\u0e0a\u0e19\u0e35\u0e1c\u0e39\u0e49\u0e1a\u0e23\u0e34\u0e42\u0e20\u0e04\u0e1e\u0e37\u0e49\u0e19\u0e10\u0e32\u0e19"],
-                preset3: ["\u0e01\u0e25\u0e38\u0e48\u0e21\u0e2d\u0e32\u0e2b\u0e32\u0e23\u0e2a\u0e14\u0e41\u0e25\u0e30\u0e1e\u0e25\u0e31\u0e07\u0e07\u0e32\u0e19", "- \u0e2d\u0e32\u0e2b\u0e32\u0e23\u0e2a\u0e14", "- \u0e1e\u0e25\u0e31\u0e07\u0e07\u0e32\u0e19 (Energy)"]
+                core: ['รวมทุกรายการ', 'ดัชนีผู้บริโภคทั่วไป', 'ดัชนีผู้บริโภคพื้นฐาน'],
+                broad: ['ดัชนีผู้บริโภคทั่วไป', 'หมวดอาหารและเครื่องดื่มฯ', 'หมวดอื่นๆ ไม่ใช่อาหารฯ', '- อาหารสด', '- พลังงาน (Energy)'],
+                all: allCategories
             };
-            selectedHistoricalCategories = (presets[preset] || presets.preset1).slice();
-            normalizeHistoricalSelection();
+            selectedHistoricalCategories = (presets[preset] || presets.core).slice();
+            ensureHistoricalMinSelection();
             triggerDraw();
         }
 
         function renderHistoricalCategorySelector() {
             const wrap = document.getElementById('historical-category-selector');
             if (!wrap) return;
-            normalizeHistoricalSelection();
+            ensureHistoricalMinSelection();
             const selected = new Set(selectedHistoricalCategories);
             wrap.innerHTML = getHistoricalMatrixCategories().map(cat => {
                 const isChecked = selected.has(cat.name);
+                const disabled = isChecked && selectedHistoricalCategories.length <= 3;
                 return `
                     <button type="button"
-                        onclick="toggleHistoricalCategory('${cat.name.replace(/'/g, "\\'")}')"
-                        class="historical-chip ${isChecked ? 'active' : ''}">
+                        onclick="${disabled ? '' : `toggleHistoricalCategory('${cat.name.replace(/'/g, "\'")}')`}"
+                        class="historical-chip ${isChecked ? 'active' : ''} ${disabled ? 'disabled' : ''}">
                         <span class="historical-chip-dot"></span>
                         <span class="min-w-0 text-left">
                             <span class="historical-chip-text">${cat.name}</span>
-                            <span class="historical-chip-sub block">${isChecked ? '\u0e41\u0e2a\u0e14\u0e07\u0e2d\u0e22\u0e39\u0e48\u0e43\u0e19\u0e15\u0e32\u0e23\u0e32\u0e07\u0e41\u0e25\u0e30\u0e01\u0e23\u0e32\u0e1f' : '\u0e04\u0e25\u0e34\u0e01\u0e40\u0e1e\u0e37\u0e48\u0e2d\u0e40\u0e1e\u0e34\u0e48\u0e21\u0e2b\u0e21\u0e27\u0e14\u0e19\u0e35\u0e49'}</span>
+                            <span class="historical-chip-sub block">${isChecked ? 'แสดงอยู่ในตารางและกราฟ' : 'คลิกเพื่อเพิ่มหมวดนี้'}</span>
                         </span>
                     </button>`;
             }).join('');
@@ -4667,7 +4084,7 @@ function generateCombinedSummary(currP, targetRegion, primaryFocus) {
         function buildHistoricalMatrixData(regionCode, focusKey, selectedNames = null) {
             const years = getHistoricalYears(regionCode);
             const allCategories = getHistoricalMatrixCategories();
-            const selected = Array.isArray(selectedNames) ? new Set(selectedNames) : null;
+            const selected = selectedNames && selectedNames.length ? new Set(selectedNames) : null;
             const categories = selected ? allCategories.filter(cat => selected.has(cat.name)) : allCategories;
             const months = [
                 { no: 1, label: 'ม.ค.' }, { no: 2, label: 'ก.พ.' }, { no: 3, label: 'มี.ค.' }, { no: 4, label: 'เม.ย.' },
@@ -4718,19 +4135,13 @@ function generateCombinedSummary(currP, targetRegion, primaryFocus) {
             myHistoricalDetailCharts.forEach(ch => { if (ch) ch.destroy(); });
             myHistoricalDetailCharts = [];
 
-            for (let idx = 0; idx < 3; idx++) {
+            const topThree = categories.slice(0, 3);
+            while (topThree.length < 3) topThree.push(categories[topThree.length % categories.length]);
+
+            topThree.forEach((cat, idx) => {
                 const canvasId = `historicalDetailChart${idx + 1}`;
                 const canvas = document.getElementById(canvasId);
-                if (!canvas) continue;
-                const card = canvas.parentElement?.parentElement;
-                const cat = categories[idx] || null;
-
-                if (!cat) {
-                    if (card) card.classList.add('hidden');
-                    continue;
-                }
-                if (card) card.classList.remove('hidden');
-
+                if (!canvas) return;
                 const series = getHistoricalTrendSeries(displayReg, primaryFocus, cat);
                 const ctx = canvas.getContext('2d');
                 const chart = new Chart(ctx, {
@@ -4758,7 +4169,7 @@ function generateCombinedSummary(currP, targetRegion, primaryFocus) {
                     }
                 });
                 myHistoricalDetailCharts.push(chart);
-            }
+            });
         }
 
         function renderHistoricalMatrixSection(displayReg, primaryFocus) {
@@ -4774,7 +4185,7 @@ function generateCombinedSummary(currP, targetRegion, primaryFocus) {
 
             if (!section || !headEl || !bodyEl) return;
 
-            normalizeHistoricalSelection();
+            ensureHistoricalMinSelection();
             renderHistoricalCategorySelector();
 
             const regionLabel = getRegionLabelTH(displayReg, currentDatasetType);
@@ -4783,30 +4194,17 @@ function generateCombinedSummary(currP, targetRegion, primaryFocus) {
             const categories = data.categories;
             const grid = data.grid;
 
-            if (!years.length) {
+            if (!years.length || !categories.length) {
                 section.classList.add('hidden');
                 return;
             }
 
             section.classList.remove('hidden');
-            subtitleEl.innerText = `\u0e15\u0e32\u0e23\u0e32\u0e07\u0e1b\u0e23\u0e30\u0e27\u0e31\u0e15\u0e34\u0e2d\u0e31\u0e15\u0e23\u0e32\u0e01\u0e32\u0e23\u0e40\u0e1b\u0e25\u0e35\u0e48\u0e22\u0e19\u0e41\u0e1b\u0e25\u0e07\u0e02\u0e2d\u0e07${regionLabel} • \u0e40\u0e25\u0e37\u0e2d\u0e01\u0e2b\u0e21\u0e27\u0e14\u0e44\u0e14\u0e49\u0e2d\u0e34\u0e2a\u0e23\u0e30 \u0e44\u0e21\u0e48\u0e08\u0e33\u0e01\u0e31\u0e14\u0e08\u0e33\u0e19\u0e27\u0e19 • ${primaryFocus.toUpperCase()}`;
+            subtitleEl.innerText = `ตารางประวัติอัตราการเปลี่ยนแปลงของ${regionLabel} • เลือกหมวดได้เองอย่างน้อย 3 หมวด • ${primaryFocus.toUpperCase()}`;
             focusEl.innerText = primaryFocus.toUpperCase();
             regionEl.innerText = regionLabel;
             yearsEl.innerText = `${years[0]} - ${years[years.length - 1]}`;
             groupsEl.innerText = categories.length;
-
-            const matrixCanvas = document.getElementById('historicalMatrixChart');
-            const matrixCard = matrixCanvas?.parentElement?.parentElement;
-            if (!categories.length) {
-                if (myHistoricalMatrixChart) { myHistoricalMatrixChart.destroy(); myHistoricalMatrixChart = null; }
-                renderHistoricalDetailCharts(displayReg, primaryFocus, []);
-                if (matrixCard) matrixCard.classList.add('hidden');
-                headEl.innerHTML = `<tr><th class="border border-slate-300 px-4 py-4 text-lg font-black bg-slate-100">\u0e22\u0e31\u0e07\u0e44\u0e21\u0e48\u0e44\u0e14\u0e49\u0e40\u0e25\u0e37\u0e2d\u0e01\u0e2b\u0e21\u0e27\u0e14</th></tr>`;
-                bodyEl.innerHTML = '';
-                highlightEl.innerHTML = `<p>\u0e22\u0e31\u0e07\u0e44\u0e21\u0e48\u0e44\u0e14\u0e49\u0e40\u0e25\u0e37\u0e2d\u0e01\u0e2b\u0e21\u0e27\u0e14 \u0e01\u0e23\u0e38\u0e13\u0e32\u0e40\u0e25\u0e37\u0e2d\u0e01\u0e2b\u0e21\u0e27\u0e14\u0e17\u0e35\u0e48\u0e15\u0e49\u0e2d\u0e07\u0e01\u0e32\u0e23\u0e41\u0e2a\u0e14\u0e07</p>`;
-                return;
-            }
-            if (matrixCard) matrixCard.classList.remove('hidden');
 
             const topTitle = `ตารางประวัติอัตราการเปลี่ยนแปลงของ${regionLabel}`;
             const focusTitleMap = { mom: 'เปรียบเทียบจากเดือนก่อนหน้า (MoM)', yoy: 'เปรียบเทียบจากเดือนเดียวกันปีก่อน (YoY)', aoa: 'เฉลี่ยสะสมเทียบช่วงเดียวกันปีก่อน (AoA)', qoq: 'เปรียบเทียบไตรมาส (QoQ)', hoh: 'เปรียบเทียบครึ่งปี (HoH)' };
@@ -4885,26 +4283,16 @@ function generateCombinedSummary(currP, targetRegion, primaryFocus) {
             const displayReg = document.getElementById('mainRegionFilter').value;
             const primaryFocus = (Array.from(document.querySelectorAll('.f-check:checked:not(:disabled)')).map(cb => cb.value)[0]) || 'yoy';
             const regionLabel = getRegionLabelTH(displayReg, currentDatasetType);
-            normalizeHistoricalSelection();
+            ensureHistoricalMinSelection();
             const data = buildHistoricalMatrixData(displayReg, primaryFocus, selectedHistoricalCategories);
             const years = data.years;
             const categories = data.categories;
             const grid = data.grid;
 
             if (!years.length) return;
-            if (!categories.length) { alert('\u0e01\u0e23\u0e38\u0e13\u0e32\u0e40\u0e25\u0e37\u0e2d\u0e01\u0e2d\u0e22\u0e48\u0e32\u0e07\u0e19\u0e49\u0e2d\u0e22 1 \u0e2b\u0e21\u0e27\u0e14\u0e01\u0e48\u0e2d\u0e19 Export'); return; }
-
-            const focusTitleMap = {
-                mom: 'เปรียบเทียบจากเดือนก่อนหน้า (MoM)',
-                yoy: 'เปรียบเทียบจากเดือนเดียวกันปีก่อน (YoY)',
-                aoa: 'เฉลี่ยสะสมเทียบช่วงเดียวกันปีก่อน (AoA)',
-                qoq: 'เปรียบเทียบไตรมาส (QoQ)',
-                hoh: 'เปรียบเทียบครึ่งปี (HoH)'
-            };
 
             const wsData = [];
-            wsData.push([`ตารางประวัติอัตราการเปลี่ยนแปลงของ${regionLabel}`]);
-            wsData.push([focusTitleMap[primaryFocus] || primaryFocus.toUpperCase()]);
+            wsData.push([`ตารางประวัติอัตราการเปลี่ยนแปลงรายเดือนแยกตามหมวด - ${regionLabel} (${primaryFocus.toUpperCase()})`]);
             wsData.push([`หมวดที่เลือก: ${categories.map(c => c.name).join(' | ')}`]);
             wsData.push([]);
 
@@ -4934,9 +4322,7 @@ function generateCombinedSummary(currP, targetRegion, primaryFocus) {
             ws['!cols'] = [{ wch: 10 }].concat(Array(categories.length * years.length).fill({ wch: 11 }));
 
             XLSX.utils.book_append_sheet(wb, ws, 'Historical Matrix');
-            const safeRegion = String(regionLabel || displayReg || 'region').replace(/[\/:*?"<>|]/g, '_');
-            const safeFocus = String(primaryFocus || 'yoy').toUpperCase();
-            XLSX.writeFile(wb, `ตารางประวัติ_${safeRegion}_${safeFocus}.xlsx`);
+            XLSX.writeFile(wb, `historical_matrix_selected_${displayReg}_${primaryFocus}.xlsx`);
         }
 
         function updatePremiumTopbar(currP, displayReg) {
@@ -5101,264 +4487,7 @@ function getRegionAccentClasses(idx) {
             ];
             return palette[idx % palette.length];
         }
-
-        // =========================================================================
-        // CPI Stock-style Treemap Heatmap (visual only; existing calculations unchanged)
-        // =========================================================================
-        const CPI_HEAT_CATEGORY_NAMES = {
-            '1': 'อาหารและเครื่องดื่มไม่มีแอลกอฮอล์',
-            '2': 'เครื่องนุ่งห่มและรองเท้า',
-            '3': 'เคหสถาน',
-            '4': 'การตรวจรักษาและบริการส่วนบุคคล',
-            '5': 'พาหนะ การขนส่ง และการสื่อสาร',
-            '6': 'การบันเทิง การอ่าน การศึกษา และการศาสนา',
-            '7': 'ยาสูบและเครื่องดื่มมีแอลกอฮอล์',
-            '8': 'อื่น ๆ ไม่ใช่อาหารและเครื่องดื่ม',
-            '9': 'กลุ่มอาหารสดและพลังงาน'
-        };
-
-        function getCpiHeatCategory(code) {
-            const digits = String(code || '').replace(/\D/g, '');
-            if (!digits) return '';
-            const direct = digits[0];
-            if (/^[1-9]$/.test(direct)) return direct;
-            const m = digits.match(/[1-9]/);
-            return m ? m[0] : '';
-        }
-
-        function escapeCpiHeatHtml(value) {
-            return String(value ?? '')
-                .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
-                .replace(/"/g, '&quot;').replace(/'/g, '&#039;');
-        }
-
-        function splitTreemap(items, rect, depth = 0) {
-            if (!items.length || rect.w <= 0 || rect.h <= 0) return [];
-            if (items.length === 1) return [{ item: items[0], ...rect }];
-
-            const sorted = [...items].sort((a, b) => Number(b.value || 0) - Number(a.value || 0));
-            const total = sorted.reduce((s, x) => s + Math.max(0.000001, Number(x.value || 0)), 0);
-            let acc = 0, cut = 1;
-            for (let i = 0; i < sorted.length - 1; i++) {
-                acc += Math.max(0.000001, Number(sorted[i].value || 0));
-                cut = i + 1;
-                if (acc >= total / 2) break;
-            }
-            const a = sorted.slice(0, cut);
-            const b = sorted.slice(cut);
-            const sumA = a.reduce((s, x) => s + Math.max(0.000001, Number(x.value || 0)), 0);
-            const ratio = Math.max(0.08, Math.min(0.92, sumA / total));
-            const splitVertical = rect.w >= rect.h;
-
-            if (splitVertical) {
-                const w1 = rect.w * ratio;
-                return [
-                    ...splitTreemap(a, { x: rect.x, y: rect.y, w: w1, h: rect.h }, depth + 1),
-                    ...splitTreemap(b, { x: rect.x + w1, y: rect.y, w: rect.w - w1, h: rect.h }, depth + 1)
-                ];
-            }
-            const h1 = rect.h * ratio;
-            return [
-                ...splitTreemap(a, { x: rect.x, y: rect.y, w: rect.w, h: h1 }, depth + 1),
-                ...splitTreemap(b, { x: rect.x, y: rect.y + h1, w: rect.w, h: rect.h - h1 }, depth + 1)
-            ];
-        }
-
-        function cpiHeatColor(value, maxAbs) {
-            const v = Number(value) || 0;
-            const denom = Math.max(0.0001, Number(maxAbs) || 0.0001);
-            const t = Math.min(1, Math.abs(v) / denom);
-            if (Math.abs(v) < denom * 0.025) return { bg: '#cfd4da', fg: '#334155' };
-            if (v > 0) {
-                const light = [105, 214, 157], dark = [4, 120, 62];
-                const mix = 0.22 + 0.78 * t;
-                const rgb = light.map((c, i) => Math.round(c + (dark[i] - c) * mix));
-                return { bg: `rgb(${rgb.join(',')})`, fg: t > 0.35 ? '#ffffff' : '#083b23' };
-            }
-            const light = [255, 137, 145], dark = [185, 28, 28];
-            const mix = 0.22 + 0.78 * t;
-            const rgb = light.map((c, i) => Math.round(c + (dark[i] - c) * mix));
-            return { bg: `rgb(${rgb.join(',')})`, fg: t > 0.35 ? '#ffffff' : '#5b1111' };
-        }
-
-        function refreshCpiHeatCategoryButtons(selected) {
-            const value = String(selected || 'all');
-            document.querySelectorAll('[data-cpi-heat-cat]').forEach(btn => {
-                btn.classList.toggle('active', btn.dataset.cpiHeatCat === value);
-            });
-        }
-
-        function setCpiHeatmapCategory(cat) {
-            const value = String(cat || 'all');
-            const sel = document.getElementById('cpi-heat-category');
-            if (sel) sel.value = value;
-            refreshCpiHeatCategoryButtons(value);
-            triggerDraw();
-        }
-
-        function bindCpiHeatmapTooltip(canvas) {
-            if (!canvas || canvas.dataset.tooltipBound === '1') return;
-            canvas.dataset.tooltipBound = '1';
-            const tooltip = document.getElementById('cpi-heat-tooltip');
-            if (!tooltip) return;
-
-            const hide = () => { tooltip.style.display = 'none'; };
-            canvas.addEventListener('mouseleave', hide);
-            canvas.addEventListener('mousemove', (e) => {
-                const tile = e.target.closest('.cpi-heat-tile');
-                if (!tile || !canvas.contains(tile)) { hide(); return; }
-                const name = tile.dataset.name || '-';
-                const code = tile.dataset.code || '-';
-                const weight = tile.dataset.weight || '-';
-                const focus = tile.dataset.focus || '-';
-                const change = tile.dataset.change || '-';
-                const contribution = tile.dataset.contribution || '-';
-                const category = tile.dataset.category || '-';
-                tooltip.innerHTML = `<div class="tt-name">${escapeCpiHeatHtml(name)}</div><div class="tt-grid"><span class="tt-k">หมวด</span><span class="tt-v">${escapeCpiHeatHtml(category)}</span><span class="tt-k">รหัส</span><span class="tt-v">${escapeCpiHeatHtml(code)}</span><span class="tt-k">Weight</span><span class="tt-v">${escapeCpiHeatHtml(weight)}</span><span class="tt-k">${escapeCpiHeatHtml(focus)}</span><span class="tt-v">${escapeCpiHeatHtml(change)}</span><span class="tt-k">Contribution</span><span class="tt-v">${escapeCpiHeatHtml(contribution)}</span></div>`;
-                tooltip.style.display = 'block';
-                const pad = 16;
-                const tw = tooltip.offsetWidth || 300;
-                const th = tooltip.offsetHeight || 120;
-                let x = e.clientX + 16, y = e.clientY + 16;
-                if (x + tw + pad > window.innerWidth) x = e.clientX - tw - 16;
-                if (y + th + pad > window.innerHeight) y = e.clientY - th - 16;
-                tooltip.style.left = `${Math.max(pad, x)}px`;
-                tooltip.style.top = `${Math.max(pad, y)}px`;
-            });
-        }
-
-        function getCpiHeatLeafRows(currP, displayReg, primaryFocus, cat) {
-            const rows = scopedDb().filter(d =>
-                d.p === currP && d.region === displayReg && getCpiHeatCategory(d.code) === cat &&
-                Number.isFinite(Number(d[primaryFocus])) && Number(d.weight || 0) > 0
-            );
-            if (!rows.length) return [];
-            const levels = rows.map(d => Number(d.level)).filter(Number.isFinite);
-            const maxLevel = levels.length ? Math.max(...levels) : 0;
-            let leaf = rows.filter(d => Number(d.level) === maxLevel);
-            if (!leaf.length) leaf = rows;
-            return leaf;
-        }
-
-        function renderCpiStockHeatmap(currP, displayReg, primaryFocus) {
-            const section = document.getElementById('cpi-stock-heatmap-section');
-            const canvas = document.getElementById('cpi-stock-heatmap-canvas');
-            if (!section || !canvas) return;
-
-            const contributionFocus = !!document.getElementById('cpi-heat-contribution-focus')?.checked;
-            const contributionKey = 'c_' + primaryFocus;
-            const focusEl = document.getElementById('cpi-heat-focus');
-            if (focusEl) focusEl.innerText = contributionFocus
-                ? `${String(primaryFocus || 'yoy').toUpperCase()} • C`
-                : String(primaryFocus || 'yoy').toUpperCase();
-
-            const colorHelp = document.getElementById('cpi-heat-color-help');
-            if (colorHelp) colorHelp.innerText = contributionFocus
-                ? 'สีเข้มขึ้น = Contribution มีขนาดผลกระทบมากขึ้น'
-                : 'สีเข้มขึ้น = เปลี่ยนแปลงมากขึ้น';
-
-            const selected = document.getElementById('cpi-heat-category')?.value || '1-7';
-            refreshCpiHeatCategoryButtons(selected);
-            bindCpiHeatmapTooltip(canvas);
-            const categories = selected === 'all'
-                ? ['1','2','3','4','5','6','7','8','9']
-                : selected === '1-7'
-                    ? ['1','2','3','4','5','6','7']
-                    : [selected];
-
-            const groups = categories.map(cat => {
-                const rows = getCpiHeatLeafRows(currP, displayReg, primaryFocus, cat);
-                const items = rows.map(d => {
-                    const change = Number(d[primaryFocus] || 0);
-                    const contribution = Number(d[contributionKey] || 0);
-                    return {
-                        row: d,
-                        value: Math.max(0.000001, Number(d.weight || 0)),
-                        change,
-                        contribution,
-                        heatValue: contributionFocus ? contribution : change
-                    };
-                }).sort((a,b) => b.value - a.value);
-                return { cat, name: CPI_HEAT_CATEGORY_NAMES[cat] || `หมวด ${cat}`, items, value: items.reduce((s,x) => s + x.value, 0) };
-            }).filter(g => g.items.length > 0 && g.value > 0);
-
-            if (!groups.length) {
-                canvas.innerHTML = '<div class="cpi-heat-empty">ไม่พบข้อมูล Weight และค่าการเปลี่ยนแปลงสำหรับหมวดที่เลือก</div>';
-                const summary = document.getElementById('cpi-heat-summary');
-                if (summary) summary.innerText = '0 รายการ';
-                return;
-            }
-
-            const allItems = groups.flatMap(g => g.items);
-            const maxAbs = Math.max(
-                contributionFocus ? 0.0001 : 0.01,
-                ...allItems.map(x => Math.abs(Number(x.heatValue || 0))).filter(Number.isFinite)
-            );
-            const minLabel = document.getElementById('cpi-heat-min-label');
-            const maxLabel = document.getElementById('cpi-heat-max-label');
-            if (contributionFocus) {
-                if (minLabel) minLabel.innerText = `-${maxAbs.toFixed(4)}`;
-                if (maxLabel) maxLabel.innerText = `+${maxAbs.toFixed(4)}`;
-            } else {
-                if (minLabel) minLabel.innerText = `-${maxAbs.toFixed(2)}%`;
-                if (maxLabel) maxLabel.innerText = `+${maxAbs.toFixed(2)}%`;
-            }
-
-            const summary = document.getElementById('cpi-heat-summary');
-            if (summary) {
-                const regionName = getRegionLabelTH(displayReg, currentDatasetType);
-                const catText = selected === 'all'
-                    ? `ทั้งหมด ${groups.length} หมวด`
-                    : selected === '1-7'
-                        ? `หมวด 1–7 (${groups.length} หมวด)`
-                        : `หมวด ${selected}`;
-                const modeText = contributionFocus ? 'สี: Contribution' : `สี: ${String(primaryFocus).toUpperCase()}`;
-                summary.innerText = `${catText} • ${allItems.length} รายการ • ${regionName} • ${currP} • ${modeText}`;
-            }
-
-            const groupLayout = splitTreemap(groups.map(g => ({ ...g, value: Math.max(0.000001, g.value) })), { x: 0, y: 0, w: 100, h: 100 });
-            const groupHtml = groupLayout.map(gl => {
-                const g = gl.item;
-                const itemLayout = splitTreemap(g.items, { x: 0, y: 0, w: 100, h: 100 });
-                const itemsHtml = itemLayout.map(il => {
-                    const d = il.item.row;
-                    const change = Number(il.item.change || 0);
-                    const contribution = Number(il.item.contribution || 0);
-                    const heatValue = Number(il.item.heatValue || 0);
-                    const weight = Number(d.weight || 0);
-                    const color = cpiHeatColor(heatValue, maxAbs);
-                    const area = il.w * il.h;
-                    const cls = area < 0.28 ? 'micro' : area < 1.0 ? 'tiny' : area < 3.0 ? 'compact' : 'large';
-                    const code = String(d.code || '');
-                    const code7 = code.slice(0, 7);
-                    const signed = change > 0 ? `+${change.toFixed(2)}%` : `${change.toFixed(2)}%`;
-                    const signedContribution = contribution > 0 ? `+${contribution.toFixed(4)}` : contribution.toFixed(4);
-                    const primaryDisplay = contributionFocus ? `C ${signedContribution}` : signed;
-                    const title = `${d.name || '-'} | ${code} | Weight ${weight.toFixed(4)} | ${String(primaryFocus).toUpperCase()} ${signed} | Contribution ${signedContribution}`;
-                    return `<div class="cpi-heat-tile ${cls}" style="left:${il.x}%;top:${il.y}%;width:${il.w}%;height:${il.h}%;background:${color.bg};color:${color.fg};" title="${escapeCpiHeatHtml(title)}" data-name="${escapeCpiHeatHtml(d.name || '-')}" data-code="${escapeCpiHeatHtml(code)}" data-weight="${weight.toFixed(4)}" data-focus="${escapeCpiHeatHtml(String(primaryFocus).toUpperCase())}" data-change="${escapeCpiHeatHtml(signed)}" data-contribution="${escapeCpiHeatHtml(signedContribution)}" data-category="${escapeCpiHeatHtml(`หมวด ${g.cat} • ${g.name}`)}">
-                        <div class="cpi-heat-tile-inner">
-                            <div class="cpi-heat-code">${escapeCpiHeatHtml(code7)}</div>
-                            <div class="cpi-heat-name">${escapeCpiHeatHtml(d.name || '-')}</div>
-                            <div class="cpi-heat-value">${primaryDisplay}</div>
-                            <div class="cpi-heat-weight">Weight ${weight.toFixed(3)}</div>
-                        </div>
-                    </div>`;
-                }).join('');
-                const groupTitle = `หมวด ${g.cat} • ${g.name}`;
-                return `<div class="cpi-heat-group" style="left:${gl.x}%;top:${gl.y}%;width:${gl.w}%;height:${gl.h}%;">
-                    <div class="cpi-heat-group-head" onclick="setCpiHeatmapCategory('${g.cat}')" title="คลิกเพื่อดูเฉพาะหมวด ${g.cat}">
-                        <span class="truncate">${escapeCpiHeatHtml(groupTitle)}</span>
-                        <span class="cpi-heat-group-count">${g.items.length}</span>
-                    </div>
-                    <div class="cpi-heat-group-body">${itemsHtml}</div>
-                </div>`;
-            }).join('');
-
-            canvas.innerHTML = groupHtml;
-        }
-
-
-        function draw() {
+function draw() {
             log('Drawing...');
             const q = document.getElementById('search').value.toLowerCase();
             const pSelect = document.getElementById('periodFilter');
@@ -5391,7 +4520,6 @@ function getRegionAccentClasses(idx) {
             updatePremiumTopbar(currP, displayReg);
             generateCombinedSummary(currP, displayReg, primaryFocus);
             renderCharts(displayReg, primaryFocus, lvls);
-            renderCpiStockHeatmap(currP, displayReg, primaryFocus);
             renderRegionalExtendedSection(currP, primaryFocus);
             renderHistoricalMatrixSection(displayReg, primaryFocus);
 
@@ -5711,11 +4839,15 @@ function getRegionAccentClasses(idx) {
             render7DigitHorizontalTags(currP, displayReg, primaryFocus);
         }
         // =========================================================================
-        // Extreme Movers Heatmap
+        // 🌟 [NEW] ฟังก์ชันสำหรับเรนเดอร์ Infographic ใหม่ (Market Pulse & Extreme Movers)
         // =========================================================================
         function renderExtraInfographics(currP, displayReg, primaryFocus, keys, stacked) {
             const section = document.getElementById('extra-infographics');
             if (!section) return;
+
+            let up = 0, down = 0, stable = 0;
+            let maxUpItem = null;
+            let maxDownItem = null;
 
             const validItems = keys.map(k => stacked[k].regs[displayReg]).filter(Boolean);
 
@@ -5725,127 +4857,67 @@ function getRegionAccentClasses(idx) {
             }
 
             section.classList.remove('hidden');
-            document.getElementById('extreme-focus-label').innerText = primaryFocus.toUpperCase();
 
-            // ใช้รายการย่อยในระดับลึกที่สุดเท่าที่มีในรอบนี้ เพื่อคงตรรกะ Extreme Movers เดิม
+            // หารายการย่อย (Level ลึกสุดเท่าที่มีในรอบนี้) เพื่อหาสินค้าที่แกว่งสุด
             const maxLevel = Math.max(...validItems.map(d => d.level));
             const subItems = validItems.filter(d => d.level === maxLevel || d.level >= 4);
             const searchSpace = subItems.length > 0 ? subItems : validItems;
 
-            // เลือกว่าจะจัดอันดับ/ไล่ความเข้มตาม % การเปลี่ยนแปลง หรือ Contribution
-            const contributionFocus = !!document.getElementById('extreme-contribution-focus')?.checked;
-            const contributionKey = 'c_' + primaryFocus;
-            const rankingKey = contributionFocus ? contributionKey : primaryFocus;
+            validItems.forEach(d => {
+                const val = d[primaryFocus];
+                if (val > 0) up++;
+                else if (val < 0) down++;
+                else stable++;
+            });
 
-            const upSortNote = document.getElementById('extreme-up-sort-note');
-            const downSortNote = document.getElementById('extreme-down-sort-note');
-            const heatmapNote = document.getElementById('extreme-heatmap-note');
-            if (upSortNote) upSortNote.innerText = contributionFocus
-                ? 'เรียงจาก Contribution บวกสูงสุดลงมา'
-                : 'เรียงจากการเปลี่ยนแปลงสูงสุดลงมา';
-            if (downSortNote) downSortNote.innerText = contributionFocus
-                ? 'เรียงจาก Contribution ลบมากที่สุดขึ้นมา'
-                : 'เรียงจากการลดลงมากที่สุดขึ้นมา';
-            if (heatmapNote) heatmapNote.innerText = contributionFocus
-                ? 'สีเข้มกว่า = ขนาด Contribution มากกว่า โดยเทียบภายในรายการที่ผ่านตัวกรองปัจจุบัน'
-                : 'สีเข้มกว่า = ขนาดการเปลี่ยนแปลงมากกว่า โดยเทียบภายในรายการที่ผ่านตัวกรองปัจจุบัน';
+            searchSpace.forEach(d => {
+                const val = d[primaryFocus];
+                if (val > 0 && (!maxUpItem || val > maxUpItem[primaryFocus])) maxUpItem = d;
+                if (val < 0 && (!maxDownItem || val < maxDownItem[primaryFocus])) maxDownItem = d;
+            });
 
-            // จำนวนรายการที่ต้องการแสดงต่อทิศทาง: 10 / 20 / 30 / 50 / 100 / ทั้งหมด
-            const limitSelect = document.getElementById('extreme-limit-select');
-            const limitValue = limitSelect ? String(limitSelect.value || '10') : '10';
-            const limit = limitValue === 'all' ? Infinity : Math.max(1, parseInt(limitValue, 10) || 10);
+            const total = up + down + stable;
+            const upPct = total > 0 ? ((up / total) * 100).toFixed(1) : 0;
+            const downPct = total > 0 ? ((down / total) * 100).toFixed(1) : 0;
+            const stablePct = total > 0 ? ((stable / total) * 100).toFixed(1) : 0;
 
-            const allUpMovers = searchSpace
-                .filter(d => Number.isFinite(Number(d[rankingKey])) && Number(d[rankingKey]) > 0)
-                .sort((a, b) => Number(b[rankingKey]) - Number(a[rankingKey]));
+            document.getElementById('pulse-total-items').innerText = `รวม ${total} รายการที่กรอง`;
 
-            const allDownMovers = searchSpace
-                .filter(d => Number.isFinite(Number(d[rankingKey])) && Number(d[rankingKey]) < 0)
-                .sort((a, b) => Number(a[rankingKey]) - Number(b[rankingKey]));
+            document.getElementById('pulse-bar-up').style.width = `${upPct}%`;
+            document.getElementById('pulse-bar-up').innerText = upPct > 8 ? `${upPct}%` : '';
+            document.getElementById('pulse-bar-down').style.width = `${downPct}%`;
+            document.getElementById('pulse-bar-down').innerText = downPct > 8 ? `${downPct}%` : '';
+            document.getElementById('pulse-bar-stable').style.width = `${stablePct}%`;
 
-            const upMovers = Number.isFinite(limit) ? allUpMovers.slice(0, limit) : allUpMovers;
-            const downMovers = Number.isFinite(limit) ? allDownMovers.slice(0, limit) : allDownMovers;
+            document.getElementById('pulse-txt-up').innerText = `${upPct}%`;
+            document.getElementById('pulse-txt-down').innerText = `${downPct}%`;
+            document.getElementById('pulse-txt-stable').innerText = `${stablePct}%`;
 
-            const heatmapMaxAbs = Math.max(
-                0,
-                ...searchSpace
-                    .map(d => Math.abs(Number(d[rankingKey])))
-                    .filter(Number.isFinite)
-            );
+            document.getElementById('pulse-count-up').innerText = `${up} รายการ`;
+            document.getElementById('pulse-count-down').innerText = `${down} รายการ`;
+            document.getElementById('pulse-count-stable').innerText = `${stable} รายการ`;
 
-            const escapeHtml = (value) => String(value ?? '')
-                .replace(/&/g, '&amp;')
-                .replace(/</g, '&lt;')
-                .replace(/>/g, '&gt;')
-                .replace(/"/g, '&quot;')
-                .replace(/'/g, '&#039;');
+            document.getElementById('extreme-focus-label').innerText = primaryFocus.toUpperCase();
 
-            const renderExtremeHeatmap = (containerId, items, direction) => {
-                const container = document.getElementById(containerId);
-                if (!container) return;
+            if (maxUpItem && maxUpItem[primaryFocus] > 0) {
+                document.getElementById('extreme-up-name').innerText = maxUpItem.name;
+                document.getElementById('extreme-up-idx').innerText = maxUpItem.idx.toFixed(2);
+                document.getElementById('extreme-up-val').innerText = `+${maxUpItem[primaryFocus].toFixed(2)}%`;
+            } else {
+                document.getElementById('extreme-up-name').innerText = 'ไม่มีสินค้าที่ปรับตัวสูงขึ้น';
+                document.getElementById('extreme-up-idx').innerText = '-';
+                document.getElementById('extreme-up-val').innerText = '0.00%';
+            }
 
-                if (!items.length) {
-                    const label = direction === 'up'
-                        ? (contributionFocus ? 'ไม่มีสินค้าที่มี Contribution เป็นบวก' : 'ไม่มีสินค้าที่ปรับตัวสูงขึ้น')
-                        : (contributionFocus ? 'ไม่มีสินค้าที่มี Contribution เป็นลบ' : 'ไม่มีสินค้าที่ปรับตัวลดลง');
-                    container.innerHTML = `<div class="sm:col-span-2 lg:col-span-3 xl:col-span-4 2xl:col-span-5 rounded-2xl border border-dashed border-slate-200 bg-slate-50 p-6 text-center text-sm font-bold text-slate-400">${label}</div>`;
-                    return;
-                }
-
-                const rgb = direction === 'up' ? [8, 164, 91] : [224, 32, 32];
-                const arrow = direction === 'up' ? '▲' : '▼';
-
-                container.innerHTML = items.map((item, index) => {
-                    const changeValue = Number(item[primaryFocus]) || 0;
-                    const contributionValue = Number(item[contributionKey]) || 0;
-                    const rankingValue = Number(item[rankingKey]) || 0;
-                    const intensity = heatmapMaxAbs > 0 ? Math.min(1, Math.abs(rankingValue) / heatmapMaxAbs) : 0;
-                    const alpha = 0.08 + (intensity * 0.74);
-                    const alpha2 = Math.max(0.05, alpha - 0.16);
-                    const darkTile = intensity >= 0.54;
-                    const mainText = darkTile ? '#ffffff' : '#142033';
-                    const subText = darkTile ? 'rgba(255,255,255,.80)' : '#62748a';
-                    const border = `rgba(${rgb[0]},${rgb[1]},${rgb[2]},${0.22 + intensity * 0.52})`;
-                    const bg = `linear-gradient(135deg, rgba(${rgb[0]},${rgb[1]},${rgb[2]},${alpha}), rgba(${rgb[0]},${rgb[1]},${rgb[2]},${alpha2}))`;
-                    const idxText = Number.isFinite(Number(item.idx)) ? Number(item.idx).toFixed(2) : '-';
-                    const codeText = String(item.code || item.code16 || item.code7 || '').trim();
-                    const code7 = codeText ? codeText.slice(0, 7) : '';
-                    const signedChange = changeValue > 0 ? `+${changeValue.toFixed(2)}%` : `${changeValue.toFixed(2)}%`;
-                    const signedContribution = contributionValue > 0 ? `+${contributionValue.toFixed(4)}` : contributionValue.toFixed(4);
-                    const primaryDisplay = contributionFocus ? `C ${signedContribution}` : signedChange;
-                    const secondaryDisplay = contributionFocus
-                        ? `${primaryFocus.toUpperCase()} ${signedChange}`
-                        : `Contribution ${signedContribution}`;
-                    const safeName = escapeHtml(item.name || '-');
-                    const safeCode = escapeHtml(codeText);
-                    const safeCode7 = escapeHtml(code7);
-
-                    return `
-                        <div class="rounded-2xl p-3.5 border shadow-sm min-h-[118px] flex flex-col justify-between transition-all hover:-translate-y-0.5 hover:shadow-md"
-                             style="background:${bg}; border-color:${border}; color:${mainText};"
-                             title="${safeName}${safeCode ? ' | ' + safeCode : ''} | ${primaryFocus.toUpperCase()} ${signedChange} | Contribution ${signedContribution}">
-                            <div>
-                                <div class="flex items-start justify-between gap-2">
-                                    <div class="text-[10px] font-black uppercase tracking-[0.12em]" style="color:${subText};">#${index + 1}${safeCode7 ? ' · ' + safeCode7 : ''}</div>
-                                    <div class="text-base font-black whitespace-nowrap">${arrow} ${primaryDisplay}</div>
-                                </div>
-                                <div class="text-[12px] md:text-[13px] font-black leading-snug mt-2 line-clamp-2">${safeName}</div>
-                            </div>
-                            <div class="mt-3 flex items-end justify-between gap-2 text-[10px] font-bold" style="color:${subText};">
-                                <span>Index ${idxText}</span>
-                                <span>${secondaryDisplay}</span>
-                            </div>
-                        </div>`;
-                }).join('');
-            };
-
-            renderExtremeHeatmap('extreme-heatmap-up', upMovers, 'up');
-            renderExtremeHeatmap('extreme-heatmap-down', downMovers, 'down');
-
-            const upSuffix = Number.isFinite(limit) && allUpMovers.length > upMovers.length ? ` / ${allUpMovers.length}` : '';
-            const downSuffix = Number.isFinite(limit) && allDownMovers.length > downMovers.length ? ` / ${allDownMovers.length}` : '';
-            document.getElementById('extreme-up-count').innerText = `${upMovers.length}${upSuffix} รายการ`;
-            document.getElementById('extreme-down-count').innerText = `${downMovers.length}${downSuffix} รายการ`;
+            if (maxDownItem && maxDownItem[primaryFocus] < 0) {
+                document.getElementById('extreme-down-name').innerText = maxDownItem.name;
+                document.getElementById('extreme-down-idx').innerText = maxDownItem.idx.toFixed(2);
+                document.getElementById('extreme-down-val').innerText = `${maxDownItem[primaryFocus].toFixed(2)}%`;
+            } else {
+                document.getElementById('extreme-down-name').innerText = 'ไม่มีสินค้าที่ปรับตัวลดลง';
+                document.getElementById('extreme-down-idx').innerText = '-';
+                document.getElementById('extreme-down-val').innerText = '0.00%';
+            }
         }
 
         function exportExcel() {
@@ -6039,123 +5111,6 @@ function getRegionAccentClasses(idx) {
             document.getElementById('list-7digit-up').innerHTML = upItems.map(item => createPillTag(item, 'blue', 'text-blue-600')).join('');
             document.getElementById('list-7digit-stable').innerHTML = stableItems.map(item => createPillTag(item, 'yellow', 'text-yellow-600')).join('');
             document.getElementById('list-7digit-down').innerHTML = downItems.map(item => createPillTag(item, 'rose', 'text-rose-600')).join('');
-        }
-
-        // =========================================================================
-        // Export Contribution Impact (TG) แบบเต็ม: ไม่จำกัด Top N และแนบ Weight
-        // ใช้ universe เดียวกับหน้าจอ ณ ขณะนั้น (งวด/หมวด/ระดับ/ค้นหา/ตัวกรองทิศทาง)
-        // =========================================================================
-        function exportAllContributionImpactTGExcel() {
-            if (db.length === 0) {
-                alert("กรุณาอัปโหลดไฟล์ข้อมูลก่อนครับ");
-                return;
-            }
-
-            const pSelect = document.getElementById('periodFilter');
-            const currP = pSelect ? pSelect.value : '';
-            if (!currP) return;
-
-            const focus = Array.from(document.querySelectorAll('.f-check:checked:not(:disabled)')).map(cb => cb.value);
-            const primaryFocus = focus.length > 0 ? focus[0] : 'yoy';
-            const cFocus = 'c_' + primaryFocus;
-            const q = String(document.getElementById('search')?.value || '').toLowerCase();
-            const cpiType = document.getElementById('cpiTypeFilter')?.value || 'headline';
-            const catPrefix = document.getElementById('catFilter')?.value || 'all';
-            const lvls = Array.from(document.querySelectorAll('.lvl-check:checked')).map(cb => parseInt(cb.value));
-            const compareCodes = ["0", "0000000", "0000000000000000", "00", "9300000", "9300000000000000", "93", "1000000", "1000000000000000", "10", "8000000", "8000000000000000", "80"];
-
-            // TG เป็นชุดทั่วไป (G) โดยตรง ไม่พึ่ง display limit ของหน้าเว็บ
-            let filtered = db.filter(i => i.p === currP && i.datasetType === 'G');
-
-            if (cpiType === 'compare_all') {
-                filtered = filtered.filter(i => compareCodes.includes(i.code) || compareCodes.includes(String(i.code || '').replace(/0+$/, '')));
-            } else {
-                filtered = filtered.filter(i => lvls.includes(i.level));
-                if (catPrefix !== 'all') filtered = filtered.filter(i => String(i.code || '').startsWith(catPrefix));
-            }
-
-            const stacked = {};
-            filtered.forEach(i => {
-                if (!stacked[i.code]) stacked[i.code] = { name: i.name, code: i.code, level: i.level, regs: {} };
-                stacked[i.code].regs[i.region] = i;
-            });
-
-            let keys = Object.keys(stacked).filter(k => k.includes(q) || String(stacked[k].name || '').toLowerCase().includes(q));
-
-            // ใช้ตัวกรองทิศทางรายภาคแบบเดียวกับ draw() เพื่อให้ universe ตรงกับหน้าจอ
-            const activeRegions = getActiveRegions(filtered, 'G');
-            keys = keys.filter(k => activeRegions.every(reg => {
-                const filterEl = document.getElementById('f-' + reg);
-                const fVal = filterEl ? filterEl.value : 'all';
-                const d = stacked[k].regs[reg];
-                if (fVal === 'all') return true;
-                if (!d) return false;
-                const v = Number(d[primaryFocus] || 0);
-                if (fVal === 'pos') return v > 0;
-                if (fVal === 'neg') return v < 0;
-                if (fVal === 'stable') return v === 0;
-                return true;
-            }));
-
-            // Contribution Impact ส่วนนี้ใช้รายการสินค้า Level 6 และ TG เท่านั้น
-            const rows = keys
-                .filter(k => stacked[k].level === 6 && stacked[k].regs.TG)
-                .map(k => {
-                    const d = stacked[k].regs.TG;
-                    const contribution = Number(d[cFocus] || 0);
-                    const metricValue = Number(d[primaryFocus] || 0);
-                    return {
-                        code: String(d.code || k),
-                        code7: String(d.code || k).slice(0, 7),
-                        name: d.name || stacked[k].name || '',
-                        weight: Number(d.weight || 0),
-                        metricValue,
-                        contribution,
-                        direction: contribution > 0 ? 'ขึ้น' : (contribution < 0 ? 'ลดลง' : 'คงที่')
-                    };
-                });
-
-            if (!rows.length) {
-                alert('ไม่พบข้อมูล Contribution Impact (TG) ตามเงื่อนไขที่เลือก');
-                return;
-            }
-
-            const up = rows.filter(r => r.contribution > 0).sort((a, b) => b.contribution - a.contribution);
-            const stable = rows.filter(r => r.contribution === 0).sort((a, b) => a.code.localeCompare(b.code));
-            const down = rows.filter(r => r.contribution < 0).sort((a, b) => a.contribution - b.contribution);
-
-            const outputRows = [];
-            let overall = 1;
-            const pushGroup = (arr) => {
-                arr.forEach((r, idx) => {
-                    outputRows.push({
-                        'ลำดับรวม': overall++,
-                        'ลำดับในกลุ่ม': idx + 1,
-                        'ทิศทาง': r.direction,
-                        'รหัสสินค้า 16 หลัก': r.code,
-                        'รหัสสินค้า 7 หลัก': r.code7,
-                        'ชื่อรายการ': r.name,
-                        'Weight': r.weight,
-                        [`${primaryFocus.toUpperCase()} (%)`]: r.metricValue,
-                        [`Contribution ${primaryFocus.toUpperCase()}`]: r.contribution
-                    });
-                });
-            };
-            pushGroup(up);
-            pushGroup(stable);
-            pushGroup(down);
-
-            const ws = XLSX.utils.json_to_sheet(outputRows);
-            ws['!cols'] = [
-                { wch: 10 }, { wch: 12 }, { wch: 10 }, { wch: 20 }, { wch: 14 },
-                { wch: 42 }, { wch: 16 }, { wch: 14 }, { wch: 22 }
-            ];
-
-            const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, 'Contribution_TG_All');
-
-            const safePeriod = String(currP).replace(/[\/:*?"<>|\s]+/g, '_');
-            XLSX.writeFile(wb, `Contribution_Impact_TG_ALL_${primaryFocus.toUpperCase()}_${safePeriod}.xlsx`);
         }
 
         // =========================================================================
@@ -6613,36 +5568,6 @@ function getRegionAccentClasses(idx) {
             display: table-cell;
         }
     </style>
-
-
-<style id="single-chart-fullscreen-style">
-.single-chart-fullscreen-card{position:relative!important}
-/* Fullscreen control is embedded inside each chart card */
-.single-chart-fullscreen-actionbar{position:absolute;top:14px;right:14px;z-index:70;display:flex;align-items:center;justify-content:center;margin:0!important;min-height:0!important;pointer-events:none}
-.single-chart-fullscreen-btn{pointer-events:auto;display:inline-flex;align-items:center;justify-content:center;gap:.38rem;min-height:32px;padding:.42rem .68rem;border-radius:999px;border:1px solid rgba(143,215,247,.72);background:rgba(255,255,255,.93);color:#0c2d58;font-family:'Sarabun',sans-serif;font-size:11px;font-weight:900;line-height:1;box-shadow:0 7px 18px rgba(12,45,88,.12);backdrop-filter:blur(10px);cursor:pointer;transition:all .16s ease}
-.single-chart-fullscreen-btn:hover{background:#0c2d58;color:#fff;border-color:#0c2d58;transform:translateY(-1px);box-shadow:0 10px 22px rgba(12,45,88,.22)}
-.single-chart-fullscreen-btn .fs-icon{font-size:15px;line-height:1}
-/* keep chart/card titles readable underneath the embedded control */
-.single-chart-fullscreen-card>h3:first-of-type{padding-right:96px}
-.single-chart-fullscreen-stage{min-height:0}
-.single-chart-fullscreen-card:fullscreen{width:100vw!important;height:100vh!important;max-width:none!important;max-height:none!important;margin:0!important;padding:24px 28px!important;border-radius:0!important;border:0!important;background:#f8fcff!important;overflow:auto!important;box-shadow:none!important}
-.single-chart-fullscreen-card:fullscreen .single-chart-fullscreen-actionbar{position:fixed;top:18px;right:22px;z-index:9999;margin:0!important;padding:0;background:transparent}
-.single-chart-fullscreen-card:fullscreen .single-chart-fullscreen-btn{background:#0c2d58;color:#fff;border-color:#0c2d58;box-shadow:0 10px 24px rgba(12,45,88,.18)}
-.single-chart-fullscreen-card:fullscreen .single-chart-fullscreen-stage{height:calc(100vh - 175px)!important;min-height:520px!important;max-height:none!important}
-.single-chart-fullscreen-card:fullscreen canvas{width:100%!important;height:100%!important;max-height:none!important}
-.single-chart-fullscreen-card:fullscreen #topImpactScroll{max-height:none!important;overflow:visible!important}
-.single-chart-fullscreen-card:fullscreen #topImpactChartWrap{min-height:calc(100vh - 240px)!important;max-height:none!important}
-#cpi-stock-heatmap-section:fullscreen{background:#f8fcff!important;color:#142033!important}
-#cpi-stock-heatmap-section:fullscreen #cpi-stock-heatmap-canvas{height:calc(100vh - 360px)!important;min-height:520px!important;max-height:none!important}
-.single-chart-fullscreen-card.single-chart-pseudo-fullscreen{position:fixed!important;inset:0!important;z-index:99999!important;width:100vw!important;height:100vh!important;max-width:none!important;max-height:none!important;margin:0!important;padding:24px 28px!important;border-radius:0!important;overflow:auto!important;background:#f8fcff!important}
-.single-chart-fullscreen-card.single-chart-pseudo-fullscreen .single-chart-fullscreen-actionbar{position:fixed;top:18px;right:22px;z-index:100000}
-.single-chart-fullscreen-card.single-chart-pseudo-fullscreen .single-chart-fullscreen-stage{height:calc(100vh - 175px)!important;min-height:520px!important}
-.single-chart-fullscreen-card.single-chart-pseudo-fullscreen canvas{width:100%!important;height:100%!important}
-#cpi-stock-heatmap-section.single-chart-pseudo-fullscreen #cpi-stock-heatmap-canvas{height:calc(100vh - 360px)!important;min-height:520px!important}
-body.single-chart-lock-scroll{overflow:hidden!important}
-@media (max-width:768px){.single-chart-fullscreen-card:fullscreen,.single-chart-fullscreen-card.single-chart-pseudo-fullscreen{padding:16px!important}.single-chart-fullscreen-card:fullscreen .single-chart-fullscreen-stage,.single-chart-fullscreen-card.single-chart-pseudo-fullscreen .single-chart-fullscreen-stage{height:calc(100vh - 190px)!important;min-height:420px!important}#cpi-stock-heatmap-section:fullscreen #cpi-stock-heatmap-canvas,#cpi-stock-heatmap-section.single-chart-pseudo-fullscreen #cpi-stock-heatmap-canvas{height:calc(100vh - 430px)!important;min-height:440px!important}}
-</style>
-
 </head>
 <body>
     <table class="sheet">
@@ -6679,268 +5604,6 @@ body.single-chart-lock-scroll{overflow:hidden!important}
             __downloadExcelXml(htmlContent, fileName);
         }
 
-
-        /* ===== Universal Excel Export for Every Dashboard Table ===== */
-        const __tableExportExistingHandlers = {
-            regionalComparisonTable: 'exportRegionalTable',
-            regProductsTable: 'exportRegProductsTable',
-            regionalExtendedTable: 'exportRegionalExtendedTable',
-            historicalMatrixTable: 'exportHistoricalMatrixExcel'
-        };
-
-        function __cleanExcelFilePart(value) {
-            return String(value || '')
-                .replace(/[\\/:*?"<>|]/g, '_')
-                .replace(/\s+/g, '_')
-                .replace(/_+/g, '_')
-                .replace(/^_+|_+$/g, '')
-                .slice(0, 90) || 'Table';
-        }
-
-        function __excelPeriodForFile() {
-            const p = document.getElementById('periodFilter');
-            return p && p.value ? __cleanExcelFilePart(p.value) : '';
-        }
-
-        function __inferTableExportTitle(table, index = 1) {
-            if (!table) return `Table_${index}`;
-            if (table.dataset && table.dataset.exportTitle) return table.dataset.exportTitle;
-
-            const idTitles = {
-                regionalComparisonTable: 'อัตราการเปลี่ยนแปลงรายภาค',
-                regProductsTable: 'สินค้าปรับตัวจำแนกรายภาค',
-                regionalExtendedTable: 'รายละเอียดอัตราการเปลี่ยนแปลงรายภาค',
-                historicalMatrixTable: 'ประวัติอัตราการเปลี่ยนแปลงรายเดือน',
-                mainTable: 'Product_Info_รายละเอียดสินค้า'
-            };
-            if (table.id && idTitles[table.id]) return idTitles[table.id];
-
-            let scope = table.parentElement;
-            for (let depth = 0; scope && depth < 5; depth++, scope = scope.parentElement) {
-                const heading = scope.querySelector(':scope > h1, :scope > h2, :scope > h3, :scope > div > h1, :scope > div > h2, :scope > div > h3');
-                if (heading) {
-                    const t = String(heading.innerText || '').replace(/\s+/g, ' ').trim();
-                    if (t) return t;
-                }
-            }
-
-            const firstHead = table.querySelector('thead th');
-            if (firstHead) {
-                const t = String(firstHead.innerText || '').replace(/\s+/g, ' ').trim();
-                if (t) return `ตาราง_${t}`;
-            }
-            return `Table_${index}`;
-        }
-
-        function exportAnyDashboardTable(tableOrId, title = '') {
-            const table = typeof tableOrId === 'string'
-                ? document.getElementById(tableOrId)
-                : tableOrId;
-
-            if (!table || table.tagName !== 'TABLE') {
-                alert('ไม่พบตารางที่ต้องการ Export');
-                return;
-            }
-
-            const rowCount = table.querySelectorAll('tr').length;
-            if (!rowCount) {
-                alert('ตารางนี้ยังไม่มีข้อมูล');
-                return;
-            }
-
-            const tableIndex = Array.from(document.querySelectorAll('table')).indexOf(table) + 1;
-            const exportTitle = title || __inferTableExportTitle(table, tableIndex);
-            const sheetName = String(exportTitle || 'Table').replace(/[\\/?*\[\]:]/g, ' ').trim().slice(0, 31) || 'Table';
-
-            /* Clone first so UI-only controls / hidden nodes never leak into Excel. */
-            const clone = table.cloneNode(true);
-            clone.querySelectorAll('button, input, select, textarea, script, style').forEach(el => el.remove());
-            clone.querySelectorAll('[hidden], .hidden').forEach(el => el.remove());
-
-            const wb = XLSX.utils.table_to_book(clone, { sheet: sheetName, raw: true });
-            const ws = wb.Sheets[sheetName];
-
-            /* Practical widths based on visible content. */
-            const rows = Array.from(clone.rows || []);
-            const maxCols = rows.reduce((m, r) => Math.max(m, r.cells.length), 0);
-            if (ws && maxCols) {
-                ws['!cols'] = Array.from({ length: maxCols }, (_, colIdx) => {
-                    let longest = 10;
-                    rows.forEach(row => {
-                        const cell = row.cells[colIdx];
-                        if (!cell) return;
-                        const txt = String(cell.innerText || cell.textContent || '').replace(/\s+/g, ' ').trim();
-                        longest = Math.max(longest, Math.min(55, txt.length + 2));
-                    });
-                    return { wch: Math.min(55, Math.max(12, longest)) };
-                });
-            }
-
-            const period = __excelPeriodForFile();
-            const regionEl = document.getElementById('mainRegionFilter');
-            const region = regionEl && regionEl.value ? __cleanExcelFilePart(regionEl.value) : '';
-            const fileBits = [__cleanExcelFilePart(exportTitle), region, period].filter(Boolean);
-            XLSX.writeFile(wb, `${fileBits.join('_')}.xlsx`);
-        }
-
-        function __ensureTableHasExcelExport(table, index) {
-            if (!table || table.dataset.universalExcelReady === '1') return;
-            table.dataset.universalExcelReady = '1';
-
-            /* Tables with purpose-built exports already satisfy the requirement. */
-            if (table.id && __tableExportExistingHandlers[table.id]) return;
-
-            if (!table.id) table.id = `auto-excel-table-${index}`;
-            const exportTitle = __inferTableExportTitle(table, index);
-            table.dataset.exportTitle = exportTitle;
-
-            const toolbar = document.createElement('div');
-            toolbar.className = 'table-excel-toolbar';
-            toolbar.dataset.forTable = table.id;
-
-            const button = document.createElement('button');
-            button.type = 'button';
-            button.className = 'table-excel-btn';
-            button.innerHTML = '<span>📥</span><span>Excel</span>';
-            button.title = `ดาวน์โหลด ${exportTitle} เป็น Excel`;
-            button.addEventListener('click', () => exportAnyDashboardTable(table, exportTitle));
-
-            toolbar.appendChild(button);
-            table.parentNode.insertBefore(toolbar, table);
-        }
-
-        function enableExcelExportForAllTables() {
-            document.querySelectorAll('table').forEach((table, idx) => {
-                __ensureTableHasExcelExport(table, idx + 1);
-            });
-        }
-
-        /* Dynamic summary/regional tables are rebuilt after filters change. */
-        let __tableExportRefreshTimer = null;
-        const __tableExportObserver = new MutationObserver(() => {
-            clearTimeout(__tableExportRefreshTimer);
-            __tableExportRefreshTimer = setTimeout(enableExcelExportForAllTables, 30);
-        });
-
-        setTimeout(() => {
-            enableExcelExportForAllTables();
-            const root = document.getElementById('dashboard-content') || document.body;
-            __tableExportObserver.observe(root, { childList: true, subtree: true });
-        }, 0);
-
 </script>
-
-
-<script id="single-chart-fullscreen-script">
-(function(){
-    const CHART_FULLSCREEN_IDS = ['trendChart','compareChart','weightChart','regionBarChart','topImpactChart','radarInsightChart','bubbleInsightChart','stackedDriverChart'];
-
-    function getChartCard(canvas){
-        if(!canvas) return null;
-        let node=canvas.parentElement;
-        while(node && node.id!=='dashboard-content'){
-            const cls=typeof node.className==='string'?node.className:'';
-            if(cls.includes('bg-white') && (cls.includes('rounded-') || cls.includes('shadow-'))) return node;
-            node=node.parentElement;
-        }
-        return canvas.parentElement;
-    }
-
-    function findStage(canvas,card){
-        if(!canvas||!card) return null;
-        if(canvas.id==='topImpactChart') return document.getElementById('topImpactChartWrap')||canvas.parentElement;
-        let node=canvas.parentElement;
-        while(node && node!==card){
-            const cls=typeof node.className==='string'?node.className:'';
-            if(/\bh-(64|72|80|96)\b/.test(cls)||cls.includes('min-h-[')) return node;
-            node=node.parentElement;
-        }
-        return canvas.parentElement;
-    }
-
-    function cardContains(card,id){const el=document.getElementById(id);return !!(el&&card&&card.contains(el));}
-
-    function makeActionBar(card,stage,label){
-        if(!card||!stage||card.querySelector('.single-chart-fullscreen-actionbar')) return;
-        card.classList.add('single-chart-fullscreen-card');
-        stage.classList.add('single-chart-fullscreen-stage');
-        const bar=document.createElement('div');
-        bar.className='single-chart-fullscreen-actionbar';
-        const btn=document.createElement('button');
-        btn.type='button';
-        btn.className='single-chart-fullscreen-btn';
-        btn.setAttribute('aria-label','ดู '+(label||'กราฟ')+' แบบเต็มหน้าจอ');
-        btn.innerHTML='<span class="fs-icon">⛶</span><span class="fs-text">เต็มหน้าจอ</span>';
-        btn.addEventListener('click',function(ev){ev.preventDefault();ev.stopPropagation();toggleSingleFullscreen(card);});
-        bar.appendChild(btn);
-        /* Embed the control directly inside the chart card. */
-        card.appendChild(bar);
-    }
-
-    async function toggleSingleFullscreen(card){
-        const nativeActive=document.fullscreenElement;
-        if(nativeActive===card){try{await document.exitFullscreen();}catch(e){}return;}
-        if(nativeActive&&document.exitFullscreen){try{await document.exitFullscreen();}catch(e){}}
-        if(card.requestFullscreen){
-            try{await card.requestFullscreen();return;}catch(e){}
-        }
-        document.querySelectorAll('.single-chart-pseudo-fullscreen').forEach(el=>{if(el!==card)el.classList.remove('single-chart-pseudo-fullscreen');});
-        card.classList.toggle('single-chart-pseudo-fullscreen');
-        document.body.classList.toggle('single-chart-lock-scroll',card.classList.contains('single-chart-pseudo-fullscreen'));
-        updateFullscreenButtons();resizeDashboardChartsSoon();
-    }
-
-    function updateFullscreenButtons(){
-        document.querySelectorAll('.single-chart-fullscreen-card').forEach(card=>{
-            const btn=card.querySelector('.single-chart-fullscreen-btn');if(!btn)return;
-            const active=document.fullscreenElement===card||card.classList.contains('single-chart-pseudo-fullscreen');
-            const icon=btn.querySelector('.fs-icon');const txt=btn.querySelector('.fs-text');
-            if(icon)icon.textContent=active?'✕':'⛶';
-            if(txt)txt.textContent=active?'ออกจากเต็มหน้าจอ':'เต็มหน้าจอ';
-            btn.setAttribute('aria-label',active?'ออกจากโหมดเต็มหน้าจอ':'ดูกราฟแบบเต็มหน้าจอ');
-        });
-    }
-
-    function resizeDashboardChartsSoon(){
-        const refs=[];
-        try{if(typeof myTrendChart!=='undefined')refs.push(myTrendChart);}catch(e){}
-        try{if(typeof myCompareChart!=='undefined')refs.push(myCompareChart);}catch(e){}
-        try{if(typeof myWeightChart!=='undefined')refs.push(myWeightChart);}catch(e){}
-        try{if(typeof myRegionBarChart!=='undefined')refs.push(myRegionBarChart);}catch(e){}
-        try{if(typeof myTopImpactChart!=='undefined')refs.push(myTopImpactChart);}catch(e){}
-        try{if(typeof myRadarInsightChart!=='undefined')refs.push(myRadarInsightChart);}catch(e){}
-        try{if(typeof myBubbleInsightChart!=='undefined')refs.push(myBubbleInsightChart);}catch(e){}
-        try{if(typeof myStackedDriverChart!=='undefined')refs.push(myStackedDriverChart);}catch(e){}
-        [80,220,450].forEach(delay=>setTimeout(()=>refs.forEach(ch=>{try{if(ch&&typeof ch.resize==='function')ch.resize();}catch(e){}}),delay));
-    }
-
-    function initSingleChartFullscreen(){
-        CHART_FULLSCREEN_IDS.forEach(id=>{
-            const canvas=document.getElementById(id);if(!canvas)return;
-            const card=getChartCard(canvas);const stage=findStage(canvas,card);if(!card||!stage)return;
-            const heading=card.querySelector('h3');
-            const label=heading?heading.textContent.replace(/\s+/g,' ').trim():id;
-            makeActionBar(card,stage,label);
-        });
-        const heat=document.getElementById('cpi-stock-heatmap-section');
-        const heatStage=document.getElementById('cpi-stock-heatmap-canvas');
-        if(heat&&heatStage&&!heat.querySelector('.single-chart-fullscreen-actionbar')){
-            heat.classList.add('single-chart-fullscreen-card');heatStage.classList.add('single-chart-fullscreen-stage');
-            const bar=document.createElement('div');bar.className='single-chart-fullscreen-actionbar';
-            const btn=document.createElement('button');btn.type='button';btn.className='single-chart-fullscreen-btn';
-            btn.setAttribute('aria-label','ดู Heatmap แบบเต็มหน้าจอ');
-            btn.innerHTML='<span class="fs-icon">⛶</span><span class="fs-text">เต็มหน้าจอ</span>';
-            btn.addEventListener('click',function(ev){ev.preventDefault();ev.stopPropagation();toggleSingleFullscreen(heat);});
-            bar.appendChild(btn);heat.appendChild(bar);
-        }
-        updateFullscreenButtons();
-    }
-
-    document.addEventListener('fullscreenchange',function(){if(!document.fullscreenElement)document.body.classList.remove('single-chart-lock-scroll');updateFullscreenButtons();resizeDashboardChartsSoon();});
-    document.addEventListener('keydown',function(e){if(e.key!=='Escape')return;const pseudo=document.querySelector('.single-chart-pseudo-fullscreen');if(pseudo){pseudo.classList.remove('single-chart-pseudo-fullscreen');document.body.classList.remove('single-chart-lock-scroll');updateFullscreenButtons();resizeDashboardChartsSoon();}});
-    if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',initSingleChartFullscreen);else initSingleChartFullscreen();
-})();
-</script>
-
 </body>
 </html>
