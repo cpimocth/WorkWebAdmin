@@ -43,9 +43,21 @@
     .log{font-size:11px;color:#475467;max-height:130px;overflow:auto;margin-top:10px;padding-top:8px;border-top:1px solid var(--line)}.log div{padding:2px 0}.dot{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:6px;background:#98a2b3}.dot.ok{background:#12b76a}.dot.warn{background:#f79009}.dot.err{background:#f04438}
   
 [hidden]{display:none!important}.file-row{grid-template-columns:1fr 230px 32px}.logic-notes{font-size:11px;color:var(--muted);margin-top:12px;line-height:1.6}.logic-notes summary{cursor:pointer;font-weight:700}.logic-notes p{margin:6px 0}.file-row select{font-size:12px}.kpis{grid-template-columns:repeat(auto-fit,minmax(150px,1fr))!important} @media(max-width:600px){.file-row{grid-template-columns:1fr 32px}.file-row select{grid-row:2;grid-column:1/-1}.file-row .xbtn{grid-row:1;grid-column:2}.wrap{padding:12px}}
+    .folder-panel{margin:0 0 16px;border:1px solid #c7dcf0;background:linear-gradient(125deg,#f0f8ff,#fff);border-radius:14px;padding:15px}
+    .folder-bar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+    .folder-title{font-size:14px;font-weight:800;color:#173f62;display:flex;align-items:center;gap:7px}
+    .folder-sub{color:#576a81;font-size:11.5px;margin-top:5px;line-height:1.6}
+    .folder-actions{display:flex;gap:7px;flex-wrap:wrap}
+    .folder-actions .btn{padding:8px 12px;font-size:12px}
+    .auto-summary{margin-top:12px;display:grid;gap:7px}
+    .auto-row{display:flex;gap:12px;align-items:flex-start;justify-content:space-between;background:#fff;border:1px solid #dae6f2;border-radius:9px;padding:9px 10px;min-width:0}
+    .auto-row .auto-kind{font-weight:750;color:#173f62;font-size:11.5px;min-width:105px}
+    .auto-row .auto-info{font-size:11px;color:#486077;min-width:0;overflow-wrap:anywhere;text-align:right;flex:1}
+    .auto-row .auto-info small{display:block;color:#667085;margin-top:2px}
+    .auto-row.missing{background:#fbfcfe;border-style:dashed}.auto-row.missing .auto-info{color:#8b6d40}
     .auto-inline{border-radius:5px;background:#e4f1fd;padding:1px 5px;color:#1f4e78;font-weight:700;font-size:10px}
     .file-meta{line-height:1.4}
-.auto-row .auto-info{text-align:left}.folder-actions{width:100%}}
+    @media(max-width:640px){.auto-row{flex-direction:column;gap:5px}.auto-row .auto-info{text-align:left}.folder-actions{width:100%}}
   </style>
 </head>
 <body>
@@ -61,6 +73,21 @@
 <section class="card">
 <h2>1) ใส่ไฟล์</h2>
 <div class="sub">รองรับหลายไฟล์พร้อมกัน และเดาประเภทไฟล์ให้อัตโนมัติ</div>
+<div class="folder-panel" id="folderPanel">
+  <div class="folder-bar">
+    <div>
+      <div class="folder-title">📁 ราคากลางอัตโนมัติ <span class="auto-inline">เลือกปี/เดือนล่าสุด</span></div>
+      <div class="folder-sub" id="folderDesc">ค้นหาราคากลางรายเดือนและรายสัปดาห์ในโฟลเดอร์เดียวกัน โดยไม่รวมข้อมูลต่างเดือนเข้าด้วยกัน</div>
+    </div>
+    <div class="folder-actions">
+      <button type="button" class="btn primary" id="chooseFolderBtn">เลือกโฟลเดอร์</button>
+      <button type="button" class="btn secondary" id="reloadFolderBtn">ตรวจไฟล์ล่าสุดอีกครั้ง</button>
+    </div>
+  </div>
+  <input id="folderFallbackInput" type="file" webkitdirectory directory multiple accept=".xlsx,.xls,.xlsm"/>
+  <div id="autoSummary" class="auto-summary"></div>
+  <div class="folder-sub" id="folderHelp">เปิดด้วยไฟล์ HTML โดยตรง: ต้องอนุญาตโฟลเดอร์ครั้งแรกตามข้อจำกัดของเบราว์เซอร์ | เปิดด้วยตัวเริ่มระบบ: ตรวจโฟลเดอร์ได้ทันที</div>
+</div>
 <div class="drop" id="dropZone">
 <strong>วางไฟล์ .xlsx / .xls ที่นี่</strong>
 <span>หรือคลิกเพื่อเลือกไฟล์ — สามารถใส่ G/L, U รายเดือน, U รายสัปดาห์, Real_Master_CPI และราคากลางพร้อมกัน</span>
@@ -84,7 +111,7 @@
 <div class="step"><div class="n">4</div><div><b>ราคาที่สงสัย</b><div>Z-score รายการ 16 หลัก / หมวด 7 หลัก + REL + เหตุผลจากผู้บันทึก/ผู้ตรวจ</div></div></div>
 <div class="step"><div class="n">5</div><div><b>ตรวจตัวซ้ำ</b><div>ตรวจคู่ “รหัส + รหัสแหล่ง” ซ้ำ และแสดงทุกแถวที่เกี่ยวข้อง</div></div></div>
 <div class="step"><div class="n">6</div><div><b>Import_Weekly</b><div>dfw: สป.1 / สป.2 / สป.3 / สป.4 | ราคาทั้งสองฝั่งต้องครบ 4 สัปดาห์ | ไม่กรอง Link</div></div></div></div>
-<div class="notice"><b>Python:</b> df / dfw แยกกัน (concat ถูกคอมเมนต์ไว้)<br/>Master: <code>shop_manual_cleansing</code> + <code>ข้อมูล_รายการ_ผู้ดูแล</code><br/>Master และราคากลางรายเดือน/รายสัปดาห์ในโฟลเดอร์เดียวกันจะขึ้น AUTO โดยใช้ไฟล์รอบล่าสุดที่ตรวจพบเมื่อเปิดผ่านตัวเริ่มระบบ และยังสามารถเลือก Excel ด้วยตนเองได้</div>
+<div class="notice"><b>Python:</b> df / dfw แยกกัน (concat ถูกคอมเมนต์ไว้)<br/>Master: <code>shop_manual_cleansing</code> + <code>ข้อมูล_รายการ_ผู้ดูแล</code><br/>เปิดด้วยตัวเริ่มระบบ: อ่านราคากลางทั้งสองแบบและ Real_Master_CPI ล่าสุดในโฟลเดอร์โดยอัตโนมัติ<br/>เปิดไฟล์โดยตรง: กดเลือกโฟลเดอร์เพื่ออนุญาตการอ่านไฟล์ แล้วระบบจะเลือกปี/เดือนล่าสุดให้</div>
 <details class="logic-notes"><summary>รายละเอียดการเทียบ Python</summary><p>Analysic_03(3).ipynb: cells 19-47, 51, 53-56; shop(1).py: ไฟล์เดิมจาก Library.</p><p>หมายเหตุ: cells 53/55 อ้าง CODE7 / ผู้ดูแล จาก df แทน dw/cp. หน้านี้ใช้รหัสของแถวนั้น สำหรับการแสดงผู้ดูแล; ไม่เปลี่ยนเงื่อนไขเลือกแถวส่งออก.</p><p>Import_Weekly: ราคาเดิม และ ราคากลาง ต้องครบ 4 สัปดาห์; 0 นับว่ามีค่า; Link ไม่จำกัด.</p></details></section>
 </div>
 <section class="results" hidden="" id="results">
@@ -135,7 +162,7 @@
 
   const state = {
     files: [], results: null, monthlyCount:0, weeklyCount:0, weeklyStats:null, busy:false, activeKey: '01_RELไม่ตรง', logs: [],
-    auto: {busy:false,source:null,folderName:''}
+    auto: {busy:false,source:null,entries:[],directoryHandle:null,folderName:'',lastScan:0}
   };
 
   const $ = id => document.getElementById(id);
@@ -930,7 +957,25 @@
       (b.file.lastModified||0)-(a.file.lastModified||0)||
       b.file.name.localeCompare(a.file.name,'th',{numeric:true});
   }
-  function renderAutoSummary() { /* AUTO file labels appear in the original file list. */ }
+  function summarizeAutoSelections() {
+    const entries=state.files.filter(r=>r.auto);
+    return ['central','centralWeekly'].map(role=>{
+      const selection=entries.filter(r=>r.role===role);
+      const manual=state.files.filter(r=>!r.auto&&r.role===role);
+      const title=role==='central'?'ราคากลางรายเดือน':'ราคากลางรายสัปดาห์';
+      if(manual.length)return `<div class="auto-row"><div class="auto-kind">${title}</div><div class="auto-info">${manual.map(x=>escapeHtml(x.file.name)).join('<br>')}<small>เลือกไฟล์เอง</small></div></div>`;
+      if(!selection.length)return `<div class="auto-row missing"><div class="auto-kind">${title}</div><div class="auto-info">ไม่พบไฟล์ที่มีข้อมูลประเภทนี้ในโฟลเดอร์</div></div>`;
+      return `<div class="auto-row"><div class="auto-kind">${title}</div><div class="auto-info">${selection.map(r=>escapeHtml(r.file.name)).join('<br>')}<small>${escapeHtml(readablePeriod(selection[0].selectedPeriod))} · เลือกไฟล์ฉบับใหม่ล่าสุดอัตโนมัติ</small></div></div>`;
+    }).join('');
+  }
+  function renderAutoSummary() {
+    $('autoSummary').innerHTML=summarizeAutoSelections();
+    if(state.auto.busy){$('folderDesc').textContent='กำลังค้นหาและตรวจสอบปี/เดือนจากไฟล์ Excel ในโฟลเดอร์...';}
+    else if(state.auto.source) {$('folderDesc').textContent=`เชื่อมต่อโฟลเดอร์: ${state.auto.folderName||'โฟลเดอร์เดียวกับ HTML'} · ${state.auto.source==='http'?'อ่านอัตโนมัติผ่านตัวเริ่มระบบ':'อนุญาตการเข้าถึงแล้ว'} · ข้อมูลราคากลางแยกตามรอบล่าสุด`;}
+    else {$('folderDesc').textContent='ค้นหาราคากลางรายเดือนและรายสัปดาห์ในโฟลเดอร์เดียวกัน โดยเลือกปี/เดือนล่าสุด และไฟล์วันที่ใหม่สุด';}
+    $('chooseFolderBtn').disabled=state.auto.busy;
+    $('reloadFolderBtn').disabled=state.auto.busy;
+  }
   function preferredByRole(candidates,role) {
     const available=candidates.filter(r=>r.profile?.[role]?.count>0)
       .map(r=>({...r,role}));
@@ -973,7 +1018,7 @@
       const candidates=cache.filter(r=>r.kind==='price');
       const latest=[...preferredByRole(candidates,'central'),...preferredByRole(candidates,'centralWeekly')];
       const masters=cache.filter(r=>r.kind==='master').sort((a,b)=>snapshotNumber(b.file.name)-snapshotNumber(a.file.name)||(b.file.lastModified||0)-(a.file.lastModified||0));
-      state.files=state.files.filter(r=>!r.auto||(r.role==='master'&&!masters.length));
+      state.files=state.files.filter(r=>!r.auto);
       for(const rec of latest){
         if(state.files.some(r=>r.role===rec.role))continue; // Explicit upload wins.
         state.files.push({id:`folder-${rec.role}-${rec.file.name}`,file:rec.file,wb:rec.wb,role:rec.role,selectedPeriod:rec.selectedPeriod,auto:true,profile:rec.profile,
@@ -990,6 +1035,59 @@
       setStatus(picks.length?`ตรวจโฟลเดอร์แล้ว ${picks.length} ไฟล์ที่เกี่ยวข้อง · เลือกเฉพาะรอบล่าสุด`:'ไม่พบไฟล์ราคากลางหรือ Master ในโฟลเดอร์',picks.length?'ok':'warn');
     }catch(e){log(`ไม่สามารถเลือกไฟล์ล่าสุด: ${e.message||e}`,'err');setStatus(String(e.message||e),'err');}
     finally {state.auto.busy=false;renderAutoSummary();}
+  }
+  function indexedDBHandle(action,handle) {
+    return new Promise((resolve,reject)=>{
+      if(!('indexedDB' in window))return resolve(null);
+      let request;
+      try {request=indexedDB.open('cpi-price-validator-folder-v1',1);}catch(e){return resolve(null);}
+      request.onupgradeneeded=()=>request.result.createObjectStore('settings');
+      request.onerror=()=>resolve(null);
+      request.onsuccess=()=>{
+        const db=request.result,tx=db.transaction('settings',action==='set'?'readwrite':'readonly');
+        const r=action==='set'?tx.objectStore('settings').put(handle,'folder'):tx.objectStore('settings').get('folder');
+        r.onsuccess=()=>{resolve(r.result||null);db.close();};
+        r.onerror=()=>{resolve(null);db.close();};
+      };
+    });
+  }
+  async function scanHandle(handle) {
+    const entries=[];
+    for await(const entry of handle.values())if(entry.kind==='file'&&(isPriceName(entry.name)||isMasterName(entry.name))){
+      entries.push({name:entry.name,getFile:()=>entry.getFile()});
+    }
+    state.auto.directoryHandle=handle;
+    await loadAutoCandidates(entries,handle.name||'โฟลเดอร์ที่เลือก','handle');
+  }
+  async function chooseFolder() {
+    if(typeof window.showDirectoryPicker==='function'){
+      try {
+        const handle=await window.showDirectoryPicker({id:'cpi-price-files',mode:'read'});
+        await indexedDBHandle('set',handle);
+        await scanHandle(handle);return;
+      }catch(e){
+        if(e.name==='AbortError')return;
+        log(`การเลือกโฟลเดอร์ด้วยเบราว์เซอร์: ${e.message||e} (ลองวิธีเลือกไฟล์ทั้งโฟลเดอร์)`,'warn');
+      }
+    }
+    $('folderFallbackInput').click();
+  }
+  async function refreshFolder() {
+    if(state.auto.busy)return;
+    if(state.auto.source==='http'){
+      const found=await scanHttpDirectory();
+      if(found)return;
+    }
+    const handle=state.auto.directoryHandle||await indexedDBHandle('get');
+    if(handle){
+      try {
+        if(await handle.queryPermission({mode:'read'})!=='granted'){
+          if(await handle.requestPermission({mode:'read'})!=='granted'){setStatus('ต้องอนุญาตให้เข้าถึงโฟลเดอร์ก่อน','warn');return;}
+        }
+        await scanHandle(handle);return;
+      }catch(e){log(`ตรวจโฟลเดอร์เดิมไม่ได้: ${e.message||e}`,'warn');}
+    }
+    await chooseFolder();
   }
   async function scanHttpDirectory() {
     if(!/^https?:$/.test(location.protocol))return false;
@@ -1053,71 +1151,20 @@
       }catch(e){/* A missing optional default is not an error. */}
     }
   }
-  // Fetch same-folder files just like Real_Master_CPI.xlsx.
-  // A browser cannot enumerate unknown file names without a server listing; the included
-  // starter supplies that listing and makes latest-file selection exact. Common naming
-  // patterns are probed as a fallback for ordinary static web servers.
-  function datedPriceNames() {
-    const names=new Set([
-      'ราคากลาง.xlsx','ราคากลางรายเดือน.xlsx','ราคากลาง_รายเดือน.xlsx',
-      'ราคากลาง (รายเดือน).xlsx','ราคากลางรายสัปดาห์.xlsx',
-      'ราคากลาง_รายสัปดาห์.xlsx','ราคากลาง (รายสัปดาห์).xlsx',
-      'ราคากลาง_ข้อมูลที่กรอง.xlsx',
-      'ราคากลาง_ข้อมูลที่กรอง_20260918(1).xlsx',
-      'ราคากลาง_ข้อมูลที่กรอง_20260930.xlsx'
-    ]);
-    const date=new Date();
-    // Recent dated exports, including the previous reporting month.
-    for(let days=0;days<65;days++){
-      const d=new Date(date.getFullYear(),date.getMonth(),date.getDate()-days);
-      const stamp=d.getFullYear()+String(d.getMonth()+1).padStart(2,'0')+String(d.getDate()).padStart(2,'0');
-      names.add('ราคากลาง_ข้อมูลที่กรอง_'+stamp+'.xlsx');
-      names.add('ราคากลางรายเดือน_'+stamp+'.xlsx');
-      names.add('ราคากลางรายสัปดาห์_'+stamp+'.xlsx');
-    }
-    return [...names];
-  }
-  async function loadNamedDefaultPrices() {
-    if(!window.XLSX||!/^https?:$/.test(location.protocol))return;
-    const base=new URL('./',location.href),found=[];
-    const names=datedPriceNames();
-    // HEAD checks are lightweight: Excel payloads are downloaded only when present.
-    let index=0;
-    async function worker(){
-      while(index<names.length){
-        const name=names[index++];
-        try{
-          const url=new URL(name,base);
-          const head=await fetch(url,{method:'HEAD',cache:'no-store'});
-          if(!head.ok)continue;
-          const type=(head.headers.get('Content-Type')||'').toLowerCase();
-          if(type.includes('text/html'))continue;
-          const modified=Date.parse(head.headers.get('Last-Modified')||'')||0;
-          found.push({name,getFile:async()=>{
-            const response=await fetch(url,{cache:'no-store'});
-            if(!response.ok)throw new Error(`HTTP ${response.status}`);
-            const buffer=await response.arrayBuffer();
-            const magic=new Uint8Array(buffer.slice(0,4));
-            if(!((magic[0]===80&&magic[1]===75)||(magic[0]===208&&magic[1]===207)))throw new Error('ไม่ใช่ไฟล์ Excel');
-            return {name,lastModified:modified,arrayBuffer:async()=>buffer};
-          }});
-        }catch(e){ /* Optional candidate: no file is a normal condition. */ }
-      }
-    }
-    await Promise.all(Array.from({length:12},()=>worker()));
-    if(found.length)await loadAutoCandidates(found,'โฟลเดอร์เดียวกับ HTML','names');
-  }
   async function initializeAuto() {
-    if(!window.XLSX){setStatus('โหลดตัวอ่าน Excel ไม่สำเร็จ โปรดเชื่อมต่ออินเทอร์เน็ต หรือเพิ่ม xlsx.full.min.js','err');return;}
-    await loadDefaultMaster();  // Make the familiar Real_Master row appear immediately.
-    if(await scanHttpDirectory()){
-      // A live listing is the authoritative way to choose the newest dated filename.
-      if(!state.files.some(r=>r.role==='master'))await loadDefaultMaster();
-      return;
-    }
-    await loadNamedDefaultPrices();
+    renderAutoSummary();
+    if(!window.XLSX){setStatus('โหลด SheetJS ไม่สำเร็จ — ใช้ไฟล์ xlsx.full.min.js คู่กับ HTML หรือเชื่อมต่ออินเทอร์เน็ต','err');return;}
+    if(await scanHttpDirectory())return;
+    try {
+      const handle=await indexedDBHandle('get');
+      if(handle){
+        state.auto.directoryHandle=handle;
+        if(await handle.queryPermission({mode:'read'})==='granted'){await scanHandle(handle);return;}
+        $('folderDesc').textContent='พบโฟลเดอร์ที่เคยเลือกไว้ กด “ตรวจไฟล์ล่าสุดอีกครั้ง” เพื่ออนุญาตให้ใช้งาน';
+      }
+    }catch(e){/* Browser privacy settings may prevent persistence. */}
+    await loadDefaultMaster();
   }
-
 
 
   dropZone.addEventListener('click',()=>fileInput.click());
@@ -1130,6 +1177,14 @@
   $('searchBox').addEventListener('input',renderTable);
   $('exportAllBtn').addEventListener('click',exportAll);$('exportImportBtn').addEventListener('click',exportImport);$('exportWeeklyBtn').addEventListener('click',exportWeekly);
 
+  $('chooseFolderBtn').addEventListener('click',chooseFolder);
+  $('reloadFolderBtn').addEventListener('click',refreshFolder);
+  $('folderFallbackInput').addEventListener('change',async e=>{
+    const files=[...e.target.files].filter(f=>(f.webkitRelativePath||'').split('/').length<=2);
+    const entries=files.map(file=>({name:file.name,getFile:async()=>file}));
+    await loadAutoCandidates(entries,files[0]?.webkitRelativePath?.split('/')[0]||'โฟลเดอร์ที่เลือก','input');
+    e.target.value='';
+  });
   renderFiles();invalidateResults();setStatus('');logEl.innerHTML='';logEl.hidden=true;
   initializeAuto();
 })();
