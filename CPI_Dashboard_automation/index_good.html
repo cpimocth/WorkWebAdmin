@@ -405,9 +405,6 @@
   const DATASET_LABEL = {G:'ชุดทั่วไป',L:'ชุดรายได้น้อย',U:'ชุดนอกเขต',UNKNOWN:'ไม่ระบุชุด'};
   const DATASET_FULL_LABEL = {G:'ดัชนีราคาผู้บริโภคชุดทั่วไป',L:'ดัชนีราคาผู้บริโภคชุดรายได้น้อย',U:'ดัชนีราคาผู้บริโภคชุดนอกเขต',UNKNOWN:'ดัชนีราคาผู้บริโภค'};
   const TABLE_LIMIT_OPTIONS = [3,6,9,12,15,20,30];
-  // Level 6 and Level 7 are equally eligible item rows.
-  // E.g. 1112210 (ขนมอบ) ends in zero, so sigLen() reports level 6.
-  const MIN_PRODUCT_DRIVER_LEVEL = 6;
   const state = {reports:[], trendChart:null, outlookChart:null, posterWeightChart:null};
 
   const SUMMARY_CODES = [
@@ -699,14 +696,14 @@
     return `เฉลี่ย ${report.month} เดือน (ม.ค.–${MONTHS_SHORT[report.month]}) ปี ${report.year} เทียบช่วงเดียวกันปีก่อน (AoA)`;
   }
   function topDrivers(report,metric,positive=true,limit=3,scopeRows=null){
-    const rows=(scopeRows||report.rows).filter(r=>r.level>=MIN_PRODUCT_DRIVER_LEVEL && r.name && !/รวม|หมวด|กลุ่ม/.test(r.name));
+    const rows=(scopeRows||report.rows).filter(r=>r.level>=7 && r.name && !/รวม|หมวด|กลุ่ม/.test(r.name));
     const filtered=rows.filter(r=>{const c=contribValue(r,metric);return positive?c>0:c<0});
     filtered.sort((a,b)=>positive?contribValue(b,metric)-contribValue(a,metric):contribValue(a,metric)-contribValue(b,metric));
     const out=[];for(const r of filtered){if(!out.some(x=>x.name===r.name))out.push(r);if(out.length>=limit)break;}return out;
   }
   function topChildNames(report,categoryCode7,metric,sign,limit=3){
     const prefix=prefixForCode7(categoryCode7); const parent=findRow(report,categoryCode7);
-    let kids=report.rows.filter(r=>r.code!==parent?.code && r.code.startsWith(prefix) && r.level>=MIN_PRODUCT_DRIVER_LEVEL);
+    let kids=report.rows.filter(r=>r.code!==parent?.code && r.code.startsWith(prefix) && r.level>=7);
     let same=kids.filter(r=>sign>0?contribValue(r,metric)>0:sign<0?contribValue(r,metric)<0:true);
     if(!same.length)same=kids;
     same.sort((a,b)=>Math.abs(contribValue(b,metric))-Math.abs(contribValue(a,metric)));
