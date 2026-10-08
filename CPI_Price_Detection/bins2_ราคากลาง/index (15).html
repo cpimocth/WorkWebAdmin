@@ -81,7 +81,7 @@
 <div class="step"><div class="n">1</div><div><b>REL ไม่ตรง</b><div>RELN = ราคาปัจจุบัน / ราคาเปรียบเทียบ x 100 | diffREL = ROUND_HALF_UP(abs(ROUND_HALF_UP(RELN, 2) - REL), 2) &gt; 0</div></div></div>
 <div class="step"><div class="n">2</div><div><b>ช่องคำนวณว่าง</b><div>G / L = Checked + 3 conditions | concat df02, df021, df022, df023 | keep last</div></div></div>
 <div class="step"><div class="n">3</div><div><b>ราคากลาง</b><div>รหัส + ประเภทร้านค้า | shop.py + CODE7 | keep last</div></div></div>
-<div class="step"><div class="n">4</div><div><b>ราคาที่สงสัย</b><div>ทุกประเภทร้าน รวม Modern Trade / CJ MORE | REL ต่ำกว่า 80 มี โปร/แถม ถือว่าผ่าน | CODE7 เดียวกันและ REL เท่ากันตั้งแต่ 2 รายการ ถือว่าผ่าน | ผู้ตรวจมีคำว่า ยืนยัน ถือว่าผ่าน | ราคาปัจจุบันตรงกับราคากลางถือว่าผ่าน | รายการเดี่ยว REL สูงมากยังตรวจ</div></div></div>
+<div class="step"><div class="n">4</div><div><b>ราคาที่สงสัย</b><div>ทุกประเภทร้าน รวม Modern Trade / CJ MORE | REL ต่ำกว่า 80 มี โปร/แถม ถือว่าผ่าน | CODE7 เดียวกันและ REL เท่ากันตั้งแต่ 2 รายการ ถือว่าผ่าน | รายการเดี่ยว REL สูงมากยังตรวจ</div></div></div>
 <div class="step"><div class="n">5</div><div><b>ตรวจตัวซ้ำ</b><div>ตรวจคู่ “รหัส + รหัสแหล่ง” ซ้ำ และแสดงทุกแถวที่เกี่ยวข้อง</div></div></div>
 <div class="step"><div class="n">6</div><div><b>Import_Weekly</b><div>dfw: สป.1 / สป.2 / สป.3 / สป.4 | ราคาทั้งสองฝั่งต้องครบ 4 สัปดาห์ | ไม่กรอง Link</div></div></div></div>
 <div class="notice"><b>Python:</b> df / dfw แยกกัน (concat ถูกคอมเมนต์ไว้)<br/>Master: <code>shop_manual_cleansing</code> + <code>ข้อมูล_รายการ_ผู้ดูแล</code><br/>Master และราคากลางรายเดือน/รายสัปดาห์ในโฟลเดอร์เดียวกันจะขึ้น AUTO โดยใช้ไฟล์รอบล่าสุดที่ตรวจพบเมื่อเปิดผ่านตัวเริ่มระบบ และยังสามารถเลือก Excel ด้วยตนเองได้</div>
@@ -665,12 +665,8 @@
     return rows.map(r=>({...r,'ราคากลาง':centralMap.get(cleanCode(r['รหัส'])+'\u001f'+cleanText(r['ประเภทร้านค้า'])) ?? null}));
   }
 
-  // The same exact input row must never be reported in both 03 and 04.
-  function isCentralMismatch(r) {
-    return Number.isFinite(r[C.central])&&(!Number.isFinite(r[C.cur])||r[C.cur]-r[C.central]!==0);
-  }
   function conditionCentral(rowsWithCentral) {
-    return rowsWithCentral.filter(isCentralMismatch).map(r=>pickCols(r,sheetCols[KEYS[2]]));
+    return rowsWithCentral.filter(r=>Number.isFinite(r[C.central])&&(!Number.isFinite(r[C.cur])||r[C.cur]-r[C.central]!==0)).map(r=>pickCols(r,sheetCols[KEYS[2]]));
   }
 
   function sampleStats(values) {
@@ -693,7 +689,7 @@
     return result;
   }
 
-  function conditionSuspicious(rowsWithCentral, excludedByCentral=null) {
+  function conditionSuspicious(rowsWithCentral) {
     const rows=rowsWithCentral.map(r=>({...r}));
     const z16=zscoreMap(rows,r=>cleanCode(r['รหัส']));
     const z7=zscoreMap(rows,r=>cleanCode(r['รหัส']).slice(0,7));
@@ -715,21 +711,11 @@
 
     const out=[];
     rows.forEach((r,i)=>{
-      // Keep excluded rows in Z-score/REL-group statistics, but not in tab 04.
-      if(excludedByCentral?.has(i))return;
       const rel=r[C.rel],cur=r[C.cur],cmp=r[C.compare],cp=r[C.central];
-      // Condition 04: a numeric current price matching the mapped central price
-      // is accepted regardless of REL or Z-score. No central price != a match.
-      // Condition 03 remains the first-priority destination for mismatches.
-      if(isClose(cur,cp))return;
       const failZ=(Number.isFinite(z16[i])&&z16[i]>2)||(Number.isFinite(z7[i])&&z7[i]>2);
       const key=relKey(r);
       const same=key!=null&&(relCounts.get(key)||0)>1;
       const rec=cleanText(r[C.recorder]),ins=cleanText(r[C.inspector]);
-
-      // Inspector has explicitly confirmed the price: always pass Condition 04.
-      // Match 'ยืนยัน' anywhere in the inspector's note (no REL/Z-score restriction).
-      if(ins.includes('ยืนยัน'))return;
 
       // Reinstated original corroboration: identical REL within CODE7 is accepted,
       // even if REL is >200 and even for Modern Trade/CJ MORE.
@@ -748,6 +734,7 @@
 
       // Retain prior exceptions for non-severe, Z-score-only findings. An unrelated
       // inspector note must NOT mask a price drop <80 or a rise >=200.
+      if(!relTrigger&&check===C.check&&isClose(cur,cp))check='';
       if(!relTrigger&&check===C.check&&(/โปร|ส่วนลด/i.test(rec)||/โปร|ส่วนลด/i.test(ins)))check='';
       const recorderOK=/โปร|โปรโมชั่น|ส่วนลด|ลดราคา/i.test(rec);
       const inspectorOK=ins!=='';
@@ -777,15 +764,11 @@
 
   function buildResults(rows,centralMap) {
     const withCentral=attachCentral(rows,centralMap);
-    // Use row positions, not just CODE7 or outlet, so another record with the
-    // same codes is not accidentally removed from Condition 04.
-    const excludedByCentral=new Set();
-    withCentral.forEach((r,i)=>{if(isCentralMismatch(r))excludedByCentral.add(i);});
     return {
       [KEYS[0]]:conditionREL(rows),
       [KEYS[1]]:conditionMissing(rows),
       [KEYS[2]]:conditionCentral([...withCentral].sort(compareCodePrice)),
-      [KEYS[3]]:conditionSuspicious(withCentral,excludedByCentral).sort(compareCodePrice),
+      [KEYS[3]]:conditionSuspicious(withCentral).sort(compareCodePrice),
       [KEYS[4]]:conditionDuplicates(rows)
     };
   }
