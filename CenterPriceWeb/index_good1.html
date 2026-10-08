@@ -274,8 +274,8 @@
       <div class="header-actions">
         <button type="button" class="btn btn-primary" id="openFolderBtn">เลือกโฟลเดอร์</button>
         <button type="button" class="btn btn-secondary" id="openFileBtn">เลือกหลายไฟล์</button>
-        <button type="button" class="btn btn-green" id="exportBtn" disabled>ส่งออกข้อมูลรายเดือน (.xlsx)</button>
-        <button type="button" class="btn btn-report" id="reportBtn" disabled>ส่งออกข้อมูลรายสัปดาห์ (.xlsx)</button>
+        <button type="button" class="btn btn-green" id="exportBtn" disabled>ส่งออกข้อมูลที่กรอง (.xlsx)</button>
+        <button type="button" class="btn btn-report" id="reportBtn" disabled>ส่งออก REPORT ชุด อ. (.xlsx)</button>
       </div>
     </div>
   </header>
@@ -321,7 +321,7 @@
         <div><strong>ชุด อ. แยกเป็น REPORT รายสัปดาห์</strong><p id="reportNoticeText"></p></div>
         <div class="report-notice-actions">
           <button type="button" class="btn btn-secondary" id="viewReportBtn">ดูตาราง สป1–สป4</button>
-          <button type="button" class="btn btn-report" onclick="document.getElementById('reportBtn').click()">ราคากลางรายสัปดาห์ (.xlsx)</button>
+          <button type="button" class="btn btn-report" onclick="document.getElementById('reportBtn').click()">ส่งออก REPORT (.xlsx)</button>
         </div>
       </section>
 
@@ -364,7 +364,7 @@
       <section class="panel report-panel hidden" id="weeklyReportPanel">
         <div class="report-panel-head">
           <div>
-            <h2>ชุด อ. — ราคาแยกรายสัปดาห์</h2>
+            <h2>REPORT ชุด อ. — ราคาแยกรายสัปดาห์</h2>
             <p>ชุด อ. อ่านชื่อห้าง/ร้านจากคอลัมน์ D ของแต่ละแถว แล้วจับคู่ตาม เดือน / ปี / หมวด / รหัสรายการ / ชื่อรายการ / ห้างหรือร้าน; หัวกลุ่ม “สัปดาห์ 1–4” ใช้ลงคอลัมน์ สป1–สป4 และค่าเฉลี่ยจะแสดงเมื่อมีราคาครบทั้ง 4 สัปดาห์</p>
           </div>
           <button type="button" class="btn btn-report" id="reportExportInlineBtn">ส่งออก REPORT (.xlsx)</button>
@@ -387,7 +387,7 @@
 
         <div class="report-warning hidden" id="reportWeekWarning"></div>
         <div class="table-wrap report-table-wrap" id="weeklyReportTableWrap">
-          <table class="weekly-report-table" aria-label="ชุด อ. แยกรายสัปดาห์">
+          <table class="weekly-report-table" aria-label="REPORT ชุด อ. แยกรายสัปดาห์">
             <thead><tr>
               <th>เดือน (เลข)</th><th>ปี</th><th>หมวดหมู่ (รหัส_ชื่อ)</th><th>รหัสรายการ (ข้อความ)</th><th>ชื่อรายการสินค้า</th><th>ห้าง / ร้าน</th>
               <th>สป1</th><th>สป2</th><th>สป3</th><th>สป4</th><th>ราคาเฉลี่ย 4 สัปดาห์</th><th>สถานะ</th>
@@ -1342,7 +1342,7 @@
       el.exportBtn.disabled = state.records.length === 0;
       el.reportBtn.disabled = reportFiles.length === 0;
       el.reportExportInlineBtn.disabled = reportFiles.length === 0;
-      el.reportBtn.textContent = reportFiles.length ? `ราคากลางรายสัปดาห์ (.xlsx)` : 'ราคากลางรายสัปดาห์_ (.xlsx)';
+      el.reportBtn.textContent = reportFiles.length ? `ส่งออก REPORT ชุด อ. (${formatNumber(reportFiles.length)} ไฟล์)` : 'ส่งออก REPORT ชุด อ. (.xlsx)';
       el.reportStatFiles.textContent = formatNumber(reportFiles.length);
       el.reportStatRows.textContent = formatNumber(state.weeklyReportRows.length);
       const completeRows = state.weeklyReportRows.filter(row => row.complete).length;
@@ -1870,7 +1870,7 @@
         textXlsx(row.itemName), textXlsx(row.store), numberXlsx(row.regularPrice), numberXlsx(row.promoPrice),
         numberXlsx(row.effectivePrice), textXlsx(row.condition), textXlsx(row.link)
       ]);
-      downloadXlsx(`ราคากลางรายเดือน_${dateStamp()}.xlsx`, [{
+      downloadXlsx(`ราคากลาง_ข้อมูลที่กรอง_${dateStamp()}.xlsx`, [{
         name: 'ข้อมูลที่กรอง', headers, rows,
         widths: [34,10,12,10,10,11,27,22,55,22,14,14,14,24,55]
       }]);
@@ -1890,7 +1890,7 @@
         textXlsx(row.categoryLabel), textXlsx(String(row.itemCode || '')), textXlsx(row.itemName), textXlsx(row.store || 'ไม่ระบุห้าง'),
         numberXlsx(row.regularPrice), numberXlsx(row.promoPrice), numberXlsx(row.effectivePrice), textXlsx(row.condition), textXlsx(row.link)
       ]);
-      downloadXlsx(`ราคากลางรายสัปดาห์_${dateStamp()}.xlsx`, [
+      downloadXlsx(`REPORT_ชุด_อ_${dateStamp()}.xlsx`, [
         { name: 'REPORT_สป1-สป4', headers: reportHeaders, rows: reportData, widths: [9,12,10,27,22,52,20,14,14,14,14,20,18,28,55] },
         { name: 'ข้อมูลดิบ_ชุด_อ', headers: ['ไฟล์ต้นทาง','เดือน','ปี พ.ศ.','สัปดาห์','หมวดหมู่ (รหัส_ชื่อ)','รหัสรายการ','ชื่อรายการสินค้า','ห้าง/ร้าน','ราคาปกติ','ราคาโปร','ราคาที่ใช้','ภาวะ','URL'], rows: rawRows, widths: [34,12,10,10,27,22,52,20,14,14,14,24,55] }
       ]);
