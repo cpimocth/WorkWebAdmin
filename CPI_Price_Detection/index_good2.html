@@ -78,7 +78,7 @@
 <h2>Logic ที่ใช้</h2>
 <div class="sub">ถอดจาก Python เดิม โดยเน้นให้ผลลัพธ์และชื่อ Sheet สอดคล้องกัน</div>
 <div class="steps">
-<div class="step"><div class="n">1</div><div><b>REL ไม่ตรง</b><div>RELN = ราคาปัจจุบัน / ราคาเปรียบเทียบ x 100 | diffREL = ROUND_HALF_UP(abs(ROUND_HALF_UP(RELN, 2) - REL), 2) &gt; 0</div></div></div>
+<div class="step"><div class="n">1</div><div><b>REL ไม่ตรง</b><div>RELN = ราคาปัจจุบัน / ราคาเปรียบเทียบ x 100 | diffREL = ROUND_HALF_UP(abs(RELN - REL), 2) &gt; 0</div></div></div>
 <div class="step"><div class="n">2</div><div><b>ช่องคำนวณว่าง</b><div>G / L = Checked + 3 conditions | concat df02, df021, df022, df023 | keep last</div></div></div>
 <div class="step"><div class="n">3</div><div><b>ราคากลาง</b><div>รหัส + ประเภทร้านค้า | shop.py + CODE7 | keep last</div></div></div>
 <div class="step"><div class="n">4</div><div><b>ราคาที่สงสัย</b><div>Z-score รายการ 16 หลัก / หมวด 7 หลัก + REL + เหตุผลจากผู้บันทึก/ผู้ตรวจ</div></div></div>
@@ -634,11 +634,8 @@
     for(const r of rows) {
       const cur=r[C.cur],cmp=r[C.compare],recorded=r[C.rel];
       if(!Number.isFinite(cur)||!Number.isFinite(cmp)||cmp===0||!Number.isFinite(recorded))continue;
-      const reln=(cur/cmp)*100; // Keep full precision for RELN in the display/export.
-      // Round the calculated RELN FIRST, then compare with recorded REL.
-      // Example: 38/64*100=59.375 -> 59.38, equal to recorded 59.38 (diffREL=0).
-      const relnRounded=roundHalfUp(reln,2);
-      const diff=roundHalfUp(Math.abs(relnRounded-recorded),2);
+      const reln=(cur/cmp)*100; // No rounding of RELN in notebook cell 21.
+      const diff=roundHalfUp(Math.abs(reln-recorded),2);
       if(diff!=null&&diff>0)out.push({...pickCols(r,baseCols),RELN:reln,diffREL:diff});
     }
     return out;
