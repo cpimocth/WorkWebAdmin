@@ -1,0 +1,1073 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="light">
+<title>CPI FieldPulse | ติดตามความคืบหน้าการเก็บราคา</title>
+<style>
+:root{--navy:#13294c;--navy2:#0c1e38;--blue:#2465cd;--blue2:#478cf2;--sky:#e9f3ff;--cyan:#10a3bf;--bg:#f4f7fc;--card:#fff;--ink:#14243e;--muted:#667790;--border:#e1e8f2;--green:#099a7a;--red:#df5361;--orange:#e9a334;--radius:17px;--shadow:0 7px 27px rgba(23,53,92,.045)}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;font-family:'Sarabun','Noto Sans Thai',Tahoma,system-ui,sans-serif;background:var(--bg);color:var(--ink);font-size:14px;line-height:1.6}button,input,select{font:inherit}button{cursor:pointer}button:disabled{opacity:.5;cursor:not-allowed}select,input[type=text],input[type=search],input[type=month],input[type=number]{width:100%;min-width:0;height:42px;border:1px solid #d5e0ef;border-radius:10px;padding:0 12px;background:#fff;color:var(--ink);outline:0}select:focus,input:focus{border-color:#5896ec;box-shadow:0 0 0 3px #dcecff}button:focus-visible{outline:3px solid #a2c7ff;outline-offset:2px}label{display:block;font-size:12px;color:var(--muted);font-weight:750;margin-bottom:5px}h1,h2,h3,h4,p{margin-top:0}.layout{max-width:1620px;margin:auto;padding:0 24px 60px}header{background:linear-gradient(115deg,#0d254a 0%,#173966 72%,#1d5580 100%);color:white;position:relative;overflow:hidden}header:after{content:"";position:absolute;width:320px;height:320px;border:55px solid #ffffff0a;border-radius:50%;right:-98px;top:-188px;pointer-events:none}.head-inner{max-width:1620px;margin:auto;padding:25px 24px 36px;position:relative;z-index:1}.topbar{display:flex;align-items:center;justify-content:space-between;gap:20px;margin-bottom:27px}.brand{display:flex;gap:12px;align-items:center}.brand-mark{height:43px;width:43px;background:linear-gradient(150deg,#63ddff,#4387e8);border-radius:13px;display:grid;place-items:center;color:#07315a;font-size:14px;font-weight:950;letter-spacing:.4px}.brand-name{font-weight:850;font-size:18px;line-height:1.2;letter-spacing:.1px}.brand-sub{font-size:11px;color:#a8c6ea;letter-spacing:.65px}.head-actions{display:flex;align-items:center;gap:9px;flex-wrap:wrap}.head-actions button{border:1px solid #ffffff48;background:#ffffff11;color:white;padding:8px 14px;border-radius:10px}.head-actions button:hover{background:#ffffff27}.hero{display:flex;justify-content:space-between;align-items:flex-end;gap:16px}.eyebrow{font-size:11px;font-weight:900;letter-spacing:1.5px;color:#94d8ff;margin-bottom:6px}.hero h1{font-weight:850;font-size:clamp(24px,3vw,34px);line-height:1.35;margin:0 0 8px}.hero p{color:#bcd0e9;max-width:820px;margin:0}.period-pill{border:1px solid #ffffff52;color:#e2f4ff;background:#ffffff10;padding:12px 18px;border-radius:13px;font-size:13px;font-weight:800;white-space:nowrap}.import-card{position:relative;margin:20px 0 22px;background:white;border-radius:18px;box-shadow:0 12px 30px #17365613;padding:20px 22px;border:1px solid #e7edf7}.import-top{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap}.import-top h2{font-size:16px;margin:0;font-weight:850}.import-hint{font-size:12px;color:var(--muted)}.import-grid{display:grid;grid-template-columns:1fr 1.65fr auto;gap:13px;align-items:stretch}.upload-cell{border:1px dashed #a8c3e9;border-radius:13px;padding:13px 14px;display:flex;align-items:center;gap:12px;background:#f9fcff;min-width:0;cursor:pointer;transition:.15s}.upload-cell:hover,.upload-cell.dragover{border-color:#3675d0;background:#eff7ff}.upload-icon{height:37px;width:37px;border-radius:10px;display:grid;place-items:center;background:#e7f0ff;color:#2d6cc2;flex-shrink:0;font-size:20px}.upload-cell strong{font-size:13px;display:block}.upload-cell small{color:#6b8099;display:block;font-size:11px;line-height:1.45}.upload-cell input{display:none}.upload-right{display:flex;flex-direction:column;gap:8px}.btn{background:var(--blue);border:1px solid var(--blue);border-radius:10px;color:white;padding:10px 15px;font-weight:800;white-space:nowrap}.btn:hover{filter:brightness(.95)}.btn.light{background:#f4f8ff;color:#285caa;border-color:#cddff4}.btn.soft{background:white;color:#3b5578;border-color:#d7e2ee}.btn.green{background:#087d65;border-color:#087d65}.btn.sm{padding:7px 12px;font-size:12px}.file-list{display:flex;gap:8px;flex-wrap:wrap;margin-top:13px}.file-chip{font-size:11px;border:1px solid #dfe8f3;background:#f6f9ff;color:#4a6081;padding:5px 9px;border-radius:99px;display:flex;gap:5px;align-items:center;max-width:100%}.file-chip strong{color:#1e477c}.file-chip.warn{background:#fff8e9;border-color:#f5dfb3;color:#8d5f18}.file-chip.ok{background:#edfaf5;border-color:#bee7d8}.file-chip button{border:0;background:transparent;color:#aa4d5e;font-weight:900;font-size:16px;line-height:1;padding:0 2px}.warningbar{display:none;background:#fff7e8;color:#82540f;border:1px solid #f4dfba;border-radius:11px;padding:10px 14px;margin-top:12px;font-size:12px}.warningbar.show{display:block}.filters{background:white;border:1px solid var(--border);border-radius:16px;padding:17px 19px;box-shadow:var(--shadow);margin:0 0 18px}.filter-head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:10px}.filter-head strong{font-size:13px}.filter-head span{font-size:11px;color:var(--muted)}.filter-grid{display:grid;grid-template-columns:repeat(7,minmax(100px,1fr));gap:12px}.filter-grid .wide{grid-column:span 2}.filter-bottom{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;align-items:center}.muted{color:var(--muted)}.minor{font-size:11px}.headline{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:20px 0 11px;flex-wrap:wrap}.headline h2{margin:0;font-size:17px;font-weight:850}.section-suffix{font-size:12px;color:var(--muted)}.tabs{display:flex;gap:7px;flex-wrap:wrap;margin:15px 0}.tab{padding:10px 15px;border:1px solid transparent;border-radius:10px;background:transparent;color:#586c87;font-weight:800}.tab.active{background:#e7f0ff;color:#205cac;border-color:#c5ddff}.tab:hover{background:#edf4ff}.kpi-grid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:12px;margin-bottom:13px}.kpi{background:#fff;border:1px solid var(--border);border-radius:15px;padding:15px 16px;min-width:0;box-shadow:var(--shadow);position:relative;overflow:hidden}.kpi:before{content:"";position:absolute;width:3px;left:0;top:15px;bottom:15px;background:#c0cee0;border-radius:9px}.kpi.blue:before{background:var(--blue)}.kpi.green:before{background:var(--green)}.kpi.red:before{background:var(--red)}.kpi.cyan:before{background:var(--cyan)}.kpi .name{color:#63758d;font-size:12px;font-weight:720}.kpi .val{font-size:clamp(21px,2vw,29px);font-weight:900;letter-spacing:-.7px;line-height:1.3;margin:6px 0}.kpi .sub{color:#77869c;font-size:11px}.positive{color:var(--green)}.negative{color:var(--red)}.neutral{color:#617997}.two-cols{display:grid;grid-template-columns:1fr 1fr;gap:13px}.panel{background:#fff;border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow);padding:18px;min-width:0}.panel h3{font-size:15px;font-weight:900;margin:0 0 6px}.panel p.sub{font-size:12px;color:var(--muted);margin:0 0 14px}.progress-line{display:flex;align-items:baseline;justify-content:space-between;gap:12px}.progress-line strong{font-size:28px;letter-spacing:-.6px}.bar{height:10px;background:#e6edf7;border-radius:20px;overflow:hidden;margin:10px 0}.bar-fill{height:100%;background:linear-gradient(90deg,#3688f8,#13b9cb);border-radius:inherit;transition:width .35s}.bar-fill.green{background:linear-gradient(90deg,#09ab8c,#62c9a9)}.legend-row{display:flex;justify-content:space-between;gap:10px;font-size:12px;color:#75869a}.pill{display:inline-flex;align-items:center;gap:5px;border-radius:50px;font-size:11px;font-weight:850;padding:3px 9px;white-space:nowrap}.pill.over{background:#eaf2ff;color:#2371c6}.pill.complete{background:#e6f8f2;color:#128d6f}.pill.partial{background:#fff4dd;color:#a87019}.pill.zero{background:#fff0f1;color:#c64552}.pill.none{background:#f0f3f8;color:#728197}.panel-tools{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:12px}.mini-actions{display:flex;gap:7px;align-items:center;flex-wrap:wrap}.table-wrap{overflow:auto;max-width:100%;border:1px solid #e8eef6;border-radius:11px}.data-table{width:100%;border-collapse:separate;border-spacing:0;font-size:12px}.data-table thead th{position:sticky;top:0;z-index:1;background:#f5f8fd;color:#5e7089;text-align:left;padding:11px 12px;font-size:11px;font-weight:850;border-bottom:1px solid #e0e8f1;white-space:nowrap}.data-table td{padding:11px 12px;border-bottom:1px solid #edf1f7;vertical-align:middle}.data-table tr:last-child td{border-bottom:none}.data-table tbody tr:hover{background:#f5f9ff}.click-row{cursor:pointer}.code{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:12px;white-space:nowrap;color:#355e93}.text-right{text-align:right!important}.mono{font-variant-numeric:tabular-nums}.name-line{font-weight:780;color:var(--ink);max-width:370px}.subline{font-size:11px;color:#74859b}.cell-progress{display:flex;align-items:center;gap:8px;min-width:125px}.smallbar{height:6px;flex:1;background:#e7eef8;border-radius:5px;overflow:hidden}.smallbar i{display:block;height:100%;background:#2b87e7;border-radius:5px}.text-btn{border:0;background:transparent;color:#215ead;font-weight:800;padding:0;cursor:pointer}.text-btn:hover{text-decoration:underline}.trend-wrap{height:210px;position:relative}.trend-wrap svg{width:100%;height:100%}.trend-note{font-size:11px;color:var(--muted);margin-top:5px}.stacked{display:flex;height:13px;border-radius:14px;overflow:hidden;background:#edf2f9;margin:15px 0 8px}.stacked>*{height:100%}.state-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:12px}.state-cell{border:1px solid #e7edf7;border-radius:10px;padding:9px 10px}.state-cell strong{font-size:21px;display:block}.state-cell span{font-size:11px;color:#6b7e95}.empty{padding:44px 20px;text-align:center;color:#6c809a}.empty-icon{width:65px;height:65px;display:grid;place-items:center;background:#eaf2ff;color:#2e78d2;border-radius:21px;font-size:29px;margin:0 auto 13px}.page-nav{display:flex;gap:12px;align-items:center;justify-content:flex-end;margin:11px 0}.no-data{margin-top:16px;padding:50px 28px;background:#fff;border-radius:17px;border:1px solid var(--border);text-align:center}.no-data h2{margin-bottom:8px}.no-data p{max-width:650px;margin:auto auto 20px;color:var(--muted)}.message-box{background:#eaf4ff;border:1px solid #c9e1ff;color:#264c78;border-radius:13px;padding:17px;margin-bottom:14px;line-height:1.9}.message-box strong{color:#19385f}.note-card{background:#fcfdff;padding:14px;border:1px solid var(--border);border-radius:12px;font-size:12px;color:#60748c}.note-card h4{margin:0 0 7px;font-size:12px;color:#294c7d}.note-card ul{margin:4px 0 0;padding-left:20px}.note-card li{margin:5px 0}.legend-dot{width:7px;height:7px;border-radius:50%;display:inline-block;margin-right:5px}.detail-modal{position:fixed;inset:0;background:rgba(10,26,48,.65);z-index:3000;display:none;align-items:center;justify-content:center;padding:15px}.detail-modal.open{display:flex}.detail-dialog{background:white;border-radius:19px;width:min(1180px,100%);max-height:92vh;display:flex;flex-direction:column;box-shadow:0 24px 75px #06182a60;overflow:hidden}.modal-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:21px 23px;background:linear-gradient(120deg,#11294a,#1c4978);color:white}.modal-head h2{font-size:19px;margin:0 0 4px}.modal-head small{color:#b5d5f3}.modal-head button{color:white;background:#ffffff20;border:1px solid #ffffff44;border-radius:9px;font-size:22px;line-height:1;padding:7px 10px}.modal-body{padding:18px 22px;overflow:auto}.modal-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-bottom:15px}.modal-kpi{border:1px solid var(--border);padding:11px;border-radius:10px}.modal-kpi strong{font-size:22px;display:block}.modal-kpi span{color:#6f7f92;font-size:11px}.source-list{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:15px 0}.source-card{border:1px solid #e0e8f1;border-radius:10px;padding:11px;font-size:12px}.source-card strong{color:#2559a3}.source-card p{color:#6d829d;font-size:11px;margin:5px 0 0}.modal-subhead{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin:16px 0 9px}.file-review{font-size:12px}.file-review .table-wrap{max-height:460px}.tiny{font-size:11px}.hidden{display:none!important}#toast{position:fixed;bottom:22px;right:22px;background:#17325a;color:white;border-radius:11px;padding:12px 19px;box-shadow:0 8px 22px #102d4860;z-index:4000;display:none;max-width:400px}#toast.show{display:block}.copybox{width:100%;min-height:95px;border:1px solid #cddff1;border-radius:10px;background:#f6faff;padding:12px;font:inherit;resize:vertical}.foot{margin-top:18px;text-align:center;font-size:11px;color:#788aa4}
+@media(max-width:1250px){.kpi-grid{grid-template-columns:repeat(3,1fr)}.filter-grid{grid-template-columns:repeat(4,minmax(100px,1fr))}.import-grid{grid-template-columns:1fr 1fr}.upload-right{grid-column:1/-1;flex-direction:row}}
+@media(max-width:850px){.layout{padding-left:14px;padding-right:14px}.head-inner{padding-left:17px;padding-right:17px}.hero{align-items:flex-start;flex-direction:column}.import-grid{grid-template-columns:1fr}.upload-right{grid-column:auto}.filter-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.filter-grid .wide{grid-column:span 2}.two-cols,.source-list{grid-template-columns:1fr}.kpi-grid{grid-template-columns:repeat(2,1fr)}.modal-grid{grid-template-columns:repeat(2,1fr)}.state-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:500px){.kpi-grid{grid-template-columns:1fr 1fr}.kpi{padding:11px}.kpi .val{font-size:22px}.head-actions{width:100%}.topbar{align-items:flex-start;flex-direction:column}.filter-grid{grid-template-columns:1fr 1fr}.filter-grid>*{min-width:0}.tabs .tab{flex:1;font-size:12px;padding:8px 10px}.modal-body{padding:12px}.modal-head{padding:14px}}
+@media print{body{background:white}.head-actions,.import-card,.filters,.tabs,.mini-actions,.page-nav,.foot,.modal-modal,.text-btn{display:none!important}.head-inner{padding:20px}.layout{max-width:none;padding:0 10px}header{print-color-adjust:exact;-webkit-print-color-adjust:exact}.panel,.kpi{box-shadow:none;break-inside:avoid}.table-wrap{overflow:visible}.data-table{font-size:10px}.data-table td,.data-table thead th{padding:6px} .two-cols{grid-template-columns:1fr 1fr}.kpi-grid{grid-template-columns:repeat(3,1fr)}.detail-modal{display:none!important}}
+
+/* FieldPulse sidebar -- fixed-in-view navigation while scrolling the report. */
+.monitor-workspace{
+  display:grid;grid-template-columns:minmax(265px,302px) minmax(0,1fr);
+  align-items:start;gap:18px;position:relative;
+}
+.monitor-workspace > #appBody{min-width:0;min-height:610px}
+.monitor-workspace > .filters{
+  position:sticky;top:14px;align-self:start;z-index:30;
+  max-height:calc(100vh - 28px);max-height:calc(100dvh - 28px);
+  overflow-y:auto;overflow-x:hidden;scrollbar-width:thin;
+  scrollbar-color:#bbcee6 transparent;
+  margin:0;padding:17px 15px 13px;border:1px solid #d6e3f5;
+  border-left:4px solid #3988e7;border-radius:16px;
+  box-shadow:0 12px 32px rgba(20,57,107,.10);
+}
+.monitor-workspace > .filters::-webkit-scrollbar{width:7px}
+.monitor-workspace > .filters::-webkit-scrollbar-thumb{background:#bed0e8;border-radius:9px}
+.monitor-workspace .filter-head{
+  display:block;position:sticky;top:-17px;z-index:2;
+  background:linear-gradient(180deg,#fff 87%,rgba(255,255,255,.96));
+  border-bottom:1px solid #e8eff8;padding:2px 0 12px;margin-bottom:12px;
+}
+.monitor-workspace .filter-head strong{display:block;color:#123666;font-size:14px;font-weight:900}
+.monitor-workspace .filter-head span{display:block;line-height:1.45;font-size:11px;margin-top:3px}
+.monitor-workspace .filter-grid{display:grid;grid-template-columns:minmax(0,1fr);gap:9px}
+.monitor-workspace .filter-grid > div{min-width:0}
+.monitor-workspace .filter-grid .wide{grid-column:auto}
+.monitor-workspace .filter-grid label{margin-bottom:3px;font-size:11.5px}
+.monitor-workspace .filter-grid select{height:38px;padding:0 10px;border-radius:9px}
+.monitor-workspace .filter-bottom{
+  display:grid;grid-template-columns:1fr;align-items:center;gap:8px;
+  position:sticky;bottom:-13px;z-index:2;
+  background:linear-gradient(0deg,#fff 83%,rgba(255,255,255,.95));
+  border-top:1px solid #e8eff8;margin-top:13px;padding:12px 0 3px;
+}
+.monitor-workspace .filter-bottom .btn{width:100%;justify-self:stretch}
+.monitor-workspace #scopeCaption{display:block;font-size:10.5px;line-height:1.45;overflow-wrap:anywhere}
+.group-focus{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap;
+  background:#eaf3ff;border:1px solid #c9dffd;color:#2e5b91;border-radius:11px;
+  padding:9px 12px;margin:0 0 12px;font-size:12px}
+@media(max-width:900px){
+  .monitor-workspace{display:block}
+  .monitor-workspace > .filters{position:relative;top:auto;max-height:none;overflow:visible;
+    margin:0 0 17px;padding:16px 17px;border-left-width:3px}
+  .monitor-workspace .filter-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+  .monitor-workspace .filter-head,.monitor-workspace .filter-bottom{position:static}
+  .monitor-workspace .filter-bottom{display:flex;flex-wrap:wrap}
+  .monitor-workspace .filter-bottom .btn{width:auto}
+  .monitor-workspace > #appBody{min-height:0}
+}
+@media(max-width:510px){.monitor-workspace .filter-grid{grid-template-columns:1fr}}
+@media print{.monitor-workspace{display:block}.monitor-workspace > #appBody{min-height:0}}
+
+/* 2026-10-09: high-priority, single-column sticky filter navigator */
+.monitor-workspace{grid-template-columns:minmax(320px,352px) minmax(0,1fr);gap:17px}
+.monitor-workspace > .filters{padding:16px 13px 12px;border-left:4px solid #367ee4}
+.monitor-workspace .filter-grid{display:flex;flex-direction:column;gap:12px}
+.filter-section{border-radius:13px;border:1px solid transparent;padding:12px 11px 11px;min-width:0}
+.filter-section-primary{background:linear-gradient(130deg,#eaf3ff,#f5f9ff);border-color:#bdd8fa;box-shadow:0 4px 14px #2373c313}
+.filter-section-secondary{background:linear-gradient(130deg,#e7f8f4,#f5fcfa);border-color:#aee2d3;box-shadow:0 4px 14px #16867510}
+.filter-section-label{display:flex;align-items:center;gap:6px;color:#205a9e;font-weight:900;font-size:11px;margin:0 0 10px;letter-spacing:.2px}
+.filter-section-secondary .filter-section-label{color:#0e786b}
+.filter-section-dot{width:7px;height:7px;background:#357bda;border-radius:100%;box-shadow:0 0 0 4px #d4e8ff;flex-shrink:0;margin-right:4px}
+.filter-section-secondary .filter-section-dot{background:#07967c;box-shadow:0 0 0 4px #d0f3e9}
+.filter-section-note{margin-left:auto;background:#d4e7ff;border-radius:5px;color:#2a6caf;font-size:10px;padding:1px 6px}
+.filter-field{margin-bottom:10px;min-width:0}.filter-field:last-child{margin-bottom:0}
+.filter-field label{color:#344e70;font-weight:850;font-size:11.5px}
+.filter-section-primary .filter-field select{border-color:#bad4f2}
+.filter-section-secondary .filter-field select{border-color:#b6e3d7}
+.filter-section-primary select:focus{border-color:#4382d9;box-shadow:0 0 0 3px #d4e6fc}
+.filter-section-secondary select:focus{border-color:#169b86;box-shadow:0 0 0 3px #d3f4eb}
+.required-mark{color:#b03442;font-size:10px;font-weight:850;margin-left:5px}
+.filter-hint{font-size:10px;color:#4e7195;margin-top:4px;line-height:1.35}
+#areaFilter:invalid{border:2px solid #da7c77;background:#fffaf9}
+.filter-period-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px;align-items:end}
+.filter-period-row .filter-field{min-width:0;margin:0!important}.filter-period-row label{font-size:10.2px;white-space:nowrap;letter-spacing:-.1px}
+.filter-period-row select{padding:0 6px!important;font-size:11.2px!important;min-width:0;max-width:100%}
+.filter-aux{padding:3px 4px 0}.filter-aux label{margin-bottom:5px}
+.monitor-workspace .filter-bottom{padding-top:8px;margin-top:10px}
+.folder-status{margin-top:11px;color:#55738f;background:#eff6ff;border:1px solid #d3e6fa;border-radius:10px;padding:9px 12px;font-size:11.5px;line-height:1.5}
+.folder-status.ok{background:#eaf8f4;border-color:#bce6d7;color:#0b785e}
+.folder-status.warn{background:#fff6e8;border-color:#efd5ad;color:#8c6128}
+.source-vault{background:#fff;border:1px solid #dde8f5;border-radius:16px;box-shadow:var(--shadow);margin:24px 0 14px;padding:20px 21px;scroll-margin-top:15px}
+.source-vault-heading{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:15px;flex-wrap:wrap}
+.source-vault h2{font-size:16px;font-weight:900;margin:3px 0;color:#203f68}
+.source-vault p{font-size:12px;color:#6a819b;margin:0}
+.source-vault-eyebrow{font-weight:850;letter-spacing:1.05px;color:#1f78b6;font-size:9px}
+.source-vault-summary{background:#e9f2ff;color:#215a9b;border-radius:99px;padding:5px 12px;font-weight:850;font-size:11px}
+.source-vault .file-list{display:grid;grid-template-columns:1fr;gap:7px;margin-top:0}
+.source-vault .file-chip{font-size:12px;border-radius:10px;padding:10px 12px;display:grid;grid-template-columns:minmax(130px,180px) minmax(160px,1fr) auto;align-items:center;gap:8px;max-width:none;min-width:0}
+.source-vault .file-chip .file-name{font-size:12px;font-weight:800;color:#284366;min-width:0;overflow-wrap:anywhere}
+.source-vault .file-chip .file-meta{font-size:11px;color:#5d7188;display:block}
+.source-vault .file-chip .file-controls{display:flex;gap:7px;align-items:center;justify-content:flex-end}
+.source-vault .file-chip strong{color:#0a6d90}
+.source-vault .file-chip .file-controls button{font-size:18px}
+.source-vault .warningbar{margin-top:12px;display:block}
+.source-vault .warningbar:not(.show){display:none}
+@media(max-width:900px){.monitor-workspace .filter-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}.filter-aux{grid-column:1/-1}.source-vault .file-chip{grid-template-columns:minmax(100px,150px) minmax(120px,1fr) auto}}
+@media(max-width:610px){.monitor-workspace .filter-grid{grid-template-columns:1fr}.filter-aux{grid-column:auto}.source-vault{padding:16px 12px}.source-vault .file-chip{grid-template-columns:1fr auto}.source-vault .file-chip .file-type{grid-column:1}.source-vault .file-chip .file-name{grid-column:1}.source-vault .file-chip .file-controls{grid-column:2;grid-row:1/3}}
+
+.git-connect{border:1px solid #c9e4ed;background:linear-gradient(100deg,#f3fbff,#f6fbff);border-radius:12px;margin-top:13px;padding:12px 15px}
+.git-connect-main{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.git-connect-main>div{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.git-connect-main strong{color:#134b74;font-size:13px}
+.git-led{height:9px;width:9px;border-radius:50%;background:#a9bbcc;display:inline-block;flex-shrink:0}
+.git-led.ok{background:#0ca47c;box-shadow:0 0 0 3px #d6f5e9}
+.git-led.loading{background:#edac3d;box-shadow:0 0 0 3px #fff0d2}
+.git-led.warn{background:#dd6a56}
+.git-status{color:#59738e;font-size:12px;line-height:1.5}
+.git-settings{margin-top:8px;font-size:12px;color:#547086}
+.git-settings summary{cursor:pointer;display:inline-block;color:#2d689d;font-weight:750}
+.git-settings-row{display:flex;align-items:center;gap:8px;margin:9px 0 5px}
+.git-settings-row input{min-width:180px;flex:1}
+.git-settings small{display:block;line-height:1.6;color:#7489a0}
+@media(max-width:540px){.git-settings-row{flex-wrap:wrap}.git-settings-row button{width:100%}}
+@media print{.source-vault,.folder-status,.git-connect{display:none!important}}
+/* Intake controls are below the reports; keep clear spacing and source-audit details. */
+.dedup-notice{margin-top:12px;padding:10px 12px;border-radius:10px;background:#eaf5ff;border:1px solid #c9dff7;color:#285b89;font-size:12px}
+.code-sort-control{display:flex;gap:7px;align-items:center;flex-wrap:wrap}
+.code-sort-control label{margin:0;white-space:nowrap;font-size:12px;color:#47607d}
+.code-sort-control select{width:auto;min-width:175px;height:36px;padding:0 9px;font-size:12px}
+@media print{.dedup-notice,.code-sort-control{display:none!important}}
+</style>
+</head>
+<body>
+<header><div class="head-inner"><div class="topbar"><div class="brand"><div class="brand-mark">CPI</div><div><div class="brand-name">FieldPulse <span style="font-weight:400;color:#b7d4f5">/ Collection Monitor</span></div><div class="brand-sub">TRADE PRICE SURVEY · PROGRESS &amp; COVERAGE</div></div></div><div class="head-actions"><button id="copyTopBtn">คัดลอกข้อความรายงาน</button><button id="printBtn">พิมพ์รายงาน</button><button id="exportTopBtn">↓ Export Excel</button></div></div><div class="hero"><div><div class="eyebrow">CPI SURVEY OPERATIONS DASHBOARD</div><h1>ติดตามความคืบหน้าการจัดเก็บราคาสินค้า</h1><p>รายภาค · รายจังหวัด · รายเขตเก็บราคา · CODE7 · สเปคและแหล่งจัดเก็บ | เปรียบเทียบเป้าหมายจาก Real_Master_CPI และจำนวนที่เก็บได้จริง</p></div><div class="period-pill" id="periodBadge">ยังไม่ได้นำเข้าข้อมูล</div></div></div></header>
+<main class="layout">
+<div class="monitor-workspace"><aside class="filters" aria-label="ตัวกรองข้อมูล CPI">
+<div class="filter-head"><strong>02 &nbsp; เลือกขอบเขตการติดตาม</strong><span id="filterCaption">กรองข้อมูลและเป้าหมายพร้อมกันทุกตาราง</span></div>
+<div class="filter-grid">
+  <section class="filter-section filter-section-primary" aria-label="พื้นที่และสถานะ">
+    <div class="filter-section-label"><span class="filter-section-dot"></span>พื้นที่และสถานะ <span class="filter-section-note">เลือกก่อน</span></div>
+    <div class="filter-field"><label for="regionFilter">ภาค</label><select id="regionFilter"></select></div>
+    <div class="filter-field"><label for="areaFilter">เขต / กลุ่มเก็บราคา <span class="required-mark">* บังคับเลือก</span></label><select id="areaFilter" required aria-describedby="areaSelectHint"></select><div id="areaSelectHint" class="filter-hint">กรุณาเลือกพื้นที่ หรือ “ทุกเขต / ทุกพื้นที่”</div></div>
+    <div class="filter-field"><label for="statusFilter">สถานะหมวด</label><select id="statusFilter"><option value="all">ทุกสถานะ</option><option value="zero">ยังไม่ได้เก็บ</option><option value="partial">เก็บยังไม่ครบ</option><option value="complete">ครบตามเป้า</option><option value="over">เกินเป้า</option><option value="none">ไม่มีเป้าหมาย</option></select></div>
+  </section>
+  <section class="filter-section filter-section-secondary" aria-label="ชุดราคาและเดือน">
+    <div class="filter-section-label"><span class="filter-section-dot"></span>ชุดราคาและช่วงเวลา</div>
+    <div class="filter-field"><label for="setFilter">ชุดราคา</label><select id="setFilter"><option value="ALL" selected>G + L + U · รวมทุกชุด</option><option value="GL">G + L · รวมไม่ซ้ำ</option><option value="G">G เท่านั้น</option><option value="L">L เท่านั้น</option><option value="U">U · นอกเขตเมือง</option></select></div>
+    <div class="filter-period-row"><div class="filter-field"><label for="monthFilter">เดือนรายงาน</label><select id="monthFilter"></select></div><div class="filter-field"><label for="prevFilter">เดือนที่เปรียบเทียบ</label><select id="prevFilter"></select></div></div>
+    <div class="filter-field"><label for="adminFilter">ผู้ดูแลรายการ</label><select id="adminFilter"></select></div>
+  </section>
+  <div class="filter-aux"><label for="typeFilter">ประเภทการเก็บ</label><select id="typeFilter"><option value="all">รายเดือน + รายสัปดาห์</option><option value="monthly">รายเดือน</option><option value="weekly">รายสัปดาห์</option><option value="rental">ค่าเช่าบ้าน (ไม่มีเป้า)</option></select></div>
+</div>
+<div class="filter-bottom"><button id="resetFilters" class="btn sm soft">ล้างตัวกรอง</button></div></aside>
+<div id="appBody"><div class="no-data"><div class="empty-icon">▤</div><h2>พร้อมตรวจสอบความคืบหน้า CPI</h2><p>อัปโหลด Real_Master_CPI และไฟล์เก็บราคารายเดือน/รายสัปดาห์ ระบบจะตรวจโครงสร้าง คำนวณความครบถ้วน 2 แบบ แล้วเจาะจากภาคถึงสเปคได้ทันที</p><p class="minor">ถ้ามีข้อมูลเพียงเดือนเดียว ระบบจะไม่สมมุติยอดการเก็บของเดือนก่อน</p></div></div>
+</div><!-- /monitor-workspace -->
+<section class="source-vault" id="sourceVault" aria-labelledby="sourceVaultHeading"><div class="source-vault-heading"><div><div class="source-vault-eyebrow">SOURCE FILES · DATA AUDIT</div><h2 id="sourceVaultHeading">03 &nbsp; Master และไฟล์ข้อมูลที่นำเข้า</h2><p>ตรวจสอบไฟล์ที่ระบบอ่านได้ จำนวนแถว เดือนข้อมูล และนำไฟล์ออกได้ที่ส่วนนี้</p></div><span class="source-vault-summary" id="sourceCount">ยังไม่มีไฟล์</span></div><div id="fileList" class="file-list"></div><div id="duplicateNotice" class="dedup-notice" hidden></div><div id="warningBar" class="warningbar"></div></section>
+<div class="import-card" id="importSection"><div class="import-top"><h2>01 &nbsp; นำเข้าข้อมูล Excel</h2><span class="import-hint">Fast Data จาก GitHub Pages · รองรับ Excel อัปโหลดและโฟลเดอร์</span></div><div class="import-grid">
+<label class="upload-cell" for="masterFile"><span class="upload-icon">◫</span><span><strong>Real_Master_CPI</strong><small id="masterHint">เลือก Master เพื่ออ่านเป้าหมาย / ผู้ดูแล / พื้นที่</small></span><input id="masterFile" type="file" accept=".xlsx"></label>
+<label class="upload-cell" for="dataFiles"><span class="upload-icon">⇧</span><span><strong>ไฟล์ที่เก็บราคา (เลือกหลายไฟล์ได้)</strong><small>G/L รายเดือน 4.1.1.2 · G/L รายสัปดาห์ 4.1.1.1 · U นอกเขต 4.1.2.2 · ค่าเช่าบ้าน · หลายเดือน</small></span><input id="dataFiles" type="file" multiple accept=".xlsx"></label>
+<div class="upload-right"><button class="btn light" id="folderBtn">เปิด / เปลี่ยนโฟลเดอร์ Excel</button><button class="btn soft" id="refreshFolderBtn" disabled title="เลือกโฟลเดอร์ครั้งแรกก่อน">↻ อ่านไฟล์อัตโนมัติอีกครั้ง</button><button class="btn soft" id="clearBtn">ล้างข้อมูล</button></div>
+</div>
+<div class="git-connect" role="group" aria-label="ข้อมูลจาก GitHub">
+ <div class="git-connect-main"><div><span class="git-led" id="gitLed"></span><strong>GitHub · Fast Data Auto-Load</strong><span id="gitStatus" class="git-status" role="status" aria-live="polite">กำลังตรวจหา Repository…</span></div><button class="btn sm light" id="refreshGitBtn" type="button">↻ อัปเดตจาก Git</button></div>
+ <details class="git-settings" id="gitSettings"><summary>ตั้งค่า GitHub (ใช้เมื่อเปิดจากเครื่องหรือเว็บอื่น)</summary><div class="git-settings-row"><input id="gitRepoInput" type="text" autocomplete="url" spellcheck="false" placeholder="https://github.com/username/repository" aria-label="GitHub repository URL"><button id="connectGitBtn" class="btn sm" type="button">เชื่อม Git</button></div><small>วางลิงก์ Repository สาธารณะเพียงครั้งเดียว ระบบจดจำในเบราว์เซอร์ · GitHub Pages ไม่ต้องกรอก</small></details>
+</div>
+<input id="folderInput" type="file" multiple webkitdirectory directory hidden><div id="folderStatus" class="folder-status" role="status" aria-live="polite">อัปโหลด Excel ได้ทันที หรือเลือกโฟลเดอร์ครั้งแรกเพื่อให้ระบบอ่านอัตโนมัติในครั้งต่อไปเมื่อเบราว์เซอร์อนุญาต</div></div>
+<div class="foot">CPI FieldPulse · ประมวลผลบนเครื่องของผู้ใช้งาน · การนับสเปค/แหล่งรักษาค่าเดิมตามไฟล์ต้นทาง</div>
+</main>
+<div id="detailModal" class="detail-modal" role="dialog" aria-modal="true" aria-label="รายละเอียดสเปค"><div class="detail-dialog"><div class="modal-head"><div><h2 id="detailTitle"></h2><small id="detailSub"></small></div><button id="closeModal" aria-label="ปิด">×</button></div><div id="detailBody" class="modal-body"></div></div></div>
+<div id="toast"></div>
+<script>
+'use strict';
+// Native XLSX reader/writer for manual uploads, plus precompiled compressed FastDB snapshots for GitHub Pages.
+const enc=new TextEncoder(),dec=new TextDecoder('utf-8');
+const state={master:null,records:[],files:[],fileKeys:new Set(),duplicateWarnings:new Map(),period:'',prev:'',tab:'overview',region:'',province:'',area:'',areaSelected:false,set:'ALL',type:'all',admin:'',groupCode:'',status:'all',order:'gap',countMode:'positive',setAuto:true,page:1,report:null,selectedCode:null,notes:[],busy:false};
+const MONTHS=['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
+const MON_ABBR=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+const el=id=>document.getElementById(id),fmt=n=>Number(n||0).toLocaleString('th-TH',{maximumFractionDigits:0}),pct=n=>Number.isFinite(n)?(n*100).toLocaleString('th-TH',{minimumFractionDigits:1,maximumFractionDigits:1})+'%':'—';
+const cap=n=>Math.min(1,Math.max(0,n||0));
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const normal=s=>String(s??'').normalize('NFKC').replace(/[\s\u200b-\u200d\ufeff\-_.()（）\[\]{}\\/,:;ฯ๏]/g,'').toLocaleLowerCase('th');
+const clean=s=>String(s??'').trim().replace(/\s+/g,' ');
+const fmtDiff=n=>!Number.isFinite(n)?'—':(n>0?'+':'')+fmt(n);
+const signedClass=n=>n>0?'positive':n<0?'negative':'neutral';
+function toast(msg){const t=el('toast');t.textContent=msg;t.classList.add('show');clearTimeout(toast.t);toast.t=setTimeout(()=>t.classList.remove('show'),3800)}
+function xml(str){const d=new DOMParser().parseFromString(str,'application/xml');if(d.querySelector('parsererror'))throw Error('รูปแบบ XML ภายในไฟล์ไม่สมบูรณ์');return d}
+function xmlChildren(node,name){return Array.from(node?.children||[]).filter(x=>x.localName===name)}
+function xmlFirst(node,name){return xmlChildren(node,name)[0]||null}
+function bytesToStr(data){return dec.decode(data)}
+async function readZip(buffer){
+ const data=new Uint8Array(buffer),view=new DataView(data.buffer,data.byteOffset,data.byteLength);let end=-1;
+ for(let i=data.length-22;i>=Math.max(0,data.length-65557);i--){if(view.getUint32(i,true)===0x06054b50){end=i;break}}
+ if(end<0)throw Error('ไฟล์ไม่ใช่ Excel .xlsx (ไม่พบ ZIP directory)');
+ const count=view.getUint16(end+10,true),start=view.getUint32(end+16,true),entries=new Map();let pos=start;
+ for(let i=0;i<count;i++){
+  if(view.getUint32(pos,true)!==0x02014b50)throw Error('ZIP directory ผิดรูปแบบ');
+  const method=view.getUint16(pos+10,true),size=view.getUint32(pos+20,true),nameLen=view.getUint16(pos+28,true),extraLen=view.getUint16(pos+30,true),commentLen=view.getUint16(pos+32,true),at=view.getUint32(pos+42,true);
+  const name=dec.decode(data.slice(pos+46,pos+46+nameLen));entries.set(name,{method,size,at});pos+=46+nameLen+extraLen+commentLen;
+ }
+ async function read(name){const info=entries.get(name);if(!info)return null;const off=info.at;if(view.getUint32(off,true)!==0x04034b50)throw Error('ZIP header ผิดรูปแบบ');const at=off+30+view.getUint16(off+26,true)+view.getUint16(off+28,true);const blob=data.slice(at,at+info.size);
+  if(info.method===0)return bytesToStr(blob);
+  if(info.method!==8)throw Error('ไฟล์ Excel ใช้การบีบอัดที่ยังไม่รองรับ');
+  if(typeof DecompressionStream==='undefined')throw Error('เบราว์เซอร์นี้ไม่รองรับการอ่าน Excel แบบออฟไลน์ กรุณาใช้ Chrome/Edge รุ่นใหม่');
+  const stream=new Blob([blob]).stream().pipeThrough(new DecompressionStream('deflate-raw'));
+  return bytesToStr(new Uint8Array(await new Response(stream).arrayBuffer()));
+ }
+ return {read,entries};
+}
+const colToInt=ref=>{let n=0;for(const c of ref.match(/^[A-Z]+/)?.[0]||''){n=n*26+c.charCodeAt(0)-64}return n-1};
+function getText(node,tag){const n=node.getElementsByTagName(tag)[0];return n?n.textContent:''}
+async function parseWorkbook(file){
+ const zip=await readZip(await file.arrayBuffer());const wbtext=await zip.read('xl/workbook.xml');if(!wbtext)throw Error('ไม่พบ workbook.xml');
+ const wb=xml(wbtext),rl=xml(await zip.read('xl/_rels/workbook.xml.rels')||'<Relationships/>');
+ const rel=new Map();for(const n of Array.from(rl.getElementsByTagName('*')).filter(n=>n.localName==='Relationship'))rel.set(n.getAttribute('Id'),n.getAttribute('Target'));
+ const shared=[];const sharedRaw=await zip.read('xl/sharedStrings.xml');if(sharedRaw){const sd=xml(sharedRaw);for(const si of Array.from(sd.getElementsByTagName('*')).filter(n=>n.localName==='si')){shared.push(Array.from(si.getElementsByTagName('*')).filter(n=>n.localName==='t').map(n=>n.textContent).join(''))}}
+ const sheets=[];const nodes=Array.from(wb.getElementsByTagName('*')).filter(n=>n.localName==='sheet');
+ for(const sh of nodes){const name=sh.getAttribute('name')||'Sheet',id=sh.getAttribute('r:id')||sh.getAttributeNS('http://schemas.openxmlformats.org/officeDocument/2006/relationships','id'),target=rel.get(id);if(!target)continue;
+  const path=target.startsWith('/')?target.slice(1):target.startsWith('xl/')?target:'xl/'+target.replace(/^\.\//,'');const sheetXML=await zip.read(path);if(!sheetXML)continue;
+  const doc=xml(sheetXML),rows=Array.from(doc.getElementsByTagName('*')).filter(n=>n.localName==='row');const matrix=[];
+  for(const row of rows){const rn=Number(row.getAttribute('r'))||matrix.length+1;if(rn>250000)continue;const array=[];let sequential=0;
+   for(const c of xmlChildren(row,'c')){const idx=colToInt(c.getAttribute('r')||'')>=0?colToInt(c.getAttribute('r')):sequential;sequential=idx+1;const t=c.getAttribute('t')||'';let v='';
+    if(t==='inlineStr'){v=Array.from(c.getElementsByTagName('*')).filter(x=>x.localName==='t').map(x=>x.textContent).join('')}
+    else{const vNode=xmlFirst(c,'v');if(vNode){v=vNode.textContent;if(t==='s')v=shared[Number(v)]??'';else if(t==='b')v=v==='1';else if(t!=='str'&&t!=='e'&&v!==''&&Number.isFinite(Number(v)))v=Number(v)}}
+    array[idx]=v;
+   }
+   matrix[rn-1]=array;
+  }
+  sheets.push({name,matrix});
+ }
+ if(!sheets.length)throw Error('ไม่พบชีตข้อมูลภายใน Excel');return sheets;
+}
+function c7(v){let str=String(v??'').trim();if(/^\d+\.0$/.test(str))str=str.slice(0,-2);return /^\d{7}$/.test(str)?str:''}
+function rawCode(v){let str=String(v??'').trim();if(/^\d+\.0$/.test(str))str=str.slice(0,-2);return str}
+function posnum(x){if(x===null||x===undefined||x==='')return null;if(typeof x==='boolean')return null;const text=String(x).trim().replace(/,/g,'');if(!text||!/^[-+]?\d+(?:\.\d+)?$/.test(text))return null;const n=Number(text);return Number.isFinite(n)?n:null}
+function checked(v){return v===true||v===1||v==='1'||/^(checked|yes|true|ใช่|✓)$/i.test(clean(v))}
+function col(headers,variants){return headers.findIndex(v=>variants.some(k=>clean(v)===k))}
+function detectHeader(matrix,kind){let idx=-1,scoreBest=-1;for(let i=0;i<Math.min(matrix.length,16);i++){
+ const h=(matrix[i]||[]).map(clean);let score=0;
+ if(kind==='master'){if(h.includes('กำหนดให้เก็บ'))score+=8;if(h.includes('ผู้ดูแล'))score+=5;if(h.includes('รายการ'))score+=3;if(h.includes('รหัส'))score+=3}
+ else {if(h.includes('จังหวัด'))score+=5;if(h.includes('รหัส'))score+=3;if(h.includes('ราคาปัจจุบัน')||h.includes('ราคาเฉลี่ย'))score+=5;if(h.includes('ลักษณะจำเพาะ')||h.includes('รายการบ้านเช่า'))score+=4;if(h.includes('G'))score+=2}
+ if(score>scoreBest){idx=i;scoreBest=score}}
+ return scoreBest>=(kind==='master'?13:11)?idx:-1;
+}
+function showPeriod(p){if(!/^\d{4}-\d{2}$/.test(p))return p||'—';const [y,m]=p.split('-').map(Number);return `${MONTHS[m-1]} ${y+543}`}
+function prevMonth(p){if(!/^\d{4}-\d{2}$/.test(p))return '';const[y,m]=p.split('-').map(Number);return new Date(Date.UTC(y,m-2,1)).toISOString().slice(0,7)}
+function parsePeriod(meta,name){let text=String(meta||'');const fallback=String(name||'');let mYear=text.match(/ปี\s*(25\d{2}|20\d{2})/),year=mYear?Number(mYear[1]):null;
+ let sub=text.match(/เดือน\s*(.*?)(?:ประเทศไทย|ชุดทั่วไป|ชุดรายได้น้อย|\s*$)/)?.[1]||text;
+ const findMonth=s=>{for(let i=0;i<12;i++){if(s.includes(MONTHS[i]))return i+1;}for(let i=0;i<12;i++){if(s.includes(MON_ABBR[i]))return i+1;}return 0};
+ let month=findMonth(sub)||findMonth(fallback);
+ if(!year){const ym=fallback.match(/(?:^|\D)(25\d{2}|20\d{2})[-_ .]*(0?[1-9]|1[0-2])(?:\D|$)/);if(ym){year=Number(ym[1]);month=month||Number(ym[2])}}
+ if(!year||!month)return '';
+ return (year>=2400?year-543:year)+'-'+String(month).padStart(2,'0');
+}
+function readMaster(sheets){const s=sheets.find(x=>x.name.includes('ข้อมูล_รายการ_ผู้ดูแล'))||sheets.find(x=>x.matrix.slice(0,3).some(row=>(row||[]).includes('กำหนดให้เก็บ')));
+ if(!s)throw Error('ไม่พบชีต ข้อมูล_รายการ_ผู้ดูแล ของ Real_Master_CPI');
+ const headerRow=detectHeader(s.matrix,'master');if(headerRow<0)throw Error('ไม่พบหัวคอลัมน์กำหนดให้เก็บใน Master');const h=(s.matrix[headerRow]||[]).map(clean);const index={code:col(h,['รหัส']),name:col(h,['รายการ']),admin:col(h,['ผู้ดูแล']),target:col(h,['กำหนดให้เก็บ']),detail:col(h,['รายละเอียด']),mode:col(h,['เวลาเก็บ']),gl:col(h,['G/L']),u:col(h,['U'])};
+ const items=new Map(),review=[];for(let i=headerRow+1;i<s.matrix.length;i++){const r=s.matrix[i]||[],code=c7(r[index.code]);if(!code)continue;const target=posnum(r[index.target]);if(items.has(code)){review.push('Master พบ CODE7 ซ้ำ: '+code);continue}items.set(code,{code,name:clean(r[index.name]),admin:clean(r[index.admin]),target:target!==null&&target>0?target:0,detail:clean(r[index.detail]),mode:clean(r[index.mode]),gl:checked(r[index.gl]),u:checked(r[index.u]),available:null,uAvailable:null})}
+ const provinceMap=new Map(),regionList=new Set(),groupRows=[],majorNames={};const ps=sheets.find(x=>x.name.includes('รหัสจังหวัด'));
+ if(ps){const head=(ps.matrix[0]||[]).map(clean);const np=col(head,['จังหวัด','ชื่อจังหวัด']),nr=col(head,['ภาค','ชื่อภาค']);for(const r of ps.matrix.slice(1)){if(!r||np<0||nr<0)continue;const province=clean(r[np]),region=clean(r[nr]);if(!province||!region)continue;const entry={province,region};provinceMap.set(normal(province),entry);regionList.add(region)}}
+ const usage=sheets.find(x=>x.name.includes('จังหวัดใช้งาน'));const areasMap=new Map();
+ if(usage){const h=(usage.matrix[0]||[]).map(clean),typecol=col(h,['ชุดCPI']),areacol=col(h,['จังหวัด/กลุ่ม']),districtcol=col(h,['อำเภอ']);
+ for(const r of usage.matrix.slice(1)){if(!r||typecol<0||areacol<0)continue;
+  const type=clean(r[typecol]),survey=type.includes('ชุดนอกเขตเมือง')?'U':type.includes('ชุดอำเภอเมือง')?'GL':'';
+  if(!survey)continue;const raw=clean(r[areacol]);if(!raw)continue;
+  const isGroup=survey==='GL'&&raw.startsWith('กลุ่ม');const province=isGroup?'กรุงเทพมหานคร':raw;
+  const p=provinceMap.get(normal(province)),group=isGroup?raw:'',district=districtcol>=0?clean(r[districtcol]):'';
+  // Rural U and municipal G/L in the same province must never share an area key.
+  const id=survey==='U'?'U|'+province:province+'|'+group;
+  const label=survey==='U'?province+' · นอกเขตเมือง'+(district?' ('+district+')':''):group?'กทม. · '+group.replace(/^กลุ่ม\s*/,''):province;
+  if(!areasMap.has(id))areasMap.set(id,{id,province,region:p?.region||'ไม่พบภาค',group,groupName:group?group.replace(/^กลุ่ม\s*/,''):'',district,label,planned:true,survey});
+ }}
+ const calc=sheets.find(x=>x.name.trim()==='คำนวณ');let covered=0;
+ if(calc){for(const row of calc.matrix){const code=c7(row?.[0]);if(code&&/^\d0{6}$/.test(code)&&clean(row?.[1]))majorNames[code[0]]=clean(row[1]);}const ch=calc.matrix.find(r=>(r||[]).includes('BKK')&&(r||[]).includes('CEN'))||[];const glKeys=['BKK','CEN','NOR','NET','SOU'],uKeys=['CU','EU','NU','SU'];
+ const ix=glKeys.map(k=>ch.findIndex(x=>clean(x)===k)),ux=uKeys.map(k=>ch.findIndex(x=>clean(x)===k));
+ if(ix.every(n=>n>=0)){
+  for(const r of calc.matrix){const code=c7(r?.[0]);if(!code||!items.has(code))continue;
+   const flags={};glKeys.forEach((k,i)=>flags[k]=checked(r[ix[i]]));items.get(code).available=flags;
+   if(ux.every(n=>n>=0)){const uFlags={};uKeys.forEach((k,i)=>uFlags[k]=checked(r[ux[i]]));items.get(code).uAvailable=uFlags}
+   covered++}
+ }}
+ if(![...areasMap.values()].some(a=>a.survey==='GL'))review.push('Master ไม่มีรายการพื้นที่ชุดอำเภอเมืองในชีตจังหวัดใช้งาน');if(![...areasMap.values()].some(a=>a.survey==='U'))review.push('Master ไม่มีรายการพื้นที่ชุดนอกเขตเมืองในชีตจังหวัดใช้งาน');if(calc&&!([...items.values()].some(x=>x.uAvailable)))review.push('ไม่พบธง CU/EU/NU/SU ของชุด U ในชีตคำนวณ');if(!provinceMap.size)review.push('ไม่พบผังจังหวัด–ภาคใน Master');if(!covered)review.push('ไม่พบธงพื้นที่ BKK/CEN/NOR/NET/SOU ในชีตคำนวณ');
+ const bkk=provinceMap.get(normal('กรุงเทพมหานคร'));if(bkk){['กทม.','กทม','กรุงเทพ','กรุงเทพฯ'].forEach(k=>provinceMap.set(normal(k),bkk))}
+ return {items,areas:[...areasMap.values()],areasMap,provinceMap,regions:[...regionList],review,covered,src:s.name,groupRows,majorNames};
+}
+function areaRegionKey(area){const r=area.region||'';
+ if(area.survey==='U'){
+  if(r.includes('ตะวันออกเฉียงเหนือ')||r.includes('อีสาน'))return 'EU';
+  if(r.includes('เหนือ'))return 'NU';if(r.includes('ใต้'))return 'SU';if(r.includes('กลาง'))return 'CU';return '';
+ }
+ if(area.province==='กรุงเทพมหานคร'||['สมุทรปราการ','นนทบุรี','ปทุมธานี'].includes(area.province))return 'BKK';
+ if(r.includes('ตะวันออกเฉียงเหนือ')||r.includes('อีสาน'))return 'NET';
+ if(r.includes('เหนือ'))return 'NOR';if(r.includes('ใต้'))return 'SOU';if(r.includes('กลาง'))return 'CEN';return '';
+}
+function resolvePlace(prov,shop,market,survey='GL'){const m=state.master;let p=m?.provinceMap.get(normal(prov));if(!p){p={province:clean(prov)||'ไม่ระบุจังหวัด',region:'ไม่พบภาค'}}const province=p.province;
+ if(survey==='U'){const id='U|'+province;return m?.areasMap.get(id)||{id,province,region:p.region,group:'',groupName:'',district:'',survey:'U',label:province+' · นอกเขตเมือง',planned:false}}
+ let group='';if(province==='กรุงเทพมหานคร'&&m){const source=normal(shop+' '+market);const candidates=m.areas.filter(a=>a.survey==='GL'&&a.province==='กรุงเทพมหานคร'&&a.group).sort((a,b)=>b.group.length-a.group.length);for(const a of candidates){if(source.includes(normal(a.group))){group=a.group;break}}
+  if(!group&&source.includes('กลุ่ม')){const tail=source.split('กลุ่ม').pop();const guessed=candidates.filter(a=>normal(a.groupName).startsWith(tail)||tail.startsWith(normal(a.groupName)));if(guessed.length===1)group=guessed[0].group}
+ }
+ const id=province+'|'+group;const canonical=m?.areasMap.get(id);
+ return canonical||{id,province,region:p.region,group,groupName:group?group.replace(/^กลุ่ม/,''):'',survey:'GL',label:province==='กรุงเทพมหานคร'?(group?'กทม. · '+group.replace(/^กลุ่ม/,''):'กทม. (ไม่ทราบกลุ่ม)'):province,planned:false};
+}
+function readPriceFile(file,sheets){const all=[],skipped=[];let nTypes={};let title='';
+ for(const sh of sheets){const hi=detectHeader(sh.matrix,'main');if(hi<0)continue;const h=(sh.matrix[hi]||[]).map(clean),isRental=h.includes('รายการบ้านเช่า')||sh.name.includes('ค่าเช่าบ้าน'),isWeekly=!isRental&&h.filter(x=>x==='ราคาเฉลี่ย').length>0&&!h.includes('ราคาปัจจุบัน');
+ const type=isRental?'rental':isWeekly?'weekly':'monthly';nTypes[type]=(nTypes[type]||0)+1;
+ const row0=(sh.matrix[0]||[]).filter(x=>typeof x==='string').join(' ');const period=parsePeriod(row0,file.name);if(!title)title=row0;
+ const columns={id:col(h,['รหัส']),spec:col(h,['ลักษณะจำเพาะ','รายการบ้านเช่า']),shop:col(h,['แหล่งจัดเก็บ']),province:col(h,['จังหวัด']),source:-1,g:col(h,['G']),l:col(h,['L']),u:col(h,['U']),n:col(h,['N']),price:-1,market:col(h,['กลุ่มตลาด'])};
+ if(columns.spec>=0){columns.source=h.findIndex((v,i)=>i>columns.spec&&v==='รหัส')}
+ columns.price=isWeekly?h.lastIndexOf('ราคาเฉลี่ย'):col(h,['ราคาปัจจุบัน']);
+ if(columns.id<0||columns.province<0||columns.price<0){skipped.push(sh.name+': ไม่พบรหัส/จังหวัด/คอลัมน์ราคา');continue}
+ for(let i=hi+1;i<sh.matrix.length;i++){const r=sh.matrix[i]||[],raw=rawCode(r[columns.id]);if(!raw)continue;
+  const code=isRental?'3110001':raw.slice(0,7);if(!/^\d{7}$/.test(code)){continue}
+  if(!isRental&&raw.length!==16){if(skipped.length<30)skipped.push(sh.name+' แถว '+(i+1)+': รหัสรายการไม่ได้ยาว 16 หลัก');continue}
+  const province=clean(r[columns.province]),spec=clean(r[columns.spec]),shop=columns.shop>=0?clean(r[columns.shop]):'',market=columns.market>=0?clean(r[columns.market]):'',source=columns.source>=0?rawCode(r[columns.source]):'';
+  const price=posnum(r[columns.price]);const hasG=columns.g>=0&&checked(r[columns.g]),hasL=columns.l>=0&&checked(r[columns.l]),hasU=columns.u>=0&&checked(r[columns.u]);
+  const survey=columns.u>=0&&(columns.g<0&&columns.l<0||hasU&&!hasG&&!hasL)?'U':'GL';
+  all.push({id:all.length+'',period,code,productId:raw,spec,source,shop:shop||((isRental&&market)?market:'ไม่ระบุแหล่ง'),provinceRaw:province,market,type,price,g:hasG,l:hasL,u:hasU,survey,sh:sh.name,row:i+1,file:file.name,fileKey:'',place:null});
+ }
+ }
+ if(!Object.keys(nTypes).length)throw Error('ไม่พบชีตที่มีคอลัมน์รหัส จังหวัด และราคาปัจจุบัน/ราคาเฉลี่ย');
+ return {all,title,types:Object.keys(nTypes),skipped,periods:[...new Set(all.map(x=>x.period))]};
+}
+function refreshRecordPlaces(){const master=state.master;for(const r of state.records){if(r.place&&r._resolvedMaster===master)continue;r.place=resolvePlace(r.provinceRaw,r.shop,r.market,r.survey||'GL');r._resolvedMaster=master}}
+function areaSetAllowed(area){return state.set==='ALL'||(state.set==='U'?area.survey==='U':area.survey!=='U')}
+function recordSet(r){if(state.set==='ALL')return r.survey==='U'?r.u:(r.g||r.l);if(state.set==='U')return r.survey==='U'&&r.u;if(r.survey==='U')return false;return state.set==='G'?r.g:state.set==='L'?r.l:(r.g||r.l)}
+function defaultSetForFiles(){return 'ALL'}
+function recordType(r){return state.type==='all'||state.type===r.type||(state.type==='monthly'&&r.type==='monthly')}
+function collected(r){return state.countMode==='rows'||(r.price!==null&&(state.countMode==='numeric'||r.price>0))}
+function targetAllowed(item,area){if(!item||item.target<=0||!area.planned||!areaSetAllowed(area)||state.type==='rental')return false;
+ if(area.survey==='U'?!item.u:!item.gl)return false;
+ if(state.type==='monthly'&&item.mode!=='เดือน')return false;if(state.type==='weekly'&&item.mode!=='สัปดาห์')return false;
+ const flag=areaRegionKey(area),valid=area.survey==='U'?item.uAvailable:item.available;
+ return !valid||!flag||valid[flag]===true;
+}
+function isInScope(area){return(!state.region||area.region===state.region)&&(!state.province||area.province===state.province)&&(!state.area||area.id===state.area)}
+function itemMatch(code){const item=state.master?.items.get(code);return !state.admin||(item?.admin||'ไม่ระบุผู้ดูแล')===state.admin}
+function availablePeriods(){return [...new Set([...state.records.map(r=>r.period),...(typeof gitSession==='undefined'?[]:gitSession.entries.map(e=>e.period))].filter(Boolean))].sort()}
+function getStatus(x){if(!x.target)return 'none';if(!x.current)return 'zero';if(x.capped+1e-9<x.target)return 'partial';return x.current>x.target?'over':'complete'}
+function statusLabel(s){return({over:'เกินเป้า',complete:'ครบตามเป้า',partial:'ยังไม่ครบ',zero:'ยังไม่เก็บ',none:'ไม่มีเป้า'})[s]||s}
+const monthIndex={source:null,revision:0,built:-1,months:new Map()};
+function invalidateMonthIndex(){monthIndex.revision++;}
+function* indexedRows(...periods){
+ if(monthIndex.built!==monthIndex.revision||monthIndex.source!==state.records){
+  const by=new Map();for(const r of state.records){if(!by.has(r.period))by.set(r.period,[]);by.get(r.period).push(r)}
+  monthIndex.months=by;monthIndex.built=monthIndex.revision;monthIndex.source=state.records;
+ }
+ for(const p of new Set(periods)){if(p&&monthIndex.months.has(p))yield* monthIndex.months.get(p);}
+}
+function getReport(){
+ const m=state.master;
+ const areaMap=new Map(),codes=new Map(),records=[],lastRecords=[];
+ const scopedAreas=m?m.areas.filter(a=>areaSetAllowed(a)&&isInScope(a)).map(x=>({...x})):[];
+ for(const a of scopedAreas)areaMap.set(a.id,{...a,target:0,current:0,previous:0,capped:0,codes:0,touched:0,complete:0,over:0,partial:0,zero:0,untargeted:0,untargetedPrev:0});
+ const makeCode=(code,item)=>({code,name:item?.name||'ไม่พบชื่อรายการใน Master',admin:item?.admin||'',mode:item?.mode||'',detail:item?.detail||'',target:0,current:0,previous:0,capped:0,pairs:0,touched:0,complete:0,over:0,partial:0,zero:0,untargeted:0,untargetedPrev:0});
+ const byCurrent=new Map(),byPrevious=new Map(),entries=[];
+ for(const r of indexedRows(state.period,state.prev)){if((r.period!==state.period&&r.period!==state.prev)||(!state.period&&r.period!==state.period))continue;
+  if(!r.place||!isInScope(r.place)||!recordSet(r)||!recordType(r)||!itemMatch(r.code)||!collected(r))continue;
+  if(r.period===state.period)records.push(r);
+  else if(state.prev&&r.period===state.prev)lastRecords.push(r);
+  else continue;
+  const map=r.period===state.period?byCurrent:byPrevious,key=r.place.id+'§'+r.code;
+  map.set(key,(map.get(key)||0)+1);
+  if(!areaMap.has(r.place.id))areaMap.set(r.place.id,{...r.place,target:0,current:0,previous:0,capped:0,codes:0,touched:0,complete:0,over:0,partial:0,zero:0,untargeted:0,untargetedPrev:0});
+  if(!codes.has(r.code))codes.set(r.code,makeCode(r.code,m?.items.get(r.code)));
+ }
+ const seenPairs=new Set();
+ function register(area,code,item){const key=area.id+'§'+code;if(seenPairs.has(key))return;seenPairs.add(key);
+  const a=areaMap.get(area.id);if(!a)return;let c=codes.get(code);if(!c){c=makeCode(code,item);codes.set(code,c)}
+  const can=!!(m&&targetAllowed(item,area));const goal=can?item.target:0;
+  const count=byCurrent.get(key)||0,prev=byPrevious.get(key)||0,capped=Math.min(count,goal),excess=Math.max(0,count-goal);
+  c.current+=count;c.previous+=prev;c.target+=goal;c.capped+=capped;
+  a.current+=count;a.previous+=prev;a.target+=goal;a.capped+=capped;
+  if(goal){a.codes++;c.pairs++;if(count>0){a.touched++;c.touched++}
+   const st=count===0?'zero':count<goal?'partial':count>goal?'over':'complete';a[st==='complete'?'exact':st]=(a[st==='complete'?'exact':st]||0)+1;c[st==='complete'?'exact':st]=(c[st==='complete'?'exact':st]||0)+1;
+   if(count>=goal){a.complete++;c.complete++}
+  }else{a.untargeted+=count;a.untargetedPrev+=prev;c.untargeted+=count;c.untargetedPrev+=prev}
+  entries.push({areaId:area.id,region:area.region,province:area.province,area:area.label,code,name:c.name,admin:c.admin,frequency:item?.mode||'',target:goal,current:count,previous:prev,capped,short:Math.max(0,goal-count),excess,status:goal?getStatus({target:goal,current:count,capped}):'none'});
+ }
+ if(m){for(const area of scopedAreas){for(const item of m.items.values()){
+  if(!item.target||!itemMatch(item.code))continue;
+  if(state.type==='monthly'&&item.mode!=='เดือน')continue;if(state.type==='weekly'&&item.mode!=='สัปดาห์')continue;if(state.type==='rental')continue;
+  if(targetAllowed(item,area))register(area,item.code,item);
+ }}}
+ // Include observed counts without a target, including rent and unknown localities.
+ for(const key of new Set([...byCurrent.keys(),...byPrevious.keys()])){if(seenPairs.has(key))continue;
+  const sep=key.indexOf('§');const id=key.slice(0,sep),code=key.slice(sep+1),area=areaMap.get(id);if(area)register(area,code,m?.items.get(code));
+ }
+ const areaRows=[...areaMap.values()].sort((a,b)=>a.region.localeCompare(b.region,'th')||a.province.localeCompare(b.province,'th')||a.label.localeCompare(b.label,'th'));
+ const codeRows=[...codes.values()].sort((a,b)=>a.code.localeCompare(b.code));
+ const base={target:0,collected:0,actual:0,untargeted:0,previous:0,previousUntargeted:0,capped:0,pairs:0,touched:0,complete:0,over:0,partial:0,zero:0,uniqueCodes:0,observedCodes:0,areas:areaRows.length};
+ const plannedCodes=new Set(),observedCodes=new Set();
+ for(const a of areaRows){base.target+=a.target;base.actual+=a.current;base.collected+=a.current-a.untargeted;base.untargeted+=a.untargeted;base.previous+=a.previous;base.previousUntargeted+=a.untargetedPrev;base.capped+=a.capped;base.pairs+=a.codes;base.touched+=a.touched;base.complete+=a.complete;base.over+=a.over;base.partial+=a.partial;base.zero+=a.zero}
+ for(const c of codeRows){if(c.target>0)plannedCodes.add(c.code);if(c.current>0)observedCodes.add(c.code)}base.uniqueCodes=plannedCodes.size;base.observedCodes=observedCodes.size;
+ base.categoryRate=base.pairs?base.complete/base.pairs:null;base.touchRate=base.pairs?base.touched/base.pairs:null;base.quantityRate=base.target?base.capped/base.target:null;base.delta=state.prev?base.actual-base.previous:null;
+ const byRegion=new Map(),byProvince=new Map();
+ const addSummary=(map,key,geo)=>{if(!map.has(key))map.set(key,{...geo,target:0,current:0,previous:0,capped:0,pairs:0,touched:0,complete:0,untargeted:0,areas:0,codes:new Set()});return map.get(key)};
+ for(const a of areaRows){const reg=addSummary(byRegion,a.region,{region:a.region,label:a.region,province:''}),prov=addSummary(byProvince,a.province,{region:a.region,label:a.province,province:a.province});for(const v of [reg,prov]){v.target+=a.target;v.current+=a.current;v.previous+=a.previous;v.capped+=a.capped;v.pairs+=a.codes;v.touched+=a.touched;v.complete+=a.complete;v.untargeted+=a.untargeted;v.areas++}}
+ for(const e of entries)if(e.target){byRegion.get(e.region)?.codes.add(e.code);byProvince.get(e.province)?.codes.add(e.code)}
+ return {areas:areaRows,codes:codeRows,entries,records,prevRecords:lastRecords,summary:base,regionRows:[...byRegion.values()],provinceRows:[...byProvince.values()]};
+}
+function filterOptions(select,options,placeholder,selected){const s=el(select);s.innerHTML='';s.add(new Option(placeholder,''));for(const o of options)s.add(new Option(o.label??o.value,o.value));if(options.some(o=>o.value===selected))s.value=selected;else s.value=''}
+function fillSelects(){const months=availablePeriods(),lastActive=months.filter(p=>state.records.some(r=>r.period===p&&r.price!==null&&r.price>0));if(!state.period||!months.includes(state.period))state.period=(lastActive.at(-1)||months.at(-1)||'');
+ filterOptions('monthFilter',months.map(x=>({value:x,label:showPeriod(x)})),'— เลือกเดือน —',state.period);
+ const prior=prevMonth(state.period);if(state.prev&&!months.includes(state.prev))state.prev='';if(!state.prev&&prior&&months.includes(prior))state.prev=prior;
+ const options=months.filter(p=>p!==state.period).map(p=>({value:p,label:showPeriod(p)+(p===prior?' · เดือนก่อน':' · ต่างเดือน')}));
+ filterOptions('prevFilter',options,'ไม่มีไฟล์เดือนก่อน',state.prev);
+ const m=state.master,observed=state.records.filter(recordSet).map(r=>r.place).filter(Boolean);
+ const allPlaces=m?[...m.areas.filter(areaSetAllowed),...observed]:observed;
+ const regions=[...new Set(allPlaces.map(a=>a.region))].filter(Boolean).sort((a,b)=>a.localeCompare(b,'th'));
+ if(state.region&&!regions.includes(state.region)){state.region='';state.province='';state.area='';state.areaSelected=false}
+ filterOptions('regionFilter',regions.map(value=>({value})),'ทุกภาค',state.region);
+ const areas=allPlaces.filter(a=>(!state.region||a.region===state.region)&&(!state.province||a.province===state.province));
+ const uniq=new Map(areas.map(a=>[a.id,a]));const areaChoices=[...uniq.values()].sort((a,b)=>a.label.localeCompare(b.label,'th'));
+ if(state.area&&!uniq.has(state.area)){state.area='';state.areaSelected=false}
+ const areaInput=el('areaFilter');areaInput.replaceChildren();const placeholder=new Option('— กรุณาเลือกพื้นที่ —','');placeholder.disabled=true;areaInput.add(placeholder);
+ areaInput.add(new Option('ทุกเขต / ทุกกลุ่มเก็บราคา','__ALL__'));
+ for(const a of areaChoices)areaInput.add(new Option(a.label,a.id));
+ areaInput.value=state.areaSelected?(state.area||'__ALL__'):'';
+ el('areaSelectHint').textContent=state.areaSelected?(state.area?'เลือก: '+(uniq.get(state.area)?.label||state.area):'เลือกทุกเขต / ทุกพื้นที่แล้ว'):'ต้องเลือกพื้นที่ หรือเลือกทุกเขต / ทุกพื้นที่ก่อนแสดงผล';
+ const admins=[...new Set((m?[...m.items.values()].filter(x=>x.target>0&&(state.set==='U'?x.u:state.set==='ALL'?x.gl||x.u:x.gl)).map(x=>x.admin):[]).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'th'));
+ filterOptions('adminFilter',admins.map(value=>({value})),'ทุกผู้ดูแล',state.admin);
+ for(const[id,key]of[['setFilter','set'],['typeFilter','type'],['statusFilter','status']])el(id).value=state[key];
+}
+function fileCards(){const files=state.files.map((f,i)=>{
+ const good=f.kind==='master'||f.count>0;const type=f.kind==='master'?'Master · ฐานเป้าหมาย':f.types.join(' / ')+' · '+(f.sets||[]).join('+');
+ const label=f.kind==='master'?'MASTER':f.period?showPeriod(f.period):'ไม่พบเดือน';
+ const qualified=f.kind==='master'?'CODE7 '+fmt(state.master?.items?.size||0)+' รายการ · '+fmt(state.master?.areas?.length||0)+' พื้นที่':fmt(f.count||0)+' แถว · มีราคา '+fmt(f.positive||0);
+ const missing=f.kind!=='master'&&!f.period;
+ return `<div class="file-chip ${missing?'warn':good?'ok':''}" title="${esc(f.name)}"><strong class="file-type">${esc(type)}</strong><div class="file-name">${esc(f.name)}<span class="file-meta">${esc(label)} · ${qualified}${f.source==='folder'?' · โฟลเดอร์อัตโนมัติ':f.source==='git'?' · GitHub':''}</span></div><div class="file-controls">${missing?`<button data-setmonth="${i}" title="กำหนดเดือน" style="font-size:12px">กำหนดเดือน</button>`:''}<button data-remove="${i}" title="นำไฟล์ออก" aria-label="นำไฟล์ ${esc(f.name)} ออก">×</button></div></div>`
+ });el('fileList').innerHTML=files.join('')||'<div class="minor muted" style="padding:15px">ยังไม่มีไฟล์ที่นำเข้า</div>';
+ el('sourceCount').textContent=fmt(state.files.length)+' ไฟล์ที่นำเข้า';
+ const notices=[...state.duplicateWarnings.values()];const duplicateNote=el('duplicateNotice');
+ duplicateNote.hidden=!notices.length;
+ duplicateNote.textContent=notices.length?'ข้ามไฟล์ซ้ำ '+fmt(notices.length)+' ไฟล์ (ปี + เดือน + หัวข้อเดียวกัน) · '+notices.slice(0,4).map(n=>n.ignored+' → ใช้ '+n.kept).join(' | ')+(notices.length>4?' · และอื่น ๆ':''):'';
+ el('masterHint').textContent=state.master?'ใช้ Master · '+fmt([...state.master.items.values()].filter(x=>x.gl&&x.target>0).length)+' หมวด G/L · '+fmt([...state.master.items.values()].filter(x=>x.u&&x.target>0).length)+' หมวด U · '+fmt(state.master.areas.filter(a=>a.survey==='U').length)+' พื้นที่ U':'เลือก Master เพื่ออ่านเป้าหมาย / ผู้ดูแล / พื้นที่';
+ const notes=[];if(!state.master&&state.records.length)notes.push('ยังไม่มี Master จึงนับข้อมูลที่เก็บได้ แต่ไม่คำนวณเปอร์เซ็นต์เทียบเป้า');if(state.master?.review?.length)notes.push(state.master.review.slice(0,3).join(' · '));
+ const pendingPrice=state.files.filter(f=>f.kind!=='master'&&f.period===state.period&&f.count>0&&f.positive===0);if(pendingPrice.length)notes.push('ไฟล์เดือนนี้ '+pendingPrice.length+' ไฟล์ยังไม่มีราคาปัจจุบันที่มากกว่า 0 จึงยังไม่นับว่าเก็บได้');const undated=state.files.filter(f=>f.kind!=='master'&&!f.period);if(undated.length)notes.push('ไฟล์ที่ไม่ทราบเดือน '+undated.length+' ไฟล์ — คลิก “กำหนดเดือน” เพื่อกำหนดเดือน');
+ if(state.period&&state.records.length&&state.prev===''&&state.records.some(r=>r.period===state.period))notes.push('ยังไม่มีข้อมูลเดือนก่อนสำหรับเปรียบเทียบจำนวนครั้งที่เก็บจริง กรุณาเพิ่มไฟล์เดือนก่อน (อย่าใช้คอลัมน์ราคาเดือนก่อนแทน)');
+ if(state.master&&state.records.some(r=>r.type==='rental'))notes.push('ค่าเช่าบ้าน (รหัส 10 หลัก) จัดไว้ในหมวด 3110001 แต่ Master ไม่ระบุเป้าหมาย จึงรายงานเป็นยอดเก็บจริงนอกตัวหารเปอร์เซ็นต์');
+ const bar=el('warningBar');bar.textContent=notes.join('  |  ');bar.classList.toggle('show',!!notes.length);
+}
+function render(){refreshRecordPlaces();fillSelects();fileCards();el('filterCaption').textContent=state.province?'เจาะเฉพาะจังหวัด '+state.province+' · กรองเป้าหมายและจำนวนพร้อมกัน':'กรองข้อมูลและเป้าหมายพร้อมกันทุกตาราง';const periods=availablePeriods();el('periodBadge').textContent=state.period?'ประจำเดือน '+showPeriod(state.period):'ยังไม่ได้นำเข้าข้อมูล';
+ if(!state.master&&!state.records.length){el('appBody').innerHTML=`<div class="no-data"><div class="empty-icon">▤</div><h2>เริ่มจากการอัปโหลด Excel</h2><p>เลือก Real_Master_CPI และไฟล์เก็บราคาที่ต้องการตรวจสอบ ระบบจะสร้างรายงานความครบถ้วน ติดตามพื้นที่ และเปิดดูรายละเอียดสเปคได้</p></div>`;return}
+ if(!state.areaSelected){state.report=null;el('appBody').innerHTML='<div class="no-data"><div class="empty-icon">⌖</div><h2>เลือกเขต / กลุ่มเก็บราคาก่อนดูรายงาน</h2><p>โปรดเลือกเขตที่ต้องการติดตามในแถบด้านซ้าย หรือเลือก <b>ทุกเขต / ทุกกลุ่มเก็บราคา</b> เพื่อดูภาพรวมทั้งหมด</p></div>';return}
+ state.report=getReport();const s=state.report.summary;
+ el('appBody').innerHTML=`${state.province?`<div class="group-focus"><span>กำลังเจาะข้อมูลเฉพาะจังหวัด <strong>${esc(state.province)}</strong> ผ่านตารางรายพื้นที่</span><button class="btn sm light" data-clear-province>กลับไปดูทุกจังหวัด</button></div>`:''}<div class="tabs" role="tablist">${[['overview','ภาพรวมความคืบหน้า'],['area','รายภาค / จังหวัด / เขต'],['category','รายหมวด CODE7'],['changes','เพิ่ม–ลดจากเดือนก่อน'],['review','ตรวจสอบข้อมูลนำเข้า']].map(([k,v])=>`<button class="tab ${state.tab===k?'active':''}" data-tab="${k}" role="tab" aria-selected="${state.tab===k}">${v}</button>`).join('')}</div><div id="viewBody"></div>`;
+ if(state.tab==='overview')viewOverview();if(state.tab==='area')viewAreas();if(state.tab==='category')viewCategories();if(state.tab==='changes')viewChanges();if(state.tab==='review')viewReview();
+}
+function summaryCard(name,val,sub,cls){return `<div class="kpi ${cls||''}"><div class="name">${name}</div><div class="val mono">${val}</div><div class="sub">${sub||'&nbsp;'}</div></div>`}
+function miniBar(percentage,green=false){return `<div class="bar"><div class="bar-fill ${green?'green':''}" style="width:${Math.round(cap(percentage)*100)}%"></div></div>`}
+function pill(s){return `<span class="pill ${s}">${statusLabel(s)}</span>`}
+function showDelta(n,word='จากเดือนก่อน'){return state.prev?`<span class="${signedClass(n)}">${fmtDiff(n)}</span> ${word}`:'ไม่มีไฟล์เดือนก่อน'}
+function rateContent(title,value,den,nom,clipped,green){return `<div class="panel"><h3>${title}</h3><p class="sub">${clipped}</p><div class="progress-line"><strong>${pct(value)}</strong><span class="muted minor">${fmt(nom)} / ${fmt(den)}</span></div>${miniBar(value,green)}<div class="legend-row"><span>ยังไม่ถึงเป้า ${fmt(Math.max(0,den-nom))}</span><span>เป้าหมาย ${fmt(den)}</span></div></div>`}
+function majorGroupRows(){const grouped=new Map();for(const e of state.report.entries){const n=e.code[0];if(!/^\d$/.test(n))continue;if(!grouped.has(n))grouped.set(n,{code:n,name:state.master?.majorNames?.[n]||'หมวด '+n,target:0,current:0,capped:0,complete:0,pairs:0,untargeted:0});const v=grouped.get(n);v.target+=e.target;v.current+=e.current;v.capped+=e.capped;if(e.target){v.pairs++;if(e.current>=e.target)v.complete++}else v.untargeted+=e.current}return [...grouped.values()].sort((a,b)=>a.code.localeCompare(b.code))}
+function majorGroupTable(){const data=majorGroupRows();if(!data.length)return '<div class="empty">ไม่มีข้อมูลหมวดหลัก</div>';return `<div class="panel"><div class="panel-tools"><div><h3>ความคืบหน้าจำแนกตามหมวดใหญ่</h3><p class="sub" style="margin:0">ตามหมวด = CODE7 × พื้นที่ที่ครบเป้า · ตามจำนวน = จำนวนที่ครบเป้าหลังหักส่วนเกินแยกรายพื้นที่</p></div><button class="btn sm green" data-export="majors">↓ Excel หมวดหลัก</button></div><div class="table-wrap"><table class="data-table"><thead><tr><th>หมวดใหญ่</th><th class="text-right">หมวด-พื้นที่ที่ครบ / เป้า</th><th>% ตามหมวด</th><th class="text-right">จำนวนจริง / เป้า</th><th>% ตามจำนวน</th><th class="text-right">ยังขาด</th><th></th></tr></thead><tbody>${data.map(x=>`<tr class="click-row" data-groupcode="${x.code}"><td><span class="code">${x.code}</span><div class="name-line">${esc(x.name)}</div></td><td class="text-right mono">${fmt(x.complete)} / ${fmt(x.pairs)}</td><td><div class="cell-progress"><div class="smallbar"><i style="width:${Math.round(cap(x.pairs?x.complete/x.pairs:0)*100)}%"></i></div><span class="mono">${pct(x.pairs?x.complete/x.pairs:null)}</span></div></td><td class="text-right mono">${fmt(x.current)} / ${fmt(x.target)}</td><td><div class="cell-progress"><div class="smallbar"><i style="width:${Math.round(cap(x.target?x.capped/x.target:0)*100)}%"></i></div><span class="mono">${pct(x.target?x.capped/x.target:null)}</span></div></td><td class="text-right negative mono">${fmt(Math.max(0,x.target-x.capped))}</td><td><span class="text-btn">ดูรายการ →</span></td></tr>`).join('')}</tbody></table></div></div>`}
+function messageReport(){const s=state.report.summary;const geo=state.area?state.report.areas.find(x=>x.id===state.area)?.label:state.province||state.region||'รวมทุกพื้นที่';
+ const delta=state.prev?` เทียบกับ${showPeriod(state.prev)} เก็บ${s.delta>0?'เพิ่มขึ้น':s.delta<0?'ลดลง':'เท่าเดิม'} ${fmt(Math.abs(s.delta))} ข้อมูล (เดือนก่อน ${fmt(s.previous)} ข้อมูล)`:' ยังไม่มีไฟล์ของเดือนก่อนเพื่อเปรียบเทียบ';
+ return `รายงานความคืบหน้าการเก็บราคา CPI พื้นที่ ${geo} ประจำเดือน${showPeriod(state.period)}: กำหนดเก็บ ${fmt(s.target)} ข้อมูล ใน ${fmt(s.pairs)} หมวด-พื้นที่ ปัจจุบันเก็บจริง ${fmt(s.actual)} ข้อมูล (รายการมีเป้า ${fmt(s.collected)} และรายการไม่มีเป้า ${fmt(s.untargeted)}) ครบตามเป้าหมาย ${fmt(s.complete)} หมวด-พื้นที่ คิดเป็น ${pct(s.categoryRate)} ตามหมวด และ ${pct(s.quantityRate)} ตามจำนวน โดยยังขาด ${fmt(Math.max(0,s.target-s.capped))} ข้อมูล${delta} ระบบนับเฉพาะแถวที่มีราคาปัจจุบันมากกว่า 0`;}
+function trendChart(){const dates=availablePeriods(),m=state.master;if(!dates.length)return '<div class="empty">ไม่มีข้อมูลรายเดือน</div>';
+ const series=[];for(const p of dates){let total=0,unknown=0;for(const r of state.records){if(r.period===p&&r.place&&isInScope(r.place)&&recordSet(r)&&recordType(r)&&itemMatch(r.code)&&collected(r)){total++;
+ const mi=m?.items.get(r.code);if(!targetAllowed(mi,r.place))unknown++;
+ }}series.push({period:p,count:total,targeted:total-unknown})}
+ const max=Math.max(1,...series.map(x=>x.count)),w=560,h=180,l=36,t=17,plotH=130,dx=series.length>1?(w-l-20)/(series.length-1):0;
+ const pts=series.map((d,i)=>({x:l+i*dx,y:t+plotH-(d.count/max)*plotH,d}));
+ let path=pts.map((p,i)=>(i?'L':'M')+p.x.toFixed(1)+','+p.y.toFixed(1)).join(' ');if(pts.length===1)path+=' l 0 0';
+ const labels=pts.map((p,i)=>`<text x="${p.x}" y="174" font-size="10" fill="#8495a8" text-anchor="middle">${MON_ABBR[Number(p.d.period.slice(5))-1]} ${Number(p.d.period.slice(2,4))+43}</text>`).join('');
+ return `<div class="trend-wrap"><svg viewBox="0 0 ${w} ${h}" preserveAspectRatio="none" role="img" aria-label="จำนวนข้อมูลที่เก็บตามเดือน"><line x1="${l}" y1="${t+plotH}" x2="${w-10}" y2="${t+plotH}" stroke="#dbe5f1"/><line x1="${l}" y1="${t+plotH/2}" x2="${w-10}" y2="${t+plotH/2}" stroke="#edf2f8" stroke-dasharray="4 5"/><text x="2" y="${t+2}" font-size="10" fill="#8595a8">${fmt(max)}</text><text x="5" y="${t+plotH+4}" font-size="10" fill="#8595a8">0</text><path d="${path}" fill="none" stroke="#2872d0" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>${pts.map(p=>`<circle cx="${p.x}" cy="${p.y}" r="4.5" stroke="#fff" stroke-width="2" fill="#2475d7"><title>${esc(showPeriod(p.d.period))} : ${fmt(p.d.count)} ข้อมูล</title></circle>`).join('')}${labels}</svg></div><div class="trend-note">แสดงเฉพาะเดือนที่นำเข้า · ไม่ลากค่าของเดือนที่ไม่มีไฟล์มาแทนข้อมูลจริง</div>`;
+}
+function viewOverview(){const {summary:s,areas,regionRows,codes}=state.report;const hasPrev=!!state.prev;
+ const title=`${showPeriod(state.period)} · ${state.province||state.region||'รวมประเทศไทย'}`;
+ el('viewBody').innerHTML=`<div class="headline"><h2>ภาพรวมการจัดเก็บราคา</h2><span class="section-suffix">${esc(title)} · ${fmt(areas.length)} พื้นที่</span></div><div class="kpi-grid">
+ ${summaryCard('หมวด-พื้นที่เป้าหมาย',fmt(s.pairs),`${fmt(s.uniqueCodes)} CODE7 ไม่ซ้ำ`,'blue')}
+ ${summaryCard('หมวด-พื้นที่ที่เก็บครบ',fmt(s.complete),`${pct(s.categoryRate)} ตามหมวด`,'green')}
+ ${summaryCard('จำนวนตามเป้าหมาย',fmt(s.target),'ผลรวมโควตาตาม Master')}
+ ${summaryCard('เก็บจริงทั้งหมด',fmt(s.actual),`${fmt(s.untargeted)} ข้อมูลไม่มีเป้า`,'blue')}
+ ${summaryCard('ยังขาดตามโควตา',fmt(Math.max(0,s.target-s.capped)),'ไม่นำส่วนเกินของหมวดอื่นมาชดเชย','red')}
+ ${summaryCard('เปลี่ยนแปลงจากเดือนก่อน',hasPrev?`<span class="${signedClass(s.delta)}">${fmtDiff(s.delta)}</span>`:'—',hasPrev?`เทียบ ${showPeriod(state.prev)}`:'ต้องอัปโหลดไฟล์เดือนก่อน','cyan')}
+ </div><div class="two-cols">${rateContent('ความครบถ้วนตามหมวด (CODE7 × พื้นที่)',s.categoryRate,s.pairs,s.complete,'หมวดที่มีจำนวนเก็บจริงไม่น้อยกว่าเป้าหมาย · เกินเป้าก็นับว่าครบ',true)}${rateContent('ความครบถ้วนตามจำนวน (จำนวนราคา)',s.quantityRate,s.target,s.capped,'Σ min(จำนวนที่เก็บได้, เป้าหมาย) ÷ Σ เป้าหมาย · ไม่ให้ยอดเกินกลบยอดขาด',false)}</div>
+ <div class="two-cols" style="margin-top:13px"><div class="panel"><h3>สถานะหมวดตามพื้นที่</h3><p class="sub">จำนวนภารกิจ CODE7 × พื้นที่ทั้งหมดในขอบเขตที่เลือก</p><div class="stacked">${[['over','#448dec'],['complete','#28b79a'],['partial','#f1b954'],['zero','#e77786']].map(([k,color])=>`<span style="background:${color};width:${s.pairs?100*(s[k]||0)/s.pairs:0}%"></span>`).join('')}</div><div class="state-grid">${[['over','เกินเป้า'],['complete','ครบพอดี (รวมเกินอยู่บน)'],['partial','ยังไม่ครบ'],['zero','ยังไม่มีราคา']].map(([k,n])=>`<div class="state-cell"><strong>${fmt(k==='complete'?Math.max(0,s.complete-s.over):s[k])}</strong><span>${n}</span></div>`).join('')}</div><p class="sub" style="margin-top:12px">มีข้อมูลอย่างน้อย 1 แถว: ${fmt(s.touched)} จาก ${fmt(s.pairs)} หมวด-พื้นที่ (${pct(s.touchRate)})</p></div>
+ <div class="panel"><h3>แนวโน้มจำนวนข้อมูลที่เก็บ</h3><p class="sub">ตามเดือนในไฟล์ที่อัปโหลด · ขอบเขตตัวกรองเดียวกัน</p>${trendChart()}</div></div>
+ <div class="headline"><h2>แยกความครบถ้วนตามหมวดใหญ่</h2><span class="section-suffix">คลิกแถวเพื่อเปิด CODE7 ในหมวดนั้น</span></div>${majorGroupTable()}<div class="headline"><h2>ข้อความสื่อสารถึงเจ้าหน้าที่</h2><span class="section-suffix">กดคัดลอก / พิมพ์ หรือส่งออก Excel ได้</span></div><div class="message-box" id="reportMessage">${esc(messageReport())}</div><div class="panel-tools"><div class="mini-actions"><button class="btn sm" data-action="copy">คัดลอกข้อความรายงาน</button><button class="btn sm green" data-action="export">ส่งออก Excel รายงาน</button><button class="btn sm soft" data-action="area">ดูรายพื้นที่</button></div><span class="minor muted">รายงานจะอัปเดตเมื่อเปลี่ยนข้อมูลหรือตัวกรอง</span></div>
+ <div class="two-cols"><div class="panel"><h3>พื้นที่ที่ยังขาดมาก</h3><p class="sub">เรียงตามจำนวนที่ยังเก็บไม่ครบ (หลังหักส่วนที่เก็บจริงราย CODE7 แล้ว)</p>${makeAreaMini(areas)}</div><div class="panel"><h3>หมวดที่ควรเร่งเก็บ</h3><p class="sub">สามารถคลิก CODE7 เพื่อดูสเปคและแหล่งจัดเก็บจริง</p>${makeCodeMini(codes)}</div></div>`;
+}
+function makeAreaMini(areas){const arr=[...areas].filter(a=>a.target>0).sort((a,b)=>(b.target-b.capped)-(a.target-a.capped)).slice(0,8);return arr.length?`<div class="table-wrap"><table class="data-table"><thead><tr><th>พื้นที่</th><th class="text-right">เก็บ / เป้า</th><th class="text-right">ยังขาด</th></tr></thead><tbody>${arr.map(a=>`<tr class="click-row" data-area="${esc(a.id)}"><td><span class="text-btn">${esc(a.label)}</span></td><td class="text-right mono">${fmt(a.current)} / ${fmt(a.target)}</td><td class="text-right negative mono">${fmt(a.target-a.capped)}</td></tr>`).join('')}</tbody></table></div>`:'<div class="empty">ยังไม่มีพื้นที่ที่มีเป้าหมาย</div>'}
+function makeCodeMini(codes){const arr=[...codes].filter(c=>c.target>0).sort((a,b)=>(b.target-b.capped)-(a.target-a.capped)).slice(0,8);return arr.length?`<div class="table-wrap"><table class="data-table"><thead><tr><th>CODE7 · รายการ</th><th class="text-right">เก็บ / เป้า</th><th class="text-right">ยังขาด</th></tr></thead><tbody>${arr.map(c=>`<tr class="click-row" data-code="${esc(c.code)}"><td><span class="code">${esc(c.code)}</span><div class="name-line">${esc(c.name)}</div></td><td class="text-right mono">${fmt(c.current)} / ${fmt(c.target)}</td><td class="text-right negative mono">${fmt(c.target-c.capped)}</td></tr>`).join('')}</tbody></table></div>`:'<div class="empty">ยังไม่มีรหัสเป้าหมาย</div>'}
+function geoRate(row){return row.target?row.capped/row.target:null}
+function geoTable(rows,kind){if(!rows.length)return '<div class="empty">ไม่พบพื้นที่ในขอบเขตนี้</div>';
+ const click=kind==='region'?'data-region':kind==='province'?'data-province':'data-area';
+ const sorted=[...rows].sort((a,b)=>(b.target-b.capped)-(a.target-a.capped)||a.label.localeCompare(b.label,'th'));
+ return `<div class="table-wrap"><table class="data-table"><thead><tr><th>${kind==='region'?'ภาค':kind==='province'?'จังหวัด':'เขต / กลุ่มเก็บราคา'}</th><th class="text-right">พื้นที่</th><th class="text-right">เป้าหมาย</th><th class="text-right">เก็บจริง</th><th>จำนวนที่ครบเป้า</th><th>ครบตามหมวด</th><th class="text-right">ยังขาด</th><th class="text-right">เปลี่ยนจากเดือนก่อน</th><th>ลงรายละเอียด</th></tr></thead><tbody>${sorted.map(r=>{const rate=geoRate(r),cr=r.pairs?r.complete/r.pairs:null;return `<tr class="click-row" ${click}="${esc(kind==='district'?r.id:kind==='province'?r.province:r.region)}"><td><div class="name-line">${esc(r.label)}</div>${kind==='district'?`<div class="subline">${esc(r.province)} · ${esc(r.region)}</div>`:kind==='province'?`<div class="subline">${esc(r.region)}</div>`:''}</td><td class="text-right mono">${fmt(r.areas||1)}</td><td class="text-right mono">${fmt(r.target)}</td><td class="text-right mono"><b>${fmt(r.current)}</b>${r.untargeted?`<div class="subline">นอกเป้า ${fmt(r.untargeted)}</div>`:''}</td><td><div class="cell-progress"><div class="smallbar"><i style="width:${Math.round(cap(rate)*100)}%"></i></div><span class="mono">${pct(rate)}</span></div></td><td class="mono">${fmt(r.complete)} / ${fmt(r.pairs)} <span class="subline">(${pct(cr)})</span></td><td class="text-right mono ${r.target-r.capped?'negative':''}">${fmt(Math.max(0,r.target-r.capped))}</td><td class="text-right mono ${state.prev?signedClass(r.current-r.previous):'neutral'}">${state.prev?fmtDiff(r.current-r.previous):'—'}</td><td><span class="text-btn">${kind==='region'?'ดูจังหวัด':kind==='province'?'ดูเขต':'ดูหมวด'} →</span></td></tr>`}).join('')}</tbody></table></div>`;
+}
+function viewAreas(){const r=state.report,view=state.areaView||'province',kind=view==='region'?'region':view==='province'?'province':'district',rows=view==='region'?r.regionRows:view==='province'?r.provinceRows:r.areas;
+ el('viewBody').innerHTML=`<div class="headline"><h2>เปรียบเทียบการจัดเก็บตามพื้นที่</h2><span class="section-suffix">คลิกแถวเพื่อเจาะระดับถัดไป</span></div><div class="panel"><div class="panel-tools"><div class="mini-actions">${[['region','รายภาค'],['province','รายจังหวัด'],['district','รายเขต / กลุ่ม']].map(([k,t])=>`<button class="btn sm ${view===k?'':'soft'}" data-areaview="${k}">${t}</button>`).join('')}</div><div class="mini-actions"><button class="btn green sm" data-export="areas">↓ Excel รายพื้นที่</button><span class="minor muted">${fmt(rows.length)} แถว</span></div></div>${geoTable(rows,kind)}<p class="minor muted" style="margin:10px 0 0">เป้าหมายสะสมจากแต่ละพื้นที่ที่ Master ระบุ และตัดหมวดที่ไม่มีธงใช้งานในภาคนั้น · เปอร์เซ็นต์ไม่นำจำนวนเกินของหมวดอื่นมาชดเชย</p></div>`;
+}
+function codeTable(codes){return `<div class="table-wrap"><table class="data-table"><thead><tr><th>CODE7 / รายการ</th><th>ผู้ดูแล</th><th>เก็บแบบ</th><th class="text-right">เป้าหมาย</th><th class="text-right">เก็บจริง</th><th class="text-right">เดือนก่อน</th><th class="text-right">เพิ่ม / ลด</th><th>ครบตามจำนวน</th><th>สถานะ</th><th>รายละเอียด</th></tr></thead><tbody>${codes.map(c=>{const status=getStatus(c),rate=c.target?c.capped/c.target:null;return `<tr class="click-row" data-code="${esc(c.code)}"><td><span class="code">${esc(c.code)}</span><div class="name-line">${esc(c.name)}</div>${c.detail?`<div class="subline" style="max-width:360px">${esc(c.detail)}</div>`:''}</td><td>${esc(c.admin||'—')}</td><td>${esc(c.mode||'—')}</td><td class="text-right mono">${c.target?fmt(c.target):'—'}</td><td class="text-right mono"><b>${fmt(c.current)}</b></td><td class="text-right mono">${state.prev?fmt(c.previous):'—'}</td><td class="text-right mono ${state.prev?signedClass(c.current-c.previous):''}">${state.prev?fmtDiff(c.current-c.previous):'—'}</td><td><div class="cell-progress"><div class="smallbar"><i style="width:${Math.round(cap(rate)*100)}%"></i></div><span class="mono">${pct(rate)}</span></div><div class="subline">${fmt(c.complete)} / ${fmt(c.pairs)} หมวด-พื้นที่ครบ</div></td><td>${pill(status)}</td><td><button class="text-btn" data-code="${esc(c.code)}">ดูสเปค →</button></td></tr>`}).join('')}</tbody></table></div>`}
+function sortCodes(rows){return [...rows].sort((a,b)=>{const gap=r=>Math.max(0,r.target-r.capped);switch(state.order){case'coverage':return (a.target?a.capped/a.target:2)-(b.target?b.capped/b.target:2)||a.code.localeCompare(b.code);case'coverageDesc':return(b.target?b.capped/b.target:-1)-(a.target?a.capped/a.target:-1)||a.code.localeCompare(b.code);case'changeDown':return (a.current-a.previous)-(b.current-b.previous)||a.code.localeCompare(b.code);case'changeUp':return(b.current-b.previous)-(a.current-a.previous)||a.code.localeCompare(b.code);case'code':return a.code.localeCompare(b.code);case'codeDesc':return b.code.localeCompare(a.code);default:return gap(b)-gap(a)||a.code.localeCompare(b.code)}})}
+function filteredCodes(){return sortCodes(state.report.codes.filter(c=>(!state.groupCode||c.code.startsWith(state.groupCode))&&(state.status==='all'||getStatus(c)===state.status)))}
+function viewCategories(){const codes=filteredCodes(),pageSize=70,maxPage=Math.max(1,Math.ceil(codes.length/pageSize));state.page=Math.min(Math.max(1,state.page),maxPage);
+ const part=codes.slice((state.page-1)*pageSize,state.page*pageSize),s=state.report.summary;
+ el('viewBody').innerHTML=`<div class="headline"><h2>รายละเอียดรายการสินค้า · CODE7</h2><span class="section-suffix">${fmt(codes.length)} หมวดตามตัวกรอง / ${fmt(s.uniqueCodes)} หมวดเป้าหมาย</span></div>${state.groupCode?`<div class="group-focus"><span>กำลังดูหมวดใหญ่ <strong>${esc(state.groupCode)}</strong> · คลิกรายการเพื่อดูสเปค</span><button class="btn sm soft" data-clear-group="1">ดูทุกหมวด ✕</button></div>`:''}<div class="panel"><div class="panel-tools"><span class="minor muted">คลิกรหัสเพื่อดูสเปค รหัสสินค้า 16 หลัก แหล่งเก็บราคา และจำนวนที่เปลี่ยนไป</span><div class="mini-actions"><div class="code-sort-control"><label for="codeSortSelect">เรียงรหัส CODE7</label><select id="codeSortSelect" aria-label="เรียงลำดับรหัส CODE7"><option value="gap" ${state.order==='gap'?'selected':''}>ขาดจากเป้ามากที่สุด</option><option value="code" ${state.order==='code'?'selected':''}>รหัสน้อย → มาก (0–9)</option><option value="codeDesc" ${state.order==='codeDesc'?'selected':''}>รหัสมาก → น้อย (9–0)</option></select></div><button class="btn sm green" data-export="codes">↓ Excel ทุก CODE7</button></div></div>${part.length?codeTable(part):'<div class="empty">ไม่พบรายการที่ตรงตามตัวกรอง</div>'}<div class="page-nav"><button class="btn sm soft" data-page="-1" ${state.page===1?'disabled':''}>← ก่อนหน้า</button><span class="minor muted">หน้า ${fmt(state.page)} / ${fmt(maxPage)}</span><button class="btn sm soft" data-page="1" ${state.page===maxPage?'disabled':''}>ถัดไป →</button></div></div>`;
+}
+function keySpec(r){return [r.place.id,r.productId,r.source||normal(r.shop),r.type].join('§')}
+function crossMonthSpecs(current,previous){const byNow=new Map(),byPrev=new Map();for(const r of current){const k=keySpec(r);if(!byNow.has(k))byNow.set(k,{r,count:0});byNow.get(k).count++}for(const r of previous){const k=keySpec(r);if(!byPrev.has(k))byPrev.set(k,{r,count:0});byPrev.get(k).count++}
+ const arr=[];for(const k of new Set([...byNow.keys(),...byPrev.keys()])){const a=byNow.get(k),b=byPrev.get(k),r=a?.r||b?.r;arr.push({key:k,r,current:a?.count||0,previous:b?.count||0,delta:(a?.count||0)-(b?.count||0),status:!b?'เพิ่มใหม่':!a?'หยุดเก็บ':'ต่อเนื่อง'})}
+ return arr;
+}
+function viewChanges(){if(!state.prev){el('viewBody').innerHTML=`<div class="panel"><div class="empty"><div class="empty-icon">↕</div><h2>ต้องใช้ไฟล์เก็บราคาของเดือนก่อน</h2><p>การเพิ่ม–ลด “จำนวนที่เก็บ” ต้องเปรียบเทียบแถวข้อมูลเก็บจริงสองเดือน กรุณาอัปโหลดไฟล์ของเดือนก่อน แล้วระบบจะจับคู่ CODE7 และสเปค + แหล่งจัดเก็บโดยอัตโนมัติ</p><p>คอลัมน์ “ราคาเดือนก่อน” ใน Excel คือราคาสินค้า ไม่ใช่จำนวนรายการที่เก็บได้เดือนก่อน</p></div></div>`;return}
+ const {codes,areas,records,prevRecords}=state.report,active=codes.filter(c=>c.current||c.previous),plus=active.filter(c=>c.current>c.previous),minus=active.filter(c=>c.current<c.previous),same=active.filter(c=>c.current===c.previous),newCodes=active.filter(c=>c.current>0&&!c.previous),lostCodes=active.filter(c=>c.previous>0&&!c.current),diff=state.report.summary.delta;
+ const changedSpec=crossMonthSpecs(records,prevRecords),newSpec=changedSpec.filter(x=>!x.previous&&x.current).length,lostSpec=changedSpec.filter(x=>x.previous&&!x.current).length;
+ const movements=[...active].filter(c=>c.current!==c.previous).sort((a,b)=>Math.abs(b.current-b.previous)-Math.abs(a.current-a.previous)).slice(0,180);
+ const distinctMonth=prevMonth(state.period)!==state.prev;
+ el('viewBody').innerHTML=`<div class="headline"><h2>วิเคราะห์การเพิ่ม–ลดจำนวนที่เก็บ</h2><span class="section-suffix">${showPeriod(state.prev)} → ${showPeriod(state.period)}</span></div>${distinctMonth?`<div class="warningbar show" style="margin:0 0 12px">กำลังเทียบข้อมูลคนละช่วงเดือนที่ไม่ติดกัน (${showPeriod(state.prev)} → ${showPeriod(state.period)}) โปรดตรวจสอบช่วงเวลา</div>`:''}
+ <div class="kpi-grid">${summaryCard('ผลต่างจำนวนข้อมูล',`<span class="${signedClass(diff)}">${fmtDiff(diff)}</span>`,'แถวที่มีราคา · เดือนปัจจุบัน - เดือนก่อน','cyan')}${summaryCard('CODE7 เก็บเพิ่ม',fmt(plus.length),'หมวดที่จำนวนเพิ่ม','green')}${summaryCard('CODE7 เก็บลด',fmt(minus.length),'หมวดที่จำนวนลด','red')}${summaryCard('CODE7 จำนวนเท่าเดิม',fmt(same.length),'เทียบตามพื้นที่ที่เลือก')}${summaryCard('คู่สเปค+แหล่งที่เพิ่งพบ',fmt(newSpec),'เทียบรหัสและร้าน','green')}${summaryCard('คู่สเปค+แหล่งที่หายไป',fmt(lostSpec),'ไม่พบในเดือนนี้','red')}</div>
+ <div class="panel"><div class="panel-tools"><div><h3>ความเปลี่ยนแปลงราย CODE7</h3><p class="sub" style="margin:0">หมวดที่เดือนนี้มีจำนวนเก็บมากขึ้น / ลดลง · หมวดเริ่มเก็บใหม่ ${fmt(newCodes.length)} หมวด · หมวดที่หยุดเก็บ ${fmt(lostCodes.length)} หมวด</p></div><button class="btn green sm" data-export="changes">↓ Excel รายการเพิ่ม–ลด</button></div><div class="table-wrap"><table class="data-table"><thead><tr><th>CODE7 / รายการ</th><th>ผู้ดูแล</th><th class="text-right">เดือนก่อน</th><th class="text-right">เดือนนี้</th><th class="text-right">ผลต่าง</th><th>สถานะการเปลี่ยน</th><th>ดูสเปค</th></tr></thead><tbody>${movements.map(c=>{const delta=c.current-c.previous;return `<tr class="click-row" data-code="${esc(c.code)}"><td><span class="code">${esc(c.code)}</span><div class="name-line">${esc(c.name)}</div></td><td>${esc(c.admin||'—')}</td><td class="text-right">${fmt(c.previous)}</td><td class="text-right"><b>${fmt(c.current)}</b></td><td class="text-right ${signedClass(delta)}">${fmtDiff(delta)}</td><td>${delta>0?'<span class="pill complete">เพิ่มขึ้น</span>':'<span class="pill zero">ลดลง</span>'}</td><td><span class="text-btn">ดูสเปค →</span></td></tr>`}).join('')||'<tr><td colspan="7" class="empty">ไม่พบจำนวนที่เปลี่ยน</td></tr>'}</tbody></table></div></div>
+ <div class="headline"><h2>สเปคและแหล่งจัดเก็บที่เริ่ม / หยุดเก็บ</h2><span class="section-suffix">จับคู่ตามรหัสสินค้า + รหัสแหล่ง + พื้นที่</span></div><div class="panel"><div class="panel-tools"><span class="minor muted">แสดง 150 แถวแรกในหน้านี้ · ส่งออก Excel ได้ทั้งหมด</span><button class="btn green sm" data-export="specchanges">↓ Excel สเปคเพิ่ม–ลดทั้งหมด</button></div>${specChangeTable(changedSpec.filter(x=>x.status!=='ต่อเนื่อง').sort((a,b)=>b.delta-a.delta).slice(0,150))}</div>`;
+}
+function specChangeTable(rows){if(!rows.length)return '<div class="empty">ไม่มีสเปคที่เพิ่งพบหรือหายไป</div>';return `<div class="table-wrap"><table class="data-table"><thead><tr><th>สถานะ</th><th>CODE7 / รหัสสินค้า</th><th>ลักษณะจำเพาะ</th><th>พื้นที่</th><th>แหล่งจัดเก็บ</th><th class="text-right">ก่อน</th><th class="text-right">ตอนนี้</th></tr></thead><tbody>${rows.map(x=>`<tr><td>${x.current?'<span class="pill complete">เริ่มเก็บ</span>':'<span class="pill zero">หยุดเก็บ</span>'}</td><td><span class="code">${esc(x.r.code)}</span><div class="code">${esc(x.r.productId)}</div></td><td style="min-width:240px;max-width:430px">${esc(x.r.spec)}</td><td>${esc(x.r.place.label)}</td><td>${esc(x.r.shop)}<div class="code">${esc(x.r.source||'')}</div></td><td class="text-right">${fmt(x.previous)}</td><td class="text-right">${fmt(x.current)}</td></tr>`).join('')}</tbody></table></div>`}
+function reviewData(){const missing=[],unassigned=[],uncounted=[],duplicates=new Map();let total=0;
+ for(const r of state.records){if(!r.period)unassigned.push(r);if(r.period!==state.period)continue;if(!recordSet(r)||!recordType(r))continue;total++;
+  if(!r.place?.planned)missing.push(r);
+  if(!collected(r))uncounted.push(r);
+  const k=[r.period,r.place?.id,r.type,r.productId,r.source].join('§');if(!duplicates.has(k))duplicates.set(k,new Set());duplicates.get(k).add(r.file);
+ }
+ const overlap=[...duplicates.values()].filter(s=>s.size>1).length;
+ return {missing,unassigned,uncounted,overlap,total};
+}
+function viewReview(){const rr=reviewData(),m=state.master,files=state.files,valid=state.report.summary,unmatched=state.report.codes.filter(x=>!x.target&&x.current>0);
+ const rows=files.map(f=>`<tr><td>${esc(f.name)}</td><td>${esc(f.kind==='master'?'Real_Master_CPI':f.types.join(', '))}</td><td>${esc(f.kind==='master'?'—':showPeriod(f.period)||'ไม่มีเดือน')}</td><td class="text-right mono">${fmt(f.count)}</td><td>${f.skipped?.length?esc(f.skipped.slice(0,2).join(' / ')):'—'}</td></tr>`).join('');
+ el('viewBody').innerHTML=`<div class="headline"><h2>ตรวจสอบไฟล์และความน่าเชื่อถือของการนับ</h2><span class="section-suffix">ไม่แก้ไขข้อมูลต้นทาง</span></div><div class="kpi-grid">${summaryCard('ไฟล์ที่นำเข้า',fmt(files.length),'แยกเป็น Master และราคา')}${summaryCard('แถวราคาที่ผ่านตัวกรอง',fmt(rr.total),'รวมแถวมีและไม่มีราคา')}${summaryCard('แถวไม่ผ่านเกณฑ์นับ',fmt(rr.uncounted.length),'ราคาเป็นค่าว่าง/ศูนย์ หรือผิดชนิด','red')}${summaryCard('แถวพื้นที่ไม่อยู่ใน Master',fmt(rr.missing.length),'ไม่สร้างเป้าหมายอัตโนมัติ','red')}${summaryCard('หมวดมีข้อมูลแต่ไม่มีเป้า',fmt(unmatched.length),'แสดงนอกตัวหารเป้า')}${summaryCard('คีย์ซ้อนกันข้ามไฟล์',fmt(rr.overlap),'ตรวจทานรายการนำเข้าหลายไฟล์','cyan')}</div>
+ <div class="panel"><h3>บัญชีไฟล์ที่นำเข้า</h3><p class="sub">แสดงชื่อไฟล์ ประเภท ปีเดือน และการตรวจโครงสร้าง</p><div class="table-wrap"><table class="data-table"><thead><tr><th>ชื่อไฟล์</th><th>ประเภท</th><th>เดือน</th><th class="text-right">แถวอ่านได้</th><th>ข้อควรตรวจสอบ</th></tr></thead><tbody>${rows||'<tr><td colspan="5">ไม่พบไฟล์</td></tr>'}</tbody></table></div></div>
+ <div class="two-cols" style="margin-top:13px"><div class="panel"><h3>ข้อมูลที่ไม่มีเป้าเทียบใน Master</h3><p class="sub">หมายถึงไม่มีเป้าหมาย / นอกเขตที่กำหนด หรือไม่ได้เลือกเก็บในภูมิภาคนั้น</p>${unmatched.length?`<div class="table-wrap"><table class="data-table"><thead><tr><th>CODE7 / รายการ</th><th class="text-right">จำนวนจริง</th><th>เปิดดู</th></tr></thead><tbody>${unmatched.slice(0,70).map(x=>`<tr class="click-row" data-code="${esc(x.code)}"><td><span class="code">${esc(x.code)}</span><div class="name-line">${esc(x.name)}</div></td><td class="text-right">${fmt(x.current)}</td><td><span class="text-btn">ดูสเปค →</span></td></tr>`).join('')}</tbody></table></div>`:'<div class="empty">ไม่มีรายการนอกเป้าในตัวกรองนี้</div>'}</div><div class="panel"><h3>คำอธิบายวิธีตรวจสอบ</h3><div class="note-card"><ul><li>Master เป้าหมาย: คอลัมน์ “กำหนดให้เก็บ” ร่วมกับธง G/L หรือ U / เวลาเก็บตรงประเภท / ธงรายภาค G/L และ CU/EU/NU/SU ตามชุดที่เลือก</li><li>ผังพื้นที่: G/L = “ชุดอำเภอเมือง” (กรุงเทพฯ แยกกลุ่ม), U = “ชุดนอกเขตเมือง” ตามจังหวัดและอำเภอใน Master</li><li>แถวเก็บจริง: G หรือ L Checked สำหรับ G/L; U Checked สำหรับ U; ราคาเดือนนี้ต้องมากกว่า 0</li><li>รายสัปดาห์: ใช้ “ราคาเฉลี่ย” ตัวท้ายซึ่งเป็นเดือนปัจจุบัน ไม่ใช่ราคาเฉลี่ยเดือนก่อน</li><li>รายการค่าเช่าบ้าน: ใช้รหัสอสังหาริมทรัพย์ 10 หลัก นำมาจัดเป็นหมวด 3110001 เพื่อแสดงจำนวนจริง (แต่ไม่มีเป้า)</li><li>แถวหลายไฟล์ที่มีคีย์ซ้อนกันเพียงรายงานเตือน ไม่ลบอัตโนมัติเพื่อป้องกันข้อมูลจริงสูญหาย</li><li>ถ้ารายการรายสัปดาห์ไม่ได้อัปโหลดสำหรับเดือนที่เลือก จะยังนับเป็นเป้าหมายที่ยังไม่มีข้อมูล (เมื่อดูรายเดือน+รายสัปดาห์)</li></ul></div><button class="btn sm green" data-export="review" style="margin-top:12px">↓ Excel รายการต้องตรวจสอบ</button></div></div>`;
+}
+function openCodeDetail(code){const item=state.master?.items.get(code);const report=state.report,cat=report.codes.find(x=>x.code===code)||{code,name:item?.name||'',target:0,current:0,previous:0,capped:0,complete:0,pairs:0};state.selectedCode=code;
+ const now=report.records.filter(x=>x.code===code),before=report.prevRecords.filter(x=>x.code===code),specRows=crossMonthSpecs(now,before);state.modalSpecRows=specRows.sort((a,b)=>b.current-a.current||a.r.productId.localeCompare(b.r.productId));state.modalMore=false;
+ const shops=new Set(now.map(x=>[x.place.id,x.source||x.shop].join('|'))),specs=new Set(now.map(x=>x.productId));
+ el('detailTitle').textContent=code+' · '+(item?.name||cat.name);el('detailSub').textContent=[item?.admin?'ผู้ดูแล '+item.admin:'ไม่พบชื่อผู้ดูแล',item?.mode||'',showPeriod(state.period)].filter(Boolean).join(' · ');
+ const geo=report.entries.filter(x=>x.code===code).sort((a,b)=>(b.target-b.capped)-(a.target-a.capped)).slice(0,20);
+ el('detailBody').innerHTML=`<div class="modal-grid"><div class="modal-kpi"><span>เป้าหมายในพื้นที่</span><strong>${cat.target?fmt(cat.target):'ไม่มีเป้า'}</strong></div><div class="modal-kpi"><span>เก็บจริงเดือนนี้</span><strong>${fmt(cat.current)}</strong></div><div class="modal-kpi"><span>สเปคไม่ซ้ำ</span><strong>${fmt(specs.size)}</strong></div><div class="modal-kpi"><span>แหล่งจัดเก็บไม่ซ้ำ</span><strong>${fmt(shops.size)}</strong></div></div>
+ ${item?.detail?`<div class="note-card"><h4>กำหนดการเก็บจาก Master</h4>${esc(item.detail)}<div class="minor muted" style="margin-top:5px">Master ระบุเป้าหมายระดับ CODE7 ไม่ได้มีรายการรหัสสเปคที่ต้องเก็บทุกตัว</div></div>`:''}
+ <div class="modal-subhead"><h3 style="margin:0">การเก็บรายพื้นที่</h3><span class="minor muted">ครบตามโควตา ${fmt(cat.complete)} / ${fmt(cat.pairs)} หมวด-พื้นที่ · ${state.prev?`เปลี่ยนไป ${fmtDiff(cat.current-cat.previous)} แถว`:''}</span></div>
+ <div class="table-wrap" style="max-height:270px"><table class="data-table"><thead><tr><th>จังหวัด / เขต</th><th class="text-right">เป้า</th><th class="text-right">เก็บจริง</th><th class="text-right">เดือนก่อน</th><th class="text-right">ขาด</th><th>สถานะ</th></tr></thead><tbody>${geo.map(e=>`<tr><td>${esc(e.area)}</td><td class="text-right">${e.target?fmt(e.target):'—'}</td><td class="text-right">${fmt(e.current)}</td><td class="text-right">${state.prev?fmt(e.previous):'—'}</td><td class="text-right negative">${fmt(e.short)}</td><td>${pill(e.status)}</td></tr>`).join('')||'<tr><td colspan="6">ยังไม่มีข้อมูลในพื้นที่</td></tr>'}</tbody></table></div>
+ <div class="modal-subhead"><div><h3 style="margin:0">รายละเอียดสเปคและแหล่งจัดเก็บจริง</h3><p class="minor muted" style="margin:3px 0 0">นับตามรหัสสินค้า 16 หลัก + รหัสแหล่ง + พื้นที่ (ค่าเช่าบ้านใช้รหัสแถว 10 หลัก)</p></div><button class="btn sm green" id="exportModal">↓ Excel สเปค</button></div>
+ <div class="filter-grid" style="grid-template-columns:1fr auto;margin-bottom:9px"><input id="modalSearch" type="search" placeholder="ค้นหารหัส 16 หลัก / สเปค / แหล่งจัดเก็บ / พื้นที่"><button class="btn sm soft" id="modalShowAll">แสดงทั้งหมด</button></div>
+ <div id="modalSpecTable"></div>`;
+ renderModalSpecTable('');el('detailModal').classList.add('open');document.body.style.overflow='hidden';
+}
+function closeModal(){el('detailModal').classList.remove('open');document.body.style.overflow='';state.selectedCode=null;state.modalSpecRows=[]}
+function renderModalSpecTable(q){q=normal(q);const raw=state.modalSpecRows||[],rows=q?raw.filter(x=>normal([x.r.productId,x.r.spec,x.r.shop,x.r.source,x.r.place.label].join(' ')).includes(q)):raw;
+ const show=state.modalMore?rows:rows.slice(0,250);el('modalShowAll').textContent=state.modalMore?'จำกัด 250 แถว':`แสดงทั้งหมด (${fmt(rows.length)})`;
+ el('modalSpecTable').innerHTML=`<div class="minor muted" style="margin:7px 0">พบ ${fmt(rows.length)} คู่สเปค-แหล่ง (แสดง ${fmt(show.length)})</div><div class="table-wrap" style="max-height:450px"><table class="data-table"><thead><tr><th>สถานะ</th><th>CODE16 / รหัสเช่า</th><th>ลักษณะจำเพาะ</th><th>พื้นที่</th><th>แหล่งจัดเก็บ / รหัสแหล่ง</th><th class="text-right">เดือนนี้</th><th class="text-right">เดือนก่อน</th><th class="text-right">ราคาปัจจุบัน</th></tr></thead><tbody>${show.map(x=>{const change=x.current-x.previous,status=x.current&&!x.previous?'เพิ่มใหม่':!x.current&&x.previous?'หยุดเก็บ':change?'เปลี่ยนจำนวน':'ต่อเนื่อง';const price=x.current?x.r.price:null;return `<tr><td>${status==='เพิ่มใหม่'?'<span class="pill complete">เพิ่มใหม่</span>':status==='หยุดเก็บ'?'<span class="pill zero">หยุดเก็บ</span>':status==='เปลี่ยนจำนวน'?'<span class="pill partial">จำนวนเปลี่ยน</span>':'<span class="pill none">ต่อเนื่อง</span>'}</td><td><span class="code">${esc(x.r.productId)}</span><div class="subline">${esc(x.r.type==='weekly'?'รายสัปดาห์':x.r.type==='rental'?'ค่าเช่า':'รายเดือน')}</div></td><td style="min-width:230px;max-width:470px">${esc(x.r.spec)}</td><td>${esc(x.r.place.label)}</td><td style="min-width:175px">${esc(x.r.shop)}<div class="code">${esc(x.r.source)}</div></td><td class="text-right mono">${fmt(x.current)}</td><td class="text-right mono">${state.prev?fmt(x.previous):'—'}</td><td class="text-right mono">${price===null?'—':Number(price).toLocaleString('th-TH',{maximumFractionDigits:2})}</td></tr>`}).join('')||'<tr><td colspan="8" style="text-align:center;padding:18px">ไม่พบสเปคที่ตรงกับคำค้นหา</td></tr>'}</tbody></table></div>`;
+}
+// Produce standards-compliant, self-contained XLSX files without network libraries.
+const zipTable=(()=>{const t=[];for(let n=0;n<256;n++){let c=n;for(let k=0;k<8;k++)c=c&1?0xedb88320^(c>>>1):c>>>1;t[n]=c>>>0}return t})();
+function crc32(bytes){let c=0xffffffff;for(let i=0;i<bytes.length;i++)c=zipTable[(c^bytes[i])&255]^(c>>>8);return(c^0xffffffff)>>>0}
+function w16(v){return[v&255,v>>>8&255]}function w32(v){return[v&255,v>>>8&255,v>>>16&255,v>>>24&255]}
+async function zipSave(files){const local=[],central=[];let offset=0;
+ for(const [name,text]of Object.entries(files)){
+  const fn=enc.encode(name),bytes=enc.encode(text),crc=crc32(bytes),size=bytes.length;let packed=bytes,method=0;
+  if(typeof CompressionStream!=='undefined'){
+   try{const stream=new Blob([bytes]).stream().pipeThrough(new CompressionStream('deflate-raw'));packed=new Uint8Array(await new Response(stream).arrayBuffer());method=8}
+   catch(e){packed=bytes;method=0}
+  }
+  const csize=packed.length;
+  const header=new Uint8Array([...w32(0x04034b50),...w16(20),...w16(0),...w16(method),...w16(0),...w16(0),...w32(crc),...w32(csize),...w32(size),...w16(fn.length),...w16(0)]);
+  const cent=new Uint8Array([...w32(0x02014b50),...w16(20),...w16(20),...w16(0),...w16(method),...w16(0),...w16(0),...w32(crc),...w32(csize),...w32(size),...w16(fn.length),...w16(0),...w16(0),...w16(0),...w16(0),...w32(0),...w32(offset)]);
+  local.push(header,fn,packed);central.push(cent,fn);offset+=header.length+fn.length+csize;
+ }
+ const centralSize=central.reduce((a,b)=>a+b.length,0),count=Object.keys(files).length;
+ const end=new Uint8Array([...w32(0x06054b50),...w16(0),...w16(0),...w16(count),...w16(count),...w32(centralSize),...w32(offset),...w16(0)]);
+ return new Blob([...local,...central,end],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+}
+function xmlEscape(v){return String(v??'').replace(/[\u0000-\u0008\u000b\u000c\u000e-\u001f\ufffe\uffff]/g,'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&apos;')}
+function excelCol(i){let s='';for(let n=i+1;n>0;n=Math.floor((n-1)/26))s=String.fromCharCode(65+(n-1)%26)+s;return s}
+function excelSheet(rows){if(!rows.length)rows=[['ไม่มีข้อมูล']];const colCount=Math.max(...rows.map(r=>r.length)),widths=Array.from({length:colCount},(_,i)=>Math.min(70,Math.max(13,...rows.slice(0,200).map(r=>String(r[i]??'').length>85?70:Math.min(65,Math.ceil(String(r[i]??'').length*1.08))))));
+ const parts=[`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><sheetViews><sheetView workbookViewId="0"><pane ySplit="1" topLeftCell="A2" activePane="bottomLeft" state="frozen"/></sheetView></sheetViews><cols>${widths.map((x,i)=>`<col min="${i+1}" max="${i+1}" width="${x}" customWidth="1"/>`).join('')}</cols><sheetData>`];
+ for(let i=0;i<rows.length;i++){parts.push(`<row r="${i+1}">`);const r=rows[i];for(let j=0;j<r.length;j++){const v=r[j],addr=excelCol(j)+(i+1);if(v===null||v===undefined||v==='')continue;
+  if(typeof v==='number'&&Number.isFinite(v))parts.push(`<c r="${addr}"><v>${v}</v></c>`);
+  else parts.push(`<c r="${addr}" t="inlineStr"><is><t xml:space="preserve">${xmlEscape(v)}</t></is></c>`);
+ }parts.push('</row>')}
+ parts.push(`</sheetData><autoFilter ref="A1:${excelCol(colCount-1)}${rows.length}"/></worksheet>`);return parts.join('')}
+async function makeWorkbook(sheets){const count=sheets.length;const files={};files['[Content_Types].xml']=`<?xml version="1.0" encoding="UTF-8"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/>${sheets.map((s,i)=>`<Override PartName="/xl/worksheets/sheet${i+1}.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>`).join('')}</Types>`;
+ files['_rels/.rels']=`<?xml version="1.0" encoding="UTF-8"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>`;
+ files['xl/workbook.xml']=`<?xml version="1.0" encoding="UTF-8"?><workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets>${sheets.map((s,i)=>`<sheet name="${xmlEscape(s.name.slice(0,31))}" sheetId="${i+1}" r:id="rId${i+1}"/>`).join('')}</sheets></workbook>`;
+ files['xl/_rels/workbook.xml.rels']=`<?xml version="1.0" encoding="UTF-8"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">${sheets.map((s,i)=>`<Relationship Id="rId${i+1}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet${i+1}.xml"/>`).join('')}</Relationships>`;
+ sheets.forEach((s,i)=>files[`xl/worksheets/sheet${i+1}.xml`]=excelSheet(s.rows));return await zipSave(files);
+}
+async function exportData(mode='all'){
+ if(!state.report){toast('กรุณานำเข้าข้อมูลก่อน');return}const r=state.report,s=r.summary,m=state.master,prev=!!state.prev;
+ const head=[['รายการ','ค่า'],['เดือนรายงาน',showPeriod(state.period)],['เดือนเปรียบเทียบ',prev?showPeriod(state.prev):'ไม่ได้นำเข้า'],['พื้นที่',state.area||state.province||state.region||'ทั้งหมด'],['ชุด',state.set],['ประเภท',state.type],['เป้าหมายจำนวน',s.target],['เก็บจริง',s.actual],['เก็บจริงที่มีเป้า',s.collected],['เก็บจริงไม่มีเป้า',s.untargeted],['ครบตามจำนวน',s.capped],['เปอร์เซ็นต์ตามจำนวน',s.quantityRate===null?'':s.quantityRate*100],['หมวด-พื้นที่เป้าหมาย',s.pairs],['หมวด-พื้นที่ที่ครบ',s.complete],['เปอร์เซ็นต์ตามหมวด',s.categoryRate===null?'':s.categoryRate*100],['เดือนก่อน เก็บจริง',prev?s.previous:''],['เพิ่ม-ลด',prev?s.delta:''],['หลักเกณฑ์','เป้าหมายจาก Master; จำนวนครบ = sum(min(จำนวนจริง,เป้า)); ไม่เอาส่วนเกินมาชดเชย']];
+ const regionRows=[['ภาค','จำนวนพื้นที่','จำนวน CODE7','เป้าหมาย','เก็บจริง','ไม่มีเป้า','เก็บครอบคลุม','ครบหมวด-พื้นที่','หมวด-พื้นที่เป้า','% ตามหมวด','% ตามจำนวน','เดือนก่อน','เพิ่มลด'],...r.regionRows.map(x=>[x.label,x.areas,x.codes.size,x.target,x.current,x.untargeted,x.capped,x.complete,x.pairs,x.pairs?100*x.complete/x.pairs:'',x.target?100*x.capped/x.target:'',prev?x.previous:'',prev?x.current-x.previous:''])];
+ const provinceRows=[['ภาค','จังหวัด','จำนวนพื้นที่','เป้าหมาย','เก็บจริง','ไม่มีเป้า','ครบตามจำนวน','หมวด-พื้นที่ครบ','หมวด-พื้นที่เป้า','% ตามหมวด','% ตามจำนวน','เดือนก่อน','เพิ่มลด'],...r.provinceRows.map(x=>[x.region,x.label,x.areas,x.target,x.current,x.untargeted,x.capped,x.complete,x.pairs,x.pairs?100*x.complete/x.pairs:'',x.target?100*x.capped/x.target:'',prev?x.previous:'',prev?x.current-x.previous:''])];
+ const areaRows=[['ภาค','จังหวัด','เขต/กลุ่ม','เป้าหมาย','เก็บจริง','ไม่มีเป้า','จำนวนครอบคลุม','ยังขาด','หมวด-พื้นที่ครบ','หมวด-พื้นที่เป้า','% ตามหมวด','% ตามจำนวน','เดือนก่อน','เพิ่มลด'],...r.areas.map(x=>[x.region,x.province,x.label,x.target,x.current,x.untargeted,x.capped,Math.max(0,x.target-x.capped),x.complete,x.codes,x.codes?100*x.complete/x.codes:'',x.target?100*x.capped/x.target:'',prev?x.previous:'',prev?x.current-x.previous:''])];
+ const codes=filteredCodes();const codeRows=[['CODE7','รายการ','ผู้ดูแล','เวลาเก็บ','กำหนดให้เก็บ','รายละเอียด Master','เป้าหมายในพื้นที่','จำนวนเก็บจริง','ครบตามจำนวน','ยังขาด','หมวด-พื้นที่ครบ','หมวด-พื้นที่เป้า','% ตามจำนวน','เดือนก่อน','เพิ่ม-ลด','สถานะ'],...codes.map(c=>[c.code,c.name,c.admin,c.mode,m?.items.get(c.code)?.target||'',c.detail,c.target,c.current,c.capped,Math.max(0,c.target-c.capped),c.complete,c.pairs,c.target?100*c.capped/c.target:'',prev?c.previous:'',prev?c.current-c.previous:'',statusLabel(getStatus(c))])];
+ const changes=[['CODE7','รายการ','ผู้ดูแล','เดือนก่อน','เดือนนี้','ผลต่าง','หมวดเดิม/ใหม่'],...r.codes.map(c=>[c.code,c.name,c.admin,prev?c.previous:'',c.current,prev?c.current-c.previous:'',prev?(c.current&&!c.previous?'เริ่มเก็บ':!c.current&&c.previous?'หยุดเก็บ':'ต่อเนื่อง'):'ไม่มีข้อมูลก่อน'])];
+ const pairRows=[['ภาค','จังหวัด','พื้นที่','CODE7','รายการ','ผู้ดูแล','ความถี่','เป้าหมาย','เก็บจริง','เดือนก่อน','เพิ่มลด','ขาด','เกิน','สถานะ'],...r.entries.map(x=>[x.region,x.province,x.area,x.code,x.name,x.admin,x.frequency,x.target,x.current,prev?x.previous:'',prev?x.current-x.previous:'',x.short,x.excess,statusLabel(x.status)])];
+ const specList=crossMonthSpecs(r.records,r.prevRecords),specRows=[['เดือน','CODE7','รหัสสินค้า','ลักษณะจำเพาะ','รหัสแหล่ง','แหล่งจัดเก็บ','จังหวัด','เขต','ภาค','ประเภท','ราคา','แถวต้นทาง','ไฟล์ต้นทาง'],...r.records.map(x=>[showPeriod(state.period),x.code,x.productId,x.spec,x.source,x.shop,x.place.province,x.place.label,x.place.region,x.type,x.price,x.row,x.file])];
+ const specDiff=[['CODE7','รหัสสินค้า','ลักษณะจำเพาะ','จังหวัด','พื้นที่','รหัสแหล่ง','แหล่งจัดเก็บ','ก่อน','ปัจจุบัน','ผลต่าง','สถานะ'],...specList.map(x=>[x.r.code,x.r.productId,x.r.spec,x.r.place.province,x.r.place.label,x.r.source,x.r.shop,prev?x.previous:'',x.current,prev?x.delta:'',prev?x.status:''])];
+ const majorRows=[['รหัสหมวดใหญ่','หมวดใหญ่','เป้าหมายหมวด-พื้นที่','หมวด-พื้นที่ครบ','เปอร์เซ็นต์ตามหมวด','เป้าหมายจำนวน','จำนวนจริง','จำนวนที่ครบ','เปอร์เซ็นต์ตามจำนวน','ขาด'],...majorGroupRows().map(x=>[x.code,x.name,x.pairs,x.complete,x.pairs?100*x.complete/x.pairs:'',x.target,x.current,x.capped,x.target?100*x.capped/x.target:'',Math.max(0,x.target-x.capped)])];
+ const fileRows=[['ชื่อไฟล์','ประเภท','เดือน','อ่านได้ (แถว)','ข้อควรตรวจสอบ'],...state.files.map(x=>[x.name,x.kind==='master'?'Master':x.types.join('/'),x.period?showPeriod(x.period):'',x.count,x.skipped?.join(' · ')||''])];
+ let sheets=[{name:'00_สรุปรายงาน',rows:head}];if(mode==='majors')sheets.push({name:'หมวดใหญ่',rows:majorRows});else if(mode==='areas')sheets.push({name:'01_ภาค',rows:regionRows},{name:'02_จังหวัด',rows:provinceRows},{name:'03_เขต',rows:areaRows});
+ else if(mode==='codes')sheets.push({name:'04_CODE7',rows:codeRows});
+ else if(mode==='changes')sheets.push({name:'05_เพิ่มลด',rows:changes},{name:'06_รายพื้นที่',rows:pairRows});
+ else if(mode==='specchanges')sheets.push({name:'07_สเปคเพิ่มลด',rows:specDiff});
+ else if(mode==='review')sheets.push({name:'08_ไฟล์ข้อมูล',rows:fileRows},{name:'09_รายการไม่มีเป้า',rows:pairRows.filter((x,i)=>i===0||x[7]===0)});
+ else if(mode==='modal')sheets.push({name:'สเปค_'+state.selectedCode,rows:specDiff.filter((x,i)=>i===0||x[0]===state.selectedCode)});
+ else sheets.push({name:'01_หมวดใหญ่',rows:majorRows},{name:'01_ภาค',rows:regionRows},{name:'02_จังหวัด',rows:provinceRows},{name:'03_เขต',rows:areaRows},{name:'04_CODE7',rows:codeRows},{name:'05_เพิ่มลด',rows:changes},{name:'06_CODE7xพื้นที่',rows:pairRows},{name:'07_ข้อมูลสเปค',rows:specRows},{name:'08_สเปคเพิ่มลด',rows:specDiff},{name:'09_ไฟล์นำเข้า',rows:fileRows});
+ const filename=('CPI_Progress_'+(state.period||'NoMonth')+'_'+mode+(state.province?'_'+state.province:'')+'.xlsx').replace(/[\\/:*?"<>|]/g,'_');
+ try{const blob=await makeWorkbook(sheets);const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=filename;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),60000);toast('ส่งออก '+filename+' แล้ว')}catch(err){console.error(err);toast('ส่งออกไม่สำเร็จ: '+err.message)}
+}
+function copyMessage(){if(!state.report){toast('นำเข้าข้อมูลก่อน');return}const content=messageReport();if(navigator.clipboard?.writeText){navigator.clipboard.writeText(content).then(()=>toast('คัดลอกข้อความรายงานแล้ว'),()=>legacyCopy(content))}else legacyCopy(content)}
+function legacyCopy(t){const a=document.createElement('textarea');a.value=t;a.style.position='fixed';a.style.left='-9999px';document.body.appendChild(a);a.select();try{document.execCommand('copy');toast('คัดลอกข้อความรายงานแล้ว')}catch(e){toast('กรุณาคัดลอกจากกล่องข้อความในหน้า')}a.remove()}
+
+// One file per (year, month, survey topic). Distinct 4.1.1.1 / 4.1.1.2 / 4.1.1.3 / 4.1.2.2 always remain separate.
+// Undated files are NOT merged: without a confirmed month the period is not safe to deduplicate.
+function priceTopic(name){
+ const text=String(name||'').split('/').at(-1)||'';
+ const matched=text.match(/(?:^|[^0-9])(4\.1\.\d+\.\d+)(?!\d)/);
+ if(matched)return matched[1];
+ return 'name:'+normal(text.replace(/\s*\(\d+\)(?=\.xlsx$)/i,'').replace(/\.xlsx$/i,''));
+}
+function surveyDuplicateKey(file){
+ if(!file||file.kind==='master')return '';
+ const period=file.period||gitFilePeriod(file.name||gitName(file));
+ return /^\d{4}-(0[1-9]|1[0-2])$/.test(period)?period+'§'+priceTopic(file.name||gitName(file)):'';
+}
+function versionFromFilename(s){return Number(/\((\d+)\)(?=\.xlsx$)/i.exec(s||'')?.[1]||0)}
+function preferredPriceFile(a,b){
+ // A manually uploaded correction overrides the published source for its month/topic.
+ const rank=x=>x.source==='manual'?4:x.source==='folder'||x.source==='folder-fallback'?3:x.source==='git'?2:1;
+ if(rank(a)!==rank(b))return rank(a)>rank(b)?a:b;
+ const av=versionFromFilename(a.name),bv=versionFromFilename(b.name);
+ if(av!==bv)return av>bv?a:b;
+ const ac=Number(a.count||0),bc=Number(b.count||0);
+ if(ac&&bc&&ac!==bc)return ac>bc?a:b;
+ const az=Number(a.size||0),bz=Number(b.size||0);
+ if(az!==bz)return az>bz?a:b;
+ const at=Number(a.lastModified||0),bt=Number(b.lastModified||0);
+ if(at!==bt)return at>bt?a:b;
+ const an=String(a.path||a.gitPath||a.name||''),bn=String(b.path||b.gitPath||b.name||'');
+ return an.localeCompare(bn,'th')<=0?a:b;
+}
+function deduplicatePriceList(list){
+ const groups=new Map(),extras=[];
+ for(const entry of list){
+  const dk=surveyDuplicateKey(entry);
+  if(!dk){groups.set(Symbol(),entry);continue}
+  const existing=groups.get(dk);
+  if(!existing){groups.set(dk,entry);continue}
+  const keep=preferredPriceFile(existing,entry),drop=keep===existing?entry:existing;
+  groups.set(dk,keep);extras.push({key:dk,ignored:drop.name,kept:keep.name});
+ }
+ return {kept:[...groups.values()],skipped:extras};
+}
+function removePriceEntry(old){
+ state.fileKeys.delete(old.key);
+ state.records=state.records.filter(r=>r.fileKey!==old.key);
+ state.files=state.files.filter(f=>f!==old);
+ invalidateMonthIndex();
+}
+function recordDuplicate(ignored,kept,group){
+ if(ignored?.name&&kept?.name&&ignored.name!==kept.name){const k=group+'§'+ignored.name+'§'+kept.name;
+ state.duplicateWarnings.set(k,{ignored:ignored.name,kept:kept.name});}
+}
+
+async function importFiles(fileList,forceMaster=false,source='manual'){
+ const inputs=Array.from(fileList||[]).filter(f=>/\.xlsx$/i.test(f.name));
+ if(!inputs.length){toast('กรุณาเลือกไฟล์ .xlsx');return}
+ // Select one version per month/topic BEFORE extracting workbook XML (much cheaper for large duplicates).
+ const candidates=inputs.map(file=>({file,kind:forceMaster||/Real[_\s-]*Master[_\s-]*CPI/i.test(file.name)?'master':'price',name:file.name,
+  source,period:gitFilePeriod(file.name),size:file.size,lastModified:file.lastModified}));
+ const chosen=deduplicatePriceList(candidates);
+ for(const d of chosen.skipped)recordDuplicate({name:d.ignored},{name:d.kept},d.key);
+ const files=chosen.kept.map(x=>x.file);
+ while(state.busy)await new Promise(resolve=>setTimeout(resolve,120));state.busy=true;let imported=0;let failed=[];
+ try{for(const f of files){const key=source==='git'?'git§'+f.__gitPath+'§'+f.__gitSha:[f.name,f.size,f.lastModified].join('§');if(state.fileKeys.has(key))continue;
+  const probe={kind:'price',name:f.name,period:gitFilePeriod(f.name),size:f.size,lastModified:f.lastModified,source};
+  const prekey=surveyDuplicateKey(probe);
+  if(prekey&&!forceMaster&&!/Real[_\s-]*Master[_\s-]*CPI/i.test(f.name)){
+   const existing=state.files.find(old=>old.kind==='price'&&surveyDuplicateKey(old)===prekey&&old.name!==f.name);
+   if(existing&&preferredPriceFile(existing,probe)===existing){recordDuplicate(probe,existing,prekey);continue}
+  }
+  try{const sheets=await parseWorkbook(f),isMaster=forceMaster||sheets.some(s=>s.name.includes('ข้อมูล_รายการ_ผู้ดูแล'));
+   if(isMaster){const obj=readMaster(sheets);for(const old of state.files.filter(x=>x.kind==='master'))state.fileKeys.delete(old.key);state.master=obj;state.files=state.files.filter(x=>x.kind!=='master');state.files.unshift({kind:'master',key,name:f.name,count:0,period:'',types:['Master'],skipped:obj.review,source,gitPath:f.__gitPath||'',gitSha:f.__gitSha||''});}
+   else {const p=readPriceFile(f,sheets),period=p.periods.length===1?p.periods[0]||gitFilePeriod(f.name):gitFilePeriod(f.name);
+     const candidate={kind:'price',key,name:f.name,count:p.all.length,size:f.size,lastModified:f.lastModified,positive:p.all.filter(x=>x.price!==null&&x.price>0).length,period,types:p.types,sets:[...new Set(p.all.map(x=>x.survey))],skipped:p.skipped,source,gitPath:f.__gitPath||'',gitSha:f.__gitSha||''};
+     const dkey=surveyDuplicateKey(candidate);const same=state.files.filter(x=>x.kind==='price'&&(x.key===key||x.name===f.name||dkey&&surveyDuplicateKey(x)===dkey));
+     const prior=same.find(x=>x.key!==key&&x.name!==f.name&&preferredPriceFile(x,candidate)===x);
+     if(prior){recordDuplicate(candidate,prior,dkey);continue;}
+     for(const old of same){recordDuplicate(old,candidate,dkey||'ชื่อไฟล์เดียวกัน');removePriceEntry(old)}
+     for(const r of p.all){r.fileKey=key;if(!r.period&&period)r.period=period;}
+     for(let j=0;j<p.all.length;j+=8192)state.records.push(...p.all.slice(j,j+8192));state.files.push(candidate);}
+   state.fileKeys.add(key);imported++;
+  }catch(e){failed.push(f.name+': '+e.message);console.error('Read error',f.name,e)}
+ }
+ }finally{state.busy=false;invalidateMonthIndex();state.prev='';if(state.setAuto)state.set=defaultSetForFiles();render()}
+ if(imported)toast('นำเข้า '+fmt(imported)+' ไฟล์เรียบร้อย');if(failed.length){el('warningBar').classList.add('show');el('warningBar').textContent=(el('warningBar').textContent+' | อ่านไม่ได้: '+failed.slice(0,3).join(' / ')).trim();}
+}
+function removeFile(index){const f=state.files[index];if(!f)return;state.fileKeys.delete(f.key);if(f.kind==='master'){state.master=null}else state.records=state.records.filter(r=>r.fileKey!==f.key);state.files.splice(index,1);invalidateMonthIndex();state.prev='';render()}
+function setFileMonth(index){const f=state.files[index];if(!f||f.kind==='master')return;const value=prompt('กรอกเดือนของไฟล์ในรูปแบบ YYYY-MM เช่น 2026-09 หรือปี พ.ศ. 2569-09','2026-09');if(value===null)return;
+ let m=value.trim().match(/^(\d{4})[-/]?(0[1-9]|1[0-2])$/);if(!m){toast('รูปแบบเดือนต้องเป็น YYYY-MM เช่น 2026-09');return}let year=Number(m[1]);if(year>=2400)year-=543;const period=year+'-'+m[2];f.period=period;for(const r of state.records)if(r.fileKey===f.key)r.period=period;
+ const dkey=surveyDuplicateKey(f);const clash=state.files.find(x=>x!==f&&x.kind==='price'&&surveyDuplicateKey(x)===dkey);
+ if(clash){const keep=preferredPriceFile(clash,f),drop=keep===f?clash:f;recordDuplicate(drop,keep,dkey);removePriceEntry(drop);toast('พบไฟล์ปี/เดือน/หัวข้อซ้ำ: ใช้ '+keep.name+' เพียงไฟล์เดียว')}
+ invalidateMonthIndex();state.period=period;state.prev='';render();}
+function resetAll(){state.master=null;state.records=[];invalidateMonthIndex();state.files=[];state.fileKeys.clear();state.duplicateWarnings.clear();state.period='';state.prev='';state.tab='overview';state.region='';state.province='';state.area='';state.areaSelected=false;state.set='ALL';state.setAuto=true;state.type='all';state.admin='';state.groupCode='';state.status='all';state.order='gap';state.countMode='positive';state.page=1;state.areaView='province';render();}
+function clearFilters(){state.region='';state.province='';state.area='';state.areaSelected=false;state.admin='';state.groupCode='';state.set=defaultSetForFiles();state.setAuto=true;state.type='all';state.status='all';state.order='gap';state.countMode='positive';state.page=1;render()}
+// -------- GitHub Pages / public GitHub repository: automatic Excel discovery --------
+// No API token is embedded. Source bytes are downloaded (read-only) and analyzed locally.
+const GIT_STORAGE='TPSO_CPI_FieldPulse_GitRepo_v1';
+const gitSession={repo:null,branch:'',entries:[],busy:false,loading:null,loadedAt:0};
+const fastSession={active:false,manifest:null,base:'',loading:false};
+const gitName=e=>String(e.path||'').split('/').at(-1)||'';
+function setGitStatus(message,kind=''){el('gitStatus').textContent=message;el('gitLed').className='git-led'+(kind?' '+kind:'');el('refreshGitBtn').disabled=kind==='loading';}
+function interpretGitRepo(input){
+ let text=String(input||'').trim();if(!text)return null;
+ text=text.replace(/\.git\/?$/,'').replace(/\/$/,'');
+ let m=text.match(/^([a-z\d_.-]+)\/([a-z\d_.-]+)(?:\/tree\/(.+))?$/i);
+ if(m)return {owner:m[1],repo:m[2],branch:m[3]||''};
+ try{const url=new URL(text);
+  if(url.hostname.toLowerCase()==='github.com'){const parts=url.pathname.split('/').filter(Boolean);if(parts.length>=2)return {owner:parts[0],repo:parts[1],branch:parts[2]==='tree'?parts.slice(3).join('/'):''}}
+  if(url.hostname.toLowerCase().endsWith('.github.io')){const owner=url.hostname.split('.')[0],parts=url.pathname.split('/').filter(Boolean),repo=(parts[0]&&!/\.html?$/i.test(parts[0]))?parts[0]:owner+'.github.io';return {owner,repo,branch:''}}
+ }catch(error){}
+ return null;
+}
+function configuredGitRepo(){
+ const q=new URLSearchParams(location.search).get('repo');if(q){const parsed=interpretGitRepo(q);if(parsed)return parsed}
+ const specified=document.querySelector('meta[name="cpi-github-repo"]')?.content;
+ if(specified){const parsed=interpretGitRepo(specified);if(parsed)return parsed}
+ // GitHub Pages detects its own owner/repository. This takes precedence over a previous manual repository.
+ if(location.hostname.toLowerCase().endsWith('.github.io'))return interpretGitRepo(location.origin+location.pathname);
+ if(gitSession.repo)return gitSession.repo;
+ try{const saved=localStorage.getItem(GIT_STORAGE);if(saved)return interpretGitRepo(saved)}catch(error){}
+ return null;
+}
+// --- FastDB: files are generated from XLSX by GitHub Actions on each deployment. ---
+// Browser downloads only JSON shards for the selected months; it never opens Excel to parse the initial report.
+function fastMasterFromJSON(json){
+ const items=new Map(json.items.map(x=>[x.code,x]));
+ const provinces=new Map(json.provinces.map(p=>[normal(p.province),p]));
+ const bkk=provinces.get(normal('กรุงเทพมหานคร'));
+ if(bkk)for(const alias of ['กทม.','กทม','กรุงเทพ','กรุงเทพฯ'])provinces.set(normal(alias),bkk);
+ const areas=json.areas||[];
+ return {items,areas,areasMap:new Map(areas.map(a=>[a.id,a])),provinceMap:provinces,
+         regions:json.regions||[],review:json.review||[],covered:json.covered||0,
+         src:json.src||'ข้อมูล_รายการ_ผู้ดูแล',groupRows:[],majorNames:json.majorNames||{}};
+}
+async function fetchFastJSON(entry){
+ const url=new URL(entry.file,fastSession.base).href;
+ const response=await fetch(url,{cache:'force-cache'});
+ if(!response.ok)throw Error('FastDB file HTTP '+response.status+': '+entry.name);
+ if(!response.body||!('DecompressionStream' in window))throw Error('เบราว์เซอร์ไม่รองรับ FastDB แบบบีบอัด');
+ const txt=await new Response(response.body.pipeThrough(new DecompressionStream('gzip'))).text();
+ const json=JSON.parse(txt);
+ if(json.schema!==1||json.kind!==entry.kind)throw Error('โครงสร้าง FastDB ไม่ตรงกับเวอร์ชัน Dashboard: '+entry.name);
+ return json;
+}
+function registerFastEntry(entry,data){
+ const key='fast§'+entry.path+'§'+entry.sha;
+ if(state.fileKeys.has(key))return false;
+ if(entry.kind==='master'){
+  const existing=state.files.filter(f=>f.kind==='master');for(const old of existing)state.fileKeys.delete(old.key);
+  state.files=state.files.filter(f=>f.kind!=='master');
+  state.master=fastMasterFromJSON(data);
+  state.files.unshift({kind:'master',key,name:entry.name,count:0,period:'',types:['Master'],skipped:data.review||[],source:'git',gitPath:entry.path,gitSha:entry.sha});
+ }else{
+  const candidate={kind:'price',key,name:entry.name,period:data.period||entry.period||'',count:data.count||data.rows?.length||0,size:entry.size||0,source:'git',gitPath:entry.path,gitSha:entry.sha};
+  const dkey=surveyDuplicateKey(candidate);
+  const olds=state.files.filter(f=>f.kind==='price'&&(f.gitPath===entry.path||f.name===entry.name||dkey&&surveyDuplicateKey(f)===dkey));
+  const prior=olds.find(f=>f.gitPath!==entry.path&&f.name!==entry.name&&preferredPriceFile(f,candidate)===f);
+  if(prior){recordDuplicate(candidate,prior,dkey);return false;}
+  for(const old of olds){recordDuplicate(old,candidate,dkey||'ชื่อไฟล์เดียวกัน');removePriceEntry(old)}
+  const rows=data.rows||[],output=Array(rows.length);
+  for(let i=0;i<rows.length;i++){
+   const t=rows[i],raw=String(t[0]??''),kind=t[6],mask=Number(t[8])||0;
+   output[i]={id:String(i),period:t[12]||entry.period||'',code:kind==='rental'?'3110001':raw.slice(0,7),productId:raw,
+    spec:t[1]||'',source:t[2]||'',shop:t[3]||'',provinceRaw:t[4]||'',market:t[5]||'',type:kind,
+    price:t[7],g:!!(mask&1),l:!!(mask&2),u:!!(mask&4),survey:t[9]?'U':'GL',sh:t[10]||'',row:t[11]||0,
+    file:entry.name,fileKey:key,place:null};
+  }
+  for(let j=0;j<output.length;j+=8192)state.records.push(...output.slice(j,j+8192));
+  state.files.push({kind:'price',key,name:entry.name,count:data.count||rows.length,
+   positive:data.positive||0,period:data.period||entry.period||'',types:data.types||[],sets:data.sets||[],
+   skipped:data.skipped||[],source:'git',gitPath:entry.path,gitSha:entry.sha});
+  invalidateMonthIndex();
+ }
+ state.fileKeys.add(key);return true;
+}
+async function fastLoadEntries(entries){
+ const targets=entries.filter(gitChangedOrMissing);
+ if(!targets.length)return {loaded:0,failed:[]};
+ const sorted=targets.sort((a,b)=>Number(b.kind==='master')-Number(a.kind==='master')||a.path.localeCompare(b.path,'th'));
+ const failed=[];let loaded=0;
+ for(let i=0;i<sorted.length;i+=4){
+  const batch=sorted.slice(i,i+4),results=await Promise.allSettled(batch.map(fetchFastJSON));
+  for(let j=0;j<batch.length;j++){
+   const r=results[j];if(r.status==='rejected'){failed.push(batch[j].name+': '+r.reason?.message);continue}
+   try{if(registerFastEntry(batch[j],r.value))loaded++}catch(error){failed.push(batch[j].name+': '+error.message)}
+  }
+ }
+ return {loaded,failed};
+}
+async function tryStartFastDB(repo,force){
+ if(!('DecompressionStream' in window))return false;
+ const candidates=[];
+ // Pages deploys prebuilt manifest beside index.html; this path avoids the GitHub API entirely.
+ if(location.protocol==='http:'||location.protocol==='https:')candidates.push(new URL('fastdb/',location.href).href);
+ // A user running HTML from elsewhere can still reach the public GitHub Pages deployment.
+ if(repo?.owner&&repo?.repo)candidates.push('https://'+repo.owner+'.github.io/'+repo.repo+'/fastdb/');
+ let manifest=null,base='';
+ for(const candidate of [...new Set(candidates)]){
+  try{const res=await fetch(new URL('manifest.json',candidate).href,{cache:'no-cache'});
+   if(!res.ok)continue;const x=await res.json();if(x.schema!==1||!Array.isArray(x.files)||!x.master)continue;
+   manifest=x;base=candidate;break;
+  }catch(error){console.info('FastDB unavailable at '+candidate,error?.message||error)}
+ }
+ if(!manifest)return false;
+ const chosen=deduplicatePriceList(manifest.files.map(f=>({...f,source:'git'})));
+ for(const d of chosen.skipped)recordDuplicate({name:d.ignored},{name:d.kept},d.key);
+ for(const d of manifest.skippedDuplicates||[])recordDuplicate({name:(d.skipped||'').split('/').at(-1)},{name:(d.used||'').split('/').at(-1)},d.period+'§'+d.topic);
+ const activeFiles=chosen.kept;
+ fastSession.active=true;fastSession.manifest={...manifest,files:activeFiles};fastSession.base=base;
+ const oldPaths=new Set(activeFiles.map(x=>x.path));
+ for(const old of state.files.filter(f=>f.source==='git'&&!oldPaths.has(f.gitPath))){
+  state.fileKeys.delete(old.key);state.files=state.files.filter(x=>x!==old);
+  if(old.kind==='master')state.master=null;else{state.records=state.records.filter(r=>r.fileKey!==old.key);invalidateMonthIndex()}
+ }
+ const files=activeFiles.map(f=>({...f,sha:f.sha||'',path:f.path||'',kind:f.kind,period:f.period||''}));
+ gitSession.repo=repo||gitSession.repo;gitSession.branch='fastdb';gitSession.entries=files;
+ const recent=manifest.latest||manifest.periods?.at(-1)||'';
+ const older=recent?prevMonth(recent):'';
+ const use=new Set([recent,older]);
+ if(manifest.periods?.length>1&&!manifest.periods.includes(older))use.add(manifest.periods.at(-2));
+ const initial=files.filter(x=>x.kind==='master'||x.kind==='price'&&use.has(x.period));
+ gitSession.busy=true;setGitStatus('FastDB · กำลังโหลดข้อมูล '+(recent?showPeriod(recent):'ล่าสุด')+'…','loading');
+ try{
+  const result=await fastLoadEntries(initial);
+  if(!state.master||!state.records.length)throw Error('ไม่ได้รับ Master หรือข้อมูลราคาใน FastDB');
+  gitSession.loadedAt=Date.now();
+  const warn=result.failed.length?' · พบข้อผิดพลาด '+result.failed.slice(0,2).join(' / '):'';
+  setGitStatus('FastDB พร้อมใช้ · '+fmt(files.filter(f=>f.kind==='price').reduce((n,f)=>n+(f.count||0),0))+' แถวในฐาน · โหลด '+fmt(result.loaded)+' ไฟล์ · '+fmt(manifest.periods?.length||0)+' เดือน'+warn,result.failed.length?'warn':'ok');
+  if(state.setAuto)state.set='ALL';render();return true;
+ }catch(error){
+  console.error('FastDB',error);setGitStatus('FastDB มีข้อผิดพลาด: '+error.message,'warn');
+  fastSession.active=false;fastSession.manifest=null;
+  // If a published snapshot is corrupt, the existing XLSX loader remains available as fallback.
+  return false;
+ }finally{gitSession.busy=false;el('refreshGitBtn').disabled=false}
+}
+async function githubJSON(url){
+ const response=await fetch(url,{headers:{Accept:'application/vnd.github+json'},cache:'no-cache'});
+ if(!response.ok){let detail='';if(response.status===403||response.status===429)detail=' (GitHub API อาจจำกัดจำนวนครั้ง)';if(response.status===404)detail=' (ไม่พบ Repository สาธารณะ)';throw Error('GitHub HTTP '+response.status+detail)}
+ return await response.json();
+}
+function gitFilePeriod(name){
+ const text=String(name||'');const months=['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
+ const short=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+ const year=/(?:ปี\s*|^|[\s_-])(25\d{2}|20\d{2})(?!\d)/.exec(text);
+ const y=year?Number(year[1]):0;let mo=0;
+ for(let i=0;i<12;i++)if(text.includes(months[i])||text.includes(short[i])){mo=i+1;break}
+ if(!mo){let m=/(?:เดือน\s*|[\s_-])(0?[1-9]|1[0-2])(?=[\s_.-]|$)/.exec(text);if(m)mo=Number(m[1])}
+ if((!y||!mo)){let combined=/(25\d{2}|20\d{2})[-_.]?(0[1-9]|1[0-2])(?!\d)/.exec(text);if(combined)return (Number(combined[1])>2400?Number(combined[1])-543:Number(combined[1]))+'-'+combined[2]}
+ if(!y||!mo)return '';
+ return (y>2400?y-543:y)+'-'+String(mo).padStart(2,'0');
+}
+function gitSourceType(path){
+ const name=gitName({path});if(!/\.xlsx$/i.test(name)||/^~\$/.test(name))return '';
+ if(/Real[_\s-]*Master[_\s-]*CPI/i.test(name))return 'master';
+ if(/^4\.1\.[12]\.[123]/.test(name)||/^4\.1\.\d+\.\d+/.test(name))return 'price';
+ if(/(?:^|[\/])(?:data|excel|inputs|price-data|survey-data)[\/]/i.test(path)&&/(?:ชุด\s*[GLU]|รายเดือน|รายสัปดาห์|ราคา|rent|rental)/i.test(name))return 'price';
+ return '';
+}
+function dedupGitVersions(entries){
+ const byName=new Map();for(const e of entries){const basename=gitName(e).replace(/\s*\(\d+\)(?=\.xlsx$)/i,'');const key=e.path.slice(0,e.path.length-gitName(e).length)+basename;const old=byName.get(key);
+  const version=name=>Number(/\((\d+)\)(?=\.xlsx$)/i.exec(name)?.[1]||0);
+  if(!old||version(gitName(e))>version(gitName(old)))byName.set(key,e);
+ }return [...byName.values()];
+}
+function prioritizeGitSources(all){
+ const masters=all.filter(x=>x.kind==='master').sort((a,b)=>{
+  const priority=e=>/^(?:Real_Master_CPI)\.xlsx$/i.test(gitName(e))?100:(Number(/\((\d+)\)(?=\.xlsx$)/i.exec(gitName(e))?.[1]||0));
+  return priority(b)-priority(a)||a.path.length-b.path.length;
+ });
+ const master=masters.length?[masters[0]]:[];
+ const prices=deduplicatePriceList(dedupGitVersions(all.filter(x=>x.kind==='price').map(f=>({...f,name:gitName(f),source:'git'})))).kept;
+ const periods=[...new Set(prices.map(x=>x.period).filter(Boolean))].sort();
+ const latest=periods.at(-1),previous=latest?prevMonth(latest):'';
+ const usePeriods=new Set([latest,previous]);
+ if(periods.length>1&&!periods.includes(previous))usePeriods.add(periods.at(-2));
+ const recent=prices.filter(x=>usePeriods.has(x.period));
+ // Non-dated monthly price files are still checked because some exported filenames omit the month.
+ const undated=prices.filter(x=>!x.period).slice(0,6);
+ const initial=master.concat(recent,undated);
+ if(!initial.length)initial.push(...prices.slice(-8));
+ return {all:[...master,...prices],initial,latest,priceCount:prices.length,periodCount:periods.length};
+}
+async function discoverGitSources(repo){
+ const root='https://api.github.com/repos/'+encodeURIComponent(repo.owner)+'/'+encodeURIComponent(repo.repo);
+ const meta=await githubJSON(root);const branch=repo.branch||meta.default_branch;
+ if(!branch)throw Error('ไม่พบ branch ของ GitHub repository');
+ const tree=await githubJSON(root+'/git/trees/'+encodeURIComponent(branch)+'?recursive=1');
+ if(!Array.isArray(tree.tree))throw Error('GitHub API ไม่ส่งรายการไฟล์กลับมา');
+ if(tree.truncated)throw Error('ไฟล์ใน Git มากเกินขีดจำกัดของ API; กรุณาใช้ Repository สำหรับข้อมูล CPI โดยเฉพาะ');
+ const out=tree.tree.filter(e=>e.type==='blob'&&e.path&&/\.xlsx$/i.test(e.path)).map(e=>({path:e.path,sha:e.sha||'',size:e.size||0,kind:gitSourceType(e.path),period:gitFilePeriod(gitName(e))})).filter(x=>x.kind);
+ return {entries:out,branch};
+}
+async function fetchGitEntry(entry){
+ const repo=gitSession.repo;if(!repo)throw Error('ยังไม่เชื่อม Git');
+ const dir=entry.path.split('/').map(encodeURIComponent).join('/');
+ const branch=gitSession.branch.split('/').map(encodeURIComponent).join('/');
+ const url='https://raw.githubusercontent.com/'+encodeURIComponent(repo.owner)+'/'+encodeURIComponent(repo.repo)+'/'+branch+'/'+dir+'?cpi_sha='+encodeURIComponent(entry.sha);
+ const response=await fetch(url,{cache:'force-cache'});
+ if(!response.ok)throw Error('ดาวน์โหลด '+entry.path+' ไม่สำเร็จ (HTTP '+response.status+')');
+ const blob=await response.blob();if(blob.size<100)throw Error('ไฟล์ Excel จาก Git ว่างหรือไม่สมบูรณ์: '+entry.path);
+ const file=new File([blob],gitName(entry),{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+ file.__gitPath=entry.path;file.__gitSha=entry.sha;
+ return file;
+}
+function gitChangedOrMissing(e){return !state.files.some(f=>f.source==='git'&&f.gitPath===e.path&&f.gitSha===e.sha)}
+async function loadGitEntries(entries){
+ const targets=entries.filter(gitChangedOrMissing);if(!targets.length)return {loaded:0,failed:[]};
+ const order=[...targets].sort((a,b)=>Number(b.kind==='master')-Number(a.kind==='master')||a.path.localeCompare(b.path,'th'));
+ let loaded=0;const failed=[];
+ // Fetch in small parallel batches, but retain the original importer (one workbook at a time).
+ for(let i=0;i<order.length;i+=4){const batch=order.slice(i,i+4);
+  const downloads=await Promise.allSettled(batch.map(fetchGitEntry));
+  const files=[];for(let j=0;j<downloads.length;j++){const result=downloads[j];if(result.status==='fulfilled')files.push(result.value);else failed.push(gitName(batch[j])+': '+result.reason?.message)}
+  if(files.length){await importFiles(files,false,'git');loaded+=files.length}
+ }
+ return {loaded,failed};
+}
+async function ensureGitPeriods(periods){
+ if(!gitSession.entries.length)return;
+ while(gitSession.busy||gitSession.loading){await new Promise(resolve=>setTimeout(resolve,100))}
+ const needed=new Set(periods.filter(Boolean));const targets=gitSession.entries.filter(e=>e.kind==='price'&&needed.has(e.period)&&gitChangedOrMissing(e));
+ if(!targets.length)return;
+ gitSession.loading=true;setGitStatus((fastSession.active?'FastDB · กำลังอ่านข้อมูล ':'กำลังอ่าน Excel ')+[...needed].map(showPeriod).join(' / ')+' จาก Git…','loading');
+ try{const result=await (fastSession.active?fastLoadEntries(targets):loadGitEntries(targets));const label=result.failed.length?' · มีไฟล์อ่านไม่ได้ '+result.failed.length:' ';setGitStatus('GitHub · อ่านข้อมูลเดือนที่เลือกแล้ว '+fmt(result.loaded)+' ไฟล์'+label,result.failed.length?'warn':'ok');}
+ catch(error){setGitStatus('อ่าน Git ไม่สำเร็จ: '+error.message,'warn')}
+ finally{gitSession.loading=false;render()}
+}
+async function startGitAutoLoad(force=false,manualRepo=null){
+ if(gitSession.busy)return;
+ const repo=manualRepo||configuredGitRepo();
+ if(await tryStartFastDB(repo,force))return;
+ if(!repo){setGitStatus('เปิดผ่าน GitHub Pages เพื่อโหลดอัตโนมัติ หรือใส่ลิงก์ Repository ครั้งแรก');return}
+ if(!force&&gitSession.loadedAt&&gitSession.repo?.owner===repo.owner&&gitSession.repo?.repo===repo.repo)return;
+ fastSession.active=false;gitSession.busy=true;gitSession.repo=repo;el('gitRepoInput').value='https://github.com/'+repo.owner+'/'+repo.repo;
+ setGitStatus('กำลังค้นหา Excel ใน '+repo.owner+'/'+repo.repo+'…','loading');
+ try{
+  const {entries,branch}=await discoverGitSources(repo);gitSession.branch=branch;
+  const chosen=prioritizeGitSources(entries);
+  if(!chosen.all.length)throw Error('ไม่พบไฟล์ Real_Master_CPI หรือไฟล์เก็บราคา 4.1.x.x ใน Repository');
+  const oldFiles=state.files.filter(f=>f.source==='git'&&!chosen.all.some(x=>x.path===f.gitPath));
+  for(const f of oldFiles){state.fileKeys.delete(f.key);state.files=state.files.filter(x=>x!==f);if(f.kind==='master')state.master=null;else state.records=state.records.filter(r=>r.fileKey!==f.key)}
+  if(oldFiles.length)invalidateMonthIndex();
+  gitSession.entries=chosen.all;
+  setGitStatus('พบ '+fmt(chosen.all.length)+' ไฟล์ · กำลังอ่าน Master และข้อมูลล่าสุด…','loading');
+  const result=await loadGitEntries(chosen.initial);
+  gitSession.loadedAt=Date.now();
+  const failed=result.failed.length?' · อ่านไม่ได้ '+result.failed.length+' ไฟล์: '+result.failed.slice(0,2).join(' / '):'';
+  setGitStatus(repo.owner+'/'+repo.repo+' · '+fmt(chosen.all.length)+' ไฟล์ใน Git · นำเข้าใหม่ '+fmt(result.loaded)+' ไฟล์ · '+fmt(chosen.periodCount)+' เดือน'+failed,result.failed.length?'warn':'ok');
+  if(result.failed.length)console.warn('Git files not imported',result.failed);
+  render();
+ }catch(error){console.error('Git automatic loading',error);setGitStatus('GitHub: '+error.message+' · ยังอัปโหลด Excel เองได้','warn');}
+ finally{gitSession.busy=false;el('refreshGitBtn').disabled=false}
+}
+// -----------------------------------------------------------------------------
+// A local HTML page cannot enumerate its directory without a browser-granted folder handle.
+// After the user chooses a directory, Chromium may persist its read-only handle in IndexedDB.
+const folderSession={handle:null,scanning:false,lastScan:0};
+const FOLDER_DB='TPSO_CPI_FieldPulse_SourceDirectory_v1';
+function setFolderStatus(message,kind=''){const e=el('folderStatus');e.textContent=message;e.className='folder-status'+(kind?' '+kind:'')}
+function folderDB(mode,handle){return new Promise((resolve,reject)=>{
+ if(!('indexedDB' in window)){resolve(null);return}
+ let request;try{request=indexedDB.open(FOLDER_DB,1)}catch(error){reject(error);return}
+ request.onupgradeneeded=()=>{const db=request.result;if(!db.objectStoreNames.contains('sources'))db.createObjectStore('sources')};
+ request.onerror=()=>reject(request.error||Error('เบราว์เซอร์ไม่อนุญาตให้จำโฟลเดอร์'));
+ request.onsuccess=()=>{const db=request.result;try{
+  const tx=db.transaction('sources',mode==='save'?'readwrite':'readonly');const store=tx.objectStore('sources');
+  const op=mode==='save'?store.put(handle,'last'):store.get('last');
+  op.onsuccess=()=>resolve(mode==='save'?true:op.result||null);
+  op.onerror=()=>reject(op.error);
+  tx.oncomplete=()=>db.close();tx.onerror=()=>db.close();
+ }catch(error){db.close();reject(error)}};
+})}
+function folderKey(file){return [file.name,file.size,file.lastModified].join('§')}
+async function scanAuthorizedFolder(dir,isAutomatic=false){
+ if(!dir||folderSession.scanning)return;
+ folderSession.scanning=true;folderSession.handle=dir;
+ setFolderStatus((isAutomatic?'กำลังอ่านโฟลเดอร์ที่อนุญาตไว้':'กำลังอ่านโฟลเดอร์')+' · '+dir.name+' …');
+ try{
+  const files=[];
+  for await(const entry of dir.values()){
+   if(entry.kind!=='file'||!(/\.xlsx$/i.test(entry.name))||/^~\$/.test(entry.name))continue;
+   files.push(await entry.getFile());
+  }
+  files.sort((a,b)=>Number(!/Real_Master_CPI/i.test(a.name))-Number(!/Real_Master_CPI/i.test(b.name))||a.name.localeCompare(b.name,'th'));
+  const keys=new Set(files.map(folderKey));
+  // Synchronize files added, changed or removed in this connected directory.
+  for(const old of [...state.files])if(old.source==='folder'&&!keys.has(old.key)){
+   state.fileKeys.delete(old.key);state.files=state.files.filter(x=>x!==old);
+   if(old.kind==='price')state.records=state.records.filter(r=>r.fileKey!==old.key);
+   else if(!state.files.some(x=>x.kind==='master'))state.master=null;
+  }
+  if(files.length)await importFiles(files,false,'folder');else render();
+  folderSession.lastScan=Date.now();
+  el('refreshFolderBtn').disabled=false;
+  setFolderStatus('เชื่อมโฟลเดอร์: '+dir.name+' · พบ Excel '+fmt(files.length)+' ไฟล์ · '+(isAutomatic?'อ่านอัตโนมัติแล้ว':'พร้อมอ่านอัตโนมัติเมื่อเปิดหน้านี้อีกครั้งและสิทธิ์ยังอนุญาต')+' · กด ↻ เพื่ออ่านไฟล์ใหม่','ok');
+  if(!files.length)toast('ไม่พบไฟล์ .xlsx ในโฟลเดอร์ที่เลือก');
+ }catch(error){console.error('Folder scan',error);setFolderStatus('อ่านโฟลเดอร์ไม่ได้: '+error.message+' — กรุณาเลือกโฟลเดอร์ใหม่หรืออัปโหลดไฟล์เอง','warn')}
+ finally{folderSession.scanning=false}
+}
+async function chooseFolder(){
+ if('showDirectoryPicker' in window && window.isSecureContext){
+  try{const dir=await window.showDirectoryPicker({mode:'read'});folderSession.handle=dir;
+   try{await folderDB('save',dir)}catch(error){console.info('Folder persistence unavailable',error)}
+   await scanAuthorizedFolder(dir);return;
+  }catch(error){if(error.name==='AbortError')return;console.info('Folder picker fallback',error)}
+ }
+ el('folderInput').click();
+}
+async function restoreFolder(){
+ try{const dir=await folderDB('get');if(!dir)return;
+  folderSession.handle=dir;const permission=typeof dir.queryPermission==='function'?await dir.queryPermission({mode:'read'}):'prompt';
+  if(permission==='granted')await scanAuthorizedFolder(dir,true);
+  else setFolderStatus('เคยเชื่อมโฟลเดอร์ '+dir.name+' · เบราว์เซอร์ต้องให้สิทธิ์อีกครั้ง กด “เปิด / เปลี่ยนโฟลเดอร์ Excel” เพื่ออ่านไฟล์','warn');
+ }catch(error){console.info('Restore folder permission',error);setFolderStatus('เลือกไฟล์ Excel ได้ทันที หรือกดเปิดโฟลเดอร์เพื่ออนุญาตให้อ่านอัตโนมัติเมื่อกลับมาเปิดหน้าอีกครั้ง')}
+}
+function wire(){
+ el('masterFile').addEventListener('change',async e=>{await importFiles(e.target.files,true);e.target.value=''});
+ el('dataFiles').addEventListener('change',async e=>{await importFiles(e.target.files,false);e.target.value=''});
+ el('folderInput').addEventListener('change',async e=>{await importFiles(e.target.files,false,'folder-fallback');setFolderStatus('อ่านไฟล์จากโฟลเดอร์ที่เลือกแล้ว · หากเบราว์เซอร์ไม่รองรับการจดจำสิทธิ์ ต้องเลือกโฟลเดอร์ใหม่เมื่อเปิดหน้าเว็บอีกครั้ง','warn');e.target.value=''});
+ el('refreshGitBtn').addEventListener('click',()=>startGitAutoLoad(true));
+ el('connectGitBtn').addEventListener('click',()=>{const repo=interpretGitRepo(el('gitRepoInput').value);if(!repo){setGitStatus('โปรดใส่ลิงก์ https://github.com/owner/repo ให้ถูกต้อง','warn');return}try{localStorage.setItem(GIT_STORAGE,repo.owner+'/'+repo.repo+(repo.branch?'/tree/'+repo.branch:''))}catch(e){}startGitAutoLoad(true,repo)});
+ el('gitRepoInput').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();el('connectGitBtn').click()}});
+ el('folderBtn').addEventListener('click',chooseFolder);el('refreshFolderBtn').addEventListener('click',async()=>{if(folderSession.handle){const permission=typeof folderSession.handle.queryPermission==='function'?await folderSession.handle.queryPermission({mode:'read'}):'prompt';if(permission==='granted')await scanAuthorizedFolder(folderSession.handle);else await chooseFolder()}else await chooseFolder()});
+ for(const label of document.querySelectorAll('.upload-cell')){label.addEventListener('dragover',e=>{e.preventDefault();label.classList.add('dragover')});label.addEventListener('dragleave',()=>label.classList.remove('dragover'));label.addEventListener('drop',async e=>{e.preventDefault();label.classList.remove('dragover');await importFiles(e.dataTransfer.files,label.htmlFor==='masterFile')})}
+ el('clearBtn').addEventListener('click',()=>{if(confirm('ล้างไฟล์และผลลัพธ์ทั้งหมดในหน้าเว็บนี้?'))resetAll()});
+ el('resetFilters').addEventListener('click',clearFilters);
+ el('copyTopBtn').addEventListener('click',copyMessage);el('printBtn').addEventListener('click',()=>window.print());el('exportTopBtn').addEventListener('click',()=>exportData('all'));
+ el('fileList').addEventListener('click',e=>{const m=e.target.closest('[data-setmonth]'),r=e.target.closest('[data-remove]');if(m)setFileMonth(Number(m.dataset.setmonth));else if(r)removeFile(Number(r.dataset.remove))});
+ for(const [id,prop]of[['setFilter','set'],['typeFilter','type'],['adminFilter','admin'],['statusFilter','status']])el(id).addEventListener('change',e=>{state[prop]=e.target.value;if(prop==='set'){state.setAuto=false;state.region='';state.province='';state.area='';state.areaSelected=false;state.admin=''}state.page=1;render()});
+ el('monthFilter').addEventListener('change',async e=>{const target=e.target.value;state.period=target;state.prev='';state.page=1;render();if(target)await ensureGitPeriods([target,prevMonth(target)]);});
+ el('prevFilter').addEventListener('change',async e=>{const target=e.target.value;state.prev=target;render();if(target){await ensureGitPeriods([target]);state.prev=target;render();}});
+ el('regionFilter').addEventListener('change',e=>{state.region=e.target.value;state.province='';state.area='';state.areaSelected=false;render()});el('areaFilter').addEventListener('change',e=>{state.area=e.target.value==='__ALL__'?'':e.target.value;state.areaSelected=!!e.target.value;render()});
+ el('appBody').addEventListener('change',e=>{if(e.target.id==='codeSortSelect'){state.order=e.target.value;state.page=1;render()}});
+ el('appBody').addEventListener('click',e=>{
+  const tab=e.target.closest('[data-tab]');if(tab){state.tab=tab.dataset.tab;state.page=1;render();return}
+  const areaView=e.target.closest('[data-areaview]');if(areaView){state.areaView=areaView.dataset.areaview;render();return}
+  const action=e.target.closest('[data-action]');if(action){if(action.dataset.action==='copy')copyMessage();if(action.dataset.action==='export')exportData('all');if(action.dataset.action==='area'){state.tab='area';render()}return}
+  const clearProvince=e.target.closest('[data-clear-province]');if(clearProvince){state.province='';state.area='';state.areaSelected=true;state.page=1;render();return}
+  const clearGroup=e.target.closest('[data-clear-group]');if(clearGroup){state.groupCode='';state.page=1;render();return}
+  const exportBtn=e.target.closest('[data-export]');if(exportBtn){exportData(exportBtn.dataset.export);return}const groupCode=e.target.closest('[data-groupcode]');if(groupCode){state.groupCode=groupCode.dataset.groupcode;state.tab='category';state.page=1;render();return}
+  const page=e.target.closest('[data-page]');if(page){state.page+=Number(page.dataset.page);render();return}
+  const r=e.target.closest('[data-region]');if(r){state.region=r.dataset.region;state.province='';state.area='';state.areaSelected=true;state.tab='area';state.areaView='province';render();return}
+  const p=e.target.closest('[data-province]');if(p){state.province=p.dataset.province;state.area='';state.areaSelected=true;state.tab='area';state.areaView='district';render();return}
+  const a=e.target.closest('[data-area]');if(a){state.area=a.dataset.area;state.areaSelected=true;state.tab='category';render();return}
+  const c=e.target.closest('[data-code]');if(c){openCodeDetail(c.dataset.code);return}
+ });
+ el('closeModal').addEventListener('click',closeModal);el('detailModal').addEventListener('click',e=>{if(e.target===el('detailModal'))closeModal()});window.addEventListener('keydown',e=>{if(e.key==='Escape'&&el('detailModal').classList.contains('open'))closeModal()});
+ el('detailBody').addEventListener('input',e=>{if(e.target.id==='modalSearch')renderModalSpecTable(e.target.value)});
+ el('detailBody').addEventListener('click',e=>{if(e.target.id==='modalShowAll'){state.modalMore=!state.modalMore;renderModalSpecTable(el('modalSearch').value)}if(e.target.id==='exportModal')exportData('modal')});
+}
+wire();render();startGitAutoLoad();restoreFolder();
+// Re-scan a previously granted directory when a user returns after changing Excel files.
+window.addEventListener('focus',async()=>{if(folderSession.handle&&!folderSession.scanning&&folderSession.lastScan&&Date.now()-folderSession.lastScan>300000){try{if(await folderSession.handle.queryPermission({mode:'read'})==='granted')await scanAuthorizedFolder(folderSession.handle,true)}catch(error){console.info(error)}}});
+</script>
+</body>
+</html>
