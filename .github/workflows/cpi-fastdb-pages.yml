@@ -1,0 +1,69 @@
+name: CPI FastDB + GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: workwebadmin-pages
+  cancel-in-progress: true
+
+jobs:
+  build-and-deploy:
+    if: github.ref_name == github.event.repository.default_branch
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Check out existing websites and CPI workbooks
+        uses: actions/checkout@v4
+        with:
+          lfs: true
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install FastDB Excel reader
+        run: python -m pip install --disable-pip-version-check lxml==6.0.2
+
+      - name: Build CPI snapshots in Count_CPI_fast
+        shell: bash
+        run: |
+          test -f Count_CPI_fast/index.html
+          test -f scripts/build_fastdb.py
+          python scripts/build_fastdb.py --root . --out ./Count_CPI_fast/fastdb
+          test -s Count_CPI_fast/fastdb/manifest.json
+
+      - name: Stage existing websites without replacing root index
+        shell: bash
+        run: |
+          mkdir -p _site
+          rsync -a --exclude='/.git/' --exclude='/.github/' \
+            --exclude='/_site/' --exclude='/scripts/build_fastdb.py' \
+            ./ _site/
+          touch _site/.nojekyll
+          test -s _site/index.html
+          test -s _site/Count_CPI_fast/index.html
+          test -s _site/Count_CPI_fast/fastdb/manifest.json
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload all websites with new CPI FastDB
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: ./_site
+
+      - name: Deploy GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
