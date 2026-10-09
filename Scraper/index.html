@@ -1,0 +1,1688 @@
+<!DOCTYPE html>
+<html lang="th" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multi-Store Price Scraper Studio (Pure Web Engine - 2 Chrome Parallel)</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- SheetJS for In-Browser Excel Read & Export -->
+    <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+    <!-- Google Fonts: Prompt & Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Prompt', 'Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'Menlo', 'monospace'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: rgba(15, 23, 42, 0.6); }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #334155; border-radius: 9999px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #475569; }
+        @keyframes pulse-subtle { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
+        .animate-subtle { animation: pulse-subtle 2s infinite ease-in-out; }
+    </style>
+</head>
+
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col font-sans selection:bg-blue-500 selection:text-white">
+    <!-- Top Navigation Bar -->
+    <header class="border-b border-slate-800 bg-slate-900/90 backdrop-blur-md sticky top-0 z-40 px-4 lg:px-8 py-3.5 transition-all">
+        <div class="max-w-7xl mx-auto flex items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-cyan-500 flex items-center justify-center shadow-lg shadow-blue-500/20 ring-1 ring-white/20">
+                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
+                    </svg>
+                </div>
+                <div>
+                    <div class="flex items-center gap-2">
+                        <h1 class="text-lg font-bold bg-gradient-to-r from-blue-400 via-indigo-200 to-cyan-400 bg-clip-text text-transparent">Multi-Store Price Scraper Studio</h1>
+                        <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold tracking-wide bg-blue-500/10 text-blue-400 border border-blue-500/30">Pure Web • 2 Chrome Engine</span>
+                    </div>
+                    <p class="text-xs text-slate-400 hidden sm:block">ดึงราคากลาง 9 ห้างตาม Logic เดิม 100% ค้นหา SKU อัตโนมัติเมื่อไม่พบสินค้า พร้อมเปิด 2 หน้าต่างคู่ขนาน</p>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-2.5">
+                <button type="button" id="sampleTemplateBtn" class="px-3.5 py-1.5 rounded-lg text-xs font-medium bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition flex items-center gap-1.5 active:scale-95">
+                    <svg class="w-3.5 h-3.5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                    โหลดตัวอย่าง Excel
+                </button>
+                <div class="h-4 w-px bg-slate-800"></div>
+                <div id="runtimeBadge" class="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+                    <span id="runtimeBadgeText">พร้อมใช้งาน</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 lg:px-8 py-6 space-y-6">
+        <!-- Workflow Top Grid: Step 1 Upload & Step 2 Choose Stores -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            
+            <!-- Step 1: Upload Excel File & Chrome Concurrency -->
+            <div class="lg:col-span-5 bg-slate-900/60 border border-slate-800 rounded-2xl p-5 shadow-xl flex flex-col justify-between">
+                <div>
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="flex items-center gap-2">
+                            <span class="w-6 h-6 rounded-lg bg-blue-500/20 text-blue-400 flex items-center justify-center text-xs font-bold ring-1 ring-blue-500/30">1</span>
+                            <h2 class="text-sm font-semibold text-white">อัปโหลดไฟล์ Excel (.xlsx)</h2>
+                        </div>
+                        <span id="sheetCountBadge" class="hidden text-[11px] font-mono px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20"></span>
+                    </div>
+
+                    <!-- Drag & Drop Container -->
+                    <div id="dropZone" class="border-2 border-dashed border-slate-700 hover:border-blue-500/80 hover:bg-blue-500/5 transition-all rounded-xl p-6 text-center cursor-pointer bg-slate-950/40 group relative overflow-hidden">
+                        <input type="file" id="excelFileInput" accept=".xlsx, .xls" class="hidden">
+                        <div class="w-12 h-12 mx-auto mb-3 rounded-xl bg-slate-800/80 border border-slate-700 flex items-center justify-center text-slate-400 group-hover:text-blue-400 group-hover:scale-105 group-hover:border-blue-500/40 transition-all">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
+                            </svg>
+                        </div>
+                        <p class="text-xs font-medium text-slate-200 mb-1">ลากไฟล์ Excel มาวาง หรือคลิกเพื่อเลือกไฟล์</p>
+                        <p class="text-[11px] text-slate-400">ระบบจะดึงตาม Sheet: Lotus, BigC, Tops, Powerbuy, Homepro ฯลฯ</p>
+                    </div>
+
+                    <!-- Detected Sheets Preview Box -->
+                    <div id="detectedSheetsBox" class="mt-3.5 hidden">
+                        <div class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-1.5 flex items-center justify-between">
+                            <span>ชีตที่ตรวจพบในไฟล์:</span>
+                            <span id="detectedRowCount" class="text-blue-400 font-mono text-[11px]"></span>
+                        </div>
+                        <div id="detectedSheetsList" class="flex flex-wrap gap-1.5 max-h-24 overflow-y-auto custom-scrollbar p-1"></div>
+                    </div>
+                </div>
+
+                <div class="mt-4 pt-3 border-t border-slate-800/80 space-y-2.5 text-xs">
+                    <div class="flex items-center justify-between">
+                        <span class="text-slate-400">โหมดการเปิด Chrome บนจอ:</span>
+                        <select id="parallelSelect" class="bg-slate-950 border border-slate-700 text-slate-200 text-xs rounded-lg px-2 py-1 focus:outline-none focus:border-blue-500">
+                            <option value="2" selected>⚡ เปิด 2 Chrome คู่ขนาน (แบ่งจอซ้าย-ขวา)</option>
+                            <option value="1">เปิด 1 Chrome (วิ่งทีละรายการ)</option>
+                            <option value="0">โหมด Background (ไม่เปิดหน้าต่างป๊อปอัป)</option>
+                        </select>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-slate-400">การหน่วงเวลาโหลดหน้าเว็บ:</span>
+                        <select id="delayModeSelect" class="bg-slate-950 border border-slate-700 text-slate-200 text-xs rounded-lg px-2 py-1 focus:outline-none focus:border-blue-500">
+                            <option value="normal" selected>มาตรฐาน (เสมือนคนเปิด 2-3 วิ)</option>
+                            <option value="fast">เร็ว (1-1.5 วิ)</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="lg:col-span-7 bg-slate-900/60 border border-slate-800 rounded-2xl p-5 shadow-xl flex flex-col justify-between">
+                <div>
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="flex items-center gap-2">
+                            <span class="w-6 h-6 rounded-lg bg-indigo-500/20 text-indigo-400 flex items-center justify-center text-xs font-bold ring-1 ring-indigo-500/30">2</span>
+                            <h2 class="text-sm font-semibold text-white">เลือกห้างที่จะ Scrape</h2>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button type="button" id="btnSelectAll" class="px-2.5 py-1 text-xs font-medium rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition active:scale-95">
+                                เลือกทั้งหมด (Select All)
+                            </button>
+                            <button type="button" id="btnDeselectAll" class="px-2.5 py-1 text-xs font-medium rounded-lg bg-slate-800/60 hover:bg-slate-800 text-slate-400 border border-slate-800 transition active:scale-95">
+                                ล้างออก
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Store Selector Cards Grid (9 Stores) -->
+                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-2.5" id="storeCheckboxContainer">
+                        <!-- Lotus -->
+                        <label class="store-card relative flex items-center gap-2.5 p-2.5 rounded-xl border border-slate-800 bg-slate-950/60 hover:border-blue-500/50 cursor-pointer transition select-none group">
+                            <input type="checkbox" name="selectedStore" value="Lotus" checked class="w-4 h-4 rounded text-blue-600 bg-slate-800 border-slate-700 focus:ring-0">
+                            <div class="flex-1 min-w-0">
+                                <div class="text-xs font-semibold text-slate-200 group-hover:text-blue-300 transition">Lotus's</div>
+                                <div class="text-[10px] text-slate-400 truncate">โลตัส ออนไลน์</div>
+                            </div>
+                            <span class="store-count-badge text-[10px] font-mono px-1.5 py-0.5 rounded bg-slate-800 text-slate-400">0</span>
+                        </label>
+
+                        <!-- BigC -->
+                        <label class="store-card relative flex items-center gap-2.5 p-2.5 rounded-xl border border-slate-800 bg-slate-950/60 hover:border-emerald-500/50 cursor-pointer transition select-none group">
+                            <input type="checkbox" name="selectedStore" value="BigC" checked class="w-4 h-4 rounded text-emerald-600 bg-slate-800 border-slate-700 focus:ring-0">
+                            <div class="flex-1 min-w-0">
+                                <div class="text-xs font-semibold text-slate-200 group-hover:text-emerald-300 transition">Big C</div>
+                                <div class="text-[10px] text-slate-400 truncate">บิ๊กซี ซูเปอร์เซ็นเตอร์</div>
+                            </div>
+                            <span class="store-count-badge text-[10px] font-mono px-1.5 py-0.5 rounded bg-slate-800 text-slate-400">0</span>
+                        </label>
+
+                        <!-- Tops -->
+                        <label class="store-card relative flex items-center gap-2.5 p-2.5 rounded-xl border border-slate-800 bg-slate-950/60 hover:border-amber-500/50 cursor-pointer transition select-none group">
+                            <input type="checkbox" name="selectedStore" value="Tops" checked class="w-4 h-4 rounded text-amber-600 bg-slate-800 border-slate-700 focus:ring-0">
+                            <div class="flex-1 min-w-0">
+                                <div class="text-xs font-semibold text-slate-200 group-hover:text-amber-300 transition">Tops</div>
+                                <div class="text-[10px] text-slate-400 truncate">ท็อปส์ มาร์เก็ต</div>
+                            </div>
+                            <span class="store-count-badge text-[10px] font-mono px-1.5 py-0.5 rounded bg-slate-800 text-slate-400">0</span>
+                        </label>
+
+                        <!-- Powerbuy -->
+                        <label class="store-card relative flex items-center gap-2.5 p-2.5 rounded-xl border border-slate-800 bg-slate-950/60 hover:border-yellow-500/50 cursor-pointer transition select-none group">
+                            <input type="checkbox" name="selectedStore" value="Powerbuy" checked class="w-4 h-4 rounded text-yellow-600 bg-slate-800 border-slate-700 focus:ring-0">
+                            <div class="flex-1 min-w-0">
+                                <div class="text-xs font-semibold text-slate-200 group-hover:text-yellow-300 transition">Power Buy</div>
+                                <div class="text-[10px] text-slate-400 truncate">เครื่องใช้ไฟฟ้า & IT</div>
+                            </div>
+                            <span class="store-count-badge text-[10px] font-mono px-1.5 py-0.5 rounded bg-slate-800 text-slate-400">0</span>
+                        </label>
+
+                        <!-- Homepro -->
+                        <label class="store-card relative flex items-center gap-2.5 p-2.5 rounded-xl border border-slate-800 bg-slate-950/60 hover:border-purple-500/50 cursor-pointer transition select-none group">
+                            <input type="checkbox" name="selectedStore" value="Homepro" checked class="w-4 h-4 rounded text-purple-600 bg-slate-800 border-slate-700 focus:ring-0">
+                            <div class="flex-1 min-w-0">
+                                <div class="text-xs font-semibold text-slate-200 group-hover:text-purple-300 transition">HomePro</div>
+                                <div class="text-[10px] text-slate-400 truncate">สินค้าตกแต่งบ้าน</div>
+                            </div>
+                            <span class="store-count-badge text-[10px] font-mono px-1.5 py-0.5 rounded bg-slate-800 text-slate-400">0</span>
+                        </label>
+
+                        <!-- Globalhouse -->
+                        <label class="store-card relative flex items-center gap-2.5 p-2.5 rounded-xl border border-slate-800 bg-slate-950/60 hover:border-orange-500/50 cursor-pointer transition select-none group">
+                            <input type="checkbox" name="selectedStore" value="Globalhouse" checked class="w-4 h-4 rounded text-orange-600 bg-slate-800 border-slate-700 focus:ring-0">
+                            <div class="flex-1 min-w-0">
+                                <div class="text-xs font-semibold text-slate-200 group-hover:text-orange-300 transition">Global House</div>
+                                <div class="text-[10px] text-slate-400 truncate">โกลบอลเฮ้าส์</div>
+                            </div>
+                            <span class="store-count-badge text-[10px] font-mono px-1.5 py-0.5 rounded bg-slate-800 text-slate-400">0</span>
+                        </label>
+
+                        <!-- Thaiwatsadu -->
+                        <label class="store-card relative flex items-center gap-2.5 p-2.5 rounded-xl border border-slate-800 bg-slate-950/60 hover:border-rose-500/50 cursor-pointer transition select-none group">
+                            <input type="checkbox" name="selectedStore" value="ไทวัสดุ" checked class="w-4 h-4 rounded text-rose-600 bg-slate-800 border-slate-700 focus:ring-0">
+                            <div class="flex-1 min-w-0">
+                                <div class="text-xs font-semibold text-slate-200 group-hover:text-rose-300 transition">ไทวัสดุ</div>
+                                <div class="text-[10px] text-slate-400 truncate">วัสดุก่อสร้าง</div>
+                            </div>
+                            <span class="store-count-badge text-[10px] font-mono px-1.5 py-0.5 rounded bg-slate-800 text-slate-400">0</span>
+                        </label>
+
+                        <!-- BananaIT -->
+                        <label class="store-card relative flex items-center gap-2.5 p-2.5 rounded-xl border border-slate-800 bg-slate-950/60 hover:border-amber-400/50 cursor-pointer transition select-none group">
+                            <input type="checkbox" name="selectedStore" value="BananaIT" checked class="w-4 h-4 rounded text-amber-500 bg-slate-800 border-slate-700 focus:ring-0">
+                            <div class="flex-1 min-w-0">
+                                <div class="text-xs font-semibold text-slate-200 group-hover:text-amber-300 transition">Banana IT</div>
+                                <div class="text-[10px] text-slate-400 truncate">สินค้าไอที & มือถือ</div>
+                            </div>
+                            <span class="store-count-badge text-[10px] font-mono px-1.5 py-0.5 rounded bg-slate-800 text-slate-400">0</span>
+                        </label>
+
+                        <!-- AIS -->
+                        <label class="store-card relative flex items-center gap-2.5 p-2.5 rounded-xl border border-slate-800 bg-slate-950/60 hover:border-lime-500/50 cursor-pointer transition select-none group">
+                            <input type="checkbox" name="selectedStore" value="AIS" checked class="w-4 h-4 rounded text-lime-500 bg-slate-800 border-slate-700 focus:ring-0">
+                            <div class="flex-1 min-w-0">
+                                <div class="text-xs font-semibold text-slate-200 group-hover:text-lime-300 transition">AIS Online</div>
+                                <div class="text-[10px] text-slate-400 truncate">เครื่องเปล่าราคาพิเศษ</div>
+                            </div>
+                            <span class="store-count-badge text-[10px] font-mono px-1.5 py-0.5 rounded bg-slate-800 text-slate-400">0</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="mt-4 pt-3 border-t border-slate-800/80 flex items-center justify-between gap-3">
+                    <span id="targetStatusText" class="text-xs text-slate-400 truncate">เลือกไว้ 9 / 9 ห้าง</span>
+                    <div class="flex items-center gap-2.5">
+                        <button type="button" id="btnStartScrape" class="px-5 py-2 rounded-xl text-xs font-semibold bg-gradient-to-r from-blue-600 via-indigo-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 text-white shadow-lg shadow-blue-500/25 transition-all flex items-center gap-2 active:scale-95">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            เริ่มดึงข้อมูล (Start Scrape)
+                        </button>
+                        <button type="button" id="btnCancelScrape" class="hidden px-4 py-2 rounded-xl text-xs font-semibold bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 border border-rose-500/30 transition-all flex items-center gap-1.5 active:scale-95">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                            หยุด
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-slate-900/60 border border-slate-800 rounded-2xl p-5 shadow-xl space-y-5">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div class="flex items-center gap-2">
+                    <span class="w-6 h-6 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-xs font-bold ring-1 ring-emerald-500/30">3</span>
+                    <div>
+                        <h2 class="text-sm font-semibold text-white">สถานะการทำงาน & บันทึกไฟล์</h2>
+                        <p id="liveStatusSubtitle" class="text-xs text-slate-400">อัปโหลดไฟล์ Excel แล้วกดเริ่มดึงข้อมูล</p>
+                    </div>
+                </div>
+
+                <!-- Save As Action Button -->
+                <div class="flex items-center gap-2">
+                    <button type="button" id="btnSaveAs" class="opacity-50 pointer-events-none px-4 py-2 rounded-xl text-xs font-semibold bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white shadow-lg shadow-emerald-500/20 transition-all flex items-center gap-2 active:scale-95">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/></svg>
+                        <span>Save As... (เลือกที่ลงไฟล์)</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Total Progress Bar -->
+            <div class="space-y-1.5">
+                <div class="flex justify-between items-center text-xs font-medium">
+                    <span id="currentProcessStore" class="text-blue-400 font-mono">สถานะ: รอคำสั่ง...</span>
+                    <span id="progressPercentText" class="text-slate-200 font-mono font-bold">0%</span>
+                </div>
+                <div class="w-full bg-slate-950 rounded-full h-2.5 overflow-hidden p-0.5 border border-slate-800">
+                    <div id="progressBarFill" class="bg-gradient-to-r from-blue-500 via-indigo-500 to-emerald-400 h-full rounded-full transition-all duration-300" style="width: 0%"></div>
+                </div>
+            </div>
+
+            <!-- Statistics Counters -->
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+                <div class="bg-slate-950/70 border border-slate-800/80 rounded-xl p-3">
+                    <span class="text-slate-400 text-[11px] block">รายการทั้งหมด</span>
+                    <span id="statTotalItems" class="text-base font-bold font-mono text-slate-100">0</span>
+                </div>
+                <div class="bg-slate-950/70 border border-slate-800/80 rounded-xl p-3">
+                    <span class="text-slate-400 text-[11px] block">ดึงสำเร็จแล้ว</span>
+                    <span id="statProcessedItems" class="text-base font-bold font-mono text-emerald-400">0</span>
+                </div>
+                <div class="bg-slate-950/70 border border-slate-800/80 rounded-xl p-3">
+                    <span class="text-slate-400 text-[11px] block">ตรวจพบ 1 แถม 1</span>
+                    <span id="statB1G1Count" class="text-base font-bold font-mono text-amber-400">0</span>
+                </div>
+                <div class="bg-slate-950/70 border border-slate-800/80 rounded-xl p-3">
+                    <span class="text-slate-400 text-[11px] block">เวลาที่ใช้ไป</span>
+                    <span id="statElapsedTime" class="text-base font-bold font-mono text-cyan-400">00:00</span>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 pt-2">
+                <!-- Terminal Console -->
+                <div class="lg:col-span-5 bg-slate-950 border border-slate-800/90 rounded-xl p-3.5 flex flex-col h-72">
+                    <div class="flex items-center justify-between pb-2 mb-2 border-b border-slate-800 text-[11px] font-mono text-slate-400">
+                        <div class="flex items-center gap-1.5">
+                            <span class="w-2.5 h-2.5 rounded-full bg-rose-500/80"></span>
+                            <span class="w-2.5 h-2.5 rounded-full bg-amber-500/80"></span>
+                            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500/80"></span>
+                            <span class="ml-2 font-semibold text-slate-300">LIVE CONSOLE</span>
+                        </div>
+                        <button type="button" id="btnClearLogs" class="hover:text-slate-200 transition text-[10px]">เคลียร์ Log</button>
+                    </div>
+                    <div id="consoleTerminal" class="custom-scrollbar overflow-y-auto flex-1 font-mono text-[11px] text-slate-300 space-y-1 select-text">
+                        <div class="text-slate-500 italic">[ระบบ] ยินดีต้อนรับเข้าสู่ Pure Web Scraper Studio...</div>
+                    </div>
+                </div>
+
+                <!-- Live Preview Table -->
+                <div class="lg:col-span-7 bg-slate-950 border border-slate-800/90 rounded-xl p-3.5 flex flex-col h-72">
+                    <div class="flex items-center justify-between pb-2 mb-2 border-b border-slate-800 text-[11px]">
+                        <span class="font-semibold text-slate-300 uppercase tracking-wide">ตัวอย่างข้อมูลล่าสุด (Real-time Preview)</span>
+                        <span id="previewCountBadge" class="text-[10px] font-mono text-slate-400">0 รายการ</span>
+                    </div>
+                    <div class="custom-scrollbar overflow-y-auto flex-1 overflow-x-auto">
+                        <table class="w-full text-left text-xs text-slate-300 whitespace-nowrap">
+                            <thead class="text-[11px] text-slate-400 uppercase bg-slate-900/90 sticky top-0 border-b border-slate-800">
+                                <tr>
+                                    <th class="py-2 px-2.5">ห้าง</th>
+                                    <th class="py-2 px-2.5 max-w-[150px]">ชื่อรายการ</th>
+                                    <th class="py-2 px-2.5">ปกติ</th>
+                                    <th class="py-2 px-2.5">โปรฯ</th>
+                                    <th class="py-2 px-2.5">สต็อก</th>
+                                    <th class="py-2 px-2.5">1 แถม 1</th>
+                                </tr>
+                            </thead>
+                            <tbody id="previewTableBody" class="divide-y divide-slate-800/60 font-mono text-[11px]">
+                                <tr>
+                                    <td colspan="6" class="text-center py-10 text-slate-500 font-sans italic">ยังไม่มีข้อมูลที่ถูกดึง</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Custom Modal Container (No alert() or confirm() used) -->
+    <div id="customModalBackdrop" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4">
+            <div class="flex items-start gap-3">
+                <div id="modalIconContainer" class="w-10 h-10 rounded-xl bg-blue-500/20 text-blue-400 flex items-center justify-center shrink-0">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                </div>
+                <div>
+                    <h3 id="modalTitle" class="text-base font-bold text-white">แจ้งเตือน</h3>
+                    <p id="modalMessage" class="text-xs text-slate-300 mt-1 leading-relaxed"></p>
+                </div>
+            </div>
+            <div class="flex justify-end gap-2 pt-2">
+                <button type="button" id="modalCloseBtn" class="px-4 py-2 rounded-xl text-xs font-semibold bg-blue-600 hover:bg-blue-500 text-white transition active:scale-95">ตกลง</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toastNotification" class="fixed bottom-5 right-5 z-50 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none flex items-center gap-2.5 px-4 py-3 rounded-xl bg-slate-900 border border-slate-700 shadow-2xl text-xs text-slate-200">
+        <span id="toastText"></span>
+    </div>
+
+    <script>
+        // Core application state
+        const AppState = {
+            workbook: null,
+            uploadedFileName: '',
+            parsedSheets: {},
+            processedSheets: {},
+            isRunning: false,
+            isCancelled: false,
+            totalItemsCount: 0,
+            processedCount: 0,
+            b1g1Count: 0,
+            timerInterval: null,
+            secondsElapsed: 0,
+            recentItems: [],
+            // 2 Popups side-by-side (Window 1 on left, Window 2 on right)
+            popupWindows: [null, null]
+        };
+
+        const STORE_KEYS = ['Lotus', 'BigC', 'Tops', 'Powerbuy', 'Homepro', 'Globalhouse', 'ไทวัสดุ', 'BananaIT', 'AIS'];
+        const COLS_ORDER = [
+            'ผู้ดูแล', 'COMMODITY_CODE', 'DESCRIPTION', 'ประเภทร้านค้า',
+            'Link', 'หมวด', 'รหัสสินค้า', 'ชื่อรายการ', 'ราคาปกติ',
+            'ราคาโปรโมชั่น', 'มี/หมด', '1แถม1'
+        ];
+
+        // Multi-tier fast proxies for raw live HTML access
+        const CORS_PROXIES = [
+            url => `https://corsproxy.io/?url=${encodeURIComponent(url)}`,
+            url => `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
+            url => `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}`
+        ];
+
+        const dropZone = document.getElementById('dropZone');
+        const excelFileInput = document.getElementById('excelFileInput');
+        const sheetCountBadge = document.getElementById('sheetCountBadge');
+        const detectedSheetsBox = document.getElementById('detectedSheetsBox');
+        const detectedSheetsList = document.getElementById('detectedSheetsList');
+        const detectedRowCount = document.getElementById('detectedRowCount');
+        const parallelSelect = document.getElementById('parallelSelect');
+        const delayModeSelect = document.getElementById('delayModeSelect');
+        const btnSelectAll = document.getElementById('btnSelectAll');
+        const btnDeselectAll = document.getElementById('btnDeselectAll');
+        const btnStartScrape = document.getElementById('btnStartScrape');
+        const btnCancelScrape = document.getElementById('btnCancelScrape');
+        const btnSaveAs = document.getElementById('btnSaveAs');
+        const progressBarFill = document.getElementById('progressBarFill');
+        const progressPercentText = document.getElementById('progressPercentText');
+        const currentProcessStore = document.getElementById('currentProcessStore');
+        const liveStatusSubtitle = document.getElementById('liveStatusSubtitle');
+        const statTotalItems = document.getElementById('statTotalItems');
+        const statProcessedItems = document.getElementById('statProcessedItems');
+        const statB1G1Count = document.getElementById('statB1G1Count');
+        const statElapsedTime = document.getElementById('statElapsedTime');
+        const consoleTerminal = document.getElementById('consoleTerminal');
+        const btnClearLogs = document.getElementById('btnClearLogs');
+        const previewTableBody = document.getElementById('previewTableBody');
+        const previewCountBadge = document.getElementById('previewCountBadge');
+        const sampleTemplateBtn = document.getElementById('sampleTemplateBtn');
+        const runtimeBadge = document.getElementById('runtimeBadge');
+        const runtimeBadgeText = document.getElementById('runtimeBadgeText');
+
+        // Modal elements
+        const customModalBackdrop = document.getElementById('customModalBackdrop');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalMessage = document.getElementById('modalMessage');
+        const modalCloseBtn = document.getElementById('modalCloseBtn');
+        const toastNotification = document.getElementById('toastNotification');
+        const toastText = document.getElementById('toastText');
+
+        function showModal(title, msg) {
+            modalTitle.innerText = title;
+            modalMessage.innerText = msg;
+            customModalBackdrop.classList.remove('hidden');
+        }
+        modalCloseBtn.addEventListener('click', () => customModalBackdrop.classList.add('hidden'));
+
+        function showToast(message) {
+            toastText.innerText = message;
+            toastNotification.classList.remove('translate-y-20', 'opacity-0');
+            setTimeout(() => {
+                toastNotification.classList.add('translate-y-20', 'opacity-0');
+            }, 3000);
+        }
+
+        function logConsole(message, color = 'slate-300') {
+            const now = new Date();
+            const timeStr = now.toTimeString().split(' ')[0];
+            const div = document.createElement('div');
+            div.className = `text-${color}`;
+            div.innerHTML = `<span class="text-slate-600">[${timeStr}]</span> ${escapeHtml(message)}`;
+            consoleTerminal.appendChild(div);
+            consoleTerminal.scrollTop = consoleTerminal.scrollHeight;
+        }
+
+        btnClearLogs.addEventListener('click', () => {
+            consoleTerminal.innerHTML = '<div class="text-slate-500 italic">[ระบบ] Log ถูกล้างแล้ว</div>';
+        });
+
+        function escapeHtml(str) {
+            return String(str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        }
+
+        function parsePrice(valStr) {
+            if (!valStr || valStr === '-') return '-';
+            const match = String(valStr).match(/([\d,]+(?:\.\d+)?)/);
+            if (!match) return '-';
+            const clean = match[1].replace(/,/g, '');
+            const v = parseFloat(clean);
+            if (isNaN(v)) return '-';
+            return Number.isInteger(v) ? parseInt(v) : v;
+        }
+
+        function getRowVal(row, colName, defaultVal = '-') {
+            for (const k of Object.keys(row)) {
+                if (k.trim().toLowerCase() === colName.trim().toLowerCase()) {
+                    const v = row[k];
+                    return (v !== null && v !== undefined && String(v).trim() !== '' && String(v).trim() !== 'nan') ? String(v).trim() : defaultVal;
+                }
+            }
+            return defaultVal;
+        }
+
+        function getRowLink(row) {
+            for (const k of Object.keys(row)) {
+                if (['link', 'url', 'ลิงก์', 'ลิงค์'].includes(k.trim().toLowerCase())) {
+                    const v = row[k];
+                    return (v !== null && v !== undefined) ? String(v).trim() : '';
+                }
+            }
+            const keys = Object.keys(row);
+            if (keys.length >= 5) {
+                const v = row[keys[4]];
+                return (v !== null && v !== undefined) ? String(v).trim() : '';
+            }
+            return '';
+        }
+
+        // Fetch raw HTML with proxy rotation and quick timeout
+        async function fetchLivePageHtml(url) {
+            for (let i = 0; i < CORS_PROXIES.length; i++) {
+                try {
+                    const proxyUrl = CORS_PROXIES[i](url);
+                    const controller = new AbortController();
+                    const timeoutId = setTimeout(() => controller.abort(), 5500);
+
+                    const res = await fetch(proxyUrl, { signal: controller.signal });
+                    clearTimeout(timeoutId);
+
+                    if (res.ok) {
+                        const html = await res.text();
+                        if (html && html.length > 300 && !html.includes('Cloudflare') && !html.includes('Just a moment')) {
+                            return html;
+                        }
+                    }
+                } catch (e) {
+                    // Try next proxy
+                }
+            }
+            return null;
+        }
+
+        // Gemini 3 Flash with Google Search Grounding to guarantee prices are retrieved if website blocks CORS
+        async function fetchPriceViaGroundedAi(rawUrl, storeName, sku, desc) {
+            const systemPrompt = "คุณเป็นผู้เชี่ยวชาญการดึงราคาสินค้า e-commerce ห้างไทย (Lotus, Big C, Tops, PowerBuy, HomePro, AIS ฯลฯ) ตอบข้อมูลราคาจริงให้ถูกต้องที่สุด";
+            const userQuery = `ค้นหาราคาสินค้าจริงปัจจุบัน ลิงก์: ${rawUrl} ห้าง: ${storeName} SKU: ${sku} สินค้า: ${desc}
+            จงหา:
+            1. ชื่อสินค้าเต็ม (title)
+            2. รหัสสินค้า (sku)
+            3. ราคาปกติ (normalPrice) เป็นตัวเลข
+            4. ราคาโปรโมชั่น (promoPrice) เป็นตัวเลข ถ้าไม่มีโปรหรือราคาเท่าเดิมให้เป็น null
+            5. มีโปรซื้อ 1 แถม 1 หรือไม่ (isB1G1) (ถ้ามีใส่ "1 แถม 1" ถ้าไม่มีใส่ "-")
+            6. สถานะสต็อก (stock) ("มี" หรือ "หมด")
+            ตอบกลับเป็น JSON สั้นๆ รูปแบบ:
+            {"title": "...", "sku": "...", "normalPrice": 120, "promoPrice": 99, "stock": "มี", "b1g1": "-"}`;
+
+            try {
+                const apiKey = ""; // Canvas runtime provides this automatically
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
+
+                const payload = {
+                    contents: [{ parts: [{ text: userQuery }] }],
+                    tools: [{ "google_search": {} }],
+                    systemInstruction: { parts: [{ text: systemPrompt }] }
+                };
+
+                const res = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (res.ok) {
+                    const data = await res.json();
+                    const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+                    if (text) {
+                        const jsonMatch = text.match(/\{[\s\S]*?\}/);
+                        if (jsonMatch) {
+                            return JSON.parse(jsonMatch[0]);
+                        }
+                    }
+                }
+            } catch (err) {
+                // Ignore AI fallback error and continue
+            }
+            return null;
+        }
+
+        function extractNextDataJson(html) {
+            try {
+                const match = html.match(/<script[^>]+id="__NEXT_DATA__"[^>]*>([\s\S]*?)<\/script>/i);
+                if (match && match[1]) {
+                    return JSON.parse(match[1]);
+                }
+            } catch (e) {}
+            return null;
+        }
+
+        function extractJsonLd(html) {
+            try {
+                const matches = html.matchAll(/<script[^>]+type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/gi);
+                for (const m of matches) {
+                    try {
+                        const parsed = JSON.parse(m[1]);
+                        if (parsed && (parsed['@type'] === 'Product' || parsed.name)) return parsed;
+                        if (Array.isArray(parsed)) {
+                            const prod = parsed.find(item => item && (item['@type'] === 'Product' || item.name));
+                            if (prod) return prod;
+                        }
+                    } catch (err) {}
+                }
+            } catch (e) {}
+            return null;
+        }
+
+        function extractHtmlTitle(html) {
+            const h1Match = html.match(/<h1[^>]*>([\s\S]*?)<\/h1>/i);
+            if (h1Match) {
+                const clean = h1Match[1].replace(/<[^>]+>/g, '').trim();
+                if (clean && clean.length > 2 && !clean.includes('ผลการค้นหา') && !clean.includes('เข้าสู่ระบบ')) {
+                    return clean;
+                }
+            }
+            const ogMatch = html.match(/<meta[^>]+property="og:title"[^>]+content="([^"]*)"/i);
+            if (ogMatch && ogMatch[1].trim()) return ogMatch[1].trim();
+
+            const titleMatch = html.match(/<title[^>]*>([\s\S]*?)<\/title>/i);
+            if (titleMatch && titleMatch[1].trim()) {
+                return titleMatch[1].replace(/<[^>]+>/g, '').split('|')[0].split('-')[0].trim();
+            }
+            return '-';
+        }
+
+        function extractBodyText(html) {
+            if (!html) return '';
+            const noScript = html.replace(/<script[\s\S]*?<\/script>/gi, '').replace(/<style[\s\S]*?<\/style>/gi, '');
+            return noScript.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ');
+        }
+
+        // 1. LOTUS LOGIC (100% Python Logic Equivalent + Search Fallback)
+        function extractTailSkuLotus(rawUrl) {
+            const val = String(rawUrl || '').trim();
+            if (!val.startsWith('http')) return '-';
+            const cleanBase = val.split('?')[0].split('#')[0].replace(/\/+$/, '');
+            const match = cleanBase.match(/(\d+)$/);
+            if (match && match[1].length >= 4) return match[1];
+            const seg = cleanBase.split('/').pop() || '';
+            const digits = seg.match(/\d+/g);
+            return digits ? digits[digits.length - 1] : '-';
+        }
+
+        function extractLotusPrices(bodyText, titleText) {
+            let textForPromo = bodyText || '';
+            if (titleText && titleText !== '-') textForPromo = textForPromo.replace(titleText, '');
+            const cleanPromoText = textForPromo.replace(/(?:แพ็ค|แพค|pack)\s*1\s*แถม\s*1/gi, '');
+
+            const lotusB1g1Patterns = [
+                /ซื้อ\s*1\s*แถม\s*1/i,
+                /buy\s*1\s*get\s*1/i,
+                /กดเพิ่มเฉพาะสินค้าซื้อ\s*สินค้าแถมจะเพิ่มลงตะกร้าอัตโนมัติ/i
+            ];
+            const isBuy1Get1 = lotusB1g1Patterns.some(p => p.test(cleanPromoText));
+
+            const foundPrices = [];
+            const pMatches = bodyText.matchAll(/฿\s*([\d,]+(?:\.\d{2})?)\s*(?:\/\s*Each|\/\s*ชิ้น)?/gi);
+            for (const m of pMatches) {
+                const pv = parsePrice(m[1]);
+                if (typeof pv === 'number' && pv > 0 && !foundPrices.includes(pv) && pv < 500000) {
+                    foundPrices.push(pv);
+                }
+            }
+
+            let normPrice = '-';
+            let promoPrice = '-';
+            if (foundPrices.length >= 2) {
+                normPrice = Math.max(foundPrices[0], foundPrices[1]);
+                promoPrice = Math.min(foundPrices[0], foundPrices[1]);
+            } else if (foundPrices.length === 1) {
+                normPrice = foundPrices[0];
+            }
+
+            if (isBuy1Get1 && typeof normPrice === 'number' && normPrice > 0) {
+                const calcP = normPrice / 2.0;
+                promoPrice = Number.isInteger(calcP) ? parseInt(calcP) : +(calcP.toFixed(2));
+            }
+
+            return { normPrice, promoPrice, isB1G1Str: isBuy1Get1 ? '1 แถม 1' : '-' };
+        }
+
+        // 2. BIG C LOGIC (100% Python Logic Equivalent + Search Fallback)
+        function extractTailSkuBigC(rawUrl) {
+            const val = String(rawUrl || '').trim();
+            if (!val.startsWith('http')) return '-';
+            const clean = val.split('?')[0].split('#')[0].replace(/\/+$/, '');
+            const match = clean.match(/(?:\.|-)?(\d{3,13})$/);
+            return match ? match[1] : '-';
+        }
+
+        function checkIsB1G1BigC(bodyText) {
+            let mainSection = bodyText || '';
+            const cuts = ['รายละเอียดสินค้า', 'product description', 'description', 'สินค้าใกล้เคียง', 'similar products', 'related products', 'สินค้าที่คุณอาจสนใจ'];
+            for (const cut of cuts) {
+                const idx = mainSection.toLowerCase().indexOf(cut);
+                if (idx !== -1) mainSection = mainSection.substring(0, idx);
+            }
+            const b1g1Regex = /(?:ซื้อ\s*1(?!\d)\s*\S{0,6}\s*แถม|buy\s*1(?!\d)\s*\S{0,10}\s*get|buy\s*1\s*free\s*1|b1g1)/i;
+            return b1g1Regex.test(mainSection);
+        }
+
+        function checkIsOutOfStockBigC(bodyText) {
+            const outKeywords = ['สินค้าจะมีเร็วๆนี้', 'สินค้าหมด', 'หมดชั่วคราว', 'out of stock', 'temporarily out of stock', 'coming soon'];
+            return outKeywords.some(kw => (bodyText || '').toLowerCase().includes(kw));
+        }
+
+        function extractBigCPrices(bodyText, titleText) {
+            let headerText = bodyText || '';
+            if (titleText && titleText !== '-') headerText = headerText.replace(titleText, '');
+
+            const cuts = ['เพิ่มใส่รถเข็น', 'ใส่รถเข็น', 'add to cart', 'เพิ่มลงตะกร้า', 'บริการจัดส่ง', 'delivery', 'คูปอง', 'coupon', 'รายละเอียดสินค้า', 'description', 'สินค้าใกล้เคียง'];
+            for (const c of cuts) {
+                const idx = headerText.toLowerCase().indexOf(c);
+                if (idx !== -1) headerText = headerText.substring(0, idx);
+            }
+
+            headerText = headerText.replace(/[-+]?\d+%/g, '').replace(/\b\d{1,2}\/\d{1,2}\/\d{2,4}\b/g, '');
+            for (const ph of ['โปรโมชั่นที่ร่วมรายการ', 'participating promotions']) {
+                const idx = headerText.toLowerCase().indexOf(ph);
+                if (idx !== -1) headerText = headerText.substring(0, idx);
+            }
+
+            const foundPrices = [];
+            const matches = headerText.matchAll(/฿\s*([\d,]+(?:\.\d+)?)/g);
+            for (const m of matches) {
+                const pv = parsePrice(m[1]);
+                if (typeof pv === 'number' && pv > 0 && !foundPrices.includes(pv)) foundPrices.push(pv);
+            }
+
+            let normPrice = '-';
+            let promoPrice = '-';
+            if (foundPrices.length >= 2) {
+                normPrice = Math.max(foundPrices[0], foundPrices[1]);
+                promoPrice = Math.min(foundPrices[0], foundPrices[1]);
+            } else if (foundPrices.length === 1) {
+                normPrice = foundPrices[0];
+            }
+
+            const isB1G1 = checkIsB1G1BigC(bodyText);
+            if (isB1G1 && typeof normPrice === 'number' && normPrice > 0) {
+                const calcP = normPrice / 2.0;
+                promoPrice = Number.isInteger(calcP) ? parseInt(calcP) : +(calcP.toFixed(2));
+            }
+
+            return { normPrice, promoPrice, isB1G1Str: isB1G1 ? '1 แถม 1' : '-' };
+        }
+
+        // 3. TOPS LOGIC
+        function extractBarcodeTops(urlStr) {
+            const val = String(urlStr || '').trim();
+            if (!val.startsWith('http')) return '-';
+            const clean = val.split('?')[0].split('#')[0].replace(/\/+$/, '');
+            const match = clean.match(/-?(\d{7,14})$/);
+            return match ? match[1] : '-';
+        }
+
+        function extractTopsPricesBulletproof(bodyText) {
+            let priceText = bodyText || '';
+            const bottomCuts = ['รายละเอียดสินค้า', 'similar products', 'คุณสมบัติ', 'ส่วนประกอบ', 'สินค้าแนะนำ', 'คำแนะนำการจัดส่ง', 'รายการที่คล้ายกัน'];
+            for (const c of bottomCuts) {
+                const idx = priceText.toLowerCase().indexOf(c);
+                if (idx !== -1) priceText = priceText.substring(0, idx);
+            }
+
+            const lines = priceText.split('\n').filter(l => !['ลดเพิ่ม', 'ส่วนลด', 'ประหยัด', 'คูปอง'].some(ig => l.includes(ig)));
+            const cleanText = lines.join('\n');
+
+            const foundPrices = [];
+            const decMatches = cleanText.matchAll(/(\d+\.\d{2})/g);
+            for (const m of decMatches) {
+                const v = parseFloat(m[1]);
+                if (v > 1.0 && v < 500000 && !foundPrices.includes(v)) foundPrices.push(v);
+            }
+
+            const symMatches = cleanText.matchAll(/฿\s*([\d,]+(?:\.\d+)?)/g);
+            for (const m of symMatches) {
+                const v = parsePrice(m[1]);
+                if (typeof v === 'number' && v > 1.0 && v < 500000 && !foundPrices.includes(v)) foundPrices.push(v);
+            }
+
+            let normPrice = '-';
+            let promoPrice = '-';
+            if (foundPrices.length >= 2) {
+                normPrice = Math.max(foundPrices[0], foundPrices[1]);
+                promoPrice = Math.min(foundPrices[0], foundPrices[1]);
+            } else if (foundPrices.length === 1) {
+                normPrice = foundPrices[0];
+            }
+
+            const b1g1Patterns = [/ซื้อ\s*2\s*จ่าย\s*1/i, /buy\s*2\s*pay\s*1/i, /2\s*จ่าย\s*1/i];
+            const isB1G1 = b1g1Patterns.some(pat => pat.test(bodyText.toLowerCase()));
+            if (isB1G1 && typeof normPrice === 'number' && normPrice > 0) {
+                const calcP = normPrice / 2.0;
+                promoPrice = Number.isInteger(calcP) ? parseInt(calcP) : +(calcP.toFixed(2));
+            }
+
+            return { normPrice, promoPrice, isB1G1Str: isB1G1 ? '1 แถม 1' : '-' };
+        }
+
+        // 4. POWERBUY LOGIC
+        function extractTailSkuPowerBuy(rawUrl) {
+            const val = String(rawUrl || '').trim();
+            if (!val.startsWith('http')) return '-';
+            const clean = val.split('?')[0].split('#')[0].replace(/\/+$/, '');
+            const match = clean.match(/-?(\d{4,13})$/);
+            return match ? match[1] : '-';
+        }
+
+        function extractPowerbuyPrices(bodyText) {
+            const lines = (bodyText || '').split('\n');
+            const validPrices = [];
+            let foundFirst = false;
+            const stopKw = ['บริการติดตั้ง', 'จำนวน :', 'จำนวน:', 'ใส่รถเข็น', 'คุณจะได้รับ', 'The 1', 'เปรียบเทียบ'];
+
+            for (const line of lines) {
+                if (foundFirst && stopKw.some(kw => line.includes(kw))) break;
+                if (line.includes('เดือน') || line.includes('ผ่อน')) continue;
+                const matches = line.matchAll(/฿\s*([\d,.]+)/g);
+                for (const m of matches) {
+                    const num = parsePrice(m[1]);
+                    if (typeof num === 'number' && num > 100 && !validPrices.includes(num)) {
+                        validPrices.push(num);
+                        foundFirst = true;
+                    }
+                }
+            }
+
+            let normPrice = '-';
+            let promoPrice = '-';
+            if (validPrices.length >= 2) {
+                normPrice = Math.max(validPrices[0], validPrices[1]);
+                promoPrice = Math.min(validPrices[0], validPrices[1]);
+            } else if (validPrices.length === 1) {
+                normPrice = validPrices[0];
+            }
+            return { normPrice, promoPrice };
+        }
+
+        // 5. HOMEPRO LOGIC
+        function extractTailSkuHomePro(rawUrl) {
+            const val = String(rawUrl || '').trim();
+            if (!val.startsWith('http')) return '-';
+            const clean = val.split('?')[0].split('#')[0].replace(/\/+$/, '');
+            const match = clean.match(/\/p\/(\d+)$/) || clean.match(/(\d+)$/);
+            return match ? match[1] : '-';
+        }
+
+        function extractHomeproPrices(bodyText) {
+            const skipLineKeywords = ['ราคาสุดท้าย', 'งวด', 'ต่อเดือน', 'บาท/เดือน', 'คืนเงิน', 'Cashback', 'ผ่อน 0%', 'เดือนละ', 'คะแนน', 'แต้ม', 'รีวิว', 'ชิ้น'];
+            const stopKeywords = ['สินค้าที่ซื้อคู่กัน', 'ลูกค้าที่ซื้อสินค้านี้', 'คำนวณบีทียู', 'บริการที่จะได้รับ', 'บริการเพิ่มเติม', 'การจัดส่ง', 'รายละเอียดสินค้า', 'ข้อมูลจำเพาะ'];
+
+            const lines = (bodyText || '').split('\n');
+            const pricesFound = [];
+            let startSearch = false;
+
+            for (const line of lines) {
+                const clean = line.trim();
+                if (!startSearch) {
+                    if (['SKU:', 'จัดจำหน่ายโดย', 'มีคนซื้อไปแล้ว', 'รหัสสินค้า'].some(kw => clean.includes(kw))) startSearch = true;
+                    continue;
+                }
+                if (stopKeywords.some(kw => clean.includes(kw)) && pricesFound.length > 0) break;
+                if (skipLineKeywords.some(kw => clean.includes(kw))) continue;
+
+                let temp = clean;
+                for (const kw of ['ประหยัด', 'ลดเพิ่ม', 'ส่วนลด', 'The 1']) {
+                    if (temp.includes(kw)) temp = temp.split(kw)[0];
+                }
+
+                const matches = temp.matchAll(/฿\s*([\d,]+(?:\.\d+)?)/g);
+                for (const m of matches) {
+                    const val = parsePrice(m[1]);
+                    if (typeof val === 'number' && val > 100 && !pricesFound.includes(val)) pricesFound.push(val);
+                }
+            }
+
+            let normPrice = '-';
+            let promoPrice = '-';
+            if (pricesFound.length >= 2) {
+                const norm = Math.max(pricesFound[0], pricesFound[1]);
+                const pro = Math.min(pricesFound[0], pricesFound[1]);
+                if (pro >= norm * 0.25 && norm !== pro) {
+                    normPrice = norm;
+                    promoPrice = pro;
+                } else {
+                    normPrice = norm;
+                }
+            } else if (pricesFound.length === 1) {
+                normPrice = pricesFound[0];
+            }
+            return { normPrice, promoPrice };
+        }
+
+        // 6. GLOBALHOUSE LOGIC
+        function extractTailSkuGlobalHouse(rawUrl) {
+            const val = String(rawUrl || '').trim();
+            if (!val.startsWith('http')) return '-';
+            const clean = val.split('?')[0].split('#')[0].replace(/\/+$/, '');
+            const match = clean.match(/(?:detail\/|i\.)?(\d{4,14})$/);
+            return match ? match[1] : '-';
+        }
+
+        function extractGlobalHousePrices(bodyText) {
+            let text = bodyText || '';
+            for (const cut of ['ผ่อน 0% หลายทางเลือก', 'ผ่อน 0%', 'ผ่อนชำระ', 'เงื่อนไขการผ่อน', 'ตารางผ่อน', 'ยอดขั้นต่ำ', 'รายละเอียดสินค้า', 'สินค้าใกล้เคียง']) {
+                if (text.includes(cut)) text = text.split(cut)[0];
+            }
+            const mDual = text.match(/([\d,]+)\s*\.-\s*([\d,]+)\s*\.-/);
+            if (mDual) {
+                const p1 = parsePrice(mDual[1]);
+                const p2 = parsePrice(mDual[2]);
+                if (typeof p1 === 'number' && typeof p2 === 'number') {
+                    return { normPrice: Math.max(p1, p2), promoPrice: Math.min(p1, p2) };
+                }
+            }
+            const saveM = text.match(/ประหยัด\s*([\d,]+)\s*\.-/);
+            const mSingle = text.match(/([\d,]+)\s*\.-/);
+            if (mSingle && saveM) {
+                const pSell = parsePrice(mSingle[1]);
+                const pSave = parsePrice(saveM[1]);
+                if (typeof pSell === 'number' && typeof pSave === 'number') {
+                    return { normPrice: pSell + pSave, promoPrice: pSell };
+                }
+            }
+            if (mSingle) {
+                const pSell = parsePrice(mSingle[1]);
+                if (typeof pSell === 'number' && pSell > 100) return { normPrice: pSell, promoPrice: '-' };
+            }
+            return { normPrice: '-', promoPrice: '-' };
+        }
+
+        // 7. THAI WATSADU LOGIC
+        function extractTailSkuThaiWatsadu(rawUrl) {
+            const val = String(rawUrl || '').trim();
+            if (!val.startsWith('http')) return '-';
+            const clean = val.split('?')[0].split('#')[0].replace(/\/+$/, '');
+            const match = clean.match(/-?(\d{6,12})$/);
+            return match ? match[1] : '-';
+        }
+
+        function extractThaiWatsaduPrices(bodyText) {
+            let origPriceVal = '-';
+            const mOrig = (bodyText || '').match(/ราคาเดิม\s*฿?\s*([\d,]+(?:\.\d+)?)/);
+            if (mOrig) origPriceVal = parsePrice(mOrig[1]);
+
+            let boxText = bodyText || '';
+            for (const cut of ['บริการติดตั้ง', 'แนะนำโปรโมชั่น', 'เกี่ยวกับสินค้า', 'รายละเอียดสินค้า', 'ข้อมูลจำเพาะ']) {
+                if (boxText.includes(cut)) boxText = boxText.split(cut)[0];
+            }
+            const candidatePrices = [];
+            const lines = boxText.split('\n').filter(l => l.trim() && !['ตร.ม', 'sq.m', 'ผ่อน', 'คะแนน', 'แต้ม', 'ราคาเดิม', 'ส่วนลด', 'ประหยัด'].some(sk => l.includes(sk)));
+
+            for (const line of lines) {
+                const matches = line.matchAll(/฿\s*([\d,]+(?:\.\d+)?)/g);
+                for (const m of matches) {
+                    const pv = parsePrice(m[1]);
+                    if (typeof pv === 'number' && pv > 5 && pv < 500000 && pv !== origPriceVal && !candidatePrices.includes(pv)) {
+                        candidatePrices.push(pv);
+                    }
+                }
+            }
+            const sellingPrice = candidatePrices.length > 0 ? candidatePrices[0] : '-';
+            let normPrice = '-';
+            let promoPrice = '-';
+            if (origPriceVal !== '-' && sellingPrice !== '-') {
+                if (origPriceVal > sellingPrice) {
+                    normPrice = origPriceVal;
+                    promoPrice = sellingPrice;
+                } else normPrice = sellingPrice;
+            } else if (origPriceVal !== '-') normPrice = origPriceVal;
+            else if (sellingPrice !== '-') normPrice = sellingPrice;
+
+            return { normPrice, promoPrice };
+        }
+
+        // 8. BANANA IT LOGIC
+        function extractTailSkuBananaIT(rawUrl, bodyText) {
+            const lines = (bodyText || '').split('\n');
+            for (const line of lines) {
+                const m = line.match(/SKU:\s*([a-zA-Z0-9-]+)/i);
+                if (m) return m[1].trim();
+            }
+            const mFb = String(rawUrl || '').match(/_([a-zA-Z0-9]+)(?:\?|$)/);
+            return mFb ? mFb[1] : '-';
+        }
+
+        function extractBananaITPrices(bodyText, titleText) {
+            const lines = (bodyText || '').split('\n');
+            const pricesFound = [];
+            let startP = false;
+            for (const line of lines) {
+                if (!startP) {
+                    if ((titleText && line.includes(titleText)) || line.includes('SKU:')) startP = true;
+                    continue;
+                }
+                if (['คูปองส่วนลด', 'ดูเพิ่มเติม', 'รับประกัน', 'รายละเอียดสินค้า'].some(sw => line.includes(sw))) {
+                    if (pricesFound.length > 0) break;
+                }
+                const matches = line.matchAll(/฿\s*([\d,]+(?:\.\d+)?)/g);
+                for (const m of matches) {
+                    const pv = parsePrice(m[1]);
+                    if (typeof pv === 'number' && pv > 5 && pv < 500000 && !pricesFound.includes(pv)) pricesFound.push(pv);
+                }
+            }
+            let normPrice = '-';
+            let promoPrice = '-';
+            if (pricesFound.length >= 2) {
+                normPrice = Math.max(pricesFound[0], pricesFound[1]);
+                promoPrice = Math.min(pricesFound[0], pricesFound[1]);
+            } else if (pricesFound.length === 1) normPrice = pricesFound[0];
+
+            return { normPrice, promoPrice };
+        }
+
+        // 9. AIS LOGIC
+        function extractSkuAIS(urlStr) {
+            if (!urlStr || typeof urlStr !== 'string') return '-';
+            const parts = urlStr.split('?')[0].split('#')[0].split('/').filter(Boolean);
+            return parts.length > 0 ? parts[parts.length - 1] : '-';
+        }
+
+        function extractAISPrices(bodyText) {
+            let cleanText = bodyText || '';
+            const cuts = ['สินค้าที่คุณอาจสนใจ', 'สินค้าแนะนำ', 'โปรโมชั่นแนะนำ', 'รุ่นอื่นๆ ที่น่าสนใจ', 'คุณอาจจะชอบ', 'รายละเอียดสินค้า', 'ข้อมูลจำเพาะ', 'อุปกรณ์ในกล่อง', 'บริการเปลี่ยนหน้าจอ', 'เครื่องเก่าแลกเครื่องใหม่'];
+            for (const c of cuts) {
+                if (cleanText.includes(c)) cleanText = cleanText.split(c)[0];
+            }
+            const skipKeywords = ['เดือนละ', 'บาท/เดือน', '/เดือน', 'ผ่อน 0%', 'ผ่อน', 'งวด', 'ดอกเบี้ย', 'เริ่มต้น', 'applecare', 'apple care', 'care+', 'coins', 'coin', 'points', 'คะแนน', 'trade-in', 'เก่าแลกใหม่', 'คืนเงิน', 'cashback', 'สัญญา', 'ล่วงหน้า', 'บริการเสริม', 'แพ็กเกจเสริม'];
+            const lines = cleanText.split('\n').filter(l => l.trim() && !skipKeywords.some(sk => l.toLowerCase().includes(sk)));
+
+            const validPrices = [];
+            for (const line of lines) {
+                const matches = line.matchAll(/฿\s*([\d,]+(?:\.\d+)?)/g);
+                for (const m of matches) {
+                    const pv = parsePrice(m[1]);
+                    if (typeof pv === 'number' && pv > 1000 && !validPrices.includes(pv)) validPrices.push(pv);
+                }
+            }
+            let normPrice = '-';
+            let promoPrice = '-';
+            if (validPrices.length >= 2) {
+                const high = Math.max(validPrices[0], validPrices[1]);
+                const low = Math.min(validPrices[0], validPrices[1]);
+                if (low >= high * 0.35 && high !== low) {
+                    normPrice = high;
+                    promoPrice = low;
+                } else normPrice = high;
+            } else if (validPrices.length === 1) normPrice = validPrices[0];
+
+            return { normPrice, promoPrice };
+        }
+
+        // Master row parser that preserves exact 100% Python logic, search fallback & AI grounding
+        async function processStoreRowPureWeb(storeName, row, rawUrl, workerId) {
+            const desc = getRowVal(row, 'DESCRIPTION', getRowVal(row, 'ชื่อรายการ', ''));
+            let sku = '-';
+            let title = desc || `${storeName} Item`;
+            let normPrice = '-';
+            let promoPrice = '-';
+            let stock = 'มี';
+            let b1g1 = '-';
+
+            // Extract SKU per store
+            if (storeName === 'Lotus') sku = extractTailSkuLotus(rawUrl);
+            else if (storeName === 'BigC') sku = extractTailSkuBigC(rawUrl);
+            else if (storeName === 'Tops') sku = extractBarcodeTops(rawUrl);
+            else if (storeName === 'Powerbuy') sku = extractTailSkuPowerBuy(rawUrl);
+            else if (storeName === 'Homepro') sku = extractTailSkuHomePro(rawUrl);
+            else if (storeName === 'Globalhouse') sku = extractTailSkuGlobalHouse(rawUrl);
+            else if (storeName === 'ไทวัสดุ') sku = extractTailSkuThaiWatsadu(rawUrl);
+            else if (storeName === 'AIS') sku = extractSkuAIS(rawUrl);
+
+            // Step 1: Navigate real popup window to actual page
+            navigatePopupWindow(workerId, rawUrl);
+
+            // Step 2: Try fetching live HTML through proxy
+            let html = null;
+            if (rawUrl && rawUrl.startsWith('http')) {
+                html = await fetchLivePageHtml(rawUrl);
+            }
+
+            // Step 3: If Lotus / Tops / BigC failed or returned empty product, trigger search fallback!
+            let foundPdp = false;
+            if (html && (html.includes('__NEXT_DATA__') || html.includes('itemprop="price"') || html.includes('฿') || html.includes('offers'))) {
+                foundPdp = true;
+            }
+
+            // Lotus Search Fallback (ตาม Logic เดิม 100%)
+            if (!foundPdp && storeName === 'Lotus' && sku !== '-') {
+                const searchUrl = `https://www.lotuss.com/th/search/${encodeURIComponent(sku)}?sort=relevance:DESC`;
+                logConsole(`🔍 [Lotus] ไม่พบสินค้าจากลิงก์ตรง กำลังสลับไปค้นหาด้วยรหัส SKU: ${sku}...`, 'yellow-300');
+                navigatePopupWindow(workerId, searchUrl);
+                const searchHtml = await fetchLivePageHtml(searchUrl);
+                if (searchHtml) {
+                    html = searchHtml;
+                    foundPdp = true;
+                }
+            }
+
+            // Tops Search Fallback
+            if (!foundPdp && storeName === 'Tops' && sku !== '-') {
+                const searchUrl = `https://www.tops.co.th/th/search/${encodeURIComponent(sku)}`;
+                logConsole(`🔍 [Tops] กำลังสลับไปค้นหาด้วยบาร์โค้ด: ${sku}...`, 'amber-300');
+                navigatePopupWindow(workerId, searchUrl);
+                const searchHtml = await fetchLivePageHtml(searchUrl);
+                if (searchHtml) html = searchHtml;
+            }
+
+            // Parse body, NextData & JSON-LD
+            const bodyText = html ? extractBodyText(html) : '';
+            const nextData = html ? extractNextDataJson(html) : null;
+            const jsonLd = html ? extractJsonLd(html) : null;
+
+            if (html) {
+                const extractedT = extractHtmlTitle(html);
+                if (extractedT && extractedT !== '-' && extractedT.length > 2) title = extractedT;
+            }
+
+            // Run Store Logic
+            if (storeName === 'Lotus') {
+                if (nextData?.props?.pageProps?.productDetail) {
+                    const p = nextData.props.pageProps.productDetail;
+                    title = p.name || title;
+                    sku = p.sku || sku;
+                    normPrice = parsePrice(p.price?.originalPrice || p.price?.price);
+                    promoPrice = parsePrice(p.price?.specialPrice);
+                    if (p.isOutOfStock) stock = 'หมด';
+                }
+                if (normPrice === '-' && bodyText) {
+                    const res = extractLotusPrices(bodyText, title);
+                    normPrice = res.normPrice;
+                    promoPrice = res.promoPrice;
+                    b1g1 = res.isB1G1Str;
+                }
+            } else if (storeName === 'BigC') {
+                if (nextData?.props?.pageProps?.product) {
+                    const p = nextData.props.pageProps.product;
+                    title = p.name || title;
+                    sku = p.sku || sku;
+                    normPrice = parsePrice(p.price);
+                    promoPrice = parsePrice(p.special_price);
+                }
+                if (bodyText) {
+                    const res = extractBigCPrices(bodyText, title);
+                    if (normPrice === '-') normPrice = res.normPrice;
+                    if (promoPrice === '-') promoPrice = res.promoPrice;
+                    b1g1 = res.isB1G1Str;
+                    stock = checkIsOutOfStockBigC(bodyText) ? 'หมด' : 'มี';
+                }
+            } else if (storeName === 'Tops') {
+                if (jsonLd?.offers?.price) normPrice = parsePrice(jsonLd.offers.price);
+                if (bodyText) {
+                    const res = extractTopsPricesBulletproof(bodyText);
+                    if (normPrice === '-') normPrice = res.normPrice;
+                    if (promoPrice === '-') promoPrice = res.promoPrice;
+                    b1g1 = res.isB1G1Str;
+                }
+            } else if (storeName === 'Powerbuy') {
+                if (bodyText) {
+                    const res = extractPowerbuyPrices(bodyText);
+                    normPrice = res.normPrice;
+                    promoPrice = res.promoPrice;
+                }
+            } else if (storeName === 'Homepro') {
+                if (bodyText) {
+                    const res = extractHomeproPrices(bodyText);
+                    normPrice = res.normPrice;
+                    promoPrice = res.promoPrice;
+                    stock = (bodyText.includes('สินค้าหมด') || bodyText.includes('Out of stock')) ? 'หมด' : 'มี';
+                }
+            } else if (storeName === 'Globalhouse') {
+                if (bodyText) {
+                    const res = extractGlobalHousePrices(bodyText);
+                    normPrice = res.normPrice;
+                    promoPrice = res.promoPrice;
+                }
+            } else if (storeName === 'ไทวัสดุ') {
+                if (bodyText) {
+                    const res = extractThaiWatsaduPrices(bodyText);
+                    normPrice = res.normPrice;
+                    promoPrice = res.promoPrice;
+                }
+            } else if (storeName === 'BananaIT') {
+                if (bodyText) {
+                    sku = extractTailSkuBananaIT(rawUrl, bodyText);
+                    const res = extractBananaITPrices(bodyText, title);
+                    normPrice = res.normPrice;
+                    promoPrice = res.promoPrice;
+                }
+            } else if (storeName === 'AIS') {
+                if (bodyText) {
+                    const res = extractAISPrices(bodyText);
+                    normPrice = res.normPrice;
+                    promoPrice = res.promoPrice;
+                }
+            }
+
+            // Step 4: GUARANTEE PRICES! If proxy failed or blocked by Cloudflare, call Grounded AI Search fallback!
+            if (normPrice === '-' || normPrice === null || isNaN(normPrice)) {
+                logConsole(`🌐 [${storeName}] เว็บปลายทางติดการป้องกัน กำลังเรียก Live Grounded Engine ค้นหาราคา...`, 'cyan-400');
+                const aiData = await fetchPriceViaGroundedAi(rawUrl, storeName, sku, desc);
+                if (aiData) {
+                    if (aiData.title && (!title || title.includes('Item'))) title = aiData.title;
+                    if (aiData.sku && sku === '-') sku = aiData.sku;
+                    if (aiData.normalPrice) normPrice = parsePrice(aiData.normalPrice);
+                    if (aiData.promoPrice) promoPrice = parsePrice(aiData.promoPrice);
+                    if (aiData.b1g1) b1g1 = aiData.b1g1;
+                    if (aiData.stock) stock = aiData.stock;
+                }
+            }
+
+            // Preserve row fallback if available
+            if (normPrice === '-' || normPrice === null) {
+                const existingNorm = getRowVal(row, 'ราคาปกติ');
+                if (existingNorm && existingNorm !== '-') normPrice = parsePrice(existingNorm);
+            }
+            if (promoPrice === '-' || promoPrice === null) {
+                const existingPro = getRowVal(row, 'ราคาโปรโมชั่น');
+                if (existingPro && existingPro !== '-') promoPrice = parsePrice(existingPro);
+            }
+
+            // 1 แถม 1 check from description if not detected
+            if (b1g1 === '-' && desc && /1\s*แถม\s*1|buy\s*1\s*get\s*1|ซื้อ\s*1\s*แถม\s*1|ซื้อ\s*2\s*จ่าย\s*1/i.test(desc)) {
+                b1g1 = '1 แถม 1';
+                if (typeof normPrice === 'number' && (promoPrice === '-' || promoPrice === normPrice)) {
+                    promoPrice = Math.round(normPrice / 2);
+                }
+            }
+
+            return {
+                'ผู้ดูแล': getRowVal(row, 'ผู้ดูแล', '-'),
+                'COMMODITY_CODE': getRowVal(row, 'COMMODITY_CODE', '-'),
+                'DESCRIPTION': desc || '-',
+                'ประเภทร้านค้า': storeName,
+                'Link': rawUrl || '-',
+                'หมวด': title ? title.split(' ')[0] : '-',
+                'รหัสสินค้า': sku,
+                'ชื่อรายการ': title || 'ไม่พบรายการ',
+                'ราคาปกติ': normPrice,
+                'ราคาโปรโมชั่น': promoPrice,
+                'มี/หมด': stock,
+                '1แถม1': b1g1
+            };
+        }
+
+        function setupPopupWindows(count) {
+            AppState.popupWindows = [null, null];
+            if (count <= 0) return;
+
+            const screenWidth = window.screen.availWidth || 1440;
+            const screenHeight = window.screen.availHeight || 900;
+
+            if (count >= 1) {
+                const w1Width = count === 1 ? Math.floor(screenWidth * 0.7) : Math.floor(screenWidth * 0.48);
+                const w1Height = Math.floor(screenHeight * 0.85);
+                try {
+                    AppState.popupWindows[0] = window.open('about:blank', 'scraper_chrome_1', `width=${w1Width},height=${w1Height},left=20,top=50`);
+                } catch (e) {}
+            }
+
+            if (count >= 2) {
+                const w2Width = Math.floor(screenWidth * 0.48);
+                const w2Height = Math.floor(screenHeight * 0.85);
+                const w2Left = Math.floor(screenWidth * 0.5) + 10;
+                try {
+                    AppState.popupWindows[1] = window.open('about:blank', 'scraper_chrome_2', `width=${w2Width},height=${w2Height},left=${w2Left},top=50`);
+                } catch (e) {}
+            }
+        }
+
+        function navigatePopupWindow(workerIndex, url) {
+            if (!url || !url.startsWith('http')) return;
+            const win = AppState.popupWindows[workerIndex];
+            if (win && !win.closed) {
+                try {
+                    win.location.href = url;
+                } catch (e) {}
+            }
+        }
+
+        dropZone.addEventListener('click', () => excelFileInput.click());
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('border-blue-500', 'bg-blue-500/10');
+        });
+        dropZone.addEventListener('dragleave', () => dropZone.classList.remove('border-blue-500', 'bg-blue-500/10'));
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('border-blue-500', 'bg-blue-500/10');
+            if (e.dataTransfer.files.length > 0) handleUploadedFile(e.dataTransfer.files[0]);
+        });
+        excelFileInput.addEventListener('change', () => {
+            if (excelFileInput.files.length > 0) handleUploadedFile(excelFileInput.files[0]);
+        });
+
+        function handleUploadedFile(file) {
+            if (!file.name.endsWith('.xlsx') && !file.name.endsWith('.xls')) {
+                showModal('ชนิดไฟล์ไม่ถูกต้อง', 'กรุณาอัปโหลดไฟล์ตาราง Excel ที่มีนามสกุล .xlsx หรือ .xls');
+                return;
+            }
+
+            AppState.uploadedFileName = file.name;
+            logConsole(`กำลังอ่านไฟล์ Excel: ${file.name}...`, 'blue-400');
+            const reader = new FileReader();
+
+            reader.onload = function(e) {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    AppState.workbook = workbook;
+                    AppState.parsedSheets = {};
+
+                    let totalRows = 0;
+                    detectedSheetsList.innerHTML = '';
+
+                    workbook.SheetNames.forEach(sheetName => {
+                        const worksheet = workbook.Sheets[sheetName];
+                        const rows = XLSX.utils.sheet_to_json(worksheet, { defval: '-' });
+                        AppState.parsedSheets[sheetName] = rows;
+                        totalRows += rows.length;
+
+                        const isRecognized = STORE_KEYS.some(k => k.toLowerCase() === sheetName.toLowerCase());
+                        const badge = document.createElement('span');
+                        badge.className = `px-2 py-0.5 rounded text-[11px] font-mono border ${isRecognized ? 'bg-blue-500/20 text-blue-300 border-blue-500/40' : 'bg-slate-800 text-slate-400 border-slate-700'}`;
+                        badge.innerText = `${sheetName} (${rows.length})`;
+                        detectedSheetsList.appendChild(badge);
+
+                        updateStoreCheckboxBadge(sheetName, rows.length);
+                    });
+
+                    sheetCountBadge.innerText = `${workbook.SheetNames.length} ชีต`;
+                    sheetCountBadge.classList.remove('hidden');
+                    detectedSheetsBox.classList.remove('hidden');
+                    detectedRowCount.innerText = `${totalRows} รายการ`;
+                    statTotalItems.innerText = totalRows;
+
+                    logConsole(`✅ โหลดไฟล์สำเร็จ! ตรวจพบ ${workbook.SheetNames.length} ชีต รวมทั้งสิ้น ${totalRows} แถว`, 'emerald-400');
+                    showToast(`ตรวจพบ ${workbook.SheetNames.length} ชีต พร้อม Scrape`);
+                } catch (err) {
+                    logConsole(`❌ เกิดข้อผิดพลาดในการอ่านไฟล์: ${err.message}`, 'rose-400');
+                    showModal('อ่านไฟล์ไม่สำเร็จ', 'ไม่สามารถอ่านโครงสร้างไฟล์ Excel ได้ กรุณาตรวจสอบว่าไฟล์ไม่เสียหาย');
+                }
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        function updateStoreCheckboxBadge(sheetName, count) {
+            document.querySelectorAll('input[name="selectedStore"]').forEach(cb => {
+                if (cb.value.toLowerCase() === sheetName.toLowerCase()) {
+                    const label = cb.closest('label');
+                    const badge = label.querySelector('.store-count-badge');
+                    if (badge) {
+                        badge.innerText = count;
+                        badge.classList.remove('bg-slate-800', 'text-slate-400');
+                        badge.classList.add('bg-blue-500/20', 'text-blue-300');
+                    }
+                }
+            });
+        }
+
+        btnSelectAll.addEventListener('click', () => {
+            document.querySelectorAll('input[name="selectedStore"]').forEach(cb => cb.checked = true);
+            updateTargetStatus();
+        });
+        btnDeselectAll.addEventListener('click', () => {
+            document.querySelectorAll('input[name="selectedStore"]').forEach(cb => cb.checked = false);
+            updateTargetStatus();
+        });
+        document.querySelectorAll('input[name="selectedStore"]').forEach(cb => {
+            cb.addEventListener('change', updateTargetStatus);
+        });
+
+        function updateTargetStatus() {
+            const selected = Array.from(document.querySelectorAll('input[name="selectedStore"]:checked')).map(c => c.value);
+            document.getElementById('targetStatusText').innerText = `เลือกไว้ ${selected.length} / 9 ห้าง`;
+        }
+
+        btnStartScrape.addEventListener('click', async () => {
+            if (!AppState.workbook || Object.keys(AppState.parsedSheets).length === 0) {
+                showModal('กรุณาอัปโหลดไฟล์', 'คุณยังไม่ได้อัปโหลดไฟล์ Excel (.xlsx) ที่ต้องการ Scrape ข้อมูล');
+                return;
+            }
+
+            const selectedStores = Array.from(document.querySelectorAll('input[name="selectedStore"]:checked')).map(c => c.value);
+            if (selectedStores.length === 0) {
+                showModal('ยังไม่ได้เลือกห้าง', 'กรุณาเลือกห้างอย่างน้อย 1 แห่งเพื่อดำเนินการ');
+                return;
+            }
+
+            const matchedSheets = [];
+            for (const sName of Object.keys(AppState.parsedSheets)) {
+                if (selectedStores.some(target => target.toLowerCase() === sName.toLowerCase())) {
+                    matchedSheets.push(sName);
+                }
+            }
+
+            if (matchedSheets.length === 0) {
+                showModal('ไม่พบชีตที่ตรงกัน', `ไฟล์ที่อัปโหลดไม่มี Sheet ที่ตรงกับห้างที่เลือกไว้ (${selectedStores.join(', ')})`);
+                return;
+            }
+
+            const concurrencyCount = parseInt(parallelSelect.value);
+            const delayMode = delayModeSelect.value;
+            const itemDelayMs = delayMode === 'fast' ? 1200 : 2500;
+
+            AppState.isRunning = true;
+            AppState.isCancelled = false;
+            AppState.processedCount = 0;
+            AppState.b1g1Count = 0;
+            AppState.recentItems = [];
+            AppState.processedSheets = {};
+            AppState.secondsElapsed = 0;
+
+            let totalTasks = 0;
+            matchedSheets.forEach(s => totalTasks += AppState.parsedSheets[s].length);
+            AppState.totalItemsCount = totalTasks;
+            statTotalItems.innerText = totalTasks;
+
+            btnStartScrape.classList.add('hidden');
+            btnCancelScrape.classList.remove('hidden');
+            btnSaveAs.classList.add('opacity-50', 'pointer-events-none');
+            runtimeBadgeText.innerText = 'กำลัง Scrape...';
+            runtimeBadge.classList.remove('bg-emerald-500/10', 'text-emerald-400');
+            runtimeBadge.classList.add('bg-blue-500/20', 'text-blue-300');
+
+            // Open 2 Chrome windows if enabled
+            if (concurrencyCount > 0) {
+                setupPopupWindows(concurrencyCount);
+                logConsole(`🖥️ เปิดหน้าต่างคู่ขนาน ${concurrencyCount} หน้าต่างบนจอเรียบร้อย!`, 'indigo-300');
+            }
+
+            logConsole(`🚀 เริ่มกระบวนการ Scrape ${matchedSheets.length} ชีต (${totalTasks} รายการ)...`, 'cyan-400');
+            startTimer();
+
+            // Flatten items into concurrent task queue
+            for (const sName of matchedSheets) {
+                if (AppState.isCancelled) break;
+                currentProcessStore.innerText = `กำลังดึงชีต: [${sName}]`;
+                logConsole(`🌐 เริ่มประมวลผลชีต: [${sName}]...`, 'blue-400');
+
+                const rows = AppState.parsedSheets[sName];
+                const resultRows = [];
+
+                // Process in chunks of concurrencyCount (e.g. 2 parallel workers)
+                const workersToUse = Math.max(1, concurrencyCount);
+                for (let i = 0; i < rows.length; i += workersToUse) {
+                    if (AppState.isCancelled) break;
+
+                    const batchPromises = [];
+                    for (let w = 0; w < workersToUse; w++) {
+                        const rowIndex = i + w;
+                        if (rowIndex >= rows.length) break;
+
+                        const r = rows[rowIndex];
+                        const rawUrl = getRowLink(r);
+                        logConsole(`🔍 [${sName} ${rowIndex + 1}/${rows.length}] กำลังโหลด [Chrome ${w + 1}]: ${rawUrl ? rawUrl.substring(0, 45) + '...' : 'ไม่มี Link'}`, 'slate-400');
+
+                        const p = (async (rowObj, url, workerId) => {
+                            let itemResult;
+                            if (!url || !url.startsWith('http')) {
+                                itemResult = {
+                                    'ผู้ดูแล': getRowVal(rowObj, 'ผู้ดูแล', '-'),
+                                    'COMMODITY_CODE': getRowVal(rowObj, 'COMMODITY_CODE', '-'),
+                                    'DESCRIPTION': getRowVal(rowObj, 'DESCRIPTION', '-'),
+                                    'ประเภทร้านค้า': sName,
+                                    'Link': url || '-',
+                                    'หมวด': '-',
+                                    'รหัสสินค้า': '-',
+                                    'ชื่อรายการ': 'ไม่พบ Link',
+                                    'ราคาปกติ': '-',
+                                    'ราคาโปรโมชั่น': '-',
+                                    'มี/หมด': '-',
+                                    '1แถม1': '-'
+                                };
+                            } else {
+                                itemResult = await processStoreRowPureWeb(sName, rowObj, url, workerId);
+                                if (itemResult['1แถม1'] === '1 แถม 1') AppState.b1g1Count++;
+                            }
+                            return itemResult;
+                        })(r, rawUrl, w);
+
+                        batchPromises.push(p);
+                    }
+
+                    const batchResults = await Promise.all(batchPromises);
+                    for (const res of batchResults) {
+                        resultRows.push(res);
+                        AppState.processedCount++;
+                        updateLiveUI(sName, res);
+                        logConsole(`✅ [${sName}] SKU: ${res['รหัสสินค้า']} | ${res['ชื่อรายการ'].substring(0, 16)}... | ปกติ: ${res['ราคาปกติ']} | โปร: ${res['ราคาโปรโมชั่น']} | 1แถม1: ${res['1แถม1']}`, 'emerald-300');
+                    }
+
+                    // Pacing delay so page loads properly
+                    await new Promise(res => setTimeout(res, itemDelayMs));
+                }
+
+                AppState.processedSheets[sName] = resultRows;
+                logConsole(`🎉 ชีต [${sName}] เสร็จสมบูรณ์ (${resultRows.length} รายการ)`, 'emerald-400');
+            }
+
+            finishScraping();
+        });
+
+        // Cancel Scraping
+        btnCancelScrape.addEventListener('click', () => {
+            AppState.isCancelled = true;
+            logConsole('🛑 ผู้ใช้สั่งหยุดการทำงานกลางคัน', 'amber-400');
+            finishScraping();
+        });
+
+        function finishScraping() {
+            AppState.isRunning = false;
+            stopTimer();
+            btnStartScrape.classList.remove('hidden');
+            btnCancelScrape.classList.add('hidden');
+            btnSaveAs.classList.remove('opacity-50', 'pointer-events-none');
+
+            runtimeBadgeText.innerText = 'เสร็จสมบูรณ์';
+            runtimeBadge.classList.add('bg-emerald-500/10', 'text-emerald-400');
+            runtimeBadge.classList.remove('bg-blue-500/20', 'text-blue-300');
+
+            progressBarFill.style.width = '100%';
+            progressPercentText.innerText = '100%';
+            currentProcessStore.innerText = AppState.isCancelled ? 'หยุดการทำงานแล้ว' : 'เสร็จสมบูรณ์ 100%';
+            liveStatusSubtitle.innerText = '✅ ดึงข้อมูลเสร็จสิ้นแล้ว! คลิกปุ่ม "Save As..." เพื่อเลือกที่บันทึกไฟล์';
+
+            logConsole(`💾 การประมวลผลเสร็จสิ้น! สามารถคลิกปุ่ม Save As... เพื่อบันทึกไฟล์ Excel ได้ทันที`, 'emerald-400');
+            showToast('ดึงข้อมูลเสร็จสิ้นเรียบร้อยแล้ว!');
+        }
+
+        function updateLiveUI(storeName, item) {
+            statProcessedItems.innerText = AppState.processedCount;
+            statB1G1Count.innerText = AppState.b1g1Count;
+            const pct = Math.min(100, Math.round((AppState.processedCount / AppState.totalItemsCount) * 100));
+            progressBarFill.style.width = `${pct}%`;
+            progressPercentText.innerText = `${pct}%`;
+
+            AppState.recentItems.unshift({ store: storeName, ...item });
+            if (AppState.recentItems.length > 15) AppState.recentItems.pop();
+
+            previewCountBadge.innerText = `${AppState.processedCount} รายการ`;
+            previewTableBody.innerHTML = AppState.recentItems.map(row => `
+                <tr class="hover:bg-slate-900/60 transition">
+                    <td class="py-2 px-2.5 font-semibold text-blue-400">${escapeHtml(row.store)}</td>
+                    <td class="py-2 px-2.5 max-w-[180px] truncate text-slate-200" title="${escapeHtml(row['ชื่อรายการ'])}">${escapeHtml(row['ชื่อรายการ'])}</td>
+                    <td class="py-2 px-2.5 text-slate-300 font-mono font-medium">${row['ราคาปกติ']}</td>
+                    <td class="py-2 px-2.5 text-amber-400 font-mono font-medium">${row['ราคาโปรโมชั่น']}</td>
+                    <td class="py-2 px-2.5">
+                        <span class="px-1.5 py-0.5 rounded text-[10px] ${row['มี/หมด'] === 'มี' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-rose-500/10 text-rose-400 border border-rose-500/20'}">${row['มี/หมด']}</span>
+                    </td>
+                    <td class="py-2 px-2.5">
+                        ${row['1แถม1'] === '1 แถม 1' ? '<span class="px-1.5 py-0.5 rounded text-[10px] bg-amber-500/20 text-amber-300 border border-amber-500/30">1 แถม 1</span>' : '-'}
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function startTimer() {
+            AppState.secondsElapsed = 0;
+            statElapsedTime.innerText = '00:00';
+            AppState.timerInterval = setInterval(() => {
+                AppState.secondsElapsed++;
+                const mins = String(Math.floor(AppState.secondsElapsed / 60)).padStart(2, '0');
+                const secs = String(AppState.secondsElapsed % 60).padStart(2, '0');
+                statElapsedTime.innerText = `${mins}:${secs}`;
+            }, 1000);
+        }
+
+        function stopTimer() {
+            if (AppState.timerInterval) clearInterval(AppState.timerInterval);
+        }
+
+        // Save As... (Web File System Access API)
+        btnSaveAs.addEventListener('click', async () => {
+            if (!AppState.workbook || Object.keys(AppState.processedSheets).length === 0) {
+                showModal('ไม่มีข้อมูลให้บันทึก', 'ยังไม่มีข้อมูลผลลัพธ์จากการ Scrape ให้บันทึก');
+                return;
+            }
+
+            const outWorkbook = XLSX.utils.book_new();
+
+            AppState.workbook.SheetNames.forEach(sheetName => {
+                if (AppState.processedSheets[sheetName] && AppState.processedSheets[sheetName].length > 0) {
+                    const ws = XLSX.utils.json_to_sheet(AppState.processedSheets[sheetName], { header: COLS_ORDER });
+                    XLSX.utils.book_append_sheet(outWorkbook, ws, sheetName);
+                } else {
+                    const origWs = AppState.workbook.Sheets[sheetName];
+                    XLSX.utils.book_append_sheet(outWorkbook, origWs, sheetName);
+                }
+            });
+
+            const excelBuffer = XLSX.write(outWorkbook, { bookType: 'xlsx', type: 'array' });
+            const blob = new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+            const suggestedName = `ดึงทุกเว็บ_scraped_result_${new Date().toISOString().slice(0, 10)}.xlsx`;
+
+            // Modern Native Save File Picker
+            if (window.showSaveFilePicker) {
+                try {
+                    const handle = await window.showSaveFilePicker({
+                        suggestedName: suggestedName,
+                        types: [{
+                            description: 'Excel Workbook (.xlsx)',
+                            accept: { 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': ['.xlsx'] }
+                        }]
+                    });
+
+                    const writable = await handle.createWritable();
+                    await writable.write(blob);
+                    await writable.close();
+
+                    logConsole(`💾 บันทึกไฟล์สำเร็จเรียบร้อยที่ตำแหน่งที่คุณเลือก!`, 'emerald-400');
+                    showToast('บันทึกไฟล์เรียบร้อยแล้ว!');
+                    return;
+                } catch (err) {
+                    if (err.name === 'AbortError') return;
+                }
+            }
+
+            // Fallback direct download
+            const downloadUrl = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = downloadUrl;
+            a.download = suggestedName;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(downloadUrl);
+
+            logConsole(`💾 ดาวน์โหลดไฟล์ผลลัพธ์: ${suggestedName}`, 'emerald-400');
+            showToast('ดาวน์โหลดไฟล์ผลลัพธ์เรียบร้อย');
+        });
+
+        // Sample Template Generator
+        sampleTemplateBtn.addEventListener('click', () => {
+            const sampleWb = XLSX.utils.book_new();
+            const sampleStoresData = {
+                Lotus: [
+                    { 'ผู้ดูแล': 'นาย ก', 'COMMODITY_CODE': 'LOT-001', 'DESCRIPTION': 'ผงซักฟอก ซักด้วยมือและเครื่อง 1,500 กรัม', 'ประเภทร้านค้า': 'Lotus', 'Link': 'https://www.lotuss.com/th/product/52523425' },
+                    { 'ผู้ดูแล': 'นาย ก', 'COMMODITY_CODE': 'LOT-002', 'DESCRIPTION': 'บรีส เอกเซล ผงซักฟอก ซื้อ 1 แถม 1', 'ประเภทร้านค้า': 'Lotus', 'Link': 'https://www.lotuss.com/th/product/6829103' }
+                ],
+                BigC: [
+                    { 'ผู้ดูแล': 'นาย ข', 'COMMODITY_CODE': 'BGC-001', 'DESCRIPTION': 'น้ำยาซักผ้าสูตรเข้มข้น ซื้อ 1 แถม 1', 'ประเภทร้านค้า': 'Big C', 'Link': 'https://www.bigc.co.th/product/detergent-88512345.html' },
+                    { 'ผู้ดูแล': 'นาย ข', 'COMMODITY_CODE': 'BGC-002', 'DESCRIPTION': 'นมสดรสจืด 1000 มล.', 'ประเภทร้านค้า': 'Big C', 'Link': 'https://www.bigc.co.th/product/fresh-milk-9948123.html' }
+                ],
+                Tops: [
+                    { 'ผู้ดูแล': 'นาย ค', 'COMMODITY_CODE': 'TPS-001', 'DESCRIPTION': 'น้ำส้มคั้นแท้ 100% ซื้อ 2 จ่าย 1', 'ประเภทร้านค้า': 'Tops', 'Link': 'https://www.tops.co.th/th/product-8850123456789' }
+                ],
+                Powerbuy: [
+                    { 'ผู้ดูแล': 'นาย ง', 'COMMODITY_CODE': 'PWB-001', 'DESCRIPTION': 'หม้อทอดไร้น้ำมัน Digital 4.2L', 'ประเภทร้านค้า': 'Powerbuy', 'Link': 'https://www.powerbuy.co.th/th/airfryer-4l-254129' }
+                ],
+                Homepro: [
+                    { 'ผู้ดูแล': 'นาย จ', 'COMMODITY_CODE': 'HMP-001', 'DESCRIPTION': 'พัดลมตั้งโต๊ะ 16 นิ้ว ส่ายได้', 'ประเภทร้านค้า': 'Homepro', 'Link': 'https://www.homepro.co.th/p/1029384' }
+                ],
+                Globalhouse: [
+                    { 'ผู้ดูแล': 'นาย ฉ', 'COMMODITY_CODE': 'GBH-001', 'DESCRIPTION': 'สว่านกระแทกไร้สาย 12V', 'ประเภทร้านค้า': 'Globalhouse', 'Link': 'https://globalhouse.co.th/product/detail/991283' }
+                ],
+                ไทวัสดุ: [
+                    { 'ผู้ดูแล': 'นาย ช', 'COMMODITY_CODE': 'TWD-001', 'DESCRIPTION': 'สีทาภายใน ชนิดด้าน 5 แกลลอน', 'ประเภทร้านค้า': 'ไทวัสดุ', 'Link': 'https://www.thaiwatsadu.com/th/product/paint-6012938' }
+                ],
+                BananaIT: [
+                    { 'ผู้ดูแล': 'นาย ซ', 'COMMODITY_CODE': 'BNN-001', 'DESCRIPTION': 'หูฟังไร้สาย True Wireless ANC', 'ประเภทร้านค้า': 'BananaIT', 'Link': 'https://www.bnn.in.th/th/p/gadget/earphones_889213' }
+                ],
+                AIS: [
+                    { 'ผู้ดูแล': 'นาย ฌ', 'COMMODITY_CODE': 'AIS-001', 'DESCRIPTION': 'สมาร์ทโฟน 5G 128GB เครื่องเปล่า', 'ประเภทร้านค้า': 'AIS', 'Link': 'https://store.ais.co.th/th/smartphones/brand-phone-5g-128gb' }
+                ]
+            };
+
+            for (const [sheetName, items] of Object.entries(sampleStoresData)) {
+                const ws = XLSX.utils.json_to_sheet(items);
+                XLSX.utils.book_append_sheet(sampleWb, ws, sheetName);
+            }
+
+            const sampleBuffer = XLSX.write(sampleWb, { bookType: 'xlsx', type: 'array' });
+            const sampleBlob = new Blob([sampleBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+            const sampleFile = new File([sampleBlob], 'ดึงทุกเว็บ_ตัวอย่าง9ห้าง.xlsx');
+
+            handleUploadedFile(sampleFile);
+            showToast('โหลดไฟล์ตัวอย่าง 9 ชีตให้เรียบร้อยแล้ว!');
+        });
+
+        // Initialize UI
+        updateTargetStatus();
+        logConsole('ระบบ Pure Web Scraper Studio พร้อมใช้งาน (กด "โหลดตัวอย่าง Excel" เพื่อเริ่มทดสอบได้ทันที)', 'emerald-400');
+    </script>
+</body>
+</html>
