@@ -29,8 +29,6 @@ TAG = lambda x: '{' + NS + '}' + x
 MON = ['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม']
 SHORT = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.']
 SKIP_DIRS = {'.git', '.github', '.venv', 'node_modules', '__pycache__', '_site', 'fastdb'}
-FASTDB_BUILD_REV = 'central-details-v2'  # price rows format unchanged
-MASTER_BUILD_REV = 'master-guides-v1'  # Master classification changed; bust master cache
 
 
 def s(v):
@@ -141,32 +139,6 @@ def source_kind(rel):
     return ''
 
 
-def survey_topic(rel):
-    """The 4.1.x.x code identifies an independent report topic (weekly, monthly, rent, U)."""
-    name=Path(rel).name
-    match=re.search(r'(?<![0-9])(4\.1\.\d+\.\d+)(?![0-9])',name)
-    if match:return match.group(1)
-    return 'name:'+norm(re.sub(r'\s*\(\d+\)(?=\.xlsx$)','',name,flags=re.I).removesuffix('.xlsx'))
-
-
-def survey_dup_key(entry):
-    if entry['kind']!='price':return ''
-    period=entry.get('period') or ''
-    if not re.fullmatch(r'20\d{2}-(0[1-9]|1[0-2])',period):return ''
-    return period+'|'+survey_topic(entry['rel'])
-
-
-def file_version(entry):
-    found=re.search(r'\((\d+)\)(?=\.xlsx$)',entry['path'].name,re.I)
-    return int(found.group(1)) if found else 0
-
-
-def prefer_price(a,b):
-    """One representative file: higher filename revision, then more complete file size."""
-    def score(v):return (file_version(v),v['path'].stat().st_size,-len(v['rel']))
-    return a if score(a)>=score(b) else b
-
-
 def discover(root):
     originals=[]
     for p in root.rglob('*.xlsx'):
@@ -178,19 +150,13 @@ def discover(root):
         n=x['path'].name
         return (1000 if n.lower()=='real_master_cpi.xlsx' else int(re.search(r'\((\d+)\)\.xlsx$',n,re.I).group(1)) if re.search(r'\((\d+)\)\.xlsx$',n,re.I) else 0,-len(x['rel']))
     masters.sort(key=master_pri,reverse=True)
-    kept={};ignored=[]
-    for item in sorted((y for y in originals if y['kind']=='price'),key=lambda a:a['rel']):
-        # No year/month: retain the old conservative exact-filename deduplication.
-        key=survey_dup_key(item) or 'file:'+re.sub(r'\s*\(\d+\)(?=\.xlsx$)','',item['rel'],flags=re.I)
-        previous=kept.get(key)
-        if previous is None:
-            kept[key]=item
-            continue
-        selected=prefer_price(previous,item)
-        skipped=item if selected is previous else previous
-        kept[key]=selected
-        ignored.append({'period':item['period'],'topic':survey_topic(item['rel']),'skipped':skipped['rel'],'used':selected['rel']})
-    return masters[:1]+sorted(kept.values(),key=lambda x:x['rel']),ignored
+    seen={}
+    for x in [y for y in originals if y['kind']=='price']:
+        k=re.sub(r'\s*\(\d+\)(?=\.xlsx$)','',x['rel'],flags=re.I)
+        old=seen.get(k)
+        ver=lambda o:int(re.search(r'\((\d+)\)\.xlsx$',o['rel'],re.I).group(1)) if re.search(r'\((\d+)\)\.xlsx$',o['rel'],re.I) else 0
+        if old is None or ver(x)>ver(old):seen[k]=x
+    return masters[:1]+sorted(seen.values(),key=lambda x:x['rel'])
 
 
 class Book:
@@ -276,10 +242,8 @@ def build_master(path):
             cd=code7(get(r,ii['code']))
             if not cd:continue
             if cd in items:review.append('Master พบ CODE7 ซ้ำ: '+cd);continue
-            raw_target=clean(get(r,ii['target']));detail=clean(get(r,ii['detail']))
             tar=num(get(r,ii['target']))
-            central_master='ส่วนกลางจัดเก็บ' in norm(detail) or 'ส่วนกลางจัดเก็บ' in norm(raw_target)
-            items[cd]={'code':cd,'name':clean(get(r,ii['name'])),'admin':clean(get(r,ii['admin'])),'target':tar if tar and tar>0 else 0,'targetNote':raw_target,'detail':detail,'centralMaster':central_master,'mode':clean(get(r,ii['mode'])),'gl':flag(get(r,ii['gl'])),'u':flag(get(r,ii['u'])),'available':None,'uAvailable':None}
+            items[cd]={'code':cd,'name':clean(get(r,ii['name'])),'admin':clean(get(r,ii['admin'])),'target':tar if tar and tar>0 else 0,'detail':clean(get(r,ii['detail'])),'mode':clean(get(r,ii['mode'])),'gl':flag(get(r,ii['gl'])),'u':flag(get(r,ii['u'])),'available':None,'uAvailable':None}
         provinces=[];province_map={}; regions=[]
         ps=wb.named('รหัสจังหวัด')
         if ps:
@@ -361,7 +325,7 @@ def price_rows(path):
                 'id':col(headers,['รหัส']),'spec':col(headers,['ลักษณะจำเพาะ','รายการบ้านเช่า']),
                 'shop':col(headers,['แหล่งจัดเก็บ']),'province':col(headers,['จังหวัด']),
                 'g':col(headers,['G']),'l':col(headers,['L']),'u':col(headers,['U']),
-                'market':col(headers,['กลุ่มตลาด']),'detail':col(headers,['รายละเอียด']),'source':-1,
+                'market':col(headers,['กลุ่มตลาด']),'source':-1,
             }
             if columns['spec']>=0:columns['source']=next((i for i,x in enumerate(headers) if i>columns['spec'] and x=='รหัส'),-1)
             columns['price']=(len(headers)-1-headers[::-1].index('ราคาเฉลี่ย')) if weekly and 'ราคาเฉลี่ย' in headers else col(headers,['ราคาปัจจุบัน'])
@@ -384,19 +348,17 @@ def price_rows(path):
                 market=clean(get(r,columns['market'])) if columns['market']>=0 else ''
                 source=code(get(r,columns['source'])) if columns['source']>=0 else ''
                 price=num(get(r,columns['price']))
-                price_detail=clean(get(r,columns['detail'])) if columns['detail']>=0 else ''
                 g=columns['g']>=0 and flag(get(r,columns['g']))
                 l=columns['l']>=0 and flag(get(r,columns['l']))
                 u=columns['u']>=0 and flag(get(r,columns['u']))
                 survey='U' if columns['u']>=0 and ((columns['g']<0 and columns['l']<0) or (u and not g and not l)) else 'GL'
-                records.append([raw,spec,source,shop or (market if rental and market else 'ไม่ระบุแหล่ง'),province,market,typ,price,(1 if g else 0)|(2 if l else 0)|(4 if u else 0),1 if survey=='U' else 0,sheet,rn,period,price_detail])
+                records.append([raw,spec,source,shop or (market if rental and market else 'ไม่ระบุแหล่ง'),province,market,typ,price,(1 if g else 0)|(2 if l else 0)|(4 if u else 0),1 if survey=='U' else 0,sheet,rn,period])
                 if period:periods.add(period)
         if not types:raise ValueError('ไม่พบชีตที่มีคอลัมน์รหัส จังหวัด และราคาปัจจุบัน/ราคาเฉลี่ย')
         positive=sum(1 for r in records if r[7] is not None and r[7]>0)
-        central_positive=sum(1 for r in records if r[7] is not None and r[7]>0 and 'ส่วนกลางจัดเก็บ' in norm(r[13]))
         survey=['U' if x else 'GL' for x in sorted(set(row[9] for row in records))]
         common=next(iter(periods)) if len(periods)==1 else ''
-        return {'schema':1,'kind':'price','name':path.name,'period':common,'types':sorted(types),'sets':survey,'count':len(records),'positive':positive,'centralPositive':central_positive,'skipped':skipped,'rows':records}
+        return {'schema':1,'kind':'price','name':path.name,'period':common,'types':sorted(types),'sets':survey,'count':len(records),'positive':positive,'skipped':skipped,'rows':records}
     finally:book.close()
 
 
@@ -416,22 +378,19 @@ def main():
     if not out.is_relative_to(root):raise SystemExit('output must be within repository root')
     out.mkdir(parents=True,exist_ok=True)
     files=[];master=None;total=0
-    sources,ignored=discover(root)
-    for item in ignored:
-        print('SKIP duplicate survey '+item['period']+' / '+item['topic']+': '+item['skipped']+' -> '+item['used'],flush=True)
-    for src in sources:
+    for src in discover(root):
         p=src['path'];raw=p.read_bytes();sha=hashlib.sha256(raw).hexdigest()
         try:
             if src['kind']=='master':
                 data=build_master(p)
-                rel=f'master-{sha[:16]}-{MASTER_BUILD_REV}.json.gz'
+                rel=f'master-{sha[:16]}.json.gz'
                 meta={'path':src['rel'],'name':p.name,'kind':'master','sha':sha,'file':rel}
             else:
                 data=price_rows(p)
-                rel=f'files/{sha[:16]}-{FASTDB_BUILD_REV}.json.gz'
+                rel=f'files/{sha[:16]}.json.gz'
                 meta={'path':src['rel'],'name':p.name,'kind':'price','sha':sha,'file':rel,
                       'period':data['period'] or src['period'],'types':data['types'],'sets':data['sets'],
-                      'count':data['count'],'positive':data['positive'],'centralPositive':data['centralPositive']}
+                      'count':data['count'],'positive':data['positive']}
                 total+=data['count']
             uncompressed,compressed=dump_gzip(data,out/rel)
             files.append(meta)
@@ -449,7 +408,7 @@ def main():
     periods=sorted(set(x['period'] for x in files if x['kind']=='price' and x['period']))
     man={'schema':1,'builtAt':datetime.now(timezone.utc).isoformat(timespec='seconds'),'master':master,
          'files':files,'periods':periods,'latest':periods[-1] if periods else '',
-         'sourceRows':total,'skippedDuplicates':ignored}
+         'sourceRows':total}
     (out/'manifest.json').write_text(json.dumps(man,ensure_ascii=False,separators=(',',':')),encoding='utf-8')
     expected={x['file'] for x in files}
     for old in out.rglob('*.json.gz'):
