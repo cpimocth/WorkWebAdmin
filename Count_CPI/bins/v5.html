@@ -111,38 +111,17 @@
 .source-vault .warningbar:not(.show){display:none}
 @media(max-width:900px){.monitor-workspace .filter-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}.filter-aux{grid-column:1/-1}.source-vault .file-chip{grid-template-columns:minmax(100px,150px) minmax(120px,1fr) auto}}
 @media(max-width:610px){.monitor-workspace .filter-grid{grid-template-columns:1fr}.filter-aux{grid-column:auto}.source-vault{padding:16px 12px}.source-vault .file-chip{grid-template-columns:1fr auto}.source-vault .file-chip .file-type{grid-column:1}.source-vault .file-chip .file-name{grid-column:1}.source-vault .file-chip .file-controls{grid-column:2;grid-row:1/3}}
-
-.git-connect{border:1px solid #c9e4ed;background:linear-gradient(100deg,#f3fbff,#f6fbff);border-radius:12px;margin-top:13px;padding:12px 15px}
-.git-connect-main{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
-.git-connect-main>div{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-.git-connect-main strong{color:#134b74;font-size:13px}
-.git-led{height:9px;width:9px;border-radius:50%;background:#a9bbcc;display:inline-block;flex-shrink:0}
-.git-led.ok{background:#0ca47c;box-shadow:0 0 0 3px #d6f5e9}
-.git-led.loading{background:#edac3d;box-shadow:0 0 0 3px #fff0d2}
-.git-led.warn{background:#dd6a56}
-.git-status{color:#59738e;font-size:12px;line-height:1.5}
-.git-settings{margin-top:8px;font-size:12px;color:#547086}
-.git-settings summary{cursor:pointer;display:inline-block;color:#2d689d;font-weight:750}
-.git-settings-row{display:flex;align-items:center;gap:8px;margin:9px 0 5px}
-.git-settings-row input{min-width:180px;flex:1}
-.git-settings small{display:block;line-height:1.6;color:#7489a0}
-@media(max-width:540px){.git-settings-row{flex-wrap:wrap}.git-settings-row button{width:100%}}
-@media print{.source-vault,.folder-status,.git-connect{display:none!important}}
+@media print{.source-vault,.folder-status{display:none!important}}
 </style>
 </head>
 <body>
 <header><div class="head-inner"><div class="topbar"><div class="brand"><div class="brand-mark">CPI</div><div><div class="brand-name">FieldPulse <span style="font-weight:400;color:#b7d4f5">/ Collection Monitor</span></div><div class="brand-sub">TRADE PRICE SURVEY · PROGRESS &amp; COVERAGE</div></div></div><div class="head-actions"><button id="copyTopBtn">คัดลอกข้อความรายงาน</button><button id="printBtn">พิมพ์รายงาน</button><button id="exportTopBtn">↓ Export Excel</button></div></div><div class="hero"><div><div class="eyebrow">CPI SURVEY OPERATIONS DASHBOARD</div><h1>ติดตามความคืบหน้าการจัดเก็บราคาสินค้า</h1><p>รายภาค · รายจังหวัด · รายเขตเก็บราคา · CODE7 · สเปคและแหล่งจัดเก็บ | เปรียบเทียบเป้าหมายจาก Real_Master_CPI และจำนวนที่เก็บได้จริง</p></div><div class="period-pill" id="periodBadge">ยังไม่ได้นำเข้าข้อมูล</div></div></div></header>
 <main class="layout">
-<div class="import-card"><div class="import-top"><h2>01 &nbsp; นำเข้าข้อมูล Excel</h2><span class="import-hint">อ่านไฟล์ Excel จาก GitHub อัตโนมัติ · อัปโหลดหรือเลือกโฟลเดอร์ได้เช่นเดิม</span></div><div class="import-grid">
+<div class="import-card"><div class="import-top"><h2>01 &nbsp; นำเข้าข้อมูล Excel</h2><span class="import-hint">ทำงานในเบราว์เซอร์ · ไม่ส่งข้อมูลขึ้นเซิร์ฟเวอร์ · รองรับไฟล์ .xlsx หลายไฟล์</span></div><div class="import-grid">
 <label class="upload-cell" for="masterFile"><span class="upload-icon">◫</span><span><strong>Real_Master_CPI</strong><small id="masterHint">เลือก Master เพื่ออ่านเป้าหมาย / ผู้ดูแล / พื้นที่</small></span><input id="masterFile" type="file" accept=".xlsx"></label>
 <label class="upload-cell" for="dataFiles"><span class="upload-icon">⇧</span><span><strong>ไฟล์ที่เก็บราคา (เลือกหลายไฟล์ได้)</strong><small>G/L รายเดือน 4.1.1.2 · G/L รายสัปดาห์ 4.1.1.1 · U นอกเขต 4.1.2.2 · ค่าเช่าบ้าน · หลายเดือน</small></span><input id="dataFiles" type="file" multiple accept=".xlsx"></label>
 <div class="upload-right"><button class="btn light" id="folderBtn">เปิด / เปลี่ยนโฟลเดอร์ Excel</button><button class="btn soft" id="refreshFolderBtn" disabled title="เลือกโฟลเดอร์ครั้งแรกก่อน">↻ อ่านไฟล์อัตโนมัติอีกครั้ง</button><button class="btn soft" id="clearBtn">ล้างข้อมูล</button></div>
-</div>
-<div class="git-connect" role="group" aria-label="ข้อมูลจาก GitHub">
- <div class="git-connect-main"><div><span class="git-led" id="gitLed"></span><strong>GitHub · อ่านไฟล์อัตโนมัติ</strong><span id="gitStatus" class="git-status" role="status" aria-live="polite">กำลังตรวจหา Repository…</span></div><button class="btn sm light" id="refreshGitBtn" type="button">↻ อัปเดตจาก Git</button></div>
- <details class="git-settings" id="gitSettings"><summary>ตั้งค่า GitHub (ใช้เมื่อเปิดจากเครื่องหรือเว็บอื่น)</summary><div class="git-settings-row"><input id="gitRepoInput" type="text" autocomplete="url" spellcheck="false" placeholder="https://github.com/username/repository" aria-label="GitHub repository URL"><button id="connectGitBtn" class="btn sm" type="button">เชื่อม Git</button></div><small>วางลิงก์ Repository สาธารณะเพียงครั้งเดียว ระบบจดจำในเบราว์เซอร์ · GitHub Pages ไม่ต้องกรอก</small></details>
-</div>
-<input id="folderInput" type="file" multiple webkitdirectory directory hidden><div id="folderStatus" class="folder-status" role="status" aria-live="polite">อัปโหลด Excel ได้ทันที หรือเลือกโฟลเดอร์ครั้งแรกเพื่อให้ระบบอ่านอัตโนมัติในครั้งต่อไปเมื่อเบราว์เซอร์อนุญาต</div></div>
+</div><input id="folderInput" type="file" multiple webkitdirectory directory hidden><div id="folderStatus" class="folder-status" role="status" aria-live="polite">อัปโหลด Excel ได้ทันที หรือเลือกโฟลเดอร์ครั้งแรกเพื่อให้ระบบอ่านอัตโนมัติในครั้งต่อไปเมื่อเบราว์เซอร์อนุญาต</div></div>
 <div class="monitor-workspace"><aside class="filters" aria-label="ตัวกรองข้อมูล CPI">
 <div class="filter-head"><strong>02 &nbsp; เลือกขอบเขตการติดตาม</strong><span id="filterCaption">กรองข้อมูลและเป้าหมายพร้อมกันทุกตาราง</span></div>
 <div class="filter-grid">
@@ -333,7 +312,7 @@ function targetAllowed(item,area){if(!item||item.target<=0||!area.planned||!area
 }
 function isInScope(area){return(!state.region||area.region===state.region)&&(!state.province||area.province===state.province)&&(!state.area||area.id===state.area)}
 function itemMatch(code){const item=state.master?.items.get(code);return !state.admin||(item?.admin||'ไม่ระบุผู้ดูแล')===state.admin}
-function availablePeriods(){return [...new Set([...state.records.map(r=>r.period),...(typeof gitSession==='undefined'?[]:gitSession.entries.map(e=>e.period))].filter(Boolean))].sort()}
+function availablePeriods(){return [...new Set(state.records.map(r=>r.period).filter(Boolean))].sort()}
 function getStatus(x){if(!x.target)return 'none';if(!x.current)return 'zero';if(x.capped+1e-9<x.target)return 'partial';return x.current>x.target?'over':'complete'}
 function statusLabel(s){return({over:'เกินเป้า',complete:'ครบตามเป้า',partial:'ยังไม่ครบ',zero:'ยังไม่เก็บ',none:'ไม่มีเป้า'})[s]||s}
 function getReport(){
@@ -416,7 +395,7 @@ function fileCards(){const files=state.files.map((f,i)=>{
  const label=f.kind==='master'?'MASTER':f.period?showPeriod(f.period):'ไม่พบเดือน';
  const qualified=f.kind==='master'?'CODE7 '+fmt(state.master?.items?.size||0)+' รายการ · '+fmt(state.master?.areas?.length||0)+' พื้นที่':fmt(f.count||0)+' แถว · มีราคา '+fmt(f.positive||0);
  const missing=f.kind!=='master'&&!f.period;
- return `<div class="file-chip ${missing?'warn':good?'ok':''}" title="${esc(f.name)}"><strong class="file-type">${esc(type)}</strong><div class="file-name">${esc(f.name)}<span class="file-meta">${esc(label)} · ${qualified}${f.source==='folder'?' · โฟลเดอร์อัตโนมัติ':f.source==='git'?' · GitHub':''}</span></div><div class="file-controls">${missing?`<button data-setmonth="${i}" title="กำหนดเดือน" style="font-size:12px">กำหนดเดือน</button>`:''}<button data-remove="${i}" title="นำไฟล์ออก" aria-label="นำไฟล์ ${esc(f.name)} ออก">×</button></div></div>`
+ return `<div class="file-chip ${missing?'warn':good?'ok':''}" title="${esc(f.name)}"><strong class="file-type">${esc(type)}</strong><div class="file-name">${esc(f.name)}<span class="file-meta">${esc(label)} · ${qualified}${f.source==='folder'?' · โฟลเดอร์อัตโนมัติ':''}</span></div><div class="file-controls">${missing?`<button data-setmonth="${i}" title="กำหนดเดือน" style="font-size:12px">กำหนดเดือน</button>`:''}<button data-remove="${i}" title="นำไฟล์ออก" aria-label="นำไฟล์ ${esc(f.name)} ออก">×</button></div></div>`
  });el('fileList').innerHTML=files.join('')||'<div class="minor muted" style="padding:15px">ยังไม่มีไฟล์ที่นำเข้า</div>';
  el('sourceCount').textContent=fmt(state.files.length)+' ไฟล์ที่นำเข้า';
  el('masterHint').textContent=state.master?'ใช้ Master · '+fmt([...state.master.items.values()].filter(x=>x.gl&&x.target>0).length)+' หมวด G/L · '+fmt([...state.master.items.values()].filter(x=>x.u&&x.target>0).length)+' หมวด U · '+fmt(state.master.areas.filter(a=>a.survey==='U').length)+' พื้นที่ U':'เลือก Master เพื่ออ่านเป้าหมาย / ผู้ดูแล / พื้นที่';
@@ -597,10 +576,10 @@ async function exportData(mode='all'){
 function copyMessage(){if(!state.report){toast('นำเข้าข้อมูลก่อน');return}const content=messageReport();if(navigator.clipboard?.writeText){navigator.clipboard.writeText(content).then(()=>toast('คัดลอกข้อความรายงานแล้ว'),()=>legacyCopy(content))}else legacyCopy(content)}
 function legacyCopy(t){const a=document.createElement('textarea');a.value=t;a.style.position='fixed';a.style.left='-9999px';document.body.appendChild(a);a.select();try{document.execCommand('copy');toast('คัดลอกข้อความรายงานแล้ว')}catch(e){toast('กรุณาคัดลอกจากกล่องข้อความในหน้า')}a.remove()}
 async function importFiles(fileList,forceMaster=false,source='manual'){const files=Array.from(fileList||[]).filter(f=>/\.xlsx$/i.test(f.name));if(!files.length){toast('กรุณาเลือกไฟล์ .xlsx');return}while(state.busy)await new Promise(resolve=>setTimeout(resolve,120));state.busy=true;let imported=0;let failed=[];
- try{for(const f of files){const key=source==='git'?'git§'+f.__gitPath+'§'+f.__gitSha:[f.name,f.size,f.lastModified].join('§');if(state.fileKeys.has(key))continue;
+ try{for(const f of files){const key=[f.name,f.size,f.lastModified].join('§');if(state.fileKeys.has(key))continue;
   try{const sheets=await parseWorkbook(f),isMaster=forceMaster||sheets.some(s=>s.name.includes('ข้อมูล_รายการ_ผู้ดูแล'));
-   if(isMaster){const obj=readMaster(sheets);for(const old of state.files.filter(x=>x.kind==='master'))state.fileKeys.delete(old.key);state.master=obj;state.files=state.files.filter(x=>x.kind!=='master');state.files.unshift({kind:'master',key,name:f.name,count:0,period:'',types:['Master'],skipped:obj.review,source,gitPath:f.__gitPath||'',gitSha:f.__gitSha||''});}
-   else {const p=readPriceFile(f,sheets);for(const old of state.files.filter(x=>x.kind==='price'&&x.name===f.name)){state.fileKeys.delete(old.key);state.records=state.records.filter(r=>r.fileKey!==old.key);state.files=state.files.filter(x=>x!==old)}for(const r of p.all)r.fileKey=key;state.records.push(...p.all);state.files.push({kind:'price',key,name:f.name,count:p.all.length,positive:p.all.filter(x=>x.price!==null&&x.price>0).length,period:p.periods.length===1?p.periods[0]:'',types:p.types,sets:[...new Set(p.all.map(x=>x.survey))],skipped:p.skipped,source,gitPath:f.__gitPath||'',gitSha:f.__gitSha||''});}
+   if(isMaster){const obj=readMaster(sheets);for(const old of state.files.filter(x=>x.kind==='master'))state.fileKeys.delete(old.key);state.master=obj;state.files=state.files.filter(x=>x.kind!=='master');state.files.unshift({kind:'master',key,name:f.name,count:0,period:'',types:['Master'],skipped:obj.review,source});}
+   else {const p=readPriceFile(f,sheets);for(const old of state.files.filter(x=>x.kind==='price'&&x.name===f.name)){state.fileKeys.delete(old.key);state.records=state.records.filter(r=>r.fileKey!==old.key);state.files=state.files.filter(x=>x!==old)}for(const r of p.all)r.fileKey=key;state.records.push(...p.all);state.files.push({kind:'price',key,name:f.name,count:p.all.length,positive:p.all.filter(x=>x.price!==null&&x.price>0).length,period:p.periods.length===1?p.periods[0]:'',types:p.types,sets:[...new Set(p.all.map(x=>x.survey))],skipped:p.skipped,source});}
    state.fileKeys.add(key);imported++;
   }catch(e){failed.push(f.name+': '+e.message);console.error('Read error',f.name,e)}
  }
@@ -612,150 +591,6 @@ function setFileMonth(index){const f=state.files[index];if(!f||f.kind==='master'
  let m=value.trim().match(/^(\d{4})[-/]?(0[1-9]|1[0-2])$/);if(!m){toast('รูปแบบเดือนต้องเป็น YYYY-MM เช่น 2026-09');return}let year=Number(m[1]);if(year>=2400)year-=543;const period=year+'-'+m[2];f.period=period;for(const r of state.records)if(r.fileKey===f.key)r.period=period;state.period=period;state.prev='';render();}
 function resetAll(){state.master=null;state.records=[];state.files=[];state.fileKeys.clear();state.period='';state.prev='';state.tab='overview';state.region='';state.province='';state.area='';state.areaSelected=false;state.set='ALL';state.setAuto=true;state.type='all';state.admin='';state.groupCode='';state.status='all';state.order='gap';state.countMode='positive';state.page=1;state.areaView='province';render();}
 function clearFilters(){state.region='';state.province='';state.area='';state.areaSelected=false;state.admin='';state.groupCode='';state.set=defaultSetForFiles();state.setAuto=true;state.type='all';state.status='all';state.order='gap';state.countMode='positive';state.page=1;render()}
-// -------- GitHub Pages / public GitHub repository: automatic Excel discovery --------
-// No API token is embedded. Source bytes are downloaded (read-only) and analyzed locally.
-const GIT_STORAGE='TPSO_CPI_FieldPulse_GitRepo_v1';
-const gitSession={repo:null,branch:'',entries:[],busy:false,loading:null,loadedAt:0};
-const gitName=e=>String(e.path||'').split('/').at(-1)||'';
-function setGitStatus(message,kind=''){el('gitStatus').textContent=message;el('gitLed').className='git-led'+(kind?' '+kind:'');el('refreshGitBtn').disabled=kind==='loading';}
-function interpretGitRepo(input){
- let text=String(input||'').trim();if(!text)return null;
- text=text.replace(/\.git\/?$/,'').replace(/\/$/,'');
- let m=text.match(/^([a-z\d_.-]+)\/([a-z\d_.-]+)(?:\/tree\/(.+))?$/i);
- if(m)return {owner:m[1],repo:m[2],branch:m[3]||''};
- try{const url=new URL(text);
-  if(url.hostname.toLowerCase()==='github.com'){const parts=url.pathname.split('/').filter(Boolean);if(parts.length>=2)return {owner:parts[0],repo:parts[1],branch:parts[2]==='tree'?parts.slice(3).join('/'):''}}
-  if(url.hostname.toLowerCase().endsWith('.github.io')){const owner=url.hostname.split('.')[0],parts=url.pathname.split('/').filter(Boolean),repo=(parts[0]&&!/\.html?$/i.test(parts[0]))?parts[0]:owner+'.github.io';return {owner,repo,branch:''}}
- }catch(error){}
- return null;
-}
-function configuredGitRepo(){
- const q=new URLSearchParams(location.search).get('repo');if(q){const parsed=interpretGitRepo(q);if(parsed)return parsed}
- const specified=document.querySelector('meta[name="cpi-github-repo"]')?.content;
- if(specified){const parsed=interpretGitRepo(specified);if(parsed)return parsed}
- // GitHub Pages detects its own owner/repository. This takes precedence over a previous manual repository.
- if(location.hostname.toLowerCase().endsWith('.github.io'))return interpretGitRepo(location.origin+location.pathname);
- if(gitSession.repo)return gitSession.repo;
- try{const saved=localStorage.getItem(GIT_STORAGE);if(saved)return interpretGitRepo(saved)}catch(error){}
- return null;
-}
-async function githubJSON(url){
- const response=await fetch(url,{headers:{Accept:'application/vnd.github+json'},cache:'no-cache'});
- if(!response.ok){let detail='';if(response.status===403||response.status===429)detail=' (GitHub API อาจจำกัดจำนวนครั้ง)';if(response.status===404)detail=' (ไม่พบ Repository สาธารณะ)';throw Error('GitHub HTTP '+response.status+detail)}
- return await response.json();
-}
-function gitFilePeriod(name){
- const text=String(name||'');const months=['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
- const short=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
- const year=/(?:ปี\s*|^|[\s_-])(25\d{2}|20\d{2})(?!\d)/.exec(text);
- const y=year?Number(year[1]):0;let mo=0;
- for(let i=0;i<12;i++)if(text.includes(months[i])||text.includes(short[i])){mo=i+1;break}
- if(!mo){let m=/(?:เดือน\s*|[\s_-])(0?[1-9]|1[0-2])(?=[\s_.-]|$)/.exec(text);if(m)mo=Number(m[1])}
- if((!y||!mo)){let combined=/(25\d{2}|20\d{2})[-_.]?(0[1-9]|1[0-2])(?!\d)/.exec(text);if(combined)return (Number(combined[1])>2400?Number(combined[1])-543:Number(combined[1]))+'-'+combined[2]}
- if(!y||!mo)return '';
- return (y>2400?y-543:y)+'-'+String(mo).padStart(2,'0');
-}
-function gitSourceType(path){
- const name=gitName({path});if(!/\.xlsx$/i.test(name)||/^~\$/.test(name))return '';
- if(/Real[_\s-]*Master[_\s-]*CPI/i.test(name))return 'master';
- if(/^4\.1\.[12]\.[123]/.test(name)||/^4\.1\.\d+\.\d+/.test(name))return 'price';
- if(/(?:^|[\/])(?:data|excel|inputs|price-data|survey-data)[\/]/i.test(path)&&/(?:ชุด\s*[GLU]|รายเดือน|รายสัปดาห์|ราคา|rent|rental)/i.test(name))return 'price';
- return '';
-}
-function dedupGitVersions(entries){
- const byName=new Map();for(const e of entries){const basename=gitName(e).replace(/\s*\(\d+\)(?=\.xlsx$)/i,'');const key=e.path.slice(0,e.path.length-gitName(e).length)+basename;const old=byName.get(key);
-  const version=name=>Number(/\((\d+)\)(?=\.xlsx$)/i.exec(name)?.[1]||0);
-  if(!old||version(gitName(e))>version(gitName(old)))byName.set(key,e);
- }return [...byName.values()];
-}
-function prioritizeGitSources(all){
- const masters=all.filter(x=>x.kind==='master').sort((a,b)=>{
-  const priority=e=>/^(?:Real_Master_CPI)\.xlsx$/i.test(gitName(e))?100:(Number(/\((\d+)\)(?=\.xlsx$)/i.exec(gitName(e))?.[1]||0));
-  return priority(b)-priority(a)||a.path.length-b.path.length;
- });
- const master=masters.length?[masters[0]]:[];
- const prices=dedupGitVersions(all.filter(x=>x.kind==='price'));
- const periods=[...new Set(prices.map(x=>x.period).filter(Boolean))].sort();
- const latest=periods.at(-1),previous=latest?prevMonth(latest):'';
- const usePeriods=new Set([latest,previous]);
- if(periods.length>1&&!periods.includes(previous))usePeriods.add(periods.at(-2));
- const recent=prices.filter(x=>usePeriods.has(x.period));
- // Non-dated monthly price files are still checked because some exported filenames omit the month.
- const undated=prices.filter(x=>!x.period).slice(0,6);
- const initial=master.concat(recent,undated);
- if(!initial.length)initial.push(...prices.slice(-8));
- return {all:[...master,...prices],initial,latest,priceCount:prices.length,periodCount:periods.length};
-}
-async function discoverGitSources(repo){
- const root='https://api.github.com/repos/'+encodeURIComponent(repo.owner)+'/'+encodeURIComponent(repo.repo);
- const meta=await githubJSON(root);const branch=repo.branch||meta.default_branch;
- if(!branch)throw Error('ไม่พบ branch ของ GitHub repository');
- const tree=await githubJSON(root+'/git/trees/'+encodeURIComponent(branch)+'?recursive=1');
- if(!Array.isArray(tree.tree))throw Error('GitHub API ไม่ส่งรายการไฟล์กลับมา');
- if(tree.truncated)throw Error('ไฟล์ใน Git มากเกินขีดจำกัดของ API; กรุณาใช้ Repository สำหรับข้อมูล CPI โดยเฉพาะ');
- const out=tree.tree.filter(e=>e.type==='blob'&&e.path&&/\.xlsx$/i.test(e.path)).map(e=>({path:e.path,sha:e.sha||'',size:e.size||0,kind:gitSourceType(e.path),period:gitFilePeriod(gitName(e))})).filter(x=>x.kind);
- return {entries:out,branch};
-}
-async function fetchGitEntry(entry){
- const repo=gitSession.repo;if(!repo)throw Error('ยังไม่เชื่อม Git');
- const dir=entry.path.split('/').map(encodeURIComponent).join('/');
- const branch=gitSession.branch.split('/').map(encodeURIComponent).join('/');
- const url='https://raw.githubusercontent.com/'+encodeURIComponent(repo.owner)+'/'+encodeURIComponent(repo.repo)+'/'+branch+'/'+dir+'?cpi_sha='+encodeURIComponent(entry.sha);
- const response=await fetch(url,{cache:'force-cache'});
- if(!response.ok)throw Error('ดาวน์โหลด '+entry.path+' ไม่สำเร็จ (HTTP '+response.status+')');
- const blob=await response.blob();if(blob.size<100)throw Error('ไฟล์ Excel จาก Git ว่างหรือไม่สมบูรณ์: '+entry.path);
- const file=new File([blob],gitName(entry),{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
- file.__gitPath=entry.path;file.__gitSha=entry.sha;
- return file;
-}
-function gitChangedOrMissing(e){return !state.files.some(f=>f.source==='git'&&f.gitPath===e.path&&f.gitSha===e.sha)}
-async function loadGitEntries(entries){
- const targets=entries.filter(gitChangedOrMissing);if(!targets.length)return {loaded:0,failed:[]};
- const order=[...targets].sort((a,b)=>Number(b.kind==='master')-Number(a.kind==='master')||a.path.localeCompare(b.path,'th'));
- let loaded=0;const failed=[];
- // Fetch in small parallel batches, but retain the original importer (one workbook at a time).
- for(let i=0;i<order.length;i+=4){const batch=order.slice(i,i+4);
-  const downloads=await Promise.allSettled(batch.map(fetchGitEntry));
-  const files=[];for(let j=0;j<downloads.length;j++){const result=downloads[j];if(result.status==='fulfilled')files.push(result.value);else failed.push(gitName(batch[j])+': '+result.reason?.message)}
-  if(files.length){await importFiles(files,false,'git');loaded+=files.length}
- }
- return {loaded,failed};
-}
-async function ensureGitPeriods(periods){
- if(!gitSession.entries.length)return;
- while(gitSession.busy||gitSession.loading){await new Promise(resolve=>setTimeout(resolve,100))}
- const needed=new Set(periods.filter(Boolean));const targets=gitSession.entries.filter(e=>e.kind==='price'&&needed.has(e.period)&&gitChangedOrMissing(e));
- if(!targets.length)return;
- gitSession.loading=true;setGitStatus('กำลังอ่าน Excel '+[...needed].map(showPeriod).join(' / ')+' จาก Git…','loading');
- try{const result=await loadGitEntries(targets);const label=result.failed.length?' · มีไฟล์อ่านไม่ได้ '+result.failed.length:' ';setGitStatus('GitHub · อ่านข้อมูลเดือนที่เลือกแล้ว '+fmt(result.loaded)+' ไฟล์'+label,result.failed.length?'warn':'ok');}
- catch(error){setGitStatus('อ่าน Git ไม่สำเร็จ: '+error.message,'warn')}
- finally{gitSession.loading=false;render()}
-}
-async function startGitAutoLoad(force=false,manualRepo=null){
- if(gitSession.busy)return;
- const repo=manualRepo||configuredGitRepo();
- if(!repo){setGitStatus('เปิดผ่าน GitHub Pages เพื่อโหลดอัตโนมัติ หรือใส่ลิงก์ Repository ครั้งแรก');return}
- if(!force&&gitSession.loadedAt&&gitSession.repo?.owner===repo.owner&&gitSession.repo?.repo===repo.repo)return;
- gitSession.busy=true;gitSession.repo=repo;el('gitRepoInput').value='https://github.com/'+repo.owner+'/'+repo.repo;
- setGitStatus('กำลังค้นหา Excel ใน '+repo.owner+'/'+repo.repo+'…','loading');
- try{
-  const {entries,branch}=await discoverGitSources(repo);gitSession.branch=branch;
-  const chosen=prioritizeGitSources(entries);
-  if(!chosen.all.length)throw Error('ไม่พบไฟล์ Real_Master_CPI หรือไฟล์เก็บราคา 4.1.x.x ใน Repository');
-  const oldFiles=state.files.filter(f=>f.source==='git'&&!chosen.all.some(x=>x.path===f.gitPath));
-  for(const f of oldFiles){state.fileKeys.delete(f.key);state.files=state.files.filter(x=>x!==f);if(f.kind==='master')state.master=null;else state.records=state.records.filter(r=>r.fileKey!==f.key)}
-  gitSession.entries=chosen.all;
-  setGitStatus('พบ '+fmt(chosen.all.length)+' ไฟล์ · กำลังอ่าน Master และข้อมูลล่าสุด…','loading');
-  const result=await loadGitEntries(chosen.initial);
-  gitSession.loadedAt=Date.now();
-  const failed=result.failed.length?' · อ่านไม่ได้ '+result.failed.length+' ไฟล์: '+result.failed.slice(0,2).join(' / '):'';
-  setGitStatus(repo.owner+'/'+repo.repo+' · '+fmt(chosen.all.length)+' ไฟล์ใน Git · นำเข้าใหม่ '+fmt(result.loaded)+' ไฟล์ · '+fmt(chosen.periodCount)+' เดือน'+failed,result.failed.length?'warn':'ok');
-  if(result.failed.length)console.warn('Git files not imported',result.failed);
-  render();
- }catch(error){console.error('Git automatic loading',error);setGitStatus('GitHub: '+error.message+' · ยังอัปโหลด Excel เองได้','warn');}
- finally{gitSession.busy=false;el('refreshGitBtn').disabled=false}
-}
-// -----------------------------------------------------------------------------
 // A local HTML page cannot enumerate its directory without a browser-granted folder handle.
 // After the user chooses a directory, Chromium may persist its read-only handle in IndexedDB.
 const folderSession={handle:null,scanning:false,lastScan:0};
@@ -821,9 +656,6 @@ function wire(){
  el('masterFile').addEventListener('change',async e=>{await importFiles(e.target.files,true);e.target.value=''});
  el('dataFiles').addEventListener('change',async e=>{await importFiles(e.target.files,false);e.target.value=''});
  el('folderInput').addEventListener('change',async e=>{await importFiles(e.target.files,false,'folder-fallback');setFolderStatus('อ่านไฟล์จากโฟลเดอร์ที่เลือกแล้ว · หากเบราว์เซอร์ไม่รองรับการจดจำสิทธิ์ ต้องเลือกโฟลเดอร์ใหม่เมื่อเปิดหน้าเว็บอีกครั้ง','warn');e.target.value=''});
- el('refreshGitBtn').addEventListener('click',()=>startGitAutoLoad(true));
- el('connectGitBtn').addEventListener('click',()=>{const repo=interpretGitRepo(el('gitRepoInput').value);if(!repo){setGitStatus('โปรดใส่ลิงก์ https://github.com/owner/repo ให้ถูกต้อง','warn');return}try{localStorage.setItem(GIT_STORAGE,repo.owner+'/'+repo.repo+(repo.branch?'/tree/'+repo.branch:''))}catch(e){}startGitAutoLoad(true,repo)});
- el('gitRepoInput').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();el('connectGitBtn').click()}});
  el('folderBtn').addEventListener('click',chooseFolder);el('refreshFolderBtn').addEventListener('click',async()=>{if(folderSession.handle){const permission=typeof folderSession.handle.queryPermission==='function'?await folderSession.handle.queryPermission({mode:'read'}):'prompt';if(permission==='granted')await scanAuthorizedFolder(folderSession.handle);else await chooseFolder()}else await chooseFolder()});
  for(const label of document.querySelectorAll('.upload-cell')){label.addEventListener('dragover',e=>{e.preventDefault();label.classList.add('dragover')});label.addEventListener('dragleave',()=>label.classList.remove('dragover'));label.addEventListener('drop',async e=>{e.preventDefault();label.classList.remove('dragover');await importFiles(e.dataTransfer.files,label.htmlFor==='masterFile')})}
  el('clearBtn').addEventListener('click',()=>{if(confirm('ล้างไฟล์และผลลัพธ์ทั้งหมดในหน้าเว็บนี้?'))resetAll()});
@@ -831,8 +663,7 @@ function wire(){
  el('copyTopBtn').addEventListener('click',copyMessage);el('printBtn').addEventListener('click',()=>window.print());el('exportTopBtn').addEventListener('click',()=>exportData('all'));
  el('fileList').addEventListener('click',e=>{const m=e.target.closest('[data-setmonth]'),r=e.target.closest('[data-remove]');if(m)setFileMonth(Number(m.dataset.setmonth));else if(r)removeFile(Number(r.dataset.remove))});
  for(const [id,prop]of[['setFilter','set'],['typeFilter','type'],['adminFilter','admin'],['statusFilter','status']])el(id).addEventListener('change',e=>{state[prop]=e.target.value;if(prop==='set'){state.setAuto=false;state.region='';state.province='';state.area='';state.areaSelected=false;state.admin=''}state.page=1;render()});
- el('monthFilter').addEventListener('change',async e=>{const target=e.target.value;state.period=target;state.prev='';state.page=1;render();if(target)await ensureGitPeriods([target,prevMonth(target)]);});
- el('prevFilter').addEventListener('change',async e=>{const target=e.target.value;state.prev=target;render();if(target){await ensureGitPeriods([target]);state.prev=target;render();}});
+ el('monthFilter').addEventListener('change',e=>{state.period=e.target.value;state.prev='';state.page=1;render()});el('prevFilter').addEventListener('change',e=>{state.prev=e.target.value;render()});
  el('regionFilter').addEventListener('change',e=>{state.region=e.target.value;state.province='';state.area='';state.areaSelected=false;render()});el('areaFilter').addEventListener('change',e=>{state.area=e.target.value==='__ALL__'?'':e.target.value;state.areaSelected=!!e.target.value;render()});
  el('appBody').addEventListener('click',e=>{
   const tab=e.target.closest('[data-tab]');if(tab){state.tab=tab.dataset.tab;state.page=1;render();return}
@@ -851,7 +682,7 @@ function wire(){
  el('detailBody').addEventListener('input',e=>{if(e.target.id==='modalSearch')renderModalSpecTable(e.target.value)});
  el('detailBody').addEventListener('click',e=>{if(e.target.id==='modalShowAll'){state.modalMore=!state.modalMore;renderModalSpecTable(el('modalSearch').value)}if(e.target.id==='exportModal')exportData('modal')});
 }
-wire();render();startGitAutoLoad();restoreFolder();
+wire();render();restoreFolder();
 // Re-scan a previously granted directory when a user returns after changing Excel files.
 window.addEventListener('focus',async()=>{if(folderSession.handle&&!folderSession.scanning&&folderSession.lastScan&&Date.now()-folderSession.lastScan>300000){try{if(await folderSession.handle.queryPermission({mode:'read'})==='granted')await scanAuthorizedFolder(folderSession.handle,true)}catch(error){console.info(error)}}});
 </script>
