@@ -90,16 +90,16 @@ const TASKS={
   {id:'w1w2',n:4,title:'จัดทำ Report W1W2',desc:'เปรียบเทียบ W4 เดือนก่อนกับ W1–W2 เดือนนี้ รวมข้อมูลเดือนก่อนและสรุปเป็นรายจังหวัด/ภาค',inputs:['current','prev','shop']},
   {id:'combine-w1w2',n:5,title:'รวมไฟล์ Report W1W2',desc:'รวมไฟล์ยืนยันราคา W1W2 จากหลายจังหวัด และทำเครื่องหมายเมื่อราคากับช่องยืนยันไม่ตรงกัน',inputs:['confirmation']},
   {id:'pending-w1w2',n:6,title:'ตรวจรายการยังไม่ได้แก้ราคา W1W2',desc:'จับคู่รายการ/แหล่งระหว่างไฟล์ที่รวมคำยืนยันแล้ว กับราคาสัปดาห์ 1–2 ในระบบ เพื่อหาที่ไม่ตรงกัน',inputs:['current','combined']},
-  {id:'vegetables',n:7,title:'ตารางถามตอบผักสำคัญ',desc:'ราคาเฉลี่ยของสินค้าผักรายการหลักเทียบ 3 ปี พร้อม MoM, YoY และ ContributeYoY จาก 6.1.7',inputs:['current','lastYear','twoYears','veg','cpi617']},
-  {id:'central-b',n:8,title:'ราคากลาง ชุด บ.',desc:'อ่านข้อมูลราคากลางทุกชีต เลือกราคาโปรโมชั่นก่อนราคาปกติ Export ตารางราคาที่จับคู่ได้และ APEX JS Runner ต้นฉบับ',inputs:['central']},
-  {id:'central-or',n:9,title:'ราคากลาง ชุด อ. รายสัปดาห์',desc:'อ่านราคากลางรายสัปดาห์ทุกชีต (สป.1–4) จากผังแถวต้นฉบับ และ Export APEX JS Runner',inputs:['central']}
+  // {id:'vegetables',n:7,title:'ตารางถามตอบผักสำคัญ',desc:'ราคาเฉลี่ยของสินค้าผักรายการหลักเทียบ 3 ปี พร้อม MoM, YoY และ ContributeYoY จาก 6.1.7',inputs:['current','lastYear','twoYears','veg','cpi617']},
+  // {id:'central-b',n:8,title:'ราคากลาง ชุด บ.',desc:'อ่านข้อมูลราคากลางทุกชีต เลือกราคาโปรโมชั่นก่อนราคาปกติ Export ตารางราคาที่จับคู่ได้และ APEX JS Runner ต้นฉบับ',inputs:['central']},
+  // {id:'central-or',n:9,title:'ราคากลาง ชุด อ. รายสัปดาห์',desc:'อ่านราคากลางรายสัปดาห์ทุกชีต (สป.1–4) จากผังแถวต้นฉบับ และ Export APEX JS Runner',inputs:['central']}
  ],
  U:[
   {id:'general',n:1,title:'ตรวจทั่วไป + ราคาต่างกันระหว่างสัปดาห์',desc:'สร้าง Excel 2 ไฟล์สำหรับชุดนอกเขต โดยเช็ค R_FLAG, REL/AVG, REL สุดโต่ง, สเปคซ้ำ/แหล่งซ้ำ และ DIFF >50%',inputs:['current','master']},
   {id:'weekly',n:2,title:'จัดทำ Report รายสัปดาห์ ชุด U',desc:'วิเคราะห์ >50% และ Z-score ตามรหัสสินค้า สรุปแยกภาค/จังหวัด พร้อมชื่ออำเภอจากไฟล์ mapping',inputs:['current','district']},
   {id:'combine-weekly',n:3,title:'รวมไฟล์ Report รายสัปดาห์ ชุด U',desc:'รวมไฟล์ยืนยันราคาจากหลายอำเภอหรือจังหวัด เป็นไฟล์ยืนยันราคาชุดนอกเขต',inputs:['confirmation']},
-  {id:'central-b',n:4,title:'ราคากลาง ชุด บ. ชุด U',desc:'อ่าน Excel ราคากลางชุด บ. ทุกชีต และสร้าง APEX JS Runner สำหรับตารางชุด U',inputs:['central']},
-  {id:'central-or',n:5,title:'ราคากลาง ชุด อ. ชุด U',desc:'อ่าน Excel ราคากลางชุด อ. ทุกชีตและสร้าง APEX JS Runner สำหรับตารางชุด U',inputs:['central']}
+  // {id:'central-b',n:4,title:'ราคากลาง ชุด บ. ชุด U',desc:'อ่าน Excel ราคากลางชุด บ. ทุกชีต และสร้าง APEX JS Runner สำหรับตารางชุด U',inputs:['central']},
+  // {id:'central-or',n:5,title:'ราคากลาง ชุด อ. ชุด U',desc:'อ่าน Excel ราคากลางชุด อ. ทุกชีตและสร้าง APEX JS Runner สำหรับตารางชุด U',inputs:['central']}
  ]
 };
 const SLOT={
