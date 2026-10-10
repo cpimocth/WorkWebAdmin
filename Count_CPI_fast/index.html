@@ -176,7 +176,7 @@
  .is-awaiting .cpi-load-icon .empty-icon,.cpi-wait-dot,.cpi-skeletons span,.no-data.is-awaiting:before{animation:none!important}}
 
 /* Price source flag: centrally collected rows can be included on demand without changing Master quotas. */
-@media(min-width:1251px){.monitor-workspace .kpi-grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
+@media(min-width:1251px){.monitor-workspace .kpi-grid{grid-template-columns:repeat(6,minmax(0,1fr))}}
 .central-filter{margin-top:2px;padding:10px 11px;border:1px solid #e0ca98;border-radius:11px;background:#fff9ec}
 .central-filter label{color:#8b5e22;font-weight:900}
 .central-filter select{border-color:#e5c78b;background:#fff}
@@ -597,8 +597,7 @@ function viewOverview(){const {summary:s,areas,regionRows,codes}=state.report;co
  ${summaryCard('หมวด-พื้นที่ที่เก็บครบ',fmt(s.complete),`${pct(s.categoryRate)} ตามหมวด`,'green')}
  ${summaryCard('จำนวนตามเป้าหมาย',fmt(s.target),'ผลรวมโควตาตาม Master')}
  ${summaryCard('เก็บจริงทั้งหมด',fmt(s.actual),`${fmt(s.untargeted)} ข้อมูลไม่มีเป้า`,'blue')}
- ${summaryCard('ส่วนกลางจากไฟล์ราคา',fmt(s.centralCurrent),state.includeCentral?'รวมในเก็บจริงแล้ว':'แยกออกจากเก็บจริง','cyan')}
- ${summaryCard('ยังขาดตามโควตา',fmt(Math.max(0,s.target-s.capped)),'ไม่นำส่วนเกินของหมวดอื่นมาชดเชย','red')}
+ ${summaryCard('ยังขาด',fmt(Math.max(0,s.target-s.capped)),'ไม่นำส่วนเกินของหมวดอื่นมาชดเชย','red')}
  ${summaryCard('เปลี่ยนแปลงจากเดือนก่อน',hasPrev?`<span class="${signedClass(s.delta)}">${fmtDiff(s.delta)}</span>`:'—',hasPrev?`เทียบ ${showPeriod(state.prev)}`:'ต้องอัปโหลดไฟล์เดือนก่อน','cyan')}
  </div><div class="two-cols">${rateContent('ความครบถ้วนตามหมวด (CODE7 × พื้นที่)',s.categoryRate,s.pairs,s.complete,'หมวดที่มีจำนวนเก็บจริงไม่น้อยกว่าเป้าหมาย · เกินเป้าก็นับว่าครบ',true)}${rateContent('ความครบถ้วนตามจำนวน (จำนวนราคา)',s.quantityRate,s.target,s.capped,'Σ min(จำนวนที่เก็บได้, เป้าหมาย) ÷ Σ เป้าหมาย · ไม่ให้ยอดเกินกลบยอดขาด',false)}</div>
  <div class="two-cols" style="margin-top:13px"><div class="panel"><h3>สถานะหมวดตามพื้นที่</h3><p class="sub">จำนวนภารกิจ CODE7 × พื้นที่ทั้งหมดในขอบเขตที่เลือก</p><div class="stacked">${[['over','#448dec'],['complete','#28b79a'],['partial','#f1b954'],['zero','#e77786']].map(([k,color])=>`<span style="background:${color};width:${s.pairs?100*(s[k]||0)/s.pairs:0}%"></span>`).join('')}</div><div class="state-grid">${[['over','เกินเป้า'],['complete','ครบพอดี (รวมเกินอยู่บน)'],['partial','ยังไม่ครบ'],['zero','ยังไม่มีราคา']].map(([k,n])=>`<div class="state-cell"><strong>${fmt(k==='complete'?Math.max(0,s.complete-s.over):s[k])}</strong><span>${n}</span></div>`).join('')}</div><p class="sub" style="margin-top:12px">มีข้อมูลอย่างน้อย 1 แถว: ${fmt(s.touched)} จาก ${fmt(s.pairs)} หมวด-พื้นที่ (${pct(s.touchRate)})</p></div>
