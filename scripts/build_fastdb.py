@@ -169,7 +169,8 @@ def prefer_price(a,b):
 
 def discover(root):
     originals=[]
-    for p in root.rglob('*.xlsx'):
+    for p in (root / 'Count_CPI_fast').glob('*.xlsx'):
+    # for p in root.rglob('*.xlsx'):
         if any(x in SKIP_DIRS or x.startswith('.') for x in p.relative_to(root).parts[:-1]):continue
         kind=source_kind(p.relative_to(root).as_posix())
         if kind:originals.append({'path':p,'rel':p.relative_to(root).as_posix(),'kind':kind,'period':git_period(p.name)})
