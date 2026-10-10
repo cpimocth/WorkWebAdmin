@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light">
+<title>CPI Collection Quality Score | คะแนนคุณภาพการเก็บราคา</title>
+<style>
+:root{
+  --navy:#082d5b;--navy2:#0f447e;--blue:#1d69d5;--blue2:#4a91ef;--sky:#eaf4ff;
+  --teal:#0d9e9a;--green:#0b9b73;--orange:#e99a2b;--red:#dc5263;--ink:#142b47;
+  --muted:#687e98;--line:#dce7f3;--bg:#f4f8fd;--card:#fff;--shadow:0 12px 34px rgba(20,62,108,.08);
+}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--ink);font-family:'Kanit','Noto Sans Thai','Sarabun',Tahoma,Arial,sans-serif;font-size:14px;line-height:1.58}
+button,input,select{font:inherit}button{cursor:pointer}button:disabled{opacity:.45;cursor:not-allowed}.shell{max-width:1680px;margin:auto;padding:0 24px 70px}
+.hero{background:linear-gradient(115deg,#082a55 0%,#0d447d 62%,#1476a6 100%);color:white;position:relative;overflow:hidden}.hero:after{content:"";position:absolute;width:540px;height:540px;border-radius:50%;border:92px solid rgba(255,255,255,.045);right:-210px;top:-310px}.hero-inner{max-width:1680px;margin:auto;padding:25px 24px 42px;position:relative;z-index:1}.topbar{display:flex;justify-content:space-between;gap:18px;align-items:center;margin-bottom:30px}.brand{display:flex;gap:13px;align-items:center}.brand-mark{width:46px;height:46px;border-radius:14px;background:linear-gradient(145deg,#78ddff,#4d8fee);display:grid;place-items:center;color:#06305d;font-weight:950}.brand strong{font-size:18px}.brand small{display:block;color:#b9d8f4}.hero-copy{display:flex;justify-content:space-between;align-items:flex-end;gap:22px}.eyebrow{font-size:11px;font-weight:900;letter-spacing:1.7px;color:#8fdcff;margin-bottom:6px}.hero h1{font-size:clamp(28px,3vw,42px);line-height:1.22;margin:0 0 10px;font-weight:900}.hero p{margin:0;color:#c8ddf2;max-width:920px;font-size:14px}.hero-score{min-width:185px;border:1px solid rgba(255,255,255,.27);background:rgba(255,255,255,.09);border-radius:18px;padding:14px 18px;text-align:center}.hero-score b{font-size:31px;display:block;line-height:1.1}.hero-score span{font-size:11px;color:#d5e8f8}
+.toolbar{display:flex;gap:9px;flex-wrap:wrap}.btn{border:1px solid transparent;border-radius:11px;padding:9px 14px;font-weight:800;background:var(--blue);color:#fff}.btn:hover{filter:brightness(.97)}.btn.soft{background:#fff;color:#31577f;border-color:#d4e1ef}.btn.green{background:#087c65}.btn.ghost{background:#ffffff12;color:#fff;border-color:#ffffff42}.btn.sm{font-size:12px;padding:7px 11px}
+.loader-card{margin:-22px 0 18px;position:relative;z-index:3;background:#fff;border:1px solid var(--line);border-radius:19px;box-shadow:var(--shadow);padding:18px 20px}.loader-grid{display:grid;grid-template-columns:1fr 1.4fr auto;gap:12px;align-items:stretch}.drop{border:1px dashed #9dbfe6;background:#f9fcff;border-radius:13px;padding:13px 14px;display:flex;gap:11px;align-items:center;cursor:pointer;min-width:0}.drop:hover,.drop.dragover{background:#eef7ff;border-color:#4f8fd9;box-shadow:0 0 0 3px #dcecff}.drop.dragover{transform:translateY(-1px)}.drop-icon{width:38px;height:38px;border-radius:10px;background:#e6f1ff;color:#2670c8;display:grid;place-items:center;font-size:20px;flex:0 0 auto}.drop strong{display:block;font-size:13px}.drop small{display:block;color:var(--muted);font-size:11px}.drop input{display:none}.load-actions{display:flex;gap:8px;align-items:center}.file-status{margin-top:11px;font-size:12px;color:#58718d;display:flex;gap:7px;flex-wrap:wrap}.chip{border:1px solid #dbe7f3;background:#f6f9fd;border-radius:999px;padding:5px 9px}.chip.ok{background:#edf9f5;border-color:#bce7d8;color:#0b755b}.chip.warn{background:#fff7e8;border-color:#f0d5aa;color:#8b621f}.auto-source{margin-top:11px;padding:11px 13px;border:1px solid #cfe1f3;background:linear-gradient(100deg,#f4faff,#fbfdff);border-radius:12px;display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap}.auto-source strong{font-size:12px;color:#21527f}.auto-source span{font-size:11px;color:#65809b}.auto-source.ok{background:#edf9f5;border-color:#bee6d8}.auto-source.warn{background:#fff7e9;border-color:#efd8b4}.auto-actions{display:flex;gap:7px;flex-wrap:wrap}
+.controls{background:#fff;border:1px solid var(--line);border-radius:17px;padding:17px 18px;box-shadow:0 7px 26px rgba(20,62,108,.04);margin-bottom:15px}.control-head{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:12px}.control-head strong{font-size:15px}.control-head span{font-size:11px;color:var(--muted)}.control-grid{display:grid;grid-template-columns:repeat(6,minmax(130px,1fr));gap:10px}.field label{display:block;color:#58708b;font-size:11px;font-weight:850;margin-bottom:4px}.field select,.field input[type=number]{width:100%;height:40px;border:1px solid #d5e2ef;border-radius:10px;background:#fff;color:var(--ink);padding:0 10px;outline:0}.field select:focus,.field input:focus{border-color:#4f91e2;box-shadow:0 0 0 3px #dfedff}.switchbox{height:40px;border:1px solid #d5e2ef;border-radius:10px;padding:0 10px;display:flex;align-items:center;gap:8px;background:#fff}.switchbox input{accent-color:#1d69d5}.control-note{font-size:11px;color:#6f839a;margin-top:10px}
+.geo-search{display:flex;gap:9px;align-items:center;flex-wrap:wrap;margin:0 0 13px;padding:12px 13px;border:1px solid #d7e5f3;background:linear-gradient(100deg,#f7fbff,#fff);border-radius:13px}.geo-search-main{display:flex;gap:8px;align-items:center;flex:1;min-width:280px}.geo-search input{width:100%;height:42px;border:1px solid #cbdced;border-radius:10px;padding:0 12px;outline:0;color:var(--ink);background:#fff}.geo-search input:focus{border-color:#4f91e2;box-shadow:0 0 0 3px #dfedff}.geo-search-meta{font-size:11px;color:#6e8298;white-space:nowrap}.geo-search .btn{height:42px}.search-hit{font-weight:850;color:#174f88}
+.global-search{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:15px 0 7px;padding:13px 14px;border:1px solid #bfd8f2;background:linear-gradient(110deg,#eef7ff,#ffffff);border-radius:15px;box-shadow:0 5px 20px rgba(29,105,213,.055)}.global-search-box{display:flex;align-items:center;gap:8px;flex:1;min-width:300px}.global-search-icon{width:36px;height:36px;border-radius:10px;background:#dfeeff;color:#1d69d5;display:grid;place-items:center;font-size:18px;font-weight:900;flex:0 0 auto}.global-search input{width:100%;height:43px;border:1px solid #c5d9ee;border-radius:10px;padding:0 12px;background:#fff;color:var(--ink);outline:0}.global-search input:focus{border-color:#4c8edc;box-shadow:0 0 0 3px #dcecff}.global-search-meta{font-size:11px;color:#607994;white-space:nowrap}.global-search-label{font-size:10px;font-weight:900;letter-spacing:.65px;color:#3972ad;text-transform:uppercase}.global-search-copy{min-width:155px}.global-search-copy b{display:block;font-size:12px;color:#214c77}.global-search-copy span{display:block;font-size:10.5px;color:#71869e}
+.tabs{display:flex;gap:7px;flex-wrap:wrap;margin:15px 0}.tab{border:1px solid transparent;background:transparent;color:#5a708b;border-radius:10px;padding:9px 14px;font-weight:850}.tab.active{background:#e8f2ff;color:#185dac;border-color:#c7ddf7}.tab:hover{background:#edf5ff}
+.headline{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin:18px 0 10px}.headline h2{font-size:18px;margin:0}.suffix{font-size:11px;color:var(--muted)}.kpi-grid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:11px}.kpi{background:#fff;border:1px solid var(--line);border-radius:15px;padding:14px 15px;box-shadow:0 5px 22px rgba(20,62,108,.045);position:relative;overflow:hidden}.kpi:before{content:"";position:absolute;left:0;top:13px;bottom:13px;width:4px;border-radius:9px;background:#b6c8dc}.kpi.blue:before{background:var(--blue)}.kpi.green:before{background:var(--green)}.kpi.red:before{background:var(--red)}.kpi.orange:before{background:var(--orange)}.kpi.teal:before{background:var(--teal)}.kpi .name{font-size:11px;color:#657a93;font-weight:800}.kpi .value{font-size:27px;font-weight:950;line-height:1.2;margin:6px 0;letter-spacing:-.4px}.kpi .sub{font-size:10.5px;color:#7d8ea2}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}.panel{background:#fff;border:1px solid var(--line);border-radius:16px;padding:17px;box-shadow:0 5px 24px rgba(20,62,108,.045);min-width:0}.panel h3{font-size:15px;margin:0 0 4px}.panel p.sub{font-size:11.5px;color:var(--muted);margin:0 0 12px}.table-wrap{overflow:auto;border:1px solid #e5edf6;border-radius:12px}.table{width:100%;border-collapse:separate;border-spacing:0;font-size:12px}.table th{position:sticky;top:0;background:#f5f8fc;color:#59708b;text-align:left;padding:10px 11px;border-bottom:1px solid #dde7f1;white-space:nowrap;font-size:10.8px;z-index:1}.table th.sortable{cursor:pointer;user-select:none}.table th.sortable:hover{background:#eaf2fc;color:#245f9d}.sort-mark{font-size:9px;margin-left:5px;color:#7e94ab}.trend-card{margin-top:14px}.trend-chart{width:100%;height:300px;display:block}.trend-legend{display:flex;gap:10px;flex-wrap:wrap;margin:8px 0 0}.trend-legend span{font-size:11px;color:#5e738d;background:#f4f8fc;border:1px solid #e1e9f2;border-radius:999px;padding:4px 8px}.chart-empty{padding:45px;text-align:center;color:#7b8ca0}.chart-title-row{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;flex-wrap:wrap;margin-bottom:8px}.table td{padding:10px 11px;border-bottom:1px solid #edf2f7;vertical-align:middle}.table tr:last-child td{border-bottom:0}.table tbody tr:hover{background:#f7fbff}.clickable{cursor:pointer}.right{text-align:right!important}.mono{font-variant-numeric:tabular-nums}.score{font-weight:950;font-size:16px}.score.good{color:var(--green)}.score.mid{color:#be7a12}.score.low{color:var(--red)}.rank{width:28px;height:28px;border-radius:9px;background:#eef4fb;display:grid;place-items:center;font-weight:900;color:#4a6683}.rank.top{background:#e5f4ff;color:#175fae}.barrow{display:flex;align-items:center;gap:8px;min-width:130px}.mini-bar{height:6px;border-radius:9px;background:#e7eef7;overflow:hidden;flex:1}.mini-bar i{height:100%;display:block;border-radius:inherit;background:linear-gradient(90deg,#2c78db,#20a6b1)}.pill{display:inline-flex;align-items:center;border-radius:999px;padding:3px 8px;font-size:10.5px;font-weight:850}.pill.good{background:#e9f8f2;color:#08795b}.pill.warn{background:#fff4df;color:#9a671a}.pill.bad{background:#ffedef;color:#b43e50}.pill.info{background:#e9f2ff;color:#2865ac}.tag{display:inline-flex;gap:4px;align-items:center;font-size:10px;color:#647b95;background:#f2f6fb;border:1px solid #e0e8f2;border-radius:7px;padding:2px 6px;margin:1px 2px 1px 0}.code{font-family:Consolas,ui-monospace,monospace;color:#34608e}.spec{font-weight:750;max-width:430px}.small{font-size:10.5px;color:#77899e}.positive{color:var(--green)}.negative{color:var(--red)}
+.score-break{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;min-width:250px}.break-item{font-size:10px}.break-item b{display:block;font-size:12px}.empty{background:#fff;border:1px solid var(--line);border-radius:17px;padding:55px 20px;text-align:center;color:#6d829a}.empty-icon{width:68px;height:68px;border-radius:22px;background:#e8f2ff;color:#2e76cf;display:grid;place-items:center;font-size:30px;margin:0 auto 13px}.method{display:grid;grid-template-columns:repeat(4,1fr);gap:11px}.method-card{border:1px solid var(--line);border-radius:14px;padding:14px;background:#fbfdff}.method-card b{display:block;color:#174d84;margin-bottom:6px}.method-card .big{font-size:23px;font-weight:950}.formula{font-family:Consolas,ui-monospace,monospace;background:#f1f6fc;border:1px solid #dce7f3;padding:9px 10px;border-radius:9px;font-size:11px;color:#34516f}.notice{padding:11px 13px;border-radius:11px;background:#edf6ff;border:1px solid #cee3f8;color:#315b81;font-size:11.5px;margin:10px 0}.notice.warn{background:#fff7e9;border-color:#efdab8;color:#835a20}.detail-banner{background:linear-gradient(110deg,#eaf4ff,#f6fbff);border:1px solid #cce1f7;border-radius:13px;padding:11px 13px;display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:11px}.detail-banner strong{color:#194f88}.foot{text-align:center;color:#8393a6;font-size:10.5px;margin-top:22px}
+@media(max-width:1250px){.control-grid{grid-template-columns:repeat(4,1fr)}.kpi-grid{grid-template-columns:repeat(3,1fr)}.loader-grid{grid-template-columns:1fr 1fr}.load-actions{grid-column:1/-1}.method{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:780px){.shell,.hero-inner{padding-left:13px;padding-right:13px}.hero-copy{align-items:flex-start;flex-direction:column}.hero-score{width:100%}.loader-grid,.grid2{grid-template-columns:1fr}.control-grid{grid-template-columns:repeat(2,1fr)}.kpi-grid{grid-template-columns:repeat(2,1fr)}.method{grid-template-columns:1fr}.topbar{align-items:flex-start;flex-direction:column}.toolbar{width:100%}}
+@media(max-width:480px){.control-grid{grid-template-columns:1fr}.kpi-grid{grid-template-columns:1fr 1fr}.kpi .value{font-size:22px}}
+@media print{body{background:#fff}.loader-card,.controls,.tabs,.toolbar,.foot{display:none!important}.hero-inner{padding:18px 24px}.shell{max-width:none}.panel,.kpi{box-shadow:none;break-inside:avoid}.table-wrap{overflow:visible}.table{font-size:9px}.table th,.table td{padding:5px 6px}}
+</style>
+</head>
+<body>
+<header class="hero">
+  <div class="hero-inner">
+    <div class="topbar">
+      <div class="brand"><div class="brand-mark">CPI</div><div><strong>Collection Quality Score</strong><small>Trade Policy and Strategy Office · Ministry of Commerce</small></div></div>
+      <div class="toolbar"><button class="btn ghost" id="printBtn">พิมพ์รายงาน</button><button class="btn ghost" id="exportBtn">↓ Export CSV</button></div>
+    </div>
+    <div class="hero-copy">
+      <div><div class="eyebrow">PRICE COLLECTION QUALITY · SCORE 0–10</div><h1>คะแนนคุณภาพการจัดเก็บราคา CPI</h1><p>เปรียบเทียบจังหวัดและเขตจาก Movement รายเดือน / รายสัปดาห์ ภาวะ จำนวนสเปค และ REL โดยเลือกฐานหารได้ และกำหนดได้ว่าจะนำ REL / นิ่งนานมาคิดคะแนนหรือไม่</p></div>
+      <div class="hero-score"><b>10.0</b><span>อันดับ 1 ของช่วงที่เลือก = เต็ม 10</span></div>
+    </div>
+  </div>
+</header>
+<main class="shell">
+  <section class="loader-card">
+    <div class="loader-grid">
+      <label class="drop" for="masterInput"><span class="drop-icon">M</span><span><strong>Real_Master_CPI</strong><small>คลิกเลือกหรือลากไฟล์ Master มาวาง · ใช้ CODE7 / ผู้ดูแล / รอบเก็บ / ภาค-จังหวัด</small></span><input id="masterInput" type="file" accept=".xlsx"></label>
+      <label class="drop" for="priceInput"><span class="drop-icon">⇧</span><span><strong>ไฟล์ราคา CPI เลือกหลายเดือนได้</strong><small>คลิกเลือกหรือลากหลายไฟล์มาวาง · Movement รายเดือนและรายสัปดาห์คิดแยกกัน · “นิ่งนาน” เปิด/ปิดได้</small></span><input id="priceInput" type="file" accept=".xlsx" multiple></label>
+      <div class="load-actions"><button class="btn soft" id="folderBtn">เปิดโฟลเดอร์ Excel</button><button class="btn soft" id="refreshFolderBtn" disabled>↻ อ่านอัตโนมัติ</button><button class="btn soft" id="clearBtn">ล้างข้อมูล</button><button class="btn" id="demoBtn" title="ใช้เฉพาะเมื่อยังไม่ได้เลือกไฟล์">ดูโครงหน้าจอ</button></div>
+    </div>
+    <div class="file-status" id="fileStatus"><span class="chip">ยังไม่ได้โหลดข้อมูล</span></div>
+    <input id="folderInput" type="file" multiple webkitdirectory directory hidden>
+    <div class="auto-source" id="folderStatus"><div><strong>Auto-Load จากโฟลเดอร์</strong><br><span>เลือกโฟลเดอร์ครั้งแรก ระบบจะจำสิทธิ์และพยายามอ่าน Master + ไฟล์ราคาให้อัตโนมัติเมื่อเปิดหน้านี้อีกครั้ง</span></div><div class="auto-actions"><span id="folderStatusText">ยังไม่ได้เชื่อมโฟลเดอร์</span></div></div>
+    <div class="auto-source" id="gitStatusBox"><div><strong>GitHub Auto-Load</strong><br><span>เมื่อเปิดผ่าน GitHub Pages ระบบจะตรวจ Repository ปัจจุบันและอ่าน Real_Master_CPI + ไฟล์ราคา .xlsx ใน Git อัตโนมัติ</span></div><div class="auto-actions"><span id="gitStatusText">กำลังตรวจหา Repository…</span><button class="btn soft" id="refreshGitBtn" type="button">↻ อ่านจาก Git</button></div></div>
+    <details style="margin-top:8px"><summary class="small" style="cursor:pointer;color:#35648f;font-weight:800">ตั้งค่า GitHub เอง (ใช้เมื่อไม่ได้เปิดผ่าน GitHub Pages)</summary><div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap"><input id="gitRepoInput" type="text" placeholder="https://github.com/owner/repository" style="flex:1;min-width:260px;height:40px;border:1px solid #d5e2ef;border-radius:10px;padding:0 10px"><button class="btn soft" id="connectGitBtn" type="button">เชื่อม Git</button></div></details>
+  </section>
+
+  <section class="controls">
+    <div class="control-head"><strong>ตัวกรองและวิธีคิดคะแนน</strong><span>คะแนนคำนวณใหม่ทันทีเมื่อเปลี่ยนตัวเลือก</span></div>
+    <div class="control-grid">
+      <div class="field"><label>เดือนประเมิน</label><select id="periodFilter"></select></div>
+      <div class="field"><label>ช่วงย้อนหลัง</label><select id="windowFilter"><option value="1">เดือนนี้ + ฐานเดือนก่อน</option><option value="3">ย้อนหลัง 3 เดือน</option><option value="6">ย้อนหลัง 6 เดือน</option><option value="12">ย้อนหลัง 12 เดือน</option><option value="99" selected>ทุกเดือนที่โหลด</option></select></div>
+      <div class="field"><label>ระดับจัดอันดับ</label><select id="geoLevel"><option value="province">จังหวัด</option><option value="area" selected>เขต / กลุ่มเก็บราคา</option></select></div>
+      <div class="field"><label>ภาค</label><select id="regionFilter"><option value="">ทุกภาค</option></select></div>
+      <div class="field"><label>ชุดราคา</label><select id="setFilter"><option value="all">G + L + U</option><option value="gl">G + L</option><option value="u">U</option></select></div>
+      <div class="field"><label>ฐานการคำนวณ Movement / ภาวะ / REL</label><select id="denominatorMode"><option value="own" selected>เทียบสเปคของตัวเอง</option><option value="all">เทียบสเปคทั้งหมดของทุกพื้นที่</option></select></div>
+      <div class="field"><label>นำ “เทียบ REL” มาคิดคะแนน</label><select id="relToggle"><option value="off" selected>ไม่ใช้ (ค่าเริ่มต้น)</option><option value="on">ใช้เป็นมิติคะแนน</option></select></div>
+      <div class="field"><label>นำ “นิ่งนาน” มาคิดคะแนน</label><select id="staticToggle"><option value="off" selected>ไม่ใช้ (ค่าเริ่มต้น)</option><option value="on">ใช้เป็นมิติคะแนน</option></select></div>
+    </div>
+    <div class="control-note"><b>คะแนนรวม:</b> แยก Movement รายเดือน, Movement รายสัปดาห์, ภาวะ, จำนวนสเปค และ REL (ถ้าเปิดใช้) ออกจากกันก่อน · Movement/ภาวะ/REL เลือกฐานหารได้ว่าจะเทียบกับสเปคทั้งหมดของทุกพื้นที่หรือเทียบกับสเปคของตัวเอง · อันดับ 1 ของแต่ละมิติ = 10 แล้วจึงเฉลี่ยคะแนนมิติที่ใช้งาน · “เทียบ REL” และ “นิ่งนาน” ปิดเป็นค่าเริ่มต้น</div>
+  </section>
+
+  <section class="global-search" aria-label="ค้นหาทุกมุมมอง">
+    <div class="global-search-copy"><div class="global-search-label">GLOBAL SEARCH</div><b>ค้นหาจากช่องเดียว</b><span>คำค้นคงอยู่เมื่อสลับแท็บ</span></div>
+    <div class="global-search-box"><span class="global-search-icon">⌕</span><input id="globalSearchInput" type="search" autocomplete="off" placeholder="ค้นหา จังหวัด / เขต / CODE7 / สเปค / ร้าน / ภาวะ / ผู้ดูแล / เกณฑ์..."><button class="btn soft" id="globalSearchClear" type="button" hidden>ล้าง</button></div>
+    <div class="global-search-meta" id="globalSearchMeta">ค้นหาได้ทุกแท็บ</div>
+  </section>
+
+  <div class="tabs" id="tabs">
+    <button class="tab active" data-tab="ranking">อันดับจังหวัด / เขต</button>
+    <button class="tab" data-tab="code7">คะแนนราย CODE7</button>
+    <button class="tab" data-tab="spec">เจาะระดับสเปค</button>
+    <button class="tab" data-tab="method">เกณฑ์การให้คะแนน</button>
+  </div>
+  <div id="app"><div class="empty"><div class="empty-icon">★</div><h2>โหลด Master และไฟล์ราคาเพื่อเริ่มให้คะแนน</h2><p>แนะนำให้โหลดอย่างน้อย 2–3 เดือน เพื่อให้ระบบวัด “ราคาคงที่ต่อเนื่อง” ได้แม่นยำขึ้น</p></div></div>
+  <div class="foot">CPI Collection Quality Score · ประมวลผลภายในเบราว์เซอร์ · รองรับ Local Folder และ GitHub Auto-Load แบบอ่านอย่างเดียว</div>
+</main>
+<script>
+'use strict';
+const enc=new TextEncoder(),dec=new TextDecoder('utf-8');
+const $=id=>document.getElementById(id), clean=v=>String(v??'').trim().replace(/\s+/g,' '), norm=v=>clean(v).normalize('NFKC').replace(/[\s\u200b-\u200d\ufeff_.()（）\[\]{}\\/,:;ฯ๏-]/g,'').toLowerCase();
+const fmt=n=>Number(n||0).toLocaleString('th-TH',{maximumFractionDigits:0}), f1=n=>Number.isFinite(n)?n.toLocaleString('th-TH',{minimumFractionDigits:1,maximumFractionDigits:1}):'—', pct=n=>Number.isFinite(n)?(n*100).toLocaleString('th-TH',{minimumFractionDigits:1,maximumFractionDigits:1})+'%':'—';
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const state={master:null,rows:[],files:[],period:'',tab:'ranking',selectedGeo:'',demo:false,historyIndex:new Map(),periods:[],revision:0,scoreCache:new Map(),busy:false,rankSort:{key:'score',dir:'desc'},geoSearch:'',globalSearch:''};
+const THMONTH=['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
+const ABBR=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+function showPeriod(p){if(!/^\d{4}-\d{2}$/.test(p))return p||'—';const [y,m]=p.split('-').map(Number);return THMONTH[m-1]+' '+(y+543)}
+function periodNum(p){return /^\d{4}-\d{2}$/.test(p)?Number(p.slice(0,4))*12+Number(p.slice(5))-1:-1}
+function prevPeriod(p){if(!/^\d{4}-\d{2}$/.test(p))return '';const n=periodNum(p)-1;return Math.floor(n/12)+'-'+String(n%12+1).padStart(2,'0')}
+function posnum(x){if(x===null||x===undefined||x==='')return null;const s=String(x).trim().replace(/,/g,'');if(!/^[-+]?\d+(?:\.\d+)?$/.test(s))return null;const n=Number(s);return Number.isFinite(n)?n:null}
+function checked(v){return v===true||v===1||v==='1'||/^(checked|yes|true|ใช่|✓)$/i.test(clean(v))}
+function xml(str){const d=new DOMParser().parseFromString(str,'application/xml');if(d.querySelector('parsererror'))throw Error('รูปแบบ XML ภายในไฟล์ไม่สมบูรณ์');return d}
+function children(node,name){return Array.from(node?.children||[]).filter(x=>x.localName===name)}
+function first(node,name){return children(node,name)[0]||null}
+function bytesToStr(data){return dec.decode(data)}
+async function readZip(buffer){
+ const data=new Uint8Array(buffer),view=new DataView(data.buffer,data.byteOffset,data.byteLength);let end=-1;
+ for(let i=data.length-22;i>=Math.max(0,data.length-65557);i--){if(view.getUint32(i,true)===0x06054b50){end=i;break}}
+ if(end<0)throw Error('ไฟล์ไม่ใช่ Excel .xlsx (ไม่พบ ZIP directory)');
+ const count=view.getUint16(end+10,true),start=view.getUint32(end+16,true),entries=new Map();let pos=start;
+ for(let i=0;i<count;i++){
+  if(view.getUint32(pos,true)!==0x02014b50)throw Error('ZIP directory ผิดรูปแบบ');
+  const method=view.getUint16(pos+10,true),size=view.getUint32(pos+20,true),nameLen=view.getUint16(pos+28,true),extraLen=view.getUint16(pos+30,true),commentLen=view.getUint16(pos+32,true),at=view.getUint32(pos+42,true);
+  const name=dec.decode(data.slice(pos+46,pos+46+nameLen));entries.set(name,{method,size,at});pos+=46+nameLen+extraLen+commentLen;
+ }
+ async function read(name){const info=entries.get(name);if(!info)return null;const off=info.at;if(view.getUint32(off,true)!==0x04034b50)throw Error('ZIP header ผิดรูปแบบ');const at=off+30+view.getUint16(off+26,true)+view.getUint16(off+28,true);const blob=data.slice(at,at+info.size);
+  if(info.method===0)return bytesToStr(blob);
+  if(info.method!==8)throw Error('ไฟล์ Excel ใช้การบีบอัดที่ยังไม่รองรับ');
+  if(typeof DecompressionStream==='undefined')throw Error('เบราว์เซอร์นี้ไม่รองรับการอ่าน Excel แบบออฟไลน์ กรุณาใช้ Chrome/Edge รุ่นใหม่');
+  const stream=new Blob([blob]).stream().pipeThrough(new DecompressionStream('deflate-raw'));
+  return bytesToStr(new Uint8Array(await new Response(stream).arrayBuffer()));
+ }
+ return {read,entries};
+}
+const colIndex=ref=>{let n=0;for(const c of ref.match(/^[A-Z]+/)?.[0]||''){n=n*26+c.charCodeAt(0)-64}return n-1};
+async function parseWorkbook(file){
+ const zip=await readZip(await file.arrayBuffer());const wbtext=await zip.read('xl/workbook.xml');if(!wbtext)throw Error('ไม่พบ workbook.xml');
+ const wb=xml(wbtext),rl=xml(await zip.read('xl/_rels/workbook.xml.rels')||'<Relationships/>');
+ const rel=new Map();for(const n of Array.from(rl.getElementsByTagName('*')).filter(n=>n.localName==='Relationship'))rel.set(n.getAttribute('Id'),n.getAttribute('Target'));
+ const shared=[];const sharedRaw=await zip.read('xl/sharedStrings.xml');if(sharedRaw){const sd=xml(sharedRaw);for(const si of Array.from(sd.getElementsByTagName('*')).filter(n=>n.localName==='si')){shared.push(Array.from(si.getElementsByTagName('*')).filter(n=>n.localName==='t').map(n=>n.textContent).join(''))}}
+ const sheets=[];const nodes=Array.from(wb.getElementsByTagName('*')).filter(n=>n.localName==='sheet');
+ for(const sh of nodes){const name=sh.getAttribute('name')||'Sheet',id=sh.getAttribute('r:id')||sh.getAttributeNS('http://schemas.openxmlformats.org/officeDocument/2006/relationships','id'),target=rel.get(id);if(!target)continue;
+  const path=target.startsWith('/')?target.slice(1):target.startsWith('xl/')?target:'xl/'+target.replace(/^\.\//,'');const sheetXML=await zip.read(path);if(!sheetXML)continue;
+  const doc=xml(sheetXML),rows=Array.from(doc.getElementsByTagName('*')).filter(n=>n.localName==='row');const matrix=[];
+  for(const row of rows){const rn=Number(row.getAttribute('r'))||matrix.length+1;if(rn>250000)continue;const array=[];let sequential=0;
+   for(const c of children(row,'c')){const parsed=colIndex(c.getAttribute('r')||''),idx=parsed>=0?parsed:sequential;sequential=idx+1;const t=c.getAttribute('t')||'';let v='';
+    if(t==='inlineStr'){v=Array.from(c.getElementsByTagName('*')).filter(x=>x.localName==='t').map(x=>x.textContent).join('')}
+    else{const vNode=first(c,'v');if(vNode){v=vNode.textContent;if(t==='s')v=shared[Number(v)]??'';else if(t==='b')v=v==='1';else if(t!=='str'&&t!=='e'&&v!==''&&Number.isFinite(Number(v)))v=Number(v)}}
+    array[idx]=v;
+   }
+   matrix[rn-1]=array;
+  }
+  sheets.push({name,matrix});
+ }
+ if(!sheets.length)throw Error('ไม่พบชีตข้อมูลภายใน Excel');return sheets;
+}
+function col(h,variants){return h.findIndex(v=>variants.some(k=>clean(v)===k||norm(v)===norm(k)))}
+function cols(h,variant){const n=norm(variant),a=[];h.forEach((v,i)=>{if(norm(v)===n)a.push(i)});return a}
+function parsePeriod(text,name){let meta=String(text||''),fallback=String(name||'');let mYear=meta.match(/ปี\s*(25\d{2}|20\d{2})/),year=mYear?Number(mYear[1]):null;let sub=meta.match(/เดือน\s*(.*?)(?:ประเทศไทย|ชุดทั่วไป|ชุดรายได้น้อย|\s*$)/)?.[1]||meta;const findMonth=s=>{for(let i=0;i<12;i++){if(s.includes(THMONTH[i]))return i+1}for(let i=0;i<12;i++){if(s.includes(ABBR[i]))return i+1}return 0};let month=findMonth(sub)||findMonth(fallback);if(!year){const ym=fallback.match(/(?:^|\D)(25\d{2}|20\d{2})[-_ .]*(0?[1-9]|1[0-2])(?:\D|$)/);if(ym){year=Number(ym[1]);month=month||Number(ym[2])}}if(!year||!month)return '';return (year>=2400?year-543:year)+'-'+String(month).padStart(2,'0')}
+function detectHeader(matrix,kind='main'){let idx=-1,scoreBest=-1;for(let i=0;i<Math.min(matrix.length,16);i++){const h=(matrix[i]||[]).map(clean);let score=0;if(kind==='master'){if(h.includes('กำหนดให้เก็บ'))score+=8;if(h.includes('ผู้ดูแล'))score+=5;if(h.includes('รายการ'))score+=3;if(h.includes('รหัส'))score+=3}else{if(h.includes('จังหวัด'))score+=5;if(h.includes('รหัส'))score+=3;if(h.includes('ราคาปัจจุบัน')||h.includes('ราคาเฉลี่ย'))score+=5;if(h.includes('ลักษณะจำเพาะ')||h.includes('รายการบ้านเช่า'))score+=4;if(h.includes('G'))score+=2}if(score>scoreBest){idx=i;scoreBest=score}}return scoreBest>=(kind==='master'?13:11)?idx:-1}
+function readMaster(sheets){
+ const main=sheets.find(x=>x.name.includes('ข้อมูล_รายการ_ผู้ดูแล'))||sheets.find(x=>x.matrix.slice(0,3).some(row=>(row||[]).includes('กำหนดให้เก็บ')));
+ if(!main)throw Error('ไม่พบชีต ข้อมูล_รายการ_ผู้ดูแล ของ Real_Master_CPI');
+ const headerRow=detectHeader(main.matrix,'master');if(headerRow<0)throw Error('ไม่พบหัวคอลัมน์กำหนดให้เก็บใน Master');
+ const h=(main.matrix[headerRow]||[]).map(clean),idx={code:col(h,['รหัส']),name:col(h,['รายการ']),admin:col(h,['ผู้ดูแล']),detail:col(h,['รายละเอียด']),mode:col(h,['เวลาเก็บ'])};
+ const items=new Map();for(let i=headerRow+1;i<main.matrix.length;i++){const r=main.matrix[i]||[];let code=String(r?.[idx.code]??'').replace(/\.0$/,'').trim();if(!/^\d{7}$/.test(code))continue;items.set(code,{code,name:clean(r[idx.name]),admin:clean(r[idx.admin]),detail:clean(r[idx.detail]),mode:clean(r[idx.mode])})}
+ const provinceMap=new Map(),ps=sheets.find(s=>s.name.includes('รหัสจังหวัด'));if(ps){let phRow=0;for(let i=0;i<Math.min(ps.matrix.length,10);i++){const row=(ps.matrix[i]||[]).map(clean);if(row.includes('จังหวัด')||row.includes('ชื่อจังหวัด')){phRow=i;break}}const ph=(ps.matrix[phRow]||[]).map(clean),pi=col(ph,['จังหวัด','ชื่อจังหวัด']),ri=col(ph,['ภาค','ชื่อภาค']);for(const r of ps.matrix.slice(phRow+1)){const p=clean(r?.[pi]),reg=clean(r?.[ri]);if(p)provinceMap.set(norm(p),{province:p,region:reg})}}
+ return {items,provinceMap};
+}
+function meaningfulComment(v){return clean(v)!==''}
+function provinceFromSource(shop,fallback=''){const text=clean(shop);if(!text||!state.master?.provinceMap?.size)return fallback;const parts=[...text.matchAll(/\(([^()]*)\)/g)].map(m=>clean(m[1])).filter(Boolean).reverse();for(const p of parts){const pm=state.master.provinceMap.get(norm(p));if(pm?.province)return pm.province}return fallback}
+function areaFromRow(province,shop){if(province!=='กรุงเทพมหานคร')return province;const s=clean(shop);let m=s.match(/กลุ่ม\s*([^()]+?)(?:\)|$)/i);if(m)return 'กทม. · '+clean(m[1]);m=s.match(/\(กลุ่ม\s*([^()]+)\)/i);return m?'กทม. · '+clean(m[1]):'กทม. · ไม่ทราบกลุ่ม'}
+function readPriceFile(file,sheets){const rows=[];for(const sh of sheets){const hi=detectHeader(sh.matrix,'main');if(hi<0)continue;const h=(sh.matrix[hi]||[]).map(clean),title=(sh.matrix[0]||[]).filter(x=>typeof x==='string').join(' '),period=parsePeriod(title,file.name);const idc=col(h,['รหัส']),spec=col(h,['ลักษณะจำเพาะ','รายการบ้านเช่า']),province=col(h,['จังหวัด']),shop=col(h,['แหล่งจัดเก็บ']),unit=col(h,['หน่วย']),link=col(h,['Link']),rel=col(h,['REL']),staticM=col(h,['ราคาคงที่เดือน']),stand=col(h,['ยืนราคา']),comment=col(h,['ภาวะ(ผู้บันทึก)','ภาวะ (ผู้บันทึก)']),g=col(h,['G']),l=col(h,['L']),u=col(h,['U']);const ids=cols(h,'รหัส');const source=ids.length>1?ids[1]:-1;const avgs=cols(h,'ราคาเฉลี่ย'),w1=cols(h,'สป. 1'),w2=cols(h,'สป. 2'),w3=[...cols(h,'สป.3'),...cols(h,'สป. 3')].sort((a,b)=>a-b),w4=cols(h,'สป. 4');const weekly=avgs.length>=1&&(w1.length||w2.length||w3.length||w4.length);const curPrice=col(h,['ราคาปัจจุบัน']),prevPrice=col(h,['ราคาเดือนก่อน','ราคาเปรียบเทียบ','เปรียบเทียบ']);if(idc<0||province<0)continue;
+ for(let i=hi+1;i<sh.matrix.length;i++){const r=sh.matrix[i]||[];let raw=String(r[idc]??'').replace(/\.0$/,'').trim();if(!raw)continue;const code=raw.slice(0,7);if(!/^\d{7}$/.test(code))continue;const provRaw=clean(r[province]);if(!provRaw)continue;const shopv=shop>=0?clean(r[shop]):'',sourcev=source>=0?String(r[source]??'').replace(/\.0$/,'').trim():'';const provHint=provinceFromSource(shopv,provRaw),pm=state.master?.provinceMap.get(norm(provHint)),prov=pm?.province||provHint,region=pm?.region||'ไม่ทราบภาค';let prevAvg=null,currAvg=null,prevWeeks=[],currWeeks=[];
+ if(weekly){if(avgs.length>=2){prevAvg=posnum(r[avgs[0]]);currAvg=posnum(r[avgs[avgs.length-1]])}else currAvg=posnum(r[avgs[0]]);const groups=[w1,w2,w3,w4];for(const a of groups){if(a.length>=2){prevWeeks.push(posnum(r[a[0]]));currWeeks.push(posnum(r[a[a.length-1]]))}else if(a.length===1)currWeeks.push(posnum(r[a[0]]))} }
+ else{currAvg=curPrice>=0?posnum(r[curPrice]):null;prevAvg=prevPrice>=0?posnum(r[prevPrice]):null}
+ const set=u>=0&&checked(r[u])&&!((g>=0&&checked(r[g]))||(l>=0&&checked(r[l])))?'U':'GL';const area=areaFromRow(prov,shopv);rows.push({period,code,productId:raw,spec:spec>=0?clean(r[spec]):'',unit:unit>=0?clean(r[unit]):'',source:sourcev,shop:shopv,province:prov,region,area,set,type:weekly?'weekly':'monthly',prevAvg,currAvg,prevWeeks,currWeeks,rel:rel>=0?posnum(r[rel]):null,staticMonths:staticM>=0?posnum(r[staticM]):null,link:link>=0?clean(r[link]):'',comment:comment>=0?clean(r[comment]):'',stand:stand>=0?clean(r[stand]):'',file:file.name,row:i+1})}
+ }return rows}
+function specKey(r){return [r.set,r.productId,r.source||norm(r.shop),r.province].join('§')}
+function rebuildIndexes(){const by=new Map();for(const r of state.rows){const k=specKey(r);if(!by.has(k))by.set(k,[]);by.get(k).push(r)}for(const a of by.values())a.sort((x,y)=>x.period.localeCompare(y.period));state.historyIndex=by;state.periods=[...new Set(state.rows.map(r=>r.period).filter(Boolean))].sort();state.revision++;state.scoreCache.clear()}
+function yieldUI(){return new Promise(resolve=>requestAnimationFrame(()=>setTimeout(resolve,0)))}
+function selectedRows(){const p=$('periodFilter').value||state.period,set=$('setFilter').value,reg=$('regionFilter').value;return state.rows.filter(r=>r.period===p&&(!reg||r.region===reg)&&(set==='all'||(set==='u'?r.set==='U':r.set==='GL')))}
+function windowPeriods(){const all=state.periods,sel=$('periodFilter').value||state.period,w=Number($('windowFilter').value||99),sn=periodNum(sel);return all.filter(p=>periodNum(p)<=sn&&(w===99||periodNum(p)>=sn-(w-1)))}
+function dedupe(nums){return nums.filter(n=>Number.isFinite(n)&&n>0)}
+function latestChanged(series){if(series.length<2)return null;return Math.abs(series.at(-1)-series.at(-2))>1e-9}
+function stableStreak(series){if(series.length<2)return 0;let n=0;for(let i=series.length-1;i>0;i--){if(Math.abs(series[i]-series[i-1])<1e-9)n++;else break}return n}
+function scoreSpecWithPeriods(cur,periods){
+ const key=specKey(cur),lo=periods[0]||'',hi=periods.at(-1)||'',cacheKey=[state.revision,key,cur.period,lo,hi].join('§');
+ if(state.scoreCache.has(cacheKey))return state.scoreCache.get(cacheKey);
+ const hist=(state.historyIndex.get(key)||[]).filter(r=>(!lo||r.period>=lo)&&(!hi||r.period<=hi));let series=[],kind=cur.type,longSeries=[],longStaticEligible=false;
+ if(kind==='weekly'){
+  // Weekly movement: compare only W4 of the previous month with W1-W4 of the selected/current month.
+  // Do NOT include W1-W3 of the previous month in the movement calculation.
+  const currentWeeks=dedupe(cur.currWeeks);longSeries=currentWeeks;longStaticEligible=currentWeeks.length>=4;
+  const previousWeeks=dedupe(cur.prevWeeks);
+  let previousW4=previousWeeks.length?previousWeeks.at(-1):null;
+  // Fallback: if the workbook does not carry previous-month weeks, use the last observed
+  // current-week price from the immediately preceding loaded month for the same specification.
+  if(!Number.isFinite(previousW4)){
+   const earlier=hist.filter(r=>r.period<cur.period).sort((a,b)=>a.period.localeCompare(b.period));
+   const prior=earlier.at(-1);if(prior){const pw=dedupe(prior.currWeeks);if(pw.length)previousW4=pw.at(-1)}
+  }
+  if(Number.isFinite(previousW4))series.push(previousW4);
+  series.push(...currentWeeks);
+  if(series.length<2&&Number.isFinite(cur.prevAvg))series.unshift(cur.prevAvg);
+  if(series.length<2&&Number.isFinite(cur.currAvg))series.push(cur.currAvg);
+ }else{
+  const monthlyHist=hist.filter(r=>Number.isFinite(r.currAvg));longSeries=monthlyHist.map(r=>r.currAvg);longStaticEligible=longSeries.length>=3;
+  if(hist.length<=1&&Number.isFinite(cur.prevAvg))series.push(cur.prevAvg);
+  for(const r of hist)if(Number.isFinite(r.currAvg))series.push(r.currAvg);
+ }
+ if(series.length<2&&Number.isFinite(cur.rel)){series=[100,cur.rel]}
+ let transitions=Math.max(0,series.length-1),changes=0;for(let i=1;i<series.length;i++)if(Math.abs(series[i]-series[i-1])>1e-9)changes++;
+ const streak=stableStreak(series),longStreak=longStaticEligible?stableStreak(longSeries):null;
+ const isLongStatic=longStaticEligible&&(kind==='weekly'?longStreak>=3:longStreak>=2);
+ const changeRate=transitions?changes/transitions:null,commentPts=meaningfulComment(cur.comment)?1:0;
+ const result={...cur,key,series,transitions,changes,changeRate,streak,longSeries,longStreak,longStaticEligible,isLongStatic,latestChanged:latestChanged(series),commentPts};
+ state.scoreCache.set(cacheKey,result);return result
+}
+function scoreSpec(cur){return scoreSpecWithPeriods(cur,windowPeriods())}
+function scoredCurrent(){return selectedRows().filter(r=>Number.isFinite(r.currAvg)||r.currWeeks.some(Number.isFinite)||Number.isFinite(r.rel)).map(scoreSpec)}
+function scoreClass(s){return s>=8?'good':s>=6?'mid':'low'}
+function groupScores(rows,level){
+ const m=new Map();
+ for(const r of rows){
+  const key=level==='area'?r.area:r.province;
+  if(!m.has(key))m.set(key,{key,label:key,province:r.province,region:r.region,n:0,commentCount:0,longStaticCount:0,longStaticEligibleCount:0,monthlyChangedSpecs:0,monthlyEligibleSpecs:0,weeklyChangedSpecs:0,weeklyEligibleSpecs:0,relChangedSpecs:0,relEligibleSpecs:0,weeklyN:0,monthlyN:0,codes:new Set()});
+  const g=m.get(key);g.n++;g.commentCount+=r.commentPts?1:0;
+  if(r.longStaticEligible){g.longStaticEligibleCount++;g.longStaticCount+=r.isLongStatic?1:0}
+  if(r.type==='weekly'){
+   g.weeklyN++;
+   if(r.transitions>0){g.weeklyEligibleSpecs++;if(r.changes>0)g.weeklyChangedSpecs++}
+  }else{
+   g.monthlyN++;
+   if(r.transitions>0){g.monthlyEligibleSpecs++;if(r.changes>0)g.monthlyChangedSpecs++}
+  }
+  if(Number.isFinite(r.rel)){g.relEligibleSpecs++;if(Math.abs(r.rel-100)>1e-9)g.relChangedSpecs++}
+  g.codes.add(r.code);
+ }
+ const groups=[...m.values()];
+ const mode=$('denominatorMode')?.value||'own';
+ const totals={
+  monthly:groups.reduce((n,g)=>n+g.monthlyEligibleSpecs,0),
+  weekly:groups.reduce((n,g)=>n+g.weeklyEligibleSpecs,0),
+  comment:groups.reduce((n,g)=>n+g.n,0),
+  rel:groups.reduce((n,g)=>n+g.relEligibleSpecs,0)
+ };
+ for(const g of groups){
+  const dm=mode==='all'?totals.monthly:g.monthlyEligibleSpecs;
+  const dw=mode==='all'?totals.weekly:g.weeklyEligibleSpecs;
+  const dc=mode==='all'?totals.comment:g.n;
+  const dr=mode==='all'?totals.rel:g.relEligibleSpecs;
+  g.monthlyRate=dm?g.monthlyChangedSpecs/dm:null;
+  g.weeklyRate=dw?g.weeklyChangedSpecs/dw:null;
+  g.commentRate=dc?g.commentCount/dc:null;
+  g.relRate=dr?g.relChangedSpecs/dr:null;
+  g.longStaticRate=g.longStaticEligibleCount?g.longStaticCount/g.longStaticEligibleCount:null;
+  g.staticGoodRate=g.longStaticRate===null?null:1-g.longStaticRate;
+ }
+ const max={monthly:Math.max(0,...groups.map(g=>g.monthlyRate??0)),weekly:Math.max(0,...groups.map(g=>g.weeklyRate??0)),comment:Math.max(0,...groups.map(g=>g.commentRate??0)),spec:Math.max(0,...groups.map(g=>g.n)),rel:Math.max(0,...groups.map(g=>g.relRate??0)),static:Math.max(0,...groups.map(g=>g.staticGoodRate??0))};
+ const useStatic=$('staticToggle')?.value==='on',useRel=$('relToggle')?.value==='on';
+ for(const g of groups){
+  g.monthlyScore=g.monthlyRate===null?null:(max.monthly>0?g.monthlyRate/max.monthly*10:0);
+  g.weeklyScore=g.weeklyRate===null?null:(max.weekly>0?g.weeklyRate/max.weekly*10:0);
+  g.commentScore=g.commentRate===null?null:(max.comment>0?g.commentRate/max.comment*10:0);
+  g.specScore=max.spec>0?g.n/max.spec*10:0;
+  g.relScore=g.relRate===null?null:(max.rel>0?g.relRate/max.rel*10:0);
+  g.staticScore=g.staticGoodRate===null?null:(max.static>0?g.staticGoodRate/max.static*10:0);
+  const parts=[g.monthlyScore,g.weeklyScore,g.commentScore,g.specScore];
+  if(useRel&&g.relScore!==null)parts.push(g.relScore);
+  if(useStatic&&g.staticScore!==null)parts.push(g.staticScore);
+  const valid=parts.filter(Number.isFinite);g.rawScore=valid.length?valid.reduce((a,b)=>a+b,0)/valid.length:0;g.dimensionCount=valid.length;
+ }
+ const best=Math.max(0,...groups.map(g=>g.rawScore));for(const g of groups){g.score=best>0?g.rawScore/best*10:0;g.deduct=10-g.score}return groups.sort((a,b)=>b.score-a.score||b.rawScore-a.rawScore||b.n-a.n)
+}
+function globalSearchQuery(){return clean(state.globalSearch||'')}
+function rowSearchText(r){const item=state.master?.items.get(r.code);return [r.region,r.province,r.area,r.code,r.spec,r.shop,r.comment,item?.name,item?.admin,item?.mode,r.type,Number.isFinite(r.rel)?r.rel:''].filter(Boolean).join(' ')}
+function rowMatchesGlobal(r,q=globalSearchQuery()){if(!q)return true;return norm(rowSearchText(r)).includes(norm(q))}
+function setGlobalSearchMeta(text){const e=$('globalSearchMeta');if(e)e.innerHTML=text||'ค้นหาได้ทุกแท็บ'}
+function syncGlobalSearchControl(){const input=$('globalSearchInput'),clear=$('globalSearchClear');if(input&&input.value!==state.globalSearch)input.value=state.globalSearch||'';if(clear)clear.hidden=!globalSearchQuery()}
+function render(){syncGlobalSearchControl();const periods=state.periods;if(periods.length&&!periods.includes(state.period))state.period=periods.at(-1);const pf=$('periodFilter');pf.innerHTML=periods.length?periods.map(p=>`<option value="${p}" ${p===state.period?'selected':''}>${showPeriod(p)}</option>`).join(''):'<option value="">— ไม่มีข้อมูล —</option>';const regs=[...new Set(state.rows.map(r=>r.region).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'th')),rf=$('regionFilter'),old=rf.value;rf.innerHTML='<option value="">ทุกภาค</option>'+regs.map(r=>`<option>${esc(r)}</option>`).join('');if(regs.includes(old))rf.value=old;if(!state.rows.length&&!state.demo){$('app').innerHTML='<div class="empty"><div class="empty-icon">★</div><h2>โหลด Master และไฟล์ราคาเพื่อเริ่มให้คะแนน</h2><p>ค่าเริ่มต้นใช้ทุกเดือนที่โหลด · “นิ่งนาน” ปิดไว้ก่อนและเปิดใช้ได้เมื่อต้องการวิเคราะห์ย้อนหลัง</p></div>';return}if(state.demo&&!state.rows.length){renderDemo();return}if(state.tab==='ranking')renderRanking();else if(state.tab==='code7')renderCode7();else if(state.tab==='spec')renderSpecs();else renderMethod()}
+function kpi(name,val,sub,cls=''){return `<div class="kpi ${cls}"><div class="name">${name}</div><div class="value mono">${val}</div><div class="sub">${sub}</div></div>`}
+function fmtRateCount(rate,count){return `${pct(rate)} (${fmt(count)})`}
+function fmtMove(rate,changed,eligible,score){return rate===null?'<span class="pill info">ข้อมูลไม่พอ</span>':`<div><b>${pct(rate)}</b> <span class="small">(${fmt(changed)}/${fmt(eligible)} สเปค)</span></div><div class="small">คะแนน ${f1(score)}/10</div>`}
+function fmtMetric(rate,count,den,score,label='รายการ'){return rate===null?'<span class="pill info">ข้อมูลไม่พอ</span>':`<div><b>${pct(rate)}</b> <span class="small">(${fmt(count)}/${fmt(den)} ${label})</span></div><div class="small">คะแนน ${f1(score)}/10</div>`}
+function sortedRankingGroups(groups){const key=state.rankSort.key,dir=state.rankSort.dir,mul=dir==='asc'?1:-1;const value=(g,k)=>({rank:g.score,label:g.label,score:g.score,deduct:g.deduct,monthly:g.monthlyScore??-1,weekly:g.weeklyScore??-1,comment:g.commentCount,spec:g.n,rel:g.relRate??-1,long:g.longStaticRate??-1,codes:g.codes.size})[k];return [...groups].sort((a,b)=>{if(key==='label')return mul*a.label.localeCompare(b.label,'th');const av=value(a,key),bv=value(b,key);return mul*((av??0)-(bv??0))||b.score-a.score||a.label.localeCompare(b.label,'th')})}
+function sortHeader(label,key,right=false){const active=state.rankSort.key===key,mark=active?(state.rankSort.dir==='asc'?'▲':'▼'):'↕';return `<th class="sortable ${right?'right':''}" data-sort="${key}">${label}<span class="sort-mark">${mark}</span></th>`}
+function rowsForPeriod(period){const set=$('setFilter').value,reg=$('regionFilter').value;return state.rows.filter(r=>r.period===period&&(!reg||r.region===reg)&&(set==='all'||(set==='u'?r.set==='U':r.set==='GL')))}
+function periodsForPoint(period){const all=state.periods,sn=periodNum(period),w=Number($('windowFilter').value||99);return all.filter(p=>periodNum(p)<=sn&&(w===99||periodNum(p)>=sn-(w-1)))}
+function trendSeries(currentGroups){if(!state.periods.length||!currentGroups.length)return [];const keys=(state.selectedGeo?[state.selectedGeo]:currentGroups.slice(0,5).map(g=>g.key));return keys.map(key=>({key,label:currentGroups.find(g=>g.key===key)?.label||key,points:state.periods.map(period=>{const scored=rowsForPeriod(period).filter(r=>Number.isFinite(r.currAvg)||r.currWeeks.some(Number.isFinite)||Number.isFinite(r.rel)).map(r=>scoreSpecWithPeriods(r,periodsForPoint(period))),groups=groupScores(scored,$('geoLevel').value),g=groups.find(x=>x.key===key);return {period,score:g?.score??null}})}))}
+function scoreTrendChart(groups){const series=trendSeries(groups),periods=state.periods;if(!series.length||periods.length<2)return '<div class="chart-empty">ต้องมีข้อมูลอย่างน้อย 2 เดือนเพื่อแสดงกราฟแนวโน้มคะแนน</div>';const W=1000,H=280,L=48,R=20,T=20,B=42,ph=H-T-B,pw=W-L-R,x=i=>L+(periods.length===1?0:i*pw/(periods.length-1)),y=v=>T+(10-v)/10*ph,grid=[0,2,4,6,8,10].map(v=>`<line x1="${L}" y1="${y(v)}" x2="${W-R}" y2="${y(v)}" stroke="#e7edf5"/><text x="${L-10}" y="${y(v)+4}" text-anchor="end" font-size="11" fill="#73869b">${v}</text>`).join(''),labels=periods.map((p,i)=>`<text x="${x(i)}" y="${H-12}" text-anchor="middle" font-size="10" fill="#71859b">${ABBR[Number(p.slice(5))-1]} ${Number(p.slice(2,4))+43}</text>`).join('');const paths=series.map((s,si)=>{const pts=s.points.map((p,i)=>p.score==null?null:{x:x(i),y:y(p.score),score:p.score,period:p.period}).filter(Boolean);if(!pts.length)return '';let d='';let prevI=-2;for(const pt of pts){const i=periods.indexOf(pt.period);d+=(i===prevI+1?' L ':' M ')+pt.x.toFixed(1)+' '+pt.y.toFixed(1);prevI=i}return `<path d="${d}" fill="none" stroke="hsl(${(si*67+205)%360} 62% 48%)" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>`+pts.map(pt=>`<circle cx="${pt.x}" cy="${pt.y}" r="3.5" fill="hsl(${(si*67+205)%360} 62% 48%)"><title>${esc(s.label)} · ${showPeriod(pt.period)} · ${f1(pt.score)}</title></circle>`).join('')}).join('');const legend=series.map((s,si)=>`<span><b style="color:hsl(${(si*67+205)%360} 62% 48%)">●</b> ${esc(s.label)}</span>`).join('');return `<div class="panel trend-card"><div class="chart-title-row"><div><h3>แนวโน้มคะแนนรวมตามเดือน</h3><p class="sub">คะแนน 0–10 · ${state.selectedGeo?'พื้นที่ที่เลือก':'Top 5 ของเดือนประเมินปัจจุบัน'}</p></div><span class="small">รายเดือน / รายสัปดาห์ / ภาวะ / จำนวนสเปค${$('relToggle').value==='on'?' / REL':''}${$('staticToggle').value==='on'?' / นิ่งนาน':''}</span></div><svg class="trend-chart" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" role="img" aria-label="กราฟเส้นแนวโน้มคะแนน">${grid}<line x1="${L}" y1="${T+ph}" x2="${W-R}" y2="${T+ph}" stroke="#cbd7e4"/>${paths}${labels}</svg><div class="trend-legend">${legend}</div></div>`}
+function renderRanking(){
+ const rows=scoredCurrent(),level=$('geoLevel').value,allGroups=groupScores(rows,level),q=globalSearchQuery(),qn=norm(q);
+ let groups=allGroups;
+ if(q){const hitKeys=new Set(rows.filter(r=>rowMatchesGlobal(r,q)).map(r=>level==='area'?r.area:r.province));groups=allGroups.filter(g=>norm([g.label,g.region].join(' ')).includes(qn)||hitKeys.has(g.key))}
+ const avg=allGroups.length?allGroups.reduce((a,b)=>a+b.score,0)/allGroups.length:0,best=allGroups[0],commentCount=rows.filter(r=>r.commentPts).length,relChanged=rows.filter(r=>Number.isFinite(r.rel)&&Math.abs(r.rel-100)>1e-9).length,relEligible=rows.filter(r=>Number.isFinite(r.rel)).length,longCount=rows.filter(r=>r.longStaticEligible&&r.isLongStatic).length,longEligible=rows.filter(r=>r.longStaticEligible).length;
+ const title=level==='area'?'เขต / กลุ่มเก็บราคา':'จังหวัด',useStatic=$('staticToggle').value==='on',useRel=$('relToggle').value==='on',denLabel=$('denominatorMode').value==='all'?'เทียบสเปคทั้งหมดของทุกพื้นที่':'เทียบสเปคของตัวเอง';
+ setGlobalSearchMeta(q?`พบ <span class="search-hit">${fmt(groups.length)}</span> จาก ${fmt(allGroups.length)} ${title}`:`ค้นหาได้ ${fmt(allGroups.length)} ${title} · รวมถึง CODE7 / สเปค / ร้าน / ภาวะ`);
+ $('app').innerHTML=`<div class="headline"><h2>อันดับคะแนนระดับ${title}</h2><span class="suffix">${showPeriod(state.period)} · ${fmt(allGroups.length)} พื้นที่ · ${fmt(rows.length)} สเปค</span></div><div class="notice"><b>ฐานการคำนวณ:</b> ${denLabel} · Movement = จำนวนสเปคที่พบราคาเปลี่ยน · ภาวะ = จำนวนสเปคที่มีข้อความใน “ภาวะ (ผู้บันทึก)” · REL = จำนวนสเปคที่ REL ≠ 100</div><div class="kpi-grid">${kpi('คะแนนเฉลี่ยเทียบอันดับ 1',f1(avg)+' / 10','คะแนนรวมเฉลี่ยทุก'+title,'blue')}${kpi('อันดับ 1',best?f1(best.score):'—',best?esc(best.label)+' · ดิบ '+f1(best.rawScore):'ไม่มีข้อมูล','green')}${kpi('ภาวะ (ผู้บันทึก)',fmt(commentCount),'สเปคที่มีข้อความ','orange')}${kpi('เทียบ REL',relEligible?pct(relChanged/relEligible):'—',fmt(relChanged)+' / '+fmt(relEligible)+' สเปค'+(useRel?' · ใช้ในคะแนน':' · ไม่ใช้ในคะแนน'),'teal')}${useStatic?kpi('นิ่งนาน',longEligible?pct(longCount/longEligible):'—',fmt(longCount)+' / '+fmt(longEligible)+' สเปควัดได้','red'):kpi('นิ่งนาน','ปิด','ไม่ใช้ในการคิดคะแนน','')}</div><div class="headline"><h2>Ranking</h2><span class="suffix">แต่ละมิติอันดับ 1 = 10 · คลิกหัวคอลัมน์เพื่อเรียง</span></div><div class="panel">${rankingTable(groups)}</div>${scoreTrendChart(allGroups)}`;
+}
+function wireGeoSearch(allGroups){const input=$('geoSearch'),btn=$('geoDrillBtn'),clear=$('geoSearchClear');if(!input)return;input.addEventListener('input',e=>{state.geoSearch=e.target.value;renderRanking()});input.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();drillGeoSearch(allGroups)}});if(btn)btn.addEventListener('click',()=>drillGeoSearch(allGroups));if(clear)clear.addEventListener('click',()=>{state.geoSearch='';renderRanking()})}
+function drillGeoSearch(allGroups){const q=clean(state.geoSearch||'');if(!q)return;const qn=norm(q),exact=allGroups.find(g=>norm(g.label)===qn),matches=allGroups.filter(g=>norm(g.label).includes(qn)||norm(g.region||'').includes(qn));const hit=exact||matches[0];if(!hit)return alert('ไม่พบพื้นที่ที่ตรงกับ “'+q+'”');state.selectedGeo=hit.key;state.geoSearch=hit.label;state.tab='code7';document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active',x.dataset.tab==='code7'));render()}
+function rankingTable(groups){if(!groups.length)return '<div class="empty">ไม่มีข้อมูลตรงตามตัวกรอง</div>';const sorted=sortedRankingGroups(groups),useStatic=$('staticToggle').value==='on',useRel=$('relToggle').value==='on',mode=$('denominatorMode').value;const totals={monthly:groups.reduce((n,g)=>n+g.monthlyEligibleSpecs,0),weekly:groups.reduce((n,g)=>n+g.weeklyEligibleSpecs,0),comment:groups.reduce((n,g)=>n+g.n,0),rel:groups.reduce((n,g)=>n+g.relEligibleSpecs,0)};return `<div class="table-wrap"><table class="table"><thead><tr>${sortHeader('อันดับ','rank')}${sortHeader('จังหวัด / เขต','label')}${sortHeader('คะแนนรวม','score',true)}${sortHeader('หักจาก 10','deduct',true)}${sortHeader('Movement รายเดือน','monthly')}${sortHeader('Movement รายสัปดาห์','weekly')}${sortHeader('ภาวะ','comment')}${sortHeader('จำนวนสเปค','spec',true)}${sortHeader('เทียบ REL','rel')}${useStatic?sortHeader('นิ่งนาน','long'):''}${sortHeader('CODE7','codes',true)}<th></th></tr></thead><tbody>${sorted.map((g,i)=>`<tr class="clickable" data-geo="${esc(g.key)}"><td><span class="rank ${i<3?'top':''}">${i+1}</span></td><td><div class="spec">${esc(g.label)}</div><div class="small">${esc(g.region||'')} · ใช้ ${fmt(g.dimensionCount)} มิติคะแนน</div></td><td class="right"><span class="score ${scoreClass(g.score)}">${f1(g.score)}</span><div class="small">เฉลี่ยมิติ ${f1(g.rawScore)}</div></td><td class="right mono ${g.deduct>2?'negative':''}">-${f1(g.deduct)}</td><td>${fmtMove(g.monthlyRate,g.monthlyChangedSpecs,mode==='all'?totals.monthly:g.monthlyEligibleSpecs,g.monthlyScore)}</td><td>${fmtMove(g.weeklyRate,g.weeklyChangedSpecs,mode==='all'?totals.weekly:g.weeklyEligibleSpecs,g.weeklyScore)}</td><td>${fmtMetric(g.commentRate,g.commentCount,mode==='all'?totals.comment:g.n,g.commentScore,'สเปค')}</td><td class="right"><b>${fmt(g.n)}</b><div class="small">คะแนน ${f1(g.specScore)}/10</div></td><td>${fmtMetric(g.relRate,g.relChangedSpecs,mode==='all'?totals.rel:g.relEligibleSpecs,g.relScore,'สเปค')}<div class="small">${useRel?'ใช้ในคะแนน':'ไม่ใช้ในคะแนน'}</div></td>${useStatic?`<td><span class="pill ${g.longStaticRate===null?'info':g.longStaticRate<=.15?'good':g.longStaticRate<=.35?'warn':'bad'}">${g.longStaticRate===null?'ข้อมูลไม่พอ':fmtRateCount(g.longStaticRate,g.longStaticCount)+' / '+fmt(g.longStaticEligibleCount)+' วัดได้'}</span><div class="small">คะแนนไม่อยู่นิ่งนาน ${g.staticScore===null?'—':f1(g.staticScore)}/10</div></td>`:''}<td class="right mono">${fmt(g.codes.size)}</td><td><button class="btn sm soft" data-open-geo="${esc(g.key)}">ดู CODE7 →</button></td></tr>`).join('')}</tbody></table></div>`}
+function geoFiltered(rows){if(!state.selectedGeo)return rows;const level=$('geoLevel').value;return rows.filter(r=>(level==='area'?r.area:r.province)===state.selectedGeo)}
+function codeGroups(q=''){let rows=geoFiltered(scoredCurrent());if(q)rows=rows.filter(r=>rowMatchesGlobal(r,q));const m=new Map();for(const r of rows){if(!m.has(r.code))m.set(r.code,[]);m.get(r.code).push(r)}const pseudo=[];for(const [code,list] of m){for(const r of list)pseudo.push({...r,area:code,province:code})}const gs=groupScores(pseudo,'area');return gs.map(g=>{const sample=rows.find(r=>r.code===g.key);return {...g,code:g.key,name:state.master?.items.get(g.key)?.name||'',admin:state.master?.items.get(g.key)?.admin||'',mode:state.master?.items.get(g.key)?.mode||sample?.type||''}})}
+function detailBanner(){return state.selectedGeo?`<div class="detail-banner"><span>กำลังเจาะพื้นที่ <strong>${esc(state.selectedGeo)}</strong></span><button class="btn sm soft" id="clearGeoBtn">ดูทุกพื้นที่ ✕</button></div>`:''}
+function renderCode7(){const q=globalSearchQuery(),groups=codeGroups(q),useStatic=$('staticToggle').value==='on';setGlobalSearchMeta(q?`พบ <span class="search-hit">${fmt(groups.length)}</span> CODE7 ที่ตรงกับ “${esc(q)}”`:`ค้นหา CODE7 / ชื่อรายการ / ผู้ดูแล / พื้นที่ / ร้าน / ภาวะ ได้จากช่องด้านบน`);$('app').innerHTML=`${detailBanner()}<div class="headline"><h2>คะแนนราย CODE7</h2><span class="suffix">${fmt(groups.length)} หมวด · ใช้หลักคะแนนเดียวกับ Ranking</span></div><div class="panel"><div class="table-wrap"><table class="table"><thead><tr><th>CODE7 / รายการ</th><th>ผู้ดูแล</th><th>รอบเก็บ</th><th class="right">Score</th><th>รายเดือน</th><th>รายสัปดาห์</th><th>ภาวะ</th><th class="right">สเปค</th><th>เทียบ REL</th>${useStatic?'<th>นิ่งนาน</th>':''}<th></th></tr></thead><tbody>${groups.map(g=>`<tr class="clickable" data-code="${g.code}"><td><span class="code">${g.code}</span><div class="spec">${esc(g.name||'ไม่พบชื่อใน Master')}</div></td><td>${esc(g.admin||'—')}</td><td>${esc(g.mode||'—')}</td><td class="right"><span class="score ${scoreClass(g.score)}">${f1(g.score)}</span></td><td>${fmtMove(g.monthlyRate,g.monthlyChangedSpecs,g.monthlyEligibleSpecs,g.monthlyScore)}</td><td>${fmtMove(g.weeklyRate,g.weeklyChangedSpecs,g.weeklyEligibleSpecs,g.weeklyScore)}</td><td><b>${fmt(g.commentCount)}</b><div class="small">${f1(g.commentScore)}/10</div></td><td class="right"><b>${fmt(g.n)}</b><div class="small">${f1(g.specScore)}/10</div></td><td>${g.relRate===null?'ข้อมูลไม่พอ':pct(g.relRate)}<div class="small">${f1(g.relScore)}/10 · ${$('relToggle').value==='on'?'ใช้':'ไม่ใช้'}</div></td>${useStatic?`<td>${g.longStaticRate===null?'ข้อมูลไม่พอ':fmtRateCount(g.longStaticRate,g.longStaticCount)}</td>`:''}<td><button class="btn sm soft" data-code="${g.code}">ดูสเปค →</button></td></tr>`).join('')||'<tr><td colspan="10">ไม่มีข้อมูลตรงกับคำค้น</td></tr>'}</tbody></table></div></div>`;wireDetail()}
+function renderSpecs(code=''){let rows=geoFiltered(scoredCurrent()),q=globalSearchQuery();if(code)rows=rows.filter(r=>r.code===code);if(q)rows=rows.filter(r=>rowMatchesGlobal(r,q));rows.sort((a,b)=>(b.commentPts-a.commentPts)||(Number(b.latestChanged===true)-Number(a.latestChanged===true))||a.code.localeCompare(b.code));const useStatic=$('staticToggle').value==='on';setGlobalSearchMeta(q?`พบ <span class="search-hit">${fmt(rows.length)}</span> สเปคที่ตรงกับ “${esc(q)}”`:`ค้นหา CODE7 / สเปค / จังหวัด / เขต / ร้าน / ภาวะ ได้จากช่องด้านบน`);$('app').innerHTML=`${detailBanner()}<div class="headline"><h2>ระดับสเปค ${code?'· '+esc(code):''}</h2><span class="suffix">${fmt(rows.length)} สเปค · แสดงหลักฐานที่ใช้คิดคะแนนพื้นที่</span></div><div class="panel"><div class="table-wrap"><table class="table"><thead><tr><th>CODE7 / สเปค</th><th>พื้นที่ / แหล่ง</th><th>ประเภท</th><th>Movement</th><th>เทียบ REL</th>${useStatic?'<th>นิ่งนาน</th>':''}<th>ภาวะ (ผู้บันทึก)</th><th>ค่า REL</th><th>ประวัติที่ใช้คิด</th></tr></thead><tbody>${rows.map(r=>`<tr><td><span class="code">${r.code}</span><div class="spec">${esc(r.spec||'—')}</div><div class="small">${esc(state.master?.items.get(r.code)?.name||'')}</div></td><td><div>${esc(r.area)}</div><div class="small">${esc(r.shop||'—')}</div></td><td><span class="pill info">${r.type==='weekly'?'รายสัปดาห์':'รายเดือน'}</span></td><td>${r.changeRate===null?'<span class="pill info">ข้อมูลไม่พอ</span>':`<b>${pct(r.changeRate)}</b><div class="small">เปลี่ยน ${r.changes}/${r.transitions} ครั้ง</div>`}</td><td>${Number.isFinite(r.rel)?(Math.abs(r.rel-100)>1e-9?'<span class="pill good">REL ≠ 100</span>':'<span class="pill warn">REL = 100</span>'):'<span class="pill info">ไม่มี REL</span>'}</td>${useStatic?`<td>${!r.longStaticEligible?'<span class="pill info">ข้อมูลไม่พอ</span>':`<span class="pill ${r.isLongStatic?'bad':'good'}">${fmt(r.longStreak)} ${r.type==='weekly'?'ช่วงสัปดาห์คงที่':'ช่วงเดือนคงที่'}</span>`}</td>`:''}<td>${r.commentPts?'<span class="pill good">มีภาวะ ✓</span>':'<span class="pill bad">ว่าง</span>'}<div class="small">${esc(r.comment||'—')}</div></td><td class="mono">${Number.isFinite(r.rel)?f1(r.rel):'—'}</td><td><div class="small mono">${esc(r.series.slice(-12).map(x=>f1(x)).join(' → ')||'—')}</div></td></tr>`).join('')||'<tr><td colspan="9">ไม่มีข้อมูลตรงกับคำค้น</td></tr>'}</tbody></table></div></div>`;wireDetail()}
+function renderMethod(){const q=globalSearchQuery(),cards=[
+ ['1 · Movement รายเดือน','0–10','ใช้เฉพาะสเปครายเดือน ถ้าในช่วงย้อนหลังที่เลือกมีราคาเปลี่ยนอย่างน้อย 1 ครั้ง ถือว่าสเปคนั้น “ขยับ”','Monthly = จำนวนสเปครายเดือนที่ขยับ ÷ ฐานสเปคที่เลือก'],
+ ['2 · Movement รายสัปดาห์','0–10','ใช้เฉพาะสเปครายสัปดาห์ โดยใช้เฉพาะ สป.4 ของเดือนก่อน → สป.1 → สป.2 → สป.3 → สป.4 ของเดือนปัจจุบัน จึงมีได้สูงสุด 4 ครั้งที่เปรียบเทียบต่อสเปค ถ้ามีราคาเปลี่ยนอย่างน้อย 1 ครั้งถือว่าสเปคนั้น “ขยับ”','Weekly = จำนวนสเปครายสัปดาห์ที่ขยับ ÷ ฐานสเปคที่เลือก'],
+ ['3 · ภาวะ (ผู้บันทึก)','มีข้อความ = นับ 1','ข้อความอะไรก็ได้ในช่อง “ภาวะ (ผู้บันทึก)” นับเป็นการสื่อสาร 1 สเปค','ภาวะ = จำนวนสเปคที่มีข้อความ ÷ ฐานสเปคที่เลือก'],
+ ['4 · จำนวนสเปค','ปริมาณงาน','จำนวนสเปคยังเป็นมิติอิสระ พื้นที่ที่มีจำนวนสเปคมากที่สุดได้ 10','Spec score = จำนวนสเปคพื้นที่ ÷ จำนวนสูงสุด × 10'],
+ ['5 · เทียบ REL','เลือกใช้ได้','REL ≠ 100 ถือว่ามีการเปลี่ยนตาม REL ส่วน REL = 100 ถือว่าคงที่ เลือกได้ว่าจะนำมาคิดคะแนนหรือไม่ ค่าเริ่มต้น “ไม่ใช้” เพราะข้อมูลนี้ใกล้เคียงกับ Movement','REL = จำนวนสเปคที่ REL ≠ 100 ÷ ฐานสเปคที่เลือก'],
+ ['6 · นิ่งนาน','เลือกใช้ได้','ค่าเริ่มต้น “ปิด” และเปิดเฉพาะเมื่อต้องการวิเคราะห์ความต่อเนื่องของราคาย้อนหลัง',''],
+ ['7 · คะแนนรวม','อันดับ 1 = 10','แต่ละมิติถูกเทียบกับพื้นที่ที่ดีที่สุดในมิตินั้นก่อน แล้วเฉลี่ยเฉพาะมิติที่เปิดใช้และมีข้อมูล จากนั้น Normalize ให้อันดับ 1 รวม = 10','']
+ ],filtered=q?cards.filter(c=>norm(c.join(' ')).includes(norm(q))):cards;setGlobalSearchMeta(q?`พบ <span class="search-hit">${fmt(filtered.length)}</span> เกณฑ์ที่ตรงกับ “${esc(q)}”`:'ค้นหา Movement / ภาวะ / สเปค / REL / นิ่งนาน / คะแนนรวม ได้จากช่องด้านบน');$('app').innerHTML=`<div class="headline"><h2>เกณฑ์การให้คะแนน</h2><span class="suffix">ทุกมิติคิดแยกก่อน แล้วค่อยรวม</span></div><div class="notice"><b>ฐานการคำนวณ Movement / ภาวะ / REL:</b> เลือกได้ 2 แบบ — “เทียบสเปคทั้งหมดของทุกพื้นที่” = ตัวหารเป็นฐานรวมทุกจังหวัด/เขตในตัวกรอง หรือ “เทียบสเปคของตัวเอง” = ตัวหารเป็นฐานสเปคของพื้นที่นั้นเอง</div><div class="method">${filtered.map(c=>`<div class="method-card"><b>${esc(c[0])}</b><div class="big">${esc(c[1])}</div><p>${esc(c[2])}</p>${c[3]?`<div class="formula">${esc(c[3])}</div>`:''}</div>`).join('')||'<div class="empty"><h2>ไม่พบเกณฑ์ที่ตรงกับคำค้น</h2><p>ลองค้นคำว่า Movement, ภาวะ, REL, สเปค, นิ่งนาน หรือคะแนนรวม</p></div>'}</div>`}
+function renderDemo(){const demo=[{key:'เขต A',label:'เขต A',region:'ตัวอย่าง',score:10,rawScore:9.3,deduct:0,monthlyRate:.42,monthlyChangedSpecs:84,monthlyEligibleSpecs:200,monthlyScore:10,weeklyRate:.31,weeklyChangedSpecs:62,weeklyEligibleSpecs:200,weeklyScore:9.1,commentCount:529,commentRate:.43,commentScore:10,n:1229,relRate:.35,relChangedSpecs:430,relEligibleSpecs:1229,relScore:10,specScore:10,moveRate:.44,movedCount:421,longStaticRate:.08,longStaticCount:31,longStaticEligibleCount:390,codes:new Set(Array(87)),dimensionCount:4},{key:'เขต B',label:'เขต B',region:'ตัวอย่าง',score:8.8,rawScore:8.2,deduct:1.2,monthlyRate:.35,monthlyChangedSpecs:70,monthlyEligibleSpecs:200,monthlyScore:8.3,weeklyRate:.34,weeklyChangedSpecs:68,weeklyEligibleSpecs:200,weeklyScore:10,commentCount:487,commentRate:.46,commentScore:9.2,n:1056,relRate:.31,relChangedSpecs:327,relEligibleSpecs:1056,relScore:8.9,specScore:8.6,moveRate:.40,movedCount:360,longStaticRate:.12,longStaticCount:45,longStaticEligibleCount:375,codes:new Set(Array(81)),dimensionCount:4}];$('app').innerHTML='<div class="notice">โหมดตัวอย่างเพื่อดูหน้าตาเท่านั้น — คะแนนด้านล่างไม่ใช่ข้อมูลจริง</div><div class="headline"><h2>ตัวอย่าง Ranking เขต / กลุ่มราคา</h2></div><div class="panel">'+rankingTable(demo)+'</div>'}
+function wireDetail(){const b=$('clearGeoBtn');if(b)b.onclick=()=>{state.selectedGeo='';render()}}
+async function loadMaster(file){await yieldUI();const sheets=await parseWorkbook(file);state.master=readMaster(sheets);state.files=state.files.filter(f=>f.kind!=='master');state.files.push({kind:'master',name:file.name,count:state.master.items.size});if(state.rows.length){for(const r of state.rows){const hinted=provinceFromSource(r.shop,r.province),pm=state.master.provinceMap.get(norm(hinted));if(pm){r.province=pm.province;r.region=pm.region}else r.province=hinted;r.area=areaFromRow(r.province,r.shop)}rebuildIndexes()}}
+async function loadPrices(files){let done=0;const failed=[];for(const file of files){$('fileStatus').innerHTML=`<span class="chip">กำลังอ่าน ${done+1}/${files.length} · ${esc(file.name)}</span>`;await yieldUI();try{const sheets=await parseWorkbook(file),rows=readPriceFile(file,sheets);if(!rows.length)throw Error('ไม่พบแถวข้อมูลราคาที่รองรับ');state.rows.push(...rows);state.files.push({kind:'price',name:file.name,count:rows.length,periods:[...new Set(rows.map(r=>r.period).filter(Boolean))]});}catch(err){failed.push(file.name+': '+err.message);console.warn('Skip price file',file.name,err)}done++}state.rows=deduplicateRows(state.rows);rebuildIndexes();state.period=state.periods.at(-1)||state.period;return failed}
+function deduplicateRows(rows){const m=new Map();for(const r of rows){const k=[r.period,specKey(r),r.file,r.row].join('§');if(!m.has(k))m.set(k,r)}return [...m.values()]}
+function fileStatus(){if(!state.files.length){$('fileStatus').innerHTML='<span class="chip">ยังไม่ได้โหลดข้อมูล</span>';return}const a=state.files.map(f=>`<span class="chip ok">${f.kind==='master'?'MASTER':'DATA'} · ${esc(f.name)} · ${fmt(f.count)}</span>`);$('fileStatus').innerHTML=a.join('')}
+function setBusy(msg){$('fileStatus').innerHTML=`<span class="chip warn">${esc(msg)}</span>`}
+
+// -------- GitHub Pages / public GitHub repository: automatic Excel discovery --------
+const GIT_STORAGE='TPSO_CPI_QualityScore_GitRepo_v1';
+const gitSession={repo:null,branch:'',busy:false,loadedAt:0,entries:[]};
+const gitName=e=>String(e.path||'').split('/').at(-1)||'';
+function setGitStatus(message,kind=''){
+ const box=$('gitStatusBox'),txt=$('gitStatusText'),btn=$('refreshGitBtn');
+ if(txt)txt.textContent=message;if(box)box.className='auto-source'+(kind?' '+kind:'');if(btn)btn.disabled=kind==='loading';
+}
+function interpretGitRepo(input){
+ let text=String(input||'').trim();if(!text)return null;text=text.replace(/\.git\/?$/,'').replace(/\/$/,'');
+ let m=text.match(/^([a-z\d_.-]+)\/([a-z\d_.-]+)(?:\/tree\/(.+))?$/i);if(m)return {owner:m[1],repo:m[2],branch:m[3]||''};
+ try{const url=new URL(text);
+  if(url.hostname.toLowerCase()==='github.com'){const parts=url.pathname.split('/').filter(Boolean);if(parts.length>=2)return {owner:parts[0],repo:parts[1],branch:parts[2]==='tree'?parts.slice(3).join('/'):''}}
+  if(url.hostname.toLowerCase().endsWith('.github.io')){const owner=url.hostname.split('.')[0],parts=url.pathname.split('/').filter(Boolean),repo=(parts[0]&&!/\.html?$/i.test(parts[0]))?parts[0]:owner+'.github.io';return {owner,repo,branch:''}}
+ }catch(err){}return null;
+}
+function configuredGitRepo(){
+ const q=new URLSearchParams(location.search).get('repo');if(q){const p=interpretGitRepo(q);if(p)return p}
+ const specified=document.querySelector('meta[name="cpi-github-repo"]')?.content;if(specified){const p=interpretGitRepo(specified);if(p)return p}
+ if(location.hostname.toLowerCase().endsWith('.github.io'))return interpretGitRepo(location.origin+location.pathname);
+ if(gitSession.repo)return gitSession.repo;
+ try{const saved=localStorage.getItem(GIT_STORAGE);if(saved)return interpretGitRepo(saved)}catch(err){}
+ return null;
+}
+async function githubJSON(url){
+ const response=await fetch(url,{headers:{Accept:'application/vnd.github+json'},cache:'no-cache'});
+ if(!response.ok){let detail='';if(response.status===403||response.status===429)detail=' (GitHub API จำกัดจำนวนครั้งชั่วคราว)';if(response.status===404)detail=' (ไม่พบ Repository สาธารณะ)';throw Error('GitHub HTTP '+response.status+detail)}
+ return response.json();
+}
+function gitSourceType(path){
+ const name=gitName({path});if(!/\.xlsx$/i.test(name)||/^~\$/.test(name))return '';
+ if(/Real[_\s-]*Master[_\s-]*CPI/i.test(name))return 'master';
+ // Accept CPI price workbooks broadly. Exclude obvious output/report files.
+ if(/^(?:4\.1\.|6\.1\.)/i.test(name)||/ปี\s*25\d{2}.*เดือน/i.test(name)||/(?:ชุด\s*[GLU]|ชุด\s*G-L|ประเทศไทย)/i.test(name))return 'price';
+ return '';
+}
+async function discoverGitSources(repo){
+ const root='https://api.github.com/repos/'+encodeURIComponent(repo.owner)+'/'+encodeURIComponent(repo.repo);
+ const meta=await githubJSON(root),branch=repo.branch||meta.default_branch;if(!branch)throw Error('ไม่พบ branch ของ Repository');
+ const tree=await githubJSON(root+'/git/trees/'+encodeURIComponent(branch)+'?recursive=1');if(!Array.isArray(tree.tree))throw Error('GitHub API ไม่ส่งรายการไฟล์กลับมา');
+ if(tree.truncated)throw Error('รายการไฟล์ใน Repository ใหญ่เกินขีดจำกัด GitHub API');
+ const entries=tree.tree.filter(e=>e.type==='blob'&&e.path&&/\.xlsx$/i.test(e.path)).map(e=>({path:e.path,sha:e.sha||'',size:e.size||0,kind:gitSourceType(e.path)})).filter(e=>e.kind);
+ return {entries,branch};
+}
+function chooseGitSources(entries){
+ const masters=entries.filter(e=>e.kind==='master').sort((a,b)=>{const score=e=>/^Real_Master_CPI\.xlsx$/i.test(gitName(e))?1000:Number(/\((\d+)\)(?=\.xlsx$)/i.exec(gitName(e))?.[1]||0);return score(b)-score(a)||a.path.length-b.path.length});
+ const master=masters[0]||null;
+ const byPathName=new Map();
+ for(const e of entries.filter(e=>e.kind==='price')){const name=gitName(e),base=name.replace(/\s*\(\d+\)(?=\.xlsx$)/i,''),dir=e.path.slice(0,e.path.length-name.length),key=dir+base,ver=Number(/\((\d+)\)(?=\.xlsx$)/i.exec(name)?.[1]||0),old=byPathName.get(key);if(!old||ver>old.ver)byPathName.set(key,{e,ver})}
+ const prices=[...byPathName.values()].map(x=>x.e).sort((a,b)=>a.path.localeCompare(b.path,'th'));
+ return {master,prices,all:(master?[master]:[]).concat(prices)};
+}
+async function fetchGitEntry(entry){
+ const repo=gitSession.repo;if(!repo)throw Error('ยังไม่เชื่อม Git');
+ const dir=entry.path.split('/').map(encodeURIComponent).join('/'),branch=gitSession.branch.split('/').map(encodeURIComponent).join('/');
+ const url='https://raw.githubusercontent.com/'+encodeURIComponent(repo.owner)+'/'+encodeURIComponent(repo.repo)+'/'+branch+'/'+dir+'?cpi_sha='+encodeURIComponent(entry.sha);
+ const response=await fetch(url,{cache:'force-cache'});if(!response.ok)throw Error('ดาวน์โหลด '+entry.path+' ไม่สำเร็จ (HTTP '+response.status+')');
+ const blob=await response.blob();if(blob.size<100)throw Error('ไฟล์ว่างหรือไม่สมบูรณ์: '+entry.path);
+ return new File([blob],gitName(entry),{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',lastModified:Date.now()});
+}
+async function startGitAutoLoad(force=false,explicitRepo=null){
+ const repo=explicitRepo||configuredGitRepo();if(!repo){setGitStatus('เปิดผ่าน GitHub Pages เพื่ออ่านอัตโนมัติ หรือใส่ลิงก์ Repository','warn');return false}
+ if(gitSession.busy)return false;if(!force&&gitSession.loadedAt&&gitSession.repo?.owner===repo.owner&&gitSession.repo?.repo===repo.repo)return true;
+ gitSession.busy=true;gitSession.repo=repo;if($('gitRepoInput'))$('gitRepoInput').value='https://github.com/'+repo.owner+'/'+repo.repo;
+ setGitStatus('กำลังค้นหา Excel ใน '+repo.owner+'/'+repo.repo+'…','loading');
+ try{
+  const found=await discoverGitSources(repo);gitSession.branch=found.branch;gitSession.entries=found.entries;const chosen=chooseGitSources(found.entries);
+  if(!chosen.master)throw Error('ไม่พบ Real_Master_CPI.xlsx ใน Repository');if(!chosen.prices.length)throw Error('ไม่พบไฟล์ราคา CPI .xlsx ใน Repository');
+  setGitStatus('พบ '+chosen.prices.length+' ไฟล์ราคา · กำลังดาวน์โหลด Master…','loading');resetLoadedData();
+  const masterFile=await fetchGitEntry(chosen.master);await loadMaster(masterFile);
+  let failed=[],loaded=0;
+  for(let i=0;i<chosen.prices.length;i+=4){const batch=chosen.prices.slice(i,i+4);setGitStatus('กำลังโหลด Excel จาก Git '+Math.min(i+4,chosen.prices.length)+' / '+chosen.prices.length+' ไฟล์…','loading');
+   const got=await Promise.allSettled(batch.map(fetchGitEntry)),files=[];for(let j=0;j<got.length;j++){if(got[j].status==='fulfilled')files.push(got[j].value);else failed.push(gitName(batch[j])+': '+got[j].reason?.message)}
+   if(files.length){const parseFailed=await loadPrices(files);loaded+=files.length-parseFailed.length;failed.push(...parseFailed)}
+  }
+  state.demo=false;fileStatus();render();gitSession.loadedAt=Date.now();setGitStatus(repo.owner+'/'+repo.repo+' · โหลด '+loaded+' ไฟล์ราคา · '+state.periods.length+' เดือน'+(failed.length?' · ข้าม '+failed.length+' ไฟล์':''),failed.length?'warn':'ok');
+  if(failed.length)console.warn('Git files not imported',failed);return true;
+ }catch(err){console.error('Git automatic loading',err);setGitStatus('GitHub: '+err.message,'warn');return false}
+ finally{gitSession.busy=false;if($('refreshGitBtn'))$('refreshGitBtn').disabled=false}
+}
+
+// -------- Auto-Load folder: same permission-persistence pattern as CPI FieldPulse --------
+const FOLDER_DB='TPSO_CPI_Quality_Folder_v1',FOLDER_STORE='sources';
+const folderSession={handle:null,scanning:false,lastScan:0,signature:''};
+function setFolderStatus(message,kind=''){
+ const box=$('folderStatus'),txt=$('folderStatusText');if(txt)txt.textContent=message;if(box)box.className='auto-source'+(kind?' '+kind:'');
+}
+function folderDB(mode,handle){return new Promise((resolve,reject)=>{
+ if(!('indexedDB' in window)){resolve(null);return}
+ let req;try{req=indexedDB.open(FOLDER_DB,1)}catch(err){reject(err);return}
+ req.onupgradeneeded=()=>{const db=req.result;if(!db.objectStoreNames.contains(FOLDER_STORE))db.createObjectStore(FOLDER_STORE)};
+ req.onerror=()=>reject(req.error||Error('เปิดฐานสิทธิ์โฟลเดอร์ไม่ได้'));
+ req.onsuccess=()=>{const db=req.result;try{const tx=db.transaction(FOLDER_STORE,mode==='save'?'readwrite':'readonly'),store=tx.objectStore(FOLDER_STORE),op=mode==='save'?store.put(handle,'last'):store.get('last');op.onsuccess=()=>resolve(mode==='save'?true:op.result||null);op.onerror=()=>reject(op.error);tx.oncomplete=()=>db.close();tx.onerror=()=>db.close()}catch(err){db.close();reject(err)}};
+})}
+function resetLoadedData(){state.master=null;state.rows=[];state.files=[];state.period='';state.selectedGeo='';state.globalSearch='';state.demo=false;state.historyIndex=new Map();state.periods=[];state.scoreCache.clear();state.revision++;}
+function filesSignature(files){return files.map(f=>[f.name,f.size,f.lastModified].join(':')).sort().join('|')}
+async function loadFolderFiles(files,isAutomatic=false){
+ const usable=[...files].filter(f=>/\.xlsx$/i.test(f.name)&&!/^~\$/.test(f.name));
+ const signature=filesSignature(usable);if(isAutomatic&&signature&&signature===folderSession.signature&&state.files.length){setFolderStatus('โฟลเดอร์เดิม · ยังไม่มีไฟล์เปลี่ยนแปลง','ok');return}
+ folderSession.signature=signature;resetLoadedData();
+ const masters=usable.filter(f=>/Real_Master_CPI/i.test(f.name)).sort((a,b)=>b.lastModified-a.lastModified);
+ const prices=usable.filter(f=>!/Real_Master_CPI/i.test(f.name));
+ if(masters.length){setBusy('กำลังอ่าน Master จากโฟลเดอร์…');try{await loadMaster(masters[0])}catch(err){console.error(err);setFolderStatus('อ่าน Master ไม่สำเร็จ: '+err.message,'warn')}}
+ let failed=[];if(prices.length){setBusy('กำลังอ่านไฟล์ราคาอัตโนมัติ '+prices.length+' ไฟล์…');failed=await loadPrices(prices)}
+ state.demo=false;fileStatus();render();
+ const msg='เชื่อมโฟลเดอร์แล้ว · Excel '+usable.length+' ไฟล์ · ราคาอ่านได้ '+state.files.filter(f=>f.kind==='price').length+' ไฟล์'+(failed.length?' · ข้าม '+failed.length+' ไฟล์':'');
+ setFolderStatus(msg,failed.length?'warn':'ok');
+}
+async function scanAuthorizedFolder(dir,isAutomatic=false){
+ if(!dir||folderSession.scanning)return;folderSession.scanning=true;folderSession.handle=dir;setFolderStatus((isAutomatic?'กำลังอ่านอัตโนมัติ':'กำลังอ่านโฟลเดอร์')+' · '+dir.name+' …');
+ try{const files=[];for await(const entry of dir.values()){if(entry.kind==='file'&&/\.xlsx$/i.test(entry.name)&&!/^~\$/.test(entry.name))files.push(await entry.getFile())}await loadFolderFiles(files,isAutomatic);folderSession.lastScan=Date.now();$('refreshFolderBtn').disabled=false}
+ catch(err){console.error('Folder scan',err);setFolderStatus('อ่านโฟลเดอร์ไม่ได้: '+err.message,'warn')}finally{folderSession.scanning=false}
+}
+async function chooseFolder(){
+ if('showDirectoryPicker' in window&&window.isSecureContext){try{const dir=await window.showDirectoryPicker({mode:'read'});folderSession.handle=dir;try{await folderDB('save',dir)}catch(err){console.info('Folder save unavailable',err)}await scanAuthorizedFolder(dir);return}catch(err){if(err.name==='AbortError')return;console.info('Folder picker fallback',err)}}
+ $('folderInput').click();
+}
+async function restoreFolder(){
+ try{const dir=await folderDB('get');if(!dir)return;folderSession.handle=dir;const permission=typeof dir.queryPermission==='function'?await dir.queryPermission({mode:'read'}):'prompt';if(permission==='granted')await scanAuthorizedFolder(dir,true);else setFolderStatus('เคยเชื่อมโฟลเดอร์ '+dir.name+' · กด “เปิดโฟลเดอร์ Excel” เพื่ออนุญาตอีกครั้ง','warn')}
+ catch(err){console.info('Restore folder',err)}
+}
+$('masterInput').addEventListener('change',async e=>{const f=e.target.files[0];if(!f)return;try{setBusy('กำลังอ่าน Master…');await loadMaster(f);if(state.rows.length){for(const r of state.rows){const hinted=provinceFromSource(r.shop,r.province),pm=state.master.provinceMap.get(norm(hinted));if(pm){r.province=pm.province;r.region=pm.region}else r.province=hinted;r.area=areaFromRow(r.province,r.shop)}}rebuildIndexes();state.demo=false;fileStatus();render();e.target.value=''}catch(err){alert('อ่าน Master ไม่สำเร็จ: '+err.message);fileStatus()}});
+$('priceInput').addEventListener('change',async e=>{const fs=[...e.target.files];if(!fs.length)return;try{setBusy('กำลังอ่านไฟล์ราคา '+fs.length+' ไฟล์…');const failed=await loadPrices(fs);state.demo=false;fileStatus();render();if(failed.length)alert('อ่านได้บางส่วน · ข้าม '+failed.length+' ไฟล์\n'+failed.slice(0,5).join('\n'));e.target.value=''}catch(err){console.error(err);alert('อ่านไฟล์ราคาไม่สำเร็จ: '+err.message);fileStatus()}});
+async function handleDroppedExcel(fileList){
+ const fs=[...fileList].filter(f=>/\.xlsx$/i.test(f.name)&&!/^~\$/.test(f.name));if(!fs.length)return alert('กรุณาลากไฟล์ .xlsx เข้ามา');
+ const masters=fs.filter(f=>/Real_Master_CPI/i.test(f.name)),prices=fs.filter(f=>!/Real_Master_CPI/i.test(f.name));
+ try{
+  if(masters.length){setBusy('กำลังอ่าน Master ที่ลากเข้ามา…');await loadMaster(masters[0])}
+  if(prices.length){setBusy('กำลังอ่านไฟล์ราคาที่ลากเข้ามา '+prices.length+' ไฟล์…');const failed=await loadPrices(prices);if(failed.length)alert('อ่านได้บางส่วน · ข้าม '+failed.length+' ไฟล์\n'+failed.slice(0,5).join('\n'))}
+  state.demo=false;fileStatus();render();
+ }catch(err){console.error(err);alert('อ่านไฟล์ที่ลากเข้ามาไม่สำเร็จ: '+err.message);fileStatus()}
+}
+for(const zone of document.querySelectorAll('.drop')){
+ zone.addEventListener('dragenter',e=>{e.preventDefault();e.stopPropagation();zone.classList.add('dragover')});
+ zone.addEventListener('dragover',e=>{e.preventDefault();e.stopPropagation();if(e.dataTransfer)e.dataTransfer.dropEffect='copy';zone.classList.add('dragover')});
+ zone.addEventListener('dragleave',e=>{e.preventDefault();e.stopPropagation();if(!zone.contains(e.relatedTarget))zone.classList.remove('dragover')});
+ zone.addEventListener('drop',async e=>{e.preventDefault();e.stopPropagation();zone.classList.remove('dragover');await handleDroppedExcel(e.dataTransfer.files)});
+}
+$('clearBtn').onclick=()=>{resetLoadedData();$('masterInput').value='';$('priceInput').value='';fileStatus();render()};
+$('demoBtn').onclick=()=>{if(state.rows.length)return alert('มีข้อมูลจริงอยู่แล้ว กรุณากดล้างข้อมูลก่อนเปิดตัวอย่าง');state.demo=true;render()};
+$('printBtn').onclick=()=>window.print();
+$('exportBtn').onclick=()=>{if(!state.rows.length)return alert('ยังไม่มีข้อมูลให้ส่งออก');const rows=groupScores(scoredCurrent(),$('geoLevel').value),header=['อันดับ','พื้นที่','ภาค','Score_10','Deduct_From_10','Monthly_Move_Rate','Monthly_Move_Score','Weekly_Move_Rate','Weekly_Move_Score','Comment_Count','Comment_Rate','Comment_Score','Spec_Count','Spec_Score','REL_Changed_Count','REL_Rate','REL_Score','Long_Static_Rate','Long_Static_Count','CODE7'];const lines=[header.join(',')];rows.forEach((g,i)=>lines.push([i+1,g.label,g.region,g.score.toFixed(3),g.deduct.toFixed(3),g.monthlyRate??'',g.monthlyScore??'',g.weeklyRate??'',g.weeklyScore??'',g.commentCount,g.commentRate??'',g.commentScore,g.n,g.specScore,g.relChangedSpecs,g.relRate??'',g.relScore??'',g.longStaticRate??'',g.longStaticCount,g.codes.size].map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(',')));const blob=new Blob(['\ufeff'+lines.join('\r\n')],{type:'text/csv;charset=utf-8'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='CPI_Quality_Score_'+(state.period||'report')+'.csv';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)};
+['periodFilter','windowFilter','geoLevel','regionFilter','setFilter','denominatorMode','relToggle','staticToggle'].forEach(id=>$(id).addEventListener('change',()=>{if(id==='periodFilter')state.period=$(id).value;state.selectedGeo='';state.geoSearch='';state.scoreCache.clear();render()}));
+$('refreshGitBtn').addEventListener('click',()=>startGitAutoLoad(true));
+$('connectGitBtn').addEventListener('click',()=>{const repo=interpretGitRepo($('gitRepoInput').value);if(!repo){setGitStatus('โปรดใส่ลิงก์ https://github.com/owner/repository ให้ถูกต้อง','warn');return}try{localStorage.setItem(GIT_STORAGE,repo.owner+'/'+repo.repo+(repo.branch?'/tree/'+repo.branch:''))}catch(err){}startGitAutoLoad(true,repo)});
+$('gitRepoInput').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();$('connectGitBtn').click()}});
+$('folderBtn').addEventListener('click',chooseFolder);
+$('refreshFolderBtn').addEventListener('click',async()=>{if(folderSession.handle){const permission=typeof folderSession.handle.queryPermission==='function'?await folderSession.handle.queryPermission({mode:'read'}):'prompt';if(permission==='granted')await scanAuthorizedFolder(folderSession.handle);else await chooseFolder()}else await chooseFolder()});
+$('folderInput').addEventListener('change',async e=>{const fs=[...e.target.files];if(fs.length){await loadFolderFiles(fs,false);setFolderStatus('อ่านโฟลเดอร์ผ่านตัวเลือกไฟล์แล้ว · เบราว์เซอร์นี้อาจไม่สามารถจำสิทธิ์ข้ามครั้งได้','warn')}e.target.value=''});
+let globalSearchTimer=null;
+$('globalSearchInput').addEventListener('input',e=>{state.globalSearch=e.target.value;syncGlobalSearchControl();clearTimeout(globalSearchTimer);globalSearchTimer=setTimeout(()=>render(),160)});
+$('globalSearchInput').addEventListener('keydown',e=>{if(e.key==='Escape'){state.globalSearch='';e.target.value='';render()}});
+$('globalSearchClear').addEventListener('click',()=>{state.globalSearch='';$('globalSearchInput').value='';render();$('globalSearchInput').focus()});
+$('tabs').addEventListener('click',e=>{const b=e.target.closest('[data-tab]');if(!b)return;state.tab=b.dataset.tab;document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active',x.dataset.tab===state.tab));render()});
+$('app').addEventListener('click',e=>{const sh=e.target.closest('[data-sort]');if(sh){const key=sh.dataset.sort;if(state.rankSort.key===key)state.rankSort.dir=state.rankSort.dir==='asc'?'desc':'asc';else{state.rankSort.key=key;state.rankSort.dir=key==='label'?'asc':'desc'}render();return}const geo=e.target.closest('[data-open-geo],[data-geo]');if(geo){state.selectedGeo=geo.dataset.openGeo||geo.dataset.geo;state.geoSearch=state.selectedGeo;state.tab='code7';document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active',x.dataset.tab==='code7'));render();return}const code=e.target.closest('[data-code]');if(code){state.tab='spec';document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active',x.dataset.tab==='spec'));renderSpecs(code.dataset.code)}});
+render();
+if(location.hostname.toLowerCase().endsWith('.github.io')){startGitAutoLoad(false)}else{restoreFolder();startGitAutoLoad(false)}
+window.addEventListener('focus',async()=>{if(folderSession.handle&&!folderSession.scanning&&folderSession.lastScan&&Date.now()-folderSession.lastScan>60000){try{const permission=typeof folderSession.handle.queryPermission==='function'?await folderSession.handle.queryPermission({mode:'read'}):'prompt';if(permission==='granted')await scanAuthorizedFolder(folderSession.handle,true)}catch(err){console.info(err)}}});
+</script>
+</body>
+</html>
