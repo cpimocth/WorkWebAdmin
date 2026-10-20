@@ -1,0 +1,1378 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CPI File Formatter</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --bg:#f5f7fb;
+      --card:#ffffff;
+      --text:#0f172a;
+      --muted:#64748b;
+      --line:#e2e8f0;
+      --blue:#2563eb;
+      --blue-soft:#eff6ff;
+      --purple:#7c3aed;
+      --purple-soft:#f5f3ff;
+      --green:#059669;
+      --green-soft:#ecfdf5;
+      --amber:#d97706;
+      --amber-soft:#fffbeb;
+      --red:#dc2626;
+    }
+
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{
+      font-family:'Prompt',sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(37,99,235,.06), transparent 32%),
+        radial-gradient(circle at top right, rgba(14,165,233,.05), transparent 28%),
+        var(--bg);
+      color:var(--text);
+      min-height:100vh;
+    }
+    .font-mono{font-family:'JetBrains Mono',monospace}
+    .glass{
+      background:rgba(255,255,255,.92);
+      backdrop-filter:blur(10px);
+      -webkit-backdrop-filter:blur(10px);
+    }
+    .shadow-soft{box-shadow:0 12px 30px rgba(15,23,42,.06)}
+    .drop-active{
+      border-color:#2563eb !important;
+      background:#eff6ff !important;
+      transform:translateY(-1px);
+      box-shadow:0 18px 40px rgba(37,99,235,.14);
+    }
+    .mode-btn.active{
+      background:#2563eb !important;
+      color:#fff !important;
+      box-shadow:0 6px 18px rgba(37,99,235,.18);
+    }
+    .view-btn.active{
+      background:#0f172a !important;
+      color:#fff !important;
+      box-shadow:0 4px 12px rgba(15,23,42,.12);
+    }
+    .chip{
+      display:inline-flex;
+      align-items:center;
+      gap:.4rem;
+      border-radius:999px;
+      padding:.34rem .62rem;
+      font-size:.75rem;
+      font-weight:600;
+      border:1px solid var(--line);
+      background:#fff;
+      white-space:nowrap;
+    }
+    ::-webkit-scrollbar{width:8px;height:8px}
+    ::-webkit-scrollbar-track{background:#f1f5f9}
+    ::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:999px}
+    ::-webkit-scrollbar-thumb:hover{background:#94a3b8}
+  </style>
+</head>
+
+<body>
+  <!-- Drag Overlay -->
+  <div id="dragOverlay" class="hidden fixed inset-0 z-[100] bg-slate-950/55 backdrop-blur-sm p-6">
+    <div class="h-full w-full border-2 border-dashed border-blue-300 rounded-[28px] flex items-center justify-center pointer-events-none">
+      <div class="bg-white rounded-3xl shadow-2xl p-8 w-full max-w-md text-center">
+        <div class="w-16 h-16 rounded-2xl bg-blue-50 text-blue-600 mx-auto flex items-center justify-center mb-4">
+          <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M12 12v8m0-8l-3 3m3-3l3 3"/>
+          </svg>
+        </div>
+        <h2 class="text-xl font-bold">วางไฟล์ Excel ได้เลย</h2>
+        <p class="text-sm text-slate-500 mt-1">รองรับ .xlsx / .xls และลากหลายไฟล์พร้อมกันได้</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div id="loadingModal" class="hidden fixed inset-0 z-[90] bg-slate-950/35 backdrop-blur-sm p-4 items-center justify-center">
+    <div class="bg-white rounded-2xl shadow-2xl p-5 w-full max-w-sm flex gap-4 items-center">
+      <div class="w-9 h-9 rounded-full border-4 border-blue-600 border-t-transparent animate-spin"></div>
+      <div>
+        <div id="loadingTitle" class="font-semibold text-sm">กำลังอ่านข้อมูล...</div>
+        <div id="loadingSubtitle" class="text-xs text-slate-500 mt-1">กรุณารอสักครู่</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sticky Top Bar -->
+  <div class="sticky top-0 z-40 glass border-b border-slate-200/80">
+    <div class="max-w-[1480px] mx-auto px-4 lg:px-6 py-3 flex items-center justify-between gap-4">
+      <div class="min-w-0">
+        <div class="flex items-center gap-2">
+          <div class="w-9 h-9 rounded-xl bg-slate-900 text-white flex items-center justify-center font-bold">CPI</div>
+          <div class="min-w-0">
+            <div class="font-bold text-slate-900 truncate">CPI File Formatter</div>
+            <div class="text-xs text-slate-500 truncate">จัดโครงสร้างไฟล์รายสัปดาห์ / รายเดือน และแยกชุด GL / U</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <span id="topFileStatus" class="hidden md:inline-flex chip text-slate-600">ยังไม่มีไฟล์</span>
+        <button id="clearFilesBtnTop" type="button"
+          class="hidden px-3 py-2 rounded-xl text-xs font-semibold text-rose-600 hover:bg-rose-50">
+          ล้างข้อมูล
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <main class="max-w-[1480px] mx-auto px-4 lg:px-6 py-6 lg:py-8">
+
+    <!-- Hero -->
+    <section class="mb-5">
+      <div>
+        <div class="inline-flex items-center gap-2 text-xs font-semibold text-blue-700 bg-blue-50 border border-blue-100 px-3 py-1.5 rounded-full mb-3">
+          ⚡ ทำงานบนเครื่องของคุณ
+        </div>
+        <h1 class="text-2xl md:text-3xl lg:text-4xl font-bold tracking-tight">
+          แปลงไฟล์ CPI ให้พร้อมใช้งาน
+        </h1>
+        <p class="text-slate-500 text-sm md:text-base mt-2 max-w-3xl">
+          ลากไฟล์เข้ามา ระบบจะตรวจโหมดไฟล์ แยกชุด GL / U และเตรียมไฟล์ผลลัพธ์ให้ดาวน์โหลดได้ทันที
+        </p>
+      </div>
+    </section>
+
+    <!-- Step 1 -->
+    <section class="bg-white rounded-3xl border border-slate-200 shadow-soft p-4 md:p-5 mb-5">
+      <div class="flex items-center gap-3 mb-4">
+        <div class="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center text-sm font-bold">1</div>
+        <div>
+          <h2 class="font-bold">เลือกไฟล์ Excel</h2>
+          <p class="text-xs text-slate-500">ลากไฟล์จาก Windows Explorer มาวางตรงพื้นที่ด้านล่าง หรือคลิกเพื่อเลือกไฟล์</p>
+        </div>
+      </div>
+
+      <div id="dropzone"
+        class="border-2 border-dashed border-slate-300 rounded-2xl bg-slate-50/70 hover:bg-blue-50/60 hover:border-blue-400 transition cursor-pointer p-8 md:p-10 text-center">
+        <input id="fileInput" type="file" accept=".xlsx,.xls" multiple class="hidden">
+
+        <div class="w-14 h-14 rounded-2xl bg-white border border-slate-200 text-blue-600 mx-auto flex items-center justify-center shadow-sm">
+          <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M12 16V4m0 0L7 9m5-5l5 5M5 20h14"/>
+          </svg>
+        </div>
+
+        <div class="mt-4 text-lg font-semibold">ลากไฟล์มาวางที่นี่</div>
+        <div class="text-sm text-slate-500 mt-1">หรือคลิกเพื่อเลือกหลายไฟล์พร้อมกัน</div>
+
+        <div class="mt-4 flex flex-wrap items-center justify-center gap-2">
+          <span class="chip text-blue-700 bg-blue-50 border-blue-100">โหมด: <span id="activeModeLabel">รายสัปดาห์</span></span>
+          <span class="chip text-slate-600">รองรับ GL + U พร้อมกัน</span>
+          <span class="chip text-emerald-700 bg-emerald-50 border-emerald-100">ข้อมูลไม่ถูกส่งขึ้นเซิร์ฟเวอร์</span>
+        </div>
+      </div>
+
+      <div id="fileListContainer" class="hidden mt-4 pt-4 border-t border-slate-100">
+        <div class="flex items-center justify-between gap-3 mb-3">
+          <div class="text-sm font-semibold">
+            ไฟล์ที่โหลดแล้ว <span id="loadedFileCount" class="text-slate-400 font-normal">0</span>
+          </div>
+          <button id="clearFilesBtn" class="text-xs font-semibold text-rose-600 hover:underline">ล้างทั้งหมด</button>
+        </div>
+        <div id="fileBadges" class="grid md:grid-cols-2 xl:grid-cols-3 gap-2"></div>
+      </div>
+    </section>
+
+    <!-- Step 2 -->
+    <section id="controlPanel" class="hidden space-y-5">
+
+      <div class="bg-white rounded-3xl border border-slate-200 shadow-soft p-4 md:p-5">
+        <div class="flex items-center gap-3 mb-4">
+          <div class="w-8 h-8 rounded-full bg-slate-900 text-white flex items-center justify-center text-sm font-bold">2</div>
+          <div>
+            <h2 class="font-bold">ตรวจข้อมูลและตั้งค่าผลลัพธ์</h2>
+            <p class="text-xs text-slate-500">ดูจำนวนรายการ กรองข้อมูล และตั้งชื่อไฟล์ก่อนดาวน์โหลด</p>
+          </div>
+        </div>
+
+        <!-- Stats -->
+        <div class="grid grid-cols-2 xl:grid-cols-4 gap-3">
+          <div class="rounded-2xl border border-sky-100 bg-sky-50/70 p-4">
+            <div class="text-xs font-medium text-slate-500">ชุด GL</div>
+            <div class="mt-1 text-2xl font-bold text-sky-700 font-mono">
+              <span id="statGLFiltered">0</span>
+              <span class="text-sm font-normal text-slate-400">/ <span id="statGLTotal">0</span></span>
+            </div>
+          </div>
+          <div class="rounded-2xl border border-violet-100 bg-violet-50/70 p-4">
+            <div class="text-xs font-medium text-slate-500">ชุด U</div>
+            <div class="mt-1 text-2xl font-bold text-violet-700 font-mono">
+              <span id="statUFiltered">0</span>
+              <span class="text-sm font-normal text-slate-400">/ <span id="statUTotal">0</span></span>
+            </div>
+          </div>
+          <div class="rounded-2xl border border-amber-100 bg-amber-50/70 p-4">
+            <div class="text-xs font-medium text-slate-500">มีข้อความภาวะ</div>
+            <div id="statHasNote" class="mt-1 text-2xl font-bold text-amber-700 font-mono">0</div>
+          </div>
+          <div class="rounded-2xl border border-emerald-100 bg-emerald-50/70 p-4">
+            <div class="text-xs font-medium text-slate-500">ไฟล์สำเร็จ</div>
+            <div id="statFiles" class="mt-1 text-2xl font-bold text-emerald-700 font-mono">0</div>
+          </div>
+        </div>
+
+        <!-- Controls -->
+        <div class="grid xl:grid-cols-[1.2fr_1fr] gap-4 mt-5">
+          <div class="rounded-2xl border border-slate-200 p-4">
+            <div class="font-semibold text-sm mb-3">ตั้งชื่อไฟล์ผลลัพธ์</div>
+
+            <label class="text-xs font-medium text-slate-600">วันที่นำหน้า (พ.ศ.เดือนวัน)</label>
+            <div class="flex flex-col md:flex-row gap-3 mt-1.5">
+              <input id="datePrefix" maxlength="8"
+                class="w-full md:w-44 font-mono font-semibold rounded-xl border border-slate-300 bg-slate-50 px-3 py-2.5 outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="25691019">
+
+              <div class="flex-1 min-w-0 rounded-xl bg-slate-50 border border-slate-200 px-3 py-2.5">
+                <div class="text-[11px] text-slate-400 mb-1">ตัวอย่างชื่อไฟล์</div>
+                <div class="flex flex-wrap gap-2 text-xs font-mono font-semibold">
+                  <span id="previewNameGL" class="text-sky-700"></span>
+                  <span class="text-slate-300">•</span>
+                  <span id="previewNameU" class="text-violet-700"></span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="rounded-2xl border border-slate-200 p-4">
+            <div class="font-semibold text-sm mb-3">กรองข้อมูล</div>
+
+            <div class="grid md:grid-cols-2 gap-3">
+              <div>
+                <label class="text-xs font-medium text-slate-600">เงื่อนไข</label>
+                <select id="filterMode"
+                  class="mt-1.5 w-full rounded-xl border border-slate-300 bg-slate-50 px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-blue-500">
+                  <option value="all">ทุกรายการ</option>
+                  <option value="notes_only">เฉพาะรายการที่มีภาวะ</option>
+                  <option value="no_link">เฉพาะ Link = 0</option>
+                </select>
+              </div>
+              <div>
+                <label class="text-xs font-medium text-slate-600">ค้นหา</label>
+                <input id="searchInput"
+                  class="mt-1.5 w-full rounded-xl border border-slate-300 bg-slate-50 px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="รหัส / สินค้า / ร้านค้า">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- View -->
+        <div class="mt-4 rounded-2xl border border-slate-200 bg-slate-50/70 p-3">
+          <div class="flex flex-col xl:flex-row xl:items-center gap-3 xl:gap-5">
+            <div class="flex flex-wrap items-center gap-2">
+              <span class="text-xs text-slate-500 font-semibold mr-1">ช่วงข้อมูล:</span>
+              <button id="tabWeekBtn" type="button"
+                class="mode-btn active px-3.5 py-2 rounded-xl text-xs font-semibold transition bg-slate-100 text-slate-600">
+                📆 รายสัปดาห์
+              </button>
+              <button id="tabMonthBtn" type="button"
+                class="mode-btn px-3.5 py-2 rounded-xl text-xs font-semibold transition bg-slate-100 text-slate-600">
+                📅 รายเดือน
+              </button>
+            </div>
+
+            <div class="hidden xl:block w-px h-7 bg-slate-200"></div>
+
+            <div class="flex flex-wrap items-center gap-2">
+              <span class="text-xs text-slate-500 font-semibold mr-1">ชุดข้อมูล:</span>
+              <button type="button" data-view="all"
+                class="view-btn active px-3.5 py-2 rounded-xl text-xs font-semibold bg-slate-100 text-slate-600">
+                ทั้งหมด
+              </button>
+              <button type="button" data-view="GL"
+                class="view-btn px-3.5 py-2 rounded-xl text-xs font-semibold bg-slate-100 text-slate-600">
+                GL
+              </button>
+              <button type="button" data-view="U"
+                class="view-btn px-3.5 py-2 rounded-xl text-xs font-semibold bg-slate-100 text-slate-600">
+                U
+              </button>
+            </div>
+
+            <div class="xl:ml-auto">
+              <span class="text-[11px] text-slate-400">ใช้สำหรับเปลี่ยนข้อมูลที่แสดงในตาราง</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Table -->
+      <div id="tableContainer" class="hidden bg-white rounded-3xl border border-slate-200 shadow-soft overflow-hidden">
+        <div class="px-4 md:px-5 py-3 border-b border-slate-200 flex flex-wrap gap-2 items-center justify-between bg-slate-50/70">
+          <div>
+            <div id="previewCount" class="text-sm font-semibold">แสดง 0 รายการ</div>
+            <div id="structureDesc" class="text-[11px] text-slate-400 mt-0.5">โครงสร้างรายสัปดาห์ · เดือนปัจจุบัน</div>
+          </div>
+
+          <button id="copyBtn"
+            class="px-3 py-2 rounded-xl bg-white border border-slate-200 hover:bg-slate-50 text-xs font-semibold">
+            คัดลอกข้อมูล
+          </button>
+        </div>
+
+        <div class="overflow-auto max-h-[560px]">
+          <table class="w-full text-xs border-collapse">
+            <thead id="tableHeader" class="sticky top-0 z-10 bg-slate-100 text-slate-700"></thead>
+            <tbody id="tableBody" class="divide-y divide-slate-100"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Step 3 -->
+      <div class="bg-white rounded-3xl border border-slate-200 shadow-soft p-4 md:p-5">
+        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3 mb-4">
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-full bg-emerald-600 text-white flex items-center justify-center text-sm font-bold">3</div>
+            <div>
+              <h2 class="font-bold">ดาวน์โหลดไฟล์</h2>
+              <p class="text-xs text-slate-500">เลือกไฟล์ที่ต้องการได้ทันที — รายเดือนอยู่ด้านบน และรายสัปดาห์อยู่ด้านล่าง</p>
+            </div>
+          </div>
+          <div class="text-[11px] text-slate-400">ไฟล์ที่ไม่มีข้อมูลจะกดไม่ได้</div>
+        </div>
+
+        <div class="grid md:grid-cols-2 gap-3">
+          <!-- แถวบน: รายเดือน -->
+          <button id="exportMonthGLBtn"
+            class="group text-left px-5 py-5 rounded-2xl border border-cyan-200 bg-cyan-50 hover:bg-cyan-100 hover:border-cyan-300 disabled:opacity-40 disabled:cursor-not-allowed transition">
+            <div class="flex items-center justify-between gap-3">
+              <div>
+                <div class="text-[11px] font-semibold text-cyan-600 uppercase tracking-wide">รายเดือน</div>
+                <div class="text-lg font-bold text-cyan-900 mt-0.5">ชุด GL</div>
+              </div>
+              <div class="w-11 h-11 rounded-xl bg-cyan-600 text-white flex items-center justify-center shadow-sm text-lg">↓</div>
+            </div>
+            <div id="monthGLCount" class="text-sm text-cyan-700 mt-4 font-semibold">0 รายการ</div>
+            <div id="monthGLFilename" class="text-xs font-mono text-slate-500 mt-1 truncate"></div>
+          </button>
+
+          <button id="exportMonthUBtn"
+            class="group text-left px-5 py-5 rounded-2xl border border-fuchsia-200 bg-fuchsia-50 hover:bg-fuchsia-100 hover:border-fuchsia-300 disabled:opacity-40 disabled:cursor-not-allowed transition">
+            <div class="flex items-center justify-between gap-3">
+              <div>
+                <div class="text-[11px] font-semibold text-fuchsia-600 uppercase tracking-wide">รายเดือน</div>
+                <div class="text-lg font-bold text-fuchsia-900 mt-0.5">ชุด U</div>
+              </div>
+              <div class="w-11 h-11 rounded-xl bg-fuchsia-600 text-white flex items-center justify-center shadow-sm text-lg">↓</div>
+            </div>
+            <div id="monthUCount" class="text-sm text-fuchsia-700 mt-4 font-semibold">0 รายการ</div>
+            <div id="monthUFilename" class="text-xs font-mono text-slate-500 mt-1 truncate"></div>
+          </button>
+
+          <!-- แถวล่าง: รายสัปดาห์ -->
+          <button id="exportWeekGLBtn"
+            class="group text-left px-5 py-5 rounded-2xl border border-sky-200 bg-sky-50 hover:bg-sky-100 hover:border-sky-300 disabled:opacity-40 disabled:cursor-not-allowed transition">
+            <div class="flex items-center justify-between gap-3">
+              <div>
+                <div class="text-[11px] font-semibold text-sky-600 uppercase tracking-wide">รายสัปดาห์</div>
+                <div class="text-lg font-bold text-sky-900 mt-0.5">ชุด GL</div>
+              </div>
+              <div class="w-11 h-11 rounded-xl bg-sky-600 text-white flex items-center justify-center shadow-sm text-lg">↓</div>
+            </div>
+            <div id="weekGLCount" class="text-sm text-sky-700 mt-4 font-semibold">0 รายการ</div>
+            <div id="weekGLFilename" class="text-xs font-mono text-slate-500 mt-1 truncate"></div>
+          </button>
+
+          <button id="exportWeekUBtn"
+            class="group text-left px-5 py-5 rounded-2xl border border-violet-200 bg-violet-50 hover:bg-violet-100 hover:border-violet-300 disabled:opacity-40 disabled:cursor-not-allowed transition">
+            <div class="flex items-center justify-between gap-3">
+              <div>
+                <div class="text-[11px] font-semibold text-violet-600 uppercase tracking-wide">รายสัปดาห์</div>
+                <div class="text-lg font-bold text-violet-900 mt-0.5">ชุด U</div>
+              </div>
+              <div class="w-11 h-11 rounded-xl bg-violet-600 text-white flex items-center justify-center shadow-sm text-lg">↓</div>
+            </div>
+            <div id="weekUCount" class="text-sm text-violet-700 mt-4 font-semibold">0 รายการ</div>
+            <div id="weekUFilename" class="text-xs font-mono text-slate-500 mt-1 truncate"></div>
+          </button>
+        </div>
+
+        <div class="mt-3 rounded-2xl bg-slate-50 border border-slate-200 px-4 py-3 text-xs text-slate-500">
+          ไม่ต้องสลับแท็บก่อนดาวน์โหลด — กดไฟล์ที่ต้องการได้จาก 4 ปุ่มนี้โดยตรง
+        </div>
+      </div>
+    </section>
+
+    <!-- Empty hint -->
+    <section id="emptyHint" class="mt-5 text-center text-xs text-slate-400">
+      เมื่อเพิ่มไฟล์แล้ว ระบบจะแสดงขั้นตอนตรวจข้อมูลและดาวน์โหลดที่นี่
+    </section>
+  </main>
+
+<script>
+  // =========================
+  // STATE
+  // =========================
+  let currentMode = 'week';
+  let currentViewFilter = 'all';
+  let rawItems = [];
+  let filteredItems = [];
+  let loadedFiles = [];
+
+  // =========================
+  // DOM
+  // =========================
+  const dragOverlay = document.getElementById('dragOverlay');
+  const dropzone = document.getElementById('dropzone');
+  const fileInput = document.getElementById('fileInput');
+  const loadingModal = document.getElementById('loadingModal');
+  const loadingTitle = document.getElementById('loadingTitle');
+  const loadingSubtitle = document.getElementById('loadingSubtitle');
+
+  const fileListContainer = document.getElementById('fileListContainer');
+  const fileBadges = document.getElementById('fileBadges');
+  const loadedFileCount = document.getElementById('loadedFileCount');
+
+  const tabWeekBtn = document.getElementById('tabWeekBtn');
+  const tabMonthBtn = document.getElementById('tabMonthBtn');
+  const activeModeLabel = document.getElementById('activeModeLabel');
+
+  const controlPanel = document.getElementById('controlPanel');
+  const tableContainer = document.getElementById('tableContainer');
+  const emptyHint = document.getElementById('emptyHint');
+
+  const tableHeader = document.getElementById('tableHeader');
+  const tableBody = document.getElementById('tableBody');
+  const previewCount = document.getElementById('previewCount');
+  const structureDesc = document.getElementById('structureDesc');
+
+  const filterMode = document.getElementById('filterMode');
+  const searchInput = document.getElementById('searchInput');
+  const datePrefixInput = document.getElementById('datePrefix');
+
+  const previewNameGL = document.getElementById('previewNameGL');
+  const previewNameU = document.getElementById('previewNameU');
+
+  const exportWeekGLBtn = document.getElementById('exportWeekGLBtn');
+  const exportWeekUBtn = document.getElementById('exportWeekUBtn');
+  const exportMonthGLBtn = document.getElementById('exportMonthGLBtn');
+  const exportMonthUBtn = document.getElementById('exportMonthUBtn');
+
+  const weekGLCount = document.getElementById('weekGLCount');
+  const weekUCount = document.getElementById('weekUCount');
+  const monthGLCount = document.getElementById('monthGLCount');
+  const monthUCount = document.getElementById('monthUCount');
+
+  const weekGLFilename = document.getElementById('weekGLFilename');
+  const weekUFilename = document.getElementById('weekUFilename');
+  const monthGLFilename = document.getElementById('monthGLFilename');
+  const monthUFilename = document.getElementById('monthUFilename');
+
+  const copyBtn = document.getElementById('copyBtn');
+
+  const topFileStatus = document.getElementById('topFileStatus');
+  const clearFilesBtnTop = document.getElementById('clearFilesBtnTop');
+  const clearFilesBtn = document.getElementById('clearFilesBtn');
+
+  // =========================
+  // INITIAL
+  // =========================
+  function getDefaultThaiDatePrefix() {
+    const now = new Date();
+    const year = now.getFullYear() + 543;
+    const month = String(now.getMonth() + 1).padStart(2,'0');
+    const day = String(now.getDate()).padStart(2,'0');
+    return `${year}${month}${day}`;
+  }
+
+  datePrefixInput.value = getDefaultThaiDatePrefix();
+  updateFilenamePreviews();
+  updateDownloadCards();
+
+  // =========================
+  // DRAG & DROP
+  // =========================
+  let dragDepth = 0;
+
+  window.addEventListener('dragenter', (e) => {
+    e.preventDefault();
+    if (!hasFiles(e)) return;
+    dragDepth++;
+    dragOverlay.classList.remove('hidden');
+    dragOverlay.classList.add('flex');
+  });
+
+  window.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    if (e.dataTransfer) e.dataTransfer.dropEffect = 'copy';
+  });
+
+  window.addEventListener('dragleave', (e) => {
+    e.preventDefault();
+    if (!hasFiles(e)) return;
+    dragDepth--;
+    if (dragDepth <= 0) {
+      dragDepth = 0;
+      hideDragOverlay();
+    }
+  });
+
+  window.addEventListener('drop', (e) => {
+    e.preventDefault();
+    dragDepth = 0;
+    hideDragOverlay();
+    dropzone.classList.remove('drop-active');
+
+    const files = e.dataTransfer?.files;
+    if (files && files.length) handleFiles(files);
+  });
+
+  dropzone.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    dropzone.classList.add('drop-active');
+  });
+
+  dropzone.addEventListener('dragleave', () => {
+    dropzone.classList.remove('drop-active');
+  });
+
+  dropzone.addEventListener('click', () => fileInput.click());
+
+  fileInput.addEventListener('change', (e) => {
+    if (e.target.files?.length) handleFiles(e.target.files);
+  });
+
+  function hasFiles(e) {
+    return !!e.dataTransfer &&
+      Array.from(e.dataTransfer.types || []).includes('Files');
+  }
+
+  function hideDragOverlay() {
+    dragOverlay.classList.add('hidden');
+    dragOverlay.classList.remove('flex');
+  }
+
+  // =========================
+  // MODE
+  // =========================
+  tabWeekBtn.addEventListener('click', () => switchMode('week'));
+  tabMonthBtn.addEventListener('click', () => switchMode('month'));
+
+  function switchMode(mode) {
+    currentMode = mode;
+    tabWeekBtn.classList.toggle('active', mode === 'week');
+    tabMonthBtn.classList.toggle('active', mode === 'month');
+
+    activeModeLabel.textContent = mode === 'week' ? 'รายสัปดาห์' : 'รายเดือน';
+    structureDesc.textContent = mode === 'week'
+      ? 'โครงสร้าง 12 คอลัมน์ (รายสัปดาห์ · เดือนปัจจุบัน)'
+      : 'โครงสร้าง 9 คอลัมน์ (รายเดือน)';
+
+    updateFilenamePreviews();
+    applyFilters();
+  }
+
+  // =========================
+  // FILE PROCESS
+  // =========================
+  async function handleFiles(files) {
+    const newFiles = [...files].filter(f => {
+      if (!/\.(xlsx|xls)$/i.test(f.name)) return false;
+      return !loadedFiles.some(x => x.name === f.name && x.sizeRaw === f.size);
+    });
+
+    if (!newFiles.length) return;
+
+    showLoading('กำลังอ่านไฟล์...', `${newFiles.length} ไฟล์`);
+
+    try {
+      for (let i = 0; i < newFiles.length; i++) {
+        const file = newFiles[i];
+        loadingTitle.textContent = `กำลังอ่าน: ${file.name}`;
+        loadingSubtitle.textContent = `ไฟล์ ${i + 1} จาก ${newFiles.length}`;
+
+        const buffer = await file.arrayBuffer();
+        const workbook = XLSX.read(buffer, {
+          type: 'array',
+          cellDates: true,
+          cellText: false,
+          cellNF: false
+        });
+
+        let rowsFound = 0;
+        let detectedSet = detectSetFromFilename(file.name);
+
+        workbook.SheetNames.forEach(sheetName => {
+          const sheet = workbook.Sheets[sheetName];
+          const rows = XLSX.utils.sheet_to_json(sheet, {
+            header: 1,
+            defval: '',
+            raw: false
+          });
+
+          // ตำแหน่ง merge ต้องอิงจุดเริ่มต้นเดียวกับอาร์เรย์จาก sheet_to_json
+          const sheetStart = XLSX.utils.decode_range(sheet['!ref'] || 'A1').s;
+          const headerMerges = (sheet['!merges'] || []).map(({ s, e }) => ({
+            s: { r: s.r - sheetStart.r, c: s.c - sheetStart.c },
+            e: { r: e.r - sheetStart.r, c: e.c - sheetStart.c }
+          }));
+          const result = parseSheetRows(rows, file.name, headerMerges);
+          rowsFound += result.count;
+          if (result.setType) detectedSet = result.setType;
+        });
+
+        loadedFiles.push({
+          name: file.name,
+          sizeRaw: file.size,
+          size: `${(file.size / 1024 / 1024).toFixed(2)} MB`,
+          rows: rowsFound,
+          set: detectedSet
+        });
+      }
+
+      renderFileBadges();
+      updateUI();
+      applyFilters();
+
+      // หลังอัปโหลดและประมวลผลสำเร็จ เลื่อนลงไปส่วนดาวน์โหลดด้านล่างสุดอัตโนมัติ
+      setTimeout(() => {
+        window.scrollTo({
+          top: document.documentElement.scrollHeight,
+          behavior: 'smooth'
+        });
+      }, 180);
+
+    } catch (err) {
+      console.error(err);
+      alert('เกิดข้อผิดพลาดในการอ่านไฟล์: ' + err.message);
+    } finally {
+      hideLoading();
+      fileInput.value = '';
+    }
+  }
+
+  function normalizeHeader(value) {
+    return String(value ?? '').normalize('NFKC')
+      .replace(/[\s\u200B-\u200D\uFEFF]+/g, '').toLowerCase();
+  }
+
+  function getWeekNumber(value) {
+    const match = normalizeHeader(value).match(/^(?:สป\.?|สัปดาห์(?:ที่)?)([1-4])$/);
+    return match ? Number(match[1]) : null;
+  }
+
+  function getHeaderMonth(value) {
+    const header = normalizeHeader(value);
+    if (/เดือนปัจจุบัน|เดือนนี้|currentmonth/.test(header)) return 'current';
+    if (/เดือนก่อน|เดือนที่ผ่านมา|previousmonth/.test(header)) return 'previous';
+    return null;
+  }
+
+  function findCurrentWeekColumns(rows, headerIdx, headers, headerMerges, fileName) {
+    const firstGroupRow = Math.max(0, headerIdx - 5);
+    const monthForColumn = (column) => {
+      for (let r = headerIdx - 1; r >= firstGroupRow; r--) {
+        const merge = headerMerges.find(({ s, e }) =>
+          s.r <= r && e.r >= r && s.c <= column && e.c >= column);
+        let label = '';
+        if (merge) {
+          label = rows[merge.s.r]?.[merge.s.c];
+        } else {
+          // รองรับหัวกลุ่มที่ไม่ได้ merge โดยใช้หัวข้อที่อยู่ทางซ้ายในแถวเดียวกัน
+          for (let c = column; c >= 0; c--) {
+            if (normalizeHeader(rows[r]?.[c])) {
+              label = rows[r][c];
+              break;
+            }
+          }
+        }
+        const month = getHeaderMonth(label);
+        if (month) return month;
+      }
+      return null;
+    };
+
+    const candidates = [];
+    headers.forEach((header, column) => {
+      const week = getWeekNumber(header);
+      if (week !== null) candidates.push({ week, column, month: monthForColumn(column) });
+    });
+
+    const hasCurrentHeading = rows.slice(firstGroupRow, headerIdx)
+      .some(row => (row || []).some(value => getHeaderMonth(value) === 'current'));
+    const current = candidates.filter(item => item.month === 'current');
+    // ไฟล์ที่จัดรูปแบบแล้วอาจมีเพียง สป.1–4 ชุดเดียวและไม่มีหัวกลุ่มเดือน
+    const selected = current.length || hasCurrentHeading
+      ? current
+      : candidates.filter(item => item.month === null);
+    if (!selected.length || new Set(selected.map(item => item.week)).size !== selected.length) {
+      throw new Error(`${fileName}: ระบุคอลัมน์ สป.1–4 ของเดือนปัจจุบันไม่ได้ กรุณาตรวจหัวกลุ่มเดือนในไฟล์`);
+    }
+
+    // เลือกทั้งชุดจากเดือนเดียวกันเท่านั้น สัปดาห์ที่ไม่มีคอลัมน์ให้เว้นว่าง
+    return [1, 2, 3, 4].map(week => selected.find(item => item.week === week)?.column ?? -1);
+  }
+
+  function parseSheetRows(rows, fileName, headerMerges = []) {
+    if (!rows || rows.length < 2) return { count:0, setType:null };
+
+    let headerIdx = -1;
+
+    for (let r = 0; r < Math.min(rows.length, 20); r++) {
+      const row = rows[r].map(v => String(v ?? '').trim());
+      const joined = row.join('|');
+
+      if (
+        joined.includes('ลักษณะจำเพาะ') &&
+        (joined.includes('แหล่งจัดเก็บ') || joined.includes('แหล่ง'))
+      ) {
+        headerIdx = r;
+        break;
+      }
+    }
+
+    if (headerIdx === -1) return { count:0, setType:null };
+
+    const headers = rows[headerIdx].map(v => String(v ?? '').trim());
+
+    const isWeeklyFile = headers.some(h => getWeekNumber(h) !== null);
+    const fileMode = isWeeklyFile ? 'week' : 'month';
+
+    // เลือกโหมดหน้าจออัตโนมัติเฉพาะตอนเริ่มต้น เพื่อไม่ให้หลายไฟล์สลับหน้าจอไปมา
+    if (rawItems.length === 0) {
+      switchMode(fileMode);
+    }
+
+    const findIndex = (matcher) => headers.findIndex(matcher);
+
+    const specIdx = findIndex(h => h.includes('ลักษณะจำเพาะ'));
+    const storeNameIdx = findIndex(h => h.includes('แหล่งจัดเก็บ'));
+    const linkIdx = findIndex(h => h.toLowerCase().includes('link'));
+    const compPriceIdx = findIndex(h => h.includes('ราคาเปรียบเทียบ') || h === 'เปรียบเทียบ');
+    const note1Idx = findIndex(h => h.includes('ผู้บันทึก'));
+    const note2Idx = findIndex(h => h.includes('ผู้ตรวจ'));
+    const curPriceIdx = findIndex(h => h.includes('ราคาปัจจุบัน'));
+
+    const [w1Idx, w2Idx, w3Idx, w4Idx] = isWeeklyFile
+      ? findCurrentWeekColumns(rows, headerIdx, headers, headerMerges, fileName)
+      : [-1, -1, -1, -1];
+
+    const codeIndices = [];
+    headers.forEach((h, idx) => {
+      if (
+        h === 'รหัส' ||
+        h.includes('รหัสสินค้า') ||
+        h.includes('รหัสแหล่ง')
+      ) codeIndices.push(idx);
+    });
+
+    let itemCodeIdx = codeIndices[0] ?? -1;
+    let storeCodeIdx = codeIndices[1] ?? -1;
+
+    // ถ้าหัวตารางระบุ "รหัสแหล่ง" โดยตรง ให้ใช้ตำแหน่งนั้นเป็นรหัสแหล่ง
+    const explicitStoreCodeIdx = findIndex(h => h.includes('รหัสแหล่ง'));
+    if (explicitStoreCodeIdx !== -1) storeCodeIdx = explicitStoreCodeIdx;
+
+    const setType = detectSetFromFilename(fileName);
+
+    let count = 0;
+
+    for (let r = headerIdx + 1; r < rows.length; r++) {
+      const row = rows[r];
+      if (!row || !row.length) continue;
+
+      const itemCode = getCellString(row, itemCodeIdx);
+      const spec = getCellString(row, specIdx);
+
+      if (!itemCode && !spec) continue;
+
+      const storeCode = getCellString(row, storeCodeIdx);
+      const storeName = getCellString(row, storeNameIdx);
+
+      const note1 = getCellString(row, note1Idx);
+      const note2 = getCellString(row, note2Idx);
+
+      rawItems.push({
+        fileMode,
+        setType,
+        itemCode,
+        spec,
+        storeCode,
+        storeName,
+
+        w1: getCellNullable(row, w1Idx),
+        w2: getCellNullable(row, w2Idx),
+        w3: getCellNullable(row, w3Idx),
+        w4: getCellNullable(row, w4Idx),
+
+        curPrice: getCellNullable(row, curPriceIdx),
+        linkVal: getCellNullable(row, linkIdx) ?? '0',
+        compPrice: getCellNullable(row, compPriceIdx),
+
+        note1,
+        note2
+      });
+
+      count++;
+    }
+
+    return { count, setType };
+  }
+
+  function getCellString(row, idx) {
+    if (idx === -1 || row[idx] === undefined || row[idx] === null) return '';
+    return String(row[idx]).trim();
+  }
+
+  function getCellNullable(row, idx) {
+    if (idx === -1 || row[idx] === undefined || row[idx] === null || row[idx] === '') return null;
+    return row[idx];
+  }
+
+  function detectSetFromFilename(fileName) {
+    const n = String(fileName).toUpperCase();
+
+    if (
+      n.includes('ชุด U') ||
+      n.includes('_U') ||
+      n.includes('4.1.2') ||
+      n.includes('นอกเขต')
+    ) return 'U';
+
+    return 'GL';
+  }
+
+  // =========================
+  // RENDER FILES
+  // =========================
+  function renderFileBadges() {
+    if (!loadedFiles.length) {
+      fileListContainer.classList.add('hidden');
+      topFileStatus.textContent = 'ยังไม่มีไฟล์';
+      topFileStatus.classList.add('hidden');
+      clearFilesBtnTop.classList.add('hidden');
+      return;
+    }
+
+    fileListContainer.classList.remove('hidden');
+    loadedFileCount.textContent = `${loadedFiles.length} ไฟล์`;
+
+    topFileStatus.classList.remove('hidden');
+    clearFilesBtnTop.classList.remove('hidden');
+    topFileStatus.textContent = `${loadedFiles.length} ไฟล์ • ${rawItems.length.toLocaleString()} รายการ`;
+
+    fileBadges.innerHTML = loadedFiles.map(f => {
+      const isGL = f.set === 'GL';
+      const color = isGL
+        ? 'border-sky-100 bg-sky-50 text-sky-800'
+        : 'border-violet-100 bg-violet-50 text-violet-800';
+
+      return `
+        <div class="rounded-xl border ${color} px-3 py-2.5 flex items-start gap-2">
+          <div class="mt-0.5">✓</div>
+          <div class="min-w-0 flex-1">
+            <div class="font-semibold text-xs truncate" title="${escapeHtml(f.name)}">${escapeHtml(f.name)}</div>
+            <div class="text-[11px] opacity-70 mt-0.5 font-mono">${f.set} • ${f.rows.toLocaleString()} แถว • ${f.size}</div>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  // =========================
+  // FILTER
+  // =========================
+  function applyFilters() {
+    const mode = filterMode.value;
+    const term = searchInput.value.trim().toLowerCase();
+
+    filteredItems = rawItems.filter(item => {
+      if (item.fileMode !== currentMode) return false;
+      if (currentViewFilter !== 'all' && item.setType !== currentViewFilter) return false;
+
+      if (mode === 'notes_only' && !(item.note1 || item.note2)) return false;
+      if (mode === 'no_link' && String(item.linkVal ?? '') !== '0') return false;
+
+      if (term) {
+        const haystack = [
+          item.itemCode,
+          item.spec,
+          item.storeCode,
+          item.storeName,
+          item.note1,
+          item.note2
+        ].join(' ').toLowerCase();
+
+        if (!haystack.includes(term)) return false;
+      }
+
+      return true;
+    });
+
+    renderTable();
+    updateStats();
+  }
+
+  function updateStats() {
+    const itemsInMode = rawItems.filter(x => x.fileMode === currentMode);
+
+    const calcFiltered = (setType) => {
+      const mode = filterMode.value;
+      const term = searchInput.value.trim().toLowerCase();
+
+      return itemsInMode.filter(item => {
+        if (item.setType !== setType) return false;
+
+        if (mode === 'notes_only' && !(item.note1 || item.note2)) return false;
+        if (mode === 'no_link' && String(item.linkVal ?? '') !== '0') return false;
+
+        if (term) {
+          const haystack = [
+            item.itemCode,
+            item.spec,
+            item.storeCode,
+            item.storeName,
+            item.note1,
+            item.note2
+          ].join(' ').toLowerCase();
+
+          if (!haystack.includes(term)) return false;
+        }
+
+        return true;
+      });
+    };
+
+    const glAll = itemsInMode.filter(x => x.setType === 'GL');
+    const uAll = itemsInMode.filter(x => x.setType === 'U');
+
+    const glFiltered = calcFiltered('GL');
+    const uFiltered = calcFiltered('U');
+
+    document.getElementById('statGLTotal').textContent = glAll.length.toLocaleString();
+    document.getElementById('statGLFiltered').textContent = glFiltered.length.toLocaleString();
+
+    document.getElementById('statUTotal').textContent = uAll.length.toLocaleString();
+    document.getElementById('statUFiltered').textContent = uFiltered.length.toLocaleString();
+
+    document.getElementById('statHasNote').textContent =
+      itemsInMode.filter(x => x.note1 || x.note2).length.toLocaleString();
+
+    document.getElementById('statFiles').textContent = loadedFiles.length;
+
+    updateDownloadCards();
+  }
+
+  // =========================
+  // TABLE
+  // =========================
+  function renderTable() {
+    const weekHeaders = `
+      <tr>
+        <th class="p-3 text-center whitespace-nowrap">#</th>
+        <th class="p-3 whitespace-nowrap">ชุด</th>
+        <th class="p-3 whitespace-nowrap">รหัส</th>
+        <th class="p-3 min-w-[280px]">ลักษณะจำเพาะ</th>
+        <th class="p-3 whitespace-nowrap">รหัสแหล่ง</th>
+        <th class="p-3 min-w-[180px]">แหล่งจัดเก็บ</th>
+        <th class="p-3 text-right whitespace-nowrap">สป. 1</th>
+        <th class="p-3 text-right whitespace-nowrap">สป. 2</th>
+        <th class="p-3 text-right whitespace-nowrap">สป. 3</th>
+        <th class="p-3 text-right whitespace-nowrap">สป. 4</th>
+        <th class="p-3 text-center whitespace-nowrap">Link</th>
+        <th class="p-3 text-right whitespace-nowrap">ราคาเปรียบเทียบ</th>
+        <th class="p-3 min-w-[180px]">ภาวะผู้บันทึก</th>
+        <th class="p-3 min-w-[160px]">ภาวะผู้ตรวจ</th>
+      </tr>
+    `;
+
+    const monthHeaders = `
+      <tr>
+        <th class="p-3 text-center whitespace-nowrap">#</th>
+        <th class="p-3 whitespace-nowrap">ชุด</th>
+        <th class="p-3 whitespace-nowrap">รหัส</th>
+        <th class="p-3 min-w-[280px]">ลักษณะจำเพาะ</th>
+        <th class="p-3 whitespace-nowrap">รหัสแหล่ง</th>
+        <th class="p-3 min-w-[180px]">แหล่งจัดเก็บ</th>
+        <th class="p-3 text-right whitespace-nowrap">ราคาปัจจุบัน</th>
+        <th class="p-3 text-center whitespace-nowrap">Link</th>
+        <th class="p-3 text-right whitespace-nowrap">ราคาเปรียบเทียบ</th>
+        <th class="p-3 min-w-[180px]">ภาวะผู้บันทึก</th>
+        <th class="p-3 min-w-[160px]">ภาวะผู้ตรวจ</th>
+      </tr>
+    `;
+
+    tableHeader.innerHTML = currentMode === 'week' ? weekHeaders : monthHeaders;
+
+    previewCount.textContent = `แสดง ${filteredItems.length.toLocaleString()} รายการ`;
+
+    if (!filteredItems.length) {
+      tableBody.innerHTML = `
+        <tr>
+          <td colspan="14" class="text-center py-14 text-slate-400">
+            ไม่พบข้อมูลในโหมดหรือเงื่อนไขที่เลือก
+          </td>
+        </tr>
+      `;
+      return;
+    }
+
+    const displayItems = filteredItems.slice(0, 300);
+
+    tableBody.innerHTML = displayItems.map((row, i) => {
+      const setBadge = row.setType === 'GL'
+        ? '<span class="px-2 py-0.5 rounded-md bg-sky-100 text-sky-700 font-semibold">GL</span>'
+        : '<span class="px-2 py-0.5 rounded-md bg-violet-100 text-violet-700 font-semibold">U</span>';
+
+      const noteClass = (row.note1 || row.note2) ? 'bg-amber-50/40' : '';
+
+      if (currentMode === 'week') {
+        return `
+          <tr class="${noteClass} hover:bg-slate-50">
+            <td class="p-3 text-center text-slate-400 font-mono">${i + 1}</td>
+            <td class="p-3">${setBadge}</td>
+            <td class="p-3 font-mono font-medium whitespace-nowrap">${escapeHtml(row.itemCode)}</td>
+            <td class="p-3">${escapeHtml(row.spec)}</td>
+            <td class="p-3 font-mono whitespace-nowrap">${escapeHtml(row.storeCode)}</td>
+            <td class="p-3">${escapeHtml(row.storeName)}</td>
+            <td class="p-3 text-right font-mono">${formatPrice(row.w1)}</td>
+            <td class="p-3 text-right font-mono">${formatPrice(row.w2)}</td>
+            <td class="p-3 text-right font-mono">${formatPrice(row.w3)}</td>
+            <td class="p-3 text-right font-mono">${formatPrice(row.w4)}</td>
+            <td class="p-3 text-center font-mono">${escapeHtml(String(row.linkVal ?? ''))}</td>
+            <td class="p-3 text-right font-mono">${formatPrice(row.compPrice)}</td>
+            <td class="p-3">${noteChip(row.note1, 'amber')}</td>
+            <td class="p-3">${noteChip(row.note2, 'blue')}</td>
+          </tr>
+        `;
+      }
+
+      return `
+        <tr class="${noteClass} hover:bg-slate-50">
+          <td class="p-3 text-center text-slate-400 font-mono">${i + 1}</td>
+          <td class="p-3">${setBadge}</td>
+          <td class="p-3 font-mono font-medium whitespace-nowrap">${escapeHtml(row.itemCode)}</td>
+          <td class="p-3">${escapeHtml(row.spec)}</td>
+          <td class="p-3 font-mono whitespace-nowrap">${escapeHtml(row.storeCode)}</td>
+          <td class="p-3">${escapeHtml(row.storeName)}</td>
+          <td class="p-3 text-right font-mono font-semibold">${formatPrice(row.curPrice)}</td>
+          <td class="p-3 text-center font-mono">${escapeHtml(String(row.linkVal ?? ''))}</td>
+          <td class="p-3 text-right font-mono">${formatPrice(row.compPrice)}</td>
+          <td class="p-3">${noteChip(row.note1, 'amber')}</td>
+          <td class="p-3">${noteChip(row.note2, 'blue')}</td>
+        </tr>
+      `;
+    }).join('') + (
+      filteredItems.length > 300
+        ? `<tr><td colspan="14" class="text-center py-4 text-slate-400 bg-slate-50">แสดงตัวอย่าง 300 รายการ • ตอน Export จะส่งออกครบทั้งหมด</td></tr>`
+        : ''
+    );
+  }
+
+  function noteChip(value, tone) {
+    if (!value) return '<span class="text-slate-300">—</span>';
+    const cls = tone === 'amber'
+      ? 'bg-amber-100 text-amber-800'
+      : 'bg-blue-100 text-blue-800';
+
+    return `<span class="inline-block px-2 py-1 rounded-lg ${cls}">${escapeHtml(value)}</span>`;
+  }
+
+  // =========================
+  // WORKBOOK
+  // =========================
+  function generateWorkbook(items, mode) {
+    let headers;
+    let data;
+
+    if (mode === 'week') {
+      headers = [
+        'รหัส','ลักษณะจำเพาะ','รหัสแหล่ง','แหล่งจัดเก็บ',
+        'สป. 1','สป. 2','สป.3','สป. 4',
+        'Link','ราคาเปรียบเทียบ','ภาวะ(ผู้บันทึก)','ภาวะ(ผู้ตรวจ)'
+      ];
+
+      data = [
+        headers,
+        ...items.map(item => [
+          item.itemCode,
+          item.spec,
+          item.storeCode,
+          item.storeName,
+          normalizeExcelNumber(item.w1),
+          normalizeExcelNumber(item.w2),
+          normalizeExcelNumber(item.w3),
+          normalizeExcelNumber(item.w4),
+          item.linkVal === null || item.linkVal === '' ? '0' : String(item.linkVal),
+          normalizeExcelNumber(item.compPrice),
+          item.note1 || null,
+          item.note2 || null
+        ])
+      ];
+    } else {
+      headers = [
+        'รหัส','ลักษณะจำเพาะ','รหัสแหล่ง','แหล่งจัดเก็บ',
+        'ราคาปัจจุบัน','Link','ราคาเปรียบเทียบ',
+        'ภาวะ (ผู้บันทึก)','ภาวะ (ผู้ตรวจ)'
+      ];
+
+      data = [
+        headers,
+        ...items.map(item => [
+          item.itemCode,
+          item.spec,
+          item.storeCode,
+          item.storeName,
+          normalizeExcelNumber(item.curPrice),
+          item.linkVal === null || item.linkVal === '' ? '0' : String(item.linkVal),
+          normalizeExcelNumber(item.compPrice),
+          item.note1 || null,
+          item.note2 || null
+        ])
+      ];
+    }
+
+    const wb = XLSX.utils.book_new();
+    const ws = XLSX.utils.aoa_to_sheet(data);
+
+    // บังคับรหัสเป็นข้อความ ป้องกันเลข 0 นำหน้าหาย
+    for (let r = 2; r <= data.length; r++) {
+      if (ws[`A${r}`]) ws[`A${r}`].t = 's';
+      if (ws[`C${r}`]) ws[`C${r}`].t = 's';
+    }
+
+    ws['!cols'] = mode === 'week'
+      ? [
+          {wch:20},{wch:62},{wch:16},{wch:36},
+          {wch:11},{wch:11},{wch:11},{wch:11},
+          {wch:9},{wch:16},{wch:32},{wch:28}
+        ]
+      : [
+          {wch:20},{wch:62},{wch:16},{wch:36},
+          {wch:16},{wch:9},{wch:16},{wch:32},{wch:28}
+        ];
+
+    XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
+    return wb;
+  }
+
+  function normalizeExcelNumber(v) {
+    if (v === null || v === undefined || v === '') return null;
+    const n = Number(v);
+    return Number.isFinite(n) ? n : v;
+  }
+
+  function getExportItems(setType, fileMode = currentMode) {
+    const mode = filterMode.value;
+    const term = searchInput.value.trim().toLowerCase();
+
+    return rawItems.filter(item => {
+      if (item.fileMode !== fileMode) return false;
+      if (item.setType !== setType) return false;
+
+      if (mode === 'notes_only' && !(item.note1 || item.note2)) return false;
+      if (mode === 'no_link' && String(item.linkVal ?? '') !== '0') return false;
+
+      if (term) {
+        const haystack = [
+          item.itemCode,
+          item.spec,
+          item.storeCode,
+          item.storeName,
+          item.note1,
+          item.note2
+        ].join(' ').toLowerCase();
+
+        if (!haystack.includes(term)) return false;
+      }
+
+      return true;
+    });
+  }
+
+  function downloadSet(setType, fileMode = currentMode) {
+    const items = getExportItems(setType, fileMode);
+
+    if (!items.length) {
+      const modeLabel = fileMode === 'week' ? 'รายสัปดาห์' : 'รายเดือน';
+      alert(`ไม่มีข้อมูล ${modeLabel} สำหรับชุด ${setType}`);
+      return;
+    }
+
+    const wb = generateWorkbook(items, fileMode);
+    const prefix = datePrefixInput.value.trim() || getDefaultThaiDatePrefix();
+    XLSX.writeFile(wb, `${prefix}_${fileMode}_${setType}.xlsx`);
+  }
+
+  function updateDownloadCards() {
+    const weekGL = getExportItems('GL', 'week');
+    const weekU = getExportItems('U', 'week');
+    const monthGL = getExportItems('GL', 'month');
+    const monthU = getExportItems('U', 'month');
+
+    weekGLCount.textContent = `${weekGL.length.toLocaleString()} รายการ`;
+    weekUCount.textContent = `${weekU.length.toLocaleString()} รายการ`;
+    monthGLCount.textContent = `${monthGL.length.toLocaleString()} รายการ`;
+    monthUCount.textContent = `${monthU.length.toLocaleString()} รายการ`;
+
+    exportWeekGLBtn.disabled = weekGL.length === 0;
+    exportWeekUBtn.disabled = weekU.length === 0;
+    exportMonthGLBtn.disabled = monthGL.length === 0;
+    exportMonthUBtn.disabled = monthU.length === 0;
+
+    updateDownloadFilenames();
+  }
+
+  function updateDownloadFilenames() {
+    const prefix = datePrefixInput.value.trim() || getDefaultThaiDatePrefix();
+    weekGLFilename.textContent = `${prefix}_week_GL.xlsx`;
+    weekUFilename.textContent = `${prefix}_week_U.xlsx`;
+    monthGLFilename.textContent = `${prefix}_month_GL.xlsx`;
+    monthUFilename.textContent = `${prefix}_month_U.xlsx`;
+  }
+
+  // =========================
+  // UI ACTIONS
+  // =========================
+  function updateUI() {
+    const hasData = rawItems.length > 0;
+
+    controlPanel.classList.toggle('hidden', !hasData);
+    tableContainer.classList.toggle('hidden', !hasData);
+    emptyHint.classList.toggle('hidden', hasData);
+  }
+
+  function updateFilenamePreviews() {
+    const prefix = datePrefixInput.value.trim() || getDefaultThaiDatePrefix();
+    const gl = `${prefix}_${currentMode}_GL.xlsx`;
+    const u = `${prefix}_${currentMode}_U.xlsx`;
+
+    previewNameGL.textContent = gl;
+    previewNameU.textContent = u;
+    updateDownloadFilenames();
+  }
+
+  function clearAll() {
+    if (!rawItems.length && !loadedFiles.length) return;
+
+    if (!confirm('ต้องการล้างข้อมูลทั้งหมดหรือไม่?')) return;
+
+    rawItems = [];
+    filteredItems = [];
+    loadedFiles = [];
+
+    fileInput.value = '';
+    renderFileBadges();
+    updateUI();
+    applyFilters();
+  }
+
+  clearFilesBtn.addEventListener('click', clearAll);
+  clearFilesBtnTop.addEventListener('click', clearAll);
+
+  filterMode.addEventListener('change', applyFilters);
+  searchInput.addEventListener('input', applyFilters);
+  datePrefixInput.addEventListener('input', updateFilenamePreviews);
+
+  document.querySelectorAll('.view-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.view-btn').forEach(x => x.classList.remove('active'));
+      btn.classList.add('active');
+
+      currentViewFilter = btn.dataset.view;
+      applyFilters();
+    });
+  });
+
+  exportWeekGLBtn.addEventListener('click', () => downloadSet('GL', 'week'));
+  exportWeekUBtn.addEventListener('click', () => downloadSet('U', 'week'));
+  exportMonthGLBtn.addEventListener('click', () => downloadSet('GL', 'month'));
+  exportMonthUBtn.addEventListener('click', () => downloadSet('U', 'month'));
+
+  copyBtn.addEventListener('click', async () => {
+    if (!filteredItems.length) return;
+
+    const headers = currentMode === 'week'
+      ? [
+          'รหัส','ลักษณะจำเพาะ','รหัสแหล่ง','แหล่งจัดเก็บ',
+          'สป. 1','สป. 2','สป.3','สป. 4',
+          'Link','ราคาเปรียบเทียบ','ภาวะ(ผู้บันทึก)','ภาวะ(ผู้ตรวจ)'
+        ]
+      : [
+          'รหัส','ลักษณะจำเพาะ','รหัสแหล่ง','แหล่งจัดเก็บ',
+          'ราคาปัจจุบัน','Link','ราคาเปรียบเทียบ',
+          'ภาวะ (ผู้บันทึก)','ภาวะ (ผู้ตรวจ)'
+        ];
+
+    let tsv = headers.join('\t') + '\n';
+
+    filteredItems.forEach(item => {
+      const row = currentMode === 'week'
+        ? [
+            item.itemCode,item.spec,item.storeCode,item.storeName,
+            item.w1 ?? '',item.w2 ?? '',item.w3 ?? '',item.w4 ?? '',
+            item.linkVal ?? '',item.compPrice ?? '',item.note1,item.note2
+          ]
+        : [
+            item.itemCode,item.spec,item.storeCode,item.storeName,
+            item.curPrice ?? '',item.linkVal ?? '',item.compPrice ?? '',
+            item.note1,item.note2
+          ];
+
+      tsv += row.join('\t') + '\n';
+    });
+
+    try {
+      await navigator.clipboard.writeText(tsv);
+      const old = copyBtn.textContent;
+      copyBtn.textContent = '✓ คัดลอกแล้ว';
+      setTimeout(() => copyBtn.textContent = old, 1600);
+    } catch {
+      alert('เบราว์เซอร์ไม่อนุญาตให้คัดลอกอัตโนมัติ');
+    }
+  });
+
+  // =========================
+  // HELPERS
+  // =========================
+  function showLoading(title, subtitle) {
+    loadingTitle.textContent = title;
+    loadingSubtitle.textContent = subtitle;
+    loadingModal.classList.remove('hidden');
+    loadingModal.classList.add('flex');
+  }
+
+  function hideLoading() {
+    loadingModal.classList.add('hidden');
+    loadingModal.classList.remove('flex');
+  }
+
+  function formatPrice(val) {
+    if (val === '' || val === null || val === undefined) return '—';
+    const num = Number(val);
+    return Number.isFinite(num)
+      ? num.toLocaleString('th-TH', { maximumFractionDigits: 2 })
+      : escapeHtml(String(val));
+  }
+
+  function escapeHtml(text) {
+    return String(text ?? '')
+      .replace(/&/g,'&amp;')
+      .replace(/</g,'&lt;')
+      .replace(/>/g,'&gt;')
+      .replace(/"/g,'&quot;')
+      .replace(/'/g,'&#039;');
+  }
+</script>
+</body>
+</html>

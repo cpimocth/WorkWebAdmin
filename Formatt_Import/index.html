@@ -1091,6 +1091,58 @@
   // =========================
   // WORKBOOK
   // =========================
+  function excelFormulaLiteral(value) {
+    const normalized = normalizeExcelNumber(value);
+    if (normalized === null) return '""';
+    if (typeof normalized === 'number') return String(normalized);
+    return '"' + String(normalized).replace(/"/g, '""') + '"';
+  }
+
+  function currentWeeklyAverage(item) {
+    const prices = [item.w1, item.w2, item.w3, item.w4]
+      .map(normalizeExcelNumber)
+      .filter(value => typeof value === 'number' && Number.isFinite(value));
+    if (!prices.length) return '';
+
+    // ค่าที่เก็บไว้คู่กับสูตรต้องปัด 2 ตำแหน่งแบบ ROUND ของ Excel
+    // คิดจากเลขฐานสิบเพื่อไม่ให้จุดกึ่งกลางคลาดเคลื่อนจาก floating point
+    const parts = prices.map(value => {
+      const [mantissa, exponent = '0'] = String(value).toLowerCase().split('e');
+      return {
+        digits: BigInt(mantissa.replace('.', '')),
+        scale: (mantissa.split('.')[1] || '').length - Number(exponent)
+      };
+    });
+    const scale = Math.max(2, ...parts.map(part => part.scale));
+    const sum = parts.reduce((total, part) =>
+      total + part.digits * (10n ** BigInt(scale - part.scale)), 0n);
+    const magnitude = (sum < 0n ? -sum : sum) * 100n;
+    const divisor = (10n ** BigInt(scale)) * BigInt(prices.length);
+    const cents = (magnitude * 2n + divisor) / (divisor * 2n);
+    return (sum < 0n ? -1 : 1) * Number(cents) / 100;
+  }
+
+  function comparisonFormulaCell(item, mode, excelRow) {
+    const linkRef = `${mode === 'week' ? 'I' : 'F'}${excelRow}`;
+    const priceRef = mode === 'week' ? `E${excelRow}:H${excelRow}` : `E${excelRow}`;
+    const currentValue = mode === 'week'
+      ? `ROUND(AVERAGE(${priceRef}),2)`
+      : priceRef;
+    const condition = `OR(${linkRef}&""="1",${linkRef}&""="2")`;
+    const f = `IF(${condition},IF(COUNT(${priceRef})>0,${currentValue},""),${excelFormulaLiteral(item.compPrice)})`;
+
+    // ใส่สูตรให้ทุกแถว แม้ Link ตอน Export ยังเป็น 0 เพื่อแก้ Link ใน Excel ได้ทันที
+    const useCurrent = ['1', '2'].includes(String(item.linkVal ?? ''));
+    let cachedValue = normalizeExcelNumber(item.compPrice) ?? '';
+    if (useCurrent) {
+      const monthlyPrice = normalizeExcelNumber(item.curPrice);
+      cachedValue = mode === 'week'
+        ? currentWeeklyAverage(item)
+        : (typeof monthlyPrice === 'number' && Number.isFinite(monthlyPrice) ? monthlyPrice : '');
+    }
+    return { t: typeof cachedValue === 'number' ? 'n' : 's', v: cachedValue, f };
+  }
+
   function generateWorkbook(items, mode) {
     let headers;
     let data;
@@ -1149,6 +1201,7 @@
     for (let r = 2; r <= data.length; r++) {
       if (ws[`A${r}`]) ws[`A${r}`].t = 's';
       if (ws[`C${r}`]) ws[`C${r}`].t = 's';
+      ws[`${mode === 'week' ? 'J' : 'G'}${r}`] = comparisonFormulaCell(items[r - 2], mode, r);
     }
 
     ws['!cols'] = mode === 'week'
