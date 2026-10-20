@@ -321,7 +321,7 @@
         <div class="px-4 md:px-5 py-3 border-b border-slate-200 flex flex-wrap gap-2 items-center justify-between bg-slate-50/70">
           <div>
             <div id="previewCount" class="text-sm font-semibold">แสดง 0 รายการ</div>
-            <div id="structureDesc" class="text-[11px] text-slate-400 mt-0.5">โครงสร้างรายสัปดาห์</div>
+            <div id="structureDesc" class="text-[11px] text-slate-400 mt-0.5">โครงสร้างรายสัปดาห์ · เดือนปัจจุบัน</div>
           </div>
 
           <button id="copyBtn"
@@ -575,7 +575,7 @@
 
     activeModeLabel.textContent = mode === 'week' ? 'รายสัปดาห์' : 'รายเดือน';
     structureDesc.textContent = mode === 'week'
-      ? 'โครงสร้าง 12 คอลัมน์ (รายสัปดาห์)'
+      ? 'โครงสร้าง 12 คอลัมน์ (รายสัปดาห์ · เดือนปัจจุบัน)'
       : 'โครงสร้าง 9 คอลัมน์ (รายเดือน)';
 
     updateFilenamePreviews();
@@ -620,7 +620,13 @@
             raw: false
           });
 
-          const result = parseSheetRows(rows, file.name);
+          // ตำแหน่ง merge ต้องอิงจุดเริ่มต้นเดียวกับอาร์เรย์จาก sheet_to_json
+          const sheetStart = XLSX.utils.decode_range(sheet['!ref'] || 'A1').s;
+          const headerMerges = (sheet['!merges'] || []).map(({ s, e }) => ({
+            s: { r: s.r - sheetStart.r, c: s.c - sheetStart.c },
+            e: { r: e.r - sheetStart.r, c: e.c - sheetStart.c }
+          }));
+          const result = parseSheetRows(rows, file.name, headerMerges);
           rowsFound += result.count;
           if (result.setType) detectedSet = result.setType;
         });
@@ -655,7 +661,69 @@
     }
   }
 
-  function parseSheetRows(rows, fileName) {
+  function normalizeHeader(value) {
+    return String(value ?? '').normalize('NFKC')
+      .replace(/[\s\u200B-\u200D\uFEFF]+/g, '').toLowerCase();
+  }
+
+  function getWeekNumber(value) {
+    const match = normalizeHeader(value).match(/^(?:สป\.?|สัปดาห์(?:ที่)?)([1-4])$/);
+    return match ? Number(match[1]) : null;
+  }
+
+  function getHeaderMonth(value) {
+    const header = normalizeHeader(value);
+    if (/เดือนปัจจุบัน|เดือนนี้|currentmonth/.test(header)) return 'current';
+    if (/เดือนก่อน|เดือนที่ผ่านมา|previousmonth/.test(header)) return 'previous';
+    return null;
+  }
+
+  function findCurrentWeekColumns(rows, headerIdx, headers, headerMerges, fileName) {
+    const firstGroupRow = Math.max(0, headerIdx - 5);
+    const monthForColumn = (column) => {
+      for (let r = headerIdx - 1; r >= firstGroupRow; r--) {
+        const merge = headerMerges.find(({ s, e }) =>
+          s.r <= r && e.r >= r && s.c <= column && e.c >= column);
+        let label = '';
+        if (merge) {
+          label = rows[merge.s.r]?.[merge.s.c];
+        } else {
+          // รองรับหัวกลุ่มที่ไม่ได้ merge โดยใช้หัวข้อที่อยู่ทางซ้ายในแถวเดียวกัน
+          for (let c = column; c >= 0; c--) {
+            if (normalizeHeader(rows[r]?.[c])) {
+              label = rows[r][c];
+              break;
+            }
+          }
+        }
+        const month = getHeaderMonth(label);
+        if (month) return month;
+      }
+      return null;
+    };
+
+    const candidates = [];
+    headers.forEach((header, column) => {
+      const week = getWeekNumber(header);
+      if (week !== null) candidates.push({ week, column, month: monthForColumn(column) });
+    });
+
+    const hasCurrentHeading = rows.slice(firstGroupRow, headerIdx)
+      .some(row => (row || []).some(value => getHeaderMonth(value) === 'current'));
+    const current = candidates.filter(item => item.month === 'current');
+    // ไฟล์ที่จัดรูปแบบแล้วอาจมีเพียง สป.1–4 ชุดเดียวและไม่มีหัวกลุ่มเดือน
+    const selected = current.length || hasCurrentHeading
+      ? current
+      : candidates.filter(item => item.month === null);
+    if (!selected.length || new Set(selected.map(item => item.week)).size !== selected.length) {
+      throw new Error(`${fileName}: ระบุคอลัมน์ สป.1–4 ของเดือนปัจจุบันไม่ได้ กรุณาตรวจหัวกลุ่มเดือนในไฟล์`);
+    }
+
+    // เลือกทั้งชุดจากเดือนเดียวกันเท่านั้น สัปดาห์ที่ไม่มีคอลัมน์ให้เว้นว่าง
+    return [1, 2, 3, 4].map(week => selected.find(item => item.week === week)?.column ?? -1);
+  }
+
+  function parseSheetRows(rows, fileName, headerMerges = []) {
     if (!rows || rows.length < 2) return { count:0, setType:null };
 
     let headerIdx = -1;
@@ -677,7 +745,7 @@
 
     const headers = rows[headerIdx].map(v => String(v ?? '').trim());
 
-    const isWeeklyFile = headers.some(h => /^สป\.\s*\d/.test(h) || h.includes('สป.'));
+    const isWeeklyFile = headers.some(h => getWeekNumber(h) !== null);
     const fileMode = isWeeklyFile ? 'week' : 'month';
 
     // เลือกโหมดหน้าจออัตโนมัติเฉพาะตอนเริ่มต้น เพื่อไม่ให้หลายไฟล์สลับหน้าจอไปมา
@@ -695,10 +763,9 @@
     const note2Idx = findIndex(h => h.includes('ผู้ตรวจ'));
     const curPriceIdx = findIndex(h => h.includes('ราคาปัจจุบัน'));
 
-    const w1Idx = findIndex(h => /^สป\.\s*1$/.test(h));
-    const w2Idx = findIndex(h => /^สป\.\s*2$/.test(h));
-    const w3Idx = findIndex(h => /^สป\.\s*3$/.test(h));
-    const w4Idx = findIndex(h => /^สป\.\s*4$/.test(h));
+    const [w1Idx, w2Idx, w3Idx, w4Idx] = isWeeklyFile
+      ? findCurrentWeekColumns(rows, headerIdx, headers, headerMerges, fileName)
+      : [-1, -1, -1, -1];
 
     const codeIndices = [];
     headers.forEach((h, idx) => {
