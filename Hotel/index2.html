@@ -1,0 +1,278 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>ReplaceHotel · LEFT JOIN + เติมชื่อสเปค/แหล่ง</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+:root{--bg:#f5f7fb;--card:#fff;--text:#0f172a;--muted:#64748b;--line:#e2e8f0;--blue:#2563eb;--blue2:#1d4ed8;--green:#059669;--red:#dc2626;--amber:#d97706;--shadow:0 18px 60px rgba(15,23,42,.08)}
+*{box-sizing:border-box}body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans Thai","Prompt",sans-serif;background:linear-gradient(180deg,#f8fbff 0,#f5f7fb 40%,#eef2f7 100%);color:var(--text)}
+.wrap{width:min(1120px,calc(100% - 32px));margin:0 auto}.hero{padding:42px 0 22px}.eyebrow{display:inline-flex;align-items:center;gap:8px;padding:7px 11px;border:1px solid #bfdbfe;background:#eff6ff;color:#1d4ed8;border-radius:999px;font-size:12px;font-weight:700}.hero h1{font-size:clamp(30px,5vw,48px);letter-spacing:-.04em;margin:16px 0 8px}.hero p{margin:0;color:var(--muted);font-size:16px;line-height:1.7;max-width:760px}
+.card{background:rgba(255,255,255,.94);border:1px solid rgba(226,232,240,.95);border-radius:24px;box-shadow:var(--shadow)}
+.drop{padding:28px;min-height:270px;display:flex;align-items:center;justify-content:center;text-align:center;border:2px dashed #cbd5e1;border-radius:20px;margin:6px;transition:.2s;cursor:pointer;background:linear-gradient(180deg,#fff,#fbfdff)}.drop.drag{border-color:var(--blue);background:#eff6ff;transform:translateY(-1px)}
+.icon{width:64px;height:64px;margin:0 auto 14px;border-radius:18px;display:grid;place-items:center;background:#eff6ff;color:var(--blue);font-size:28px}.drop h2{margin:0 0 6px;font-size:20px}.drop p{margin:0;color:var(--muted)}.hint{margin-top:12px;font-size:12px;color:#94a3b8}.pick{display:inline-flex;margin-top:18px;padding:10px 16px;border-radius:12px;background:var(--blue);color:white;font-weight:700;font-size:14px}.hidden{display:none!important}
+.files{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:16px}.filebox{padding:18px;border:1px solid var(--line);border-radius:18px;background:white}.label{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:#94a3b8;font-weight:800}.filename{font-weight:800;margin-top:5px;word-break:break-word}.meta{font-size:12px;color:var(--muted);margin-top:5px}.ok{color:var(--green)}.warn{color:var(--amber)}
+.status{margin-top:18px;padding:18px 20px;display:flex;align-items:center;gap:12px}.spinner{width:20px;height:20px;border:2px solid #dbeafe;border-top-color:var(--blue);border-radius:50%;animation:spin .8s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}
+.summary{margin-top:18px;padding:22px}.summaryhead{display:flex;align-items:flex-start;justify-content:space-between;gap:16px}.summary h2{margin:0;font-size:20px}.summary .sub{color:var(--muted);font-size:13px;margin-top:4px}.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:18px}.kpi{padding:16px;border-radius:16px;background:#f8fafc;border:1px solid #eef2f7}.kpi b{display:block;font-size:28px;letter-spacing:-.03em;margin-top:4px}.kpi small{color:var(--muted)}
+.actions{display:flex;gap:10px;flex-wrap:wrap}.btn{border:0;border-radius:12px;padding:11px 15px;font-weight:800;cursor:pointer;font-size:13px}.primary{background:var(--blue);color:#fff}.primary:hover{background:var(--blue2)}.ghost{background:#f1f5f9;color:#334155}.tablewrap{overflow:auto;max-height:420px;margin-top:18px;border:1px solid var(--line);border-radius:16px}table{border-collapse:separate;border-spacing:0;width:100%;font-size:12px;background:#fff}th,td{padding:10px 12px;border-bottom:1px solid #eef2f7;white-space:nowrap}th{position:sticky;top:0;background:#f8fafc;text-align:left;color:#475569;font-weight:800}td.num{text-align:right;font-variant-numeric:tabular-nums}.badge{display:inline-flex;padding:4px 8px;border-radius:999px;font-size:11px;font-weight:800}.matched{background:#ecfdf5;color:#047857}.unmatched{background:#fff1f2;color:#be123c}.note{margin-top:14px;padding:13px 15px;border-radius:14px;background:#f8fafc;color:#475569;font-size:12px;line-height:1.6}
+footer{padding:24px 0 38px;color:#94a3b8;font-size:12px;text-align:center}@media(max-width:760px){.files,.kpis{grid-template-columns:1fr}.summaryhead{flex-direction:column}.hero{padding-top:26px}.wrap{width:min(100% - 20px,1120px)}.drop{padding:22px 14px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <section class="hero">
+    <span class="eyebrow">LEFT JOIN · ReplaceHotel เป็น Master</span>
+    <h1>โยน 2 ไฟล์ แล้วจบ</h1>
+    <p>วาง <b>ReplaceHotel</b> และ <b>4.1.1.2</b> พร้อมกัน ระบบจะแยกไฟล์อัตโนมัติ จับคู่ด้วย <b>รหัสสินค้า 16 หลัก + รหัสแหล่ง 10 หลัก</b> แล้วเติม <b>ราคาเปรียบเทียบ</b> พร้อม <b>ลักษณะจำเพาะ</b> และ <b>แหล่งจัดเก็บ</b> ที่ขาด โดยคงทุกแถวของ ReplaceHotel ไว้ครบ</p>
+  </section>
+
+  <section class="card">
+    <div id="dropZone" class="drop">
+      <input id="fileInput" type="file" accept=".xlsx,.xls,.csv" multiple class="hidden" />
+      <div>
+        <div class="icon">↥</div>
+        <h2>ลากไฟล์ Excel 2 ไฟล์มาวางพร้อมกัน</h2>
+        <p>ไม่ต้องเลือกว่าตัวไหนเป็น Master — ระบบตรวจให้เอง</p>
+        <span class="pick">เลือก 2 ไฟล์</span>
+        <div class="hint">รองรับ .xlsx / .xls / .csv · ประมวลผลบนเครื่องคุณ</div>
+      </div>
+    </div>
+  </section>
+
+  <div id="fileCards" class="files hidden">
+    <div class="filebox"><div class="label">MASTER · LEFT SIDE</div><div id="masterName" class="filename">-</div><div id="masterMeta" class="meta"></div></div>
+    <div class="filebox"><div class="label">REFERENCE · RIGHT SIDE</div><div id="refName" class="filename">-</div><div id="refMeta" class="meta"></div></div>
+  </div>
+
+  <div id="statusBox" class="card status hidden"><div class="spinner"></div><div><b id="statusTitle">กำลังอ่านไฟล์...</b><div id="statusText" class="meta">ระบบกำลังตรวจหัวตารางและคอลัมน์</div></div></div>
+
+  <section id="result" class="card summary hidden">
+    <div class="summaryhead">
+      <div><h2>ผล LEFT JOIN</h2><div id="resultSub" class="sub"></div></div>
+      <div class="actions"><button id="resetBtn" class="btn ghost">เลือกไฟล์ใหม่</button><button id="downloadBtn" class="btn primary">ดาวน์โหลด Excel</button></div>
+    </div>
+    <div class="kpis">
+      <div class="kpi"><small>Master ทั้งหมด</small><b id="totalKpi">0</b><small>แถวจาก ReplaceHotel</small></div>
+      <div class="kpi"><small>พบราคา</small><b id="matchedKpi" class="ok">0</b><small>Key ตรงกัน</small></div>
+      <div class="kpi"><small>เติมชื่อสเปค</small><b id="specFillKpi" class="ok">0</b><small>จาก 4.1.1.2</small></div>
+      <div class="kpi"><small>เติมชื่อแหล่ง</small><b id="storeFillKpi" class="ok">0</b><small>จาก 4.1.1.2</small></div>
+      <div class="kpi"><small>ไม่พบราคา</small><b id="unmatchedKpi" style="color:var(--red)">0</b><small>ยังคงแถวไว้</small></div>
+      <div class="kpi"><small>Match rate</small><b id="rateKpi">0%</b><small>จาก Master</small></div>
+    </div>
+    <div id="note" class="note"></div>
+    <div class="tablewrap"><table><thead><tr><th>#</th><th>รหัส 16</th><th>ชื่อสเปค</th><th>รหัสแหล่ง 10</th><th>ชื่อแหล่ง</th><th>สถานะ</th><th style="text-align:right">ราคาเปรียบเทียบ</th></tr></thead><tbody id="previewBody"></tbody></table></div>
+  </section>
+
+  <footer>ReplaceHotel LEFT JOIN Tool · ทำงานในเบราว์เซอร์ ไม่มีการอัปโหลดข้อมูลขึ้นเซิร์ฟเวอร์</footer>
+</div>
+<script>
+const $=id=>document.getElementById(id);
+const dropZone=$('dropZone'), fileInput=$('fileInput');
+let outputAOA=null, masterInfo=null, refInfo=null, resultStats=null;
+
+['dragenter','dragover'].forEach(ev=>dropZone.addEventListener(ev,e=>{e.preventDefault();dropZone.classList.add('drag')}));
+['dragleave','drop'].forEach(ev=>dropZone.addEventListener(ev,e=>{e.preventDefault();dropZone.classList.remove('drag')}));
+dropZone.addEventListener('click',()=>fileInput.click());
+dropZone.addEventListener('drop',e=>handleFiles([...e.dataTransfer.files]));
+fileInput.addEventListener('change',e=>handleFiles([...e.target.files]));
+$('resetBtn').addEventListener('click',resetAll);
+$('downloadBtn').addEventListener('click',downloadResult);
+
+function norm(v){return String(v??'').replace(/\s+/g,' ').trim();}
+function digits(v){return String(v??'').replace(/\.0+$/,'').replace(/[^0-9]/g,'');}
+function code(v,len){const d=digits(v); if(!d)return ''; return d.length<len?d.padStart(len,'0'):d;}
+function parsePrice(v){if(v===null||v===undefined||norm(v)==='')return ''; const s=String(v).replace(/,/g,'').trim(); const n=Number(s); return Number.isFinite(n)?n:v;}
+function esc(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));}
+
+async function handleFiles(files){
+  const candidates=files.filter(f=>/\.(xlsx|xls|csv)$/i.test(f.name));
+  if(candidates.length!==2){alert('กรุณาเลือก/ลากไฟล์ Excel จำนวน 2 ไฟล์พร้อมกัน');return;}
+  $('result').classList.add('hidden'); $('fileCards').classList.add('hidden'); $('statusBox').classList.remove('hidden');
+  $('statusTitle').textContent='กำลังอ่าน 2 ไฟล์...'; $('statusText').textContent='กำลังหา ReplaceHotel (Master) และ 4.1.1.2 (Reference)';
+  try{
+    const parsed=await Promise.all(candidates.map(readWorkbook));
+    classifyFiles(parsed);
+    showFileCards();
+    $('statusTitle').textContent='กำลัง LEFT JOIN...'; $('statusText').textContent='จับคู่ Key 26 หลัก และเติมราคาเปรียบเทียบ';
+    await new Promise(r=>setTimeout(r,40));
+    runLeftJoin();
+    $('statusBox').classList.add('hidden'); $('result').classList.remove('hidden');
+    $('result').scrollIntoView({behavior:'smooth',block:'start'});
+  }catch(err){console.error(err);$('statusBox').classList.add('hidden');alert('อ่านไฟล์ไม่สำเร็จ: '+err.message);}
+}
+
+function readWorkbook(file){
+  return new Promise((resolve,reject)=>{
+    const reader=new FileReader();
+    reader.onload=e=>{
+      try{
+        const wb=XLSX.read(e.target.result,{type:'array',cellDates:true,cellNF:true,cellText:true});
+        const sheets=wb.SheetNames.map(name=>{
+          const ws=wb.Sheets[name];
+          const rows=XLSX.utils.sheet_to_json(ws,{header:1,defval:'',raw:false,blankrows:false});
+          return {name,ws,rows};
+        });
+        resolve({file,wb,sheets});
+      }catch(ex){reject(ex)}
+    };
+    reader.onerror=()=>reject(new Error('ไม่สามารถอ่าน '+file.name));
+    reader.readAsArrayBuffer(file);
+  });
+}
+
+function bestHeader(rows,type){
+  let best={row:-1,score:-1};
+  for(let r=0;r<Math.min(rows.length,20);r++){
+    const hs=(rows[r]||[]).map(norm); let score=0;
+    if(type==='master'){
+      if(hs.includes('รหัส'))score+=3; if(hs.includes('รหัสแหล่ง'))score+=5; if(hs.includes('ราคาปัจจุบัน'))score+=2; if(hs.includes('ราคาเปรียบเทียบ'))score+=3; if(hs.includes('Link'))score+=1;
+    }else{
+      const rc=hs.filter(x=>x==='รหัส').length; if(rc>=2)score+=6; if(hs.includes('ราคาเปรียบเทียบ'))score+=4; if(hs.includes('ราคาปัจจุบัน'))score+=2; if(hs.includes('Link'))score+=1; if(hs.length>=15)score+=2;
+    }
+    if(score>best.score)best={row:r,score};
+  }
+  return best;
+}
+
+function scoreParsed(p,type){
+  let best=null;
+  for(const s of p.sheets){const h=bestHeader(s.rows,type);const n=norm(p.file.name).toLowerCase();let score=h.score;
+    if(type==='master' && n.includes('replacehotel'))score+=12;
+    if(type==='ref' && (n.includes('4.1.1.2')||n.includes('ตรวจราคารายเดือน')))score+=12;
+    if(!best||score>best.score)best={...s,headerRow:h.row,score};
+  }
+  return best;
+}
+
+function classifyFiles(parsed){
+  const aM=scoreParsed(parsed[0],'master'), bM=scoreParsed(parsed[1],'master');
+  const aR=scoreParsed(parsed[0],'ref'), bR=scoreParsed(parsed[1],'ref');
+  const option1=aM.score+bR.score, option2=bM.score+aR.score;
+  if(option1>=option2){masterInfo={...parsed[0],sheet:aM};refInfo={...parsed[1],sheet:bR};}
+  else{masterInfo={...parsed[1],sheet:bM};refInfo={...parsed[0],sheet:aR};}
+  if(masterInfo.sheet.score<7||refInfo.sheet.score<7)throw new Error('ตรวจชนิดไฟล์ไม่ชัดเจน กรุณาใช้ไฟล์ ReplaceHotel และ 4.1.1.2');
+}
+
+function findExact(headers,name){return headers.findIndex(h=>norm(h)===name);}
+function detectRefCodes(rows,headerRow,headers){
+  const candidates=[]; headers.forEach((h,i)=>{if(norm(h)==='รหัส')candidates.push(i)});
+  const rank=(idx,target)=>{let score=0;for(let r=headerRow+1;r<Math.min(rows.length,headerRow+80);r++){const d=digits(rows[r]?.[idx]);if(d.length===target)score++;}return score};
+  let c16=-1,c10=-1,b16=-1,b10=-1;
+  for(const idx of candidates){const s16=rank(idx,16),s10=rank(idx,10);if(s16>b16){b16=s16;c16=idx}if(s10>b10){b10=s10;c10=idx}}
+  if(c16<0||c10<0||c16===c10)throw new Error('หารหัส 16 หลัก / รหัสแหล่ง 10 หลักในไฟล์ 4.1.1.2 ไม่ได้');
+  return {c16,c10};
+}
+
+function showFileCards(){
+  $('fileCards').classList.remove('hidden');
+  $('masterName').textContent=masterInfo.file.name; $('refName').textContent=refInfo.file.name;
+  $('masterMeta').innerHTML=`<span class="ok">✓ Master</span> · Sheet: ${esc(masterInfo.sheet.name)} · หัวตารางแถว ${masterInfo.sheet.headerRow+1}`;
+  $('refMeta').innerHTML=`<span class="ok">✓ Reference</span> · Sheet: ${esc(refInfo.sheet.name)} · หัวตารางแถว ${refInfo.sheet.headerRow+1}`;
+}
+
+function runLeftJoin(){
+  const mr=masterInfo.sheet.rows, rr=refInfo.sheet.rows;
+  const mh=mr[masterInfo.sheet.headerRow].map(norm), rh=rr[refInfo.sheet.headerRow].map(norm);
+  const m16=findExact(mh,'รหัส'), m10=findExact(mh,'รหัสแหล่ง');
+  let mSpec=findExact(mh,'ลักษณะจำเพาะ');
+  let mStore=findExact(mh,'แหล่งจัดเก็บ');
+  let mPrice=findExact(mh,'ราคาเปรียบเทียบ');
+  if(m16<0||m10<0)throw new Error('Master ต้องมีคอลัมน์ รหัส และ รหัสแหล่ง');
+
+  const {c16:r16,c10:r10}=detectRefCodes(rr,refInfo.sheet.headerRow,rh);
+  const rSpec=findExact(rh,'ลักษณะจำเพาะ');
+  const rStore=findExact(rh,'แหล่งจัดเก็บ');
+  const rPrice=findExact(rh,'ราคาเปรียบเทียบ');
+  if(rSpec<0)throw new Error('ไม่พบคอลัมน์ ลักษณะจำเพาะ ในไฟล์ 4.1.1.2');
+  if(rStore<0)throw new Error('ไม่พบคอลัมน์ แหล่งจัดเก็บ ในไฟล์ 4.1.1.2');
+  if(rPrice<0)throw new Error('ไม่พบคอลัมน์ ราคาเปรียบเทียบ ในไฟล์ 4.1.1.2');
+
+  // 3 lookup ระดับต่างกัน:
+  // key26 = ราคาและข้อมูลที่ตรงทั้งสินค้า+แหล่ง
+  // code16 = ใช้เติมชื่อสเปคเมื่อ Master ว่าง
+  // code10 = ใช้เติมชื่อแหล่งเมื่อ Master ว่าง
+  const byKey=new Map(), specBy16=new Map(), storeBy10=new Map(), conflicts=[];
+  for(let r=refInfo.sheet.headerRow+1;r<rr.length;r++){
+    const a=code(rr[r]?.[r16],16), b=code(rr[r]?.[r10],10);
+    if(!a&&!b)continue;
+    const spec=norm(rr[r]?.[rSpec]);
+    const store=norm(rr[r]?.[rStore]);
+    const price=parsePrice(rr[r]?.[rPrice]);
+
+    if(a && spec && !specBy16.has(a)) specBy16.set(a,spec);
+    if(b && store && !storeBy10.has(b)) storeBy10.set(b,store);
+
+    if(a&&b){
+      const key=a+b;
+      if(!byKey.has(key)) byKey.set(key,{price,spec,store});
+      else if(price!=='' && byKey.get(key).price!=='' && String(byKey.get(key).price)!==String(price)) conflicts.push(key);
+    }
+  }
+
+  const headers=[...mr[masterInfo.sheet.headerRow]];
+  if(mSpec<0){headers.push('ลักษณะจำเพาะ');mSpec=headers.length-1;}
+  if(mStore<0){headers.push('แหล่งจัดเก็บ');mStore=headers.length-1;}
+  if(mPrice<0){headers.push('ราคาเปรียบเทียบ');mPrice=headers.length-1;}
+  outputAOA=[headers];
+
+  let matched=0,unmatched=0,specFilled=0,storeFilled=0;
+  const preview=[];
+  for(let r=masterInfo.sheet.headerRow+1;r<mr.length;r++){
+    const row=[...(mr[r]||[])];
+    const a=code(row[m16],16), b=code(row[m10],10);
+    if(!a&&!b)continue;
+    while(row.length<headers.length)row.push('');
+    const key=a+b;
+    const hit=a&&b&&byKey.has(key);
+    const rec=hit?byKey.get(key):null;
+
+    // Master มาก่อนเสมอ เติมเฉพาะช่องว่างเท่านั้น
+    if(!norm(row[mSpec])){
+      const v=(rec&&rec.spec)||specBy16.get(a)||'';
+      if(v){row[mSpec]=v;specFilled++;}
+    }
+    if(!norm(row[mStore])){
+      const v=(rec&&rec.store)||storeBy10.get(b)||'';
+      if(v){row[mStore]=v;storeFilled++;}
+    }
+
+    if(hit && rec.price!==''){
+      row[mPrice]=rec.price; matched++;
+    }else{
+      row[mPrice]='ไม่มี'; unmatched++;
+    }
+    outputAOA.push(row);
+    if(preview.length<100)preview.push({n:outputAOA.length-1,a,b,hit,price:row[mPrice],spec:row[mSpec],store:row[mStore]});
+  }
+
+  const total=matched+unmatched, rate=total?matched*100/total:0;
+  resultStats={total,matched,unmatched,rate,specFilled,storeFilled,conflicts:[...new Set(conflicts)]};
+  renderResult(preview);
+}
+function renderResult(preview){
+  const s=resultStats;
+  $('totalKpi').textContent=s.total.toLocaleString('th-TH');
+  $('matchedKpi').textContent=s.matched.toLocaleString('th-TH');
+  $('unmatchedKpi').textContent=s.unmatched.toLocaleString('th-TH');
+  $('rateKpi').textContent=s.rate.toFixed(1)+'%';
+  $('specFillKpi').textContent=s.specFilled.toLocaleString('th-TH');
+  $('storeFillKpi').textContent=s.storeFilled.toLocaleString('th-TH');
+  $('resultSub').textContent=`${masterInfo.file.name}  ←  ${refInfo.file.name}`;
+  $('note').innerHTML=`<b>หลักการ:</b> ReplaceHotel เป็น Master — ชื่อสเปคและชื่อแหล่งเดิมจะไม่ถูกเขียนทับ ถ้าช่องว่างจึงค่อยเติมจาก 4.1.1.2 โดยชื่อสเปคหาได้จากรหัส 16 หลัก และชื่อแหล่งหาได้จากรหัสแหล่ง 10 หลัก ส่วนราคาเปรียบเทียบต้อง Key 26 หลักตรงกัน.${s.conflicts.length?` <span class="warn">พบ Key ซ้ำที่มีราคาต่างกัน ${s.conflicts.length} Key — ใช้ค่าที่พบครั้งแรก</span>`:''}`;
+  $('previewBody').innerHTML=preview.map(x=>`<tr><td>${x.n}</td><td>${esc(x.a)}</td><td style="white-space:normal;min-width:260px">${esc(x.spec||'')}</td><td>${esc(x.b)}</td><td style="white-space:normal;min-width:220px">${esc(x.store||'')}</td><td><span class="badge ${x.hit?'matched':'unmatched'}">${x.hit?'พบราคา':'ไม่พบราคา'}</span></td><td class="num">${x.hit&&typeof x.price==='number'?Number(x.price).toLocaleString('th-TH',{minimumFractionDigits:2,maximumFractionDigits:2}):esc(x.price)}</td></tr>`).join('');
+}
+function downloadResult(){
+  if(!outputAOA)return;
+  const ws=XLSX.utils.aoa_to_sheet(outputAOA);
+  ws['!cols']=[{wch:20},{wch:42},{wch:14},{wch:28},{wch:14},{wch:8},{wch:16},{wch:22},{wch:22}];
+  const headerLen=outputAOA[0].length; const priceIdx=outputAOA[0].findIndex(h=>norm(h)==='ราคาเปรียบเทียบ');
+  if(priceIdx>=0){for(let r=1;r<outputAOA.length;r++){const addr=XLSX.utils.encode_cell({r,c:priceIdx});if(ws[addr]&&typeof ws[addr].v==='number')ws[addr].z='#,##0.00';}}
+  const wb=XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb,ws,'ReplaceHotel_LEFT_JOIN');
+  const d=new Date(), y=d.getFullYear(),m=String(d.getMonth()+1).padStart(2,'0'),day=String(d.getDate()).padStart(2,'0');
+  XLSX.writeFile(wb,`ReplaceHotel_LEFT_JOIN_${y}${m}${day}.xlsx`);
+}
+function resetAll(){outputAOA=null;masterInfo=null;refInfo=null;resultStats=null;fileInput.value='';$('fileCards').classList.add('hidden');$('statusBox').classList.add('hidden');$('result').classList.add('hidden');window.scrollTo({top:0,behavior:'smooth'});}
+</script>
+</body>
+</html>
