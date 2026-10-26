@@ -155,6 +155,11 @@ function classifyFiles(parsed){
 }
 
 function findExact(headers,name){return headers.findIndex(h=>norm(h)===name);}
+function headerKey(v){return norm(v).replace(/[()（）]/g,'').replace(/\s+/g,'').toLowerCase();}
+function findHeader(headers,...names){
+  const wanted=names.map(headerKey);
+  return headers.findIndex(h=>wanted.includes(headerKey(h)));
+}
 function detectRefCodes(rows,headerRow,headers){
   const candidates=[]; headers.forEach((h,i)=>{if(norm(h)==='รหัส')candidates.push(i)});
   const rank=(idx,target)=>{let score=0;for(let r=headerRow+1;r<Math.min(rows.length,headerRow+80);r++){const d=digits(rows[r]?.[idx]);if(d.length===target)score++;}return score};
@@ -184,6 +189,8 @@ function runLeftJoin(){
   const rSpec=findExact(rh,'ลักษณะจำเพาะ');
   const rStore=findExact(rh,'แหล่งจัดเก็บ');
   const rPrice=findExact(rh,'ราคาเปรียบเทียบ');
+  const rRecorder=findHeader(rh,'ภาวะ ผู้บันทึก','ภาวะ (ผู้บันทึก)');
+  const rReviewer=findHeader(rh,'ภาวะ ผู้ตรวจ','ภาวะ (ผู้ตรวจ)');
   if(rSpec<0)throw new Error('ไม่พบคอลัมน์ ลักษณะจำเพาะ ในไฟล์ 4.1.1.2');
   if(rStore<0)throw new Error('ไม่พบคอลัมน์ แหล่งจัดเก็บ ในไฟล์ 4.1.1.2');
   if(rPrice<0)throw new Error('ไม่พบคอลัมน์ ราคาเปรียบเทียบ ในไฟล์ 4.1.1.2');
@@ -199,14 +206,24 @@ function runLeftJoin(){
     const spec=norm(rr[r]?.[rSpec]);
     const store=norm(rr[r]?.[rStore]);
     const price=parsePrice(rr[r]?.[rPrice]);
+    const recorder=rRecorder>=0?norm(rr[r]?.[rRecorder]):'';
+    const reviewer=rReviewer>=0?norm(rr[r]?.[rReviewer]):'';
 
     if(a && spec && !specBy16.has(a)) specBy16.set(a,spec);
     if(b && store && !storeBy10.has(b)) storeBy10.set(b,store);
 
     if(a&&b){
       const key=a+b;
-      if(!byKey.has(key)) byKey.set(key,{price,spec,store});
-      else if(price!=='' && byKey.get(key).price!=='' && String(byKey.get(key).price)!==String(price)) conflicts.push(key);
+      if(!byKey.has(key)) byKey.set(key,{price,spec,store,recorder,reviewer});
+      else {
+        const prev=byKey.get(key);
+        if(prev.price==='' && price!=='') prev.price=price;
+        if(!prev.spec && spec) prev.spec=spec;
+        if(!prev.store && store) prev.store=store;
+        if(!prev.recorder && recorder) prev.recorder=recorder;
+        if(!prev.reviewer && reviewer) prev.reviewer=reviewer;
+        if(price!=='' && prev.price!=='' && String(prev.price)!==String(price)) conflicts.push(key);
+      }
     }
   }
 
@@ -214,6 +231,12 @@ function runLeftJoin(){
   if(mSpec<0){headers.push('ลักษณะจำเพาะ');mSpec=headers.length-1;}
   if(mStore<0){headers.push('แหล่งจัดเก็บ');mStore=headers.length-1;}
   if(mPrice<0){headers.push('ราคาเปรียบเทียบ');mPrice=headers.length-1;}
+
+  // ภาวะจากไฟล์ 4.1.1.2 เป็นคอลัมน์เสริม: ถ้ามีใน Reference จึงค่อยเพิ่ม/อัปเดตในผลลัพธ์
+  let mRecorder=findHeader(headers,'ภาวะ ผู้บันทึก','ภาวะ (ผู้บันทึก)');
+  let mReviewer=findHeader(headers,'ภาวะ ผู้ตรวจ','ภาวะ (ผู้ตรวจ)');
+  if(rRecorder>=0 && mRecorder<0){headers.push('ภาวะ (ผู้บันทึก)');mRecorder=headers.length-1;}
+  if(rReviewer>=0 && mReviewer<0){headers.push('ภาวะ (ผู้ตรวจ)');mReviewer=headers.length-1;}
   outputAOA=[headers];
 
   let matched=0,unmatched=0,specFilled=0,storeFilled=0;
@@ -242,8 +265,16 @@ function runLeftJoin(){
     }else{
       row[mPrice]='ไม่มี'; unmatched++;
     }
+
+    // ถ้า Reference มีคอลัมน์ภาวะ ให้ยกค่าของแถวที่ Key 26 หลักตรงกันเข้ามาด้วย
+    if(hit && rRecorder>=0) row[mRecorder]=rec.recorder;
+    if(hit && rReviewer>=0) row[mReviewer]=rec.reviewer;
+
     outputAOA.push(row);
-    if(preview.length<100)preview.push({n:outputAOA.length-1,a,b,hit,price:row[mPrice],spec:row[mSpec],store:row[mStore]});
+    if(preview.length<100)preview.push({
+      n:outputAOA.length-1,a,b,hit,price:row[mPrice],spec:row[mSpec],store:row[mStore],
+      recorder:mRecorder>=0?row[mRecorder]:'',reviewer:mReviewer>=0?row[mReviewer]:''
+    });
   }
 
   const total=matched+unmatched, rate=total?matched*100/total:0;
@@ -259,13 +290,25 @@ function renderResult(preview){
   $('specFillKpi').textContent=s.specFilled.toLocaleString('th-TH');
   $('storeFillKpi').textContent=s.storeFilled.toLocaleString('th-TH');
   $('resultSub').textContent=`${masterInfo.file.name}  ←  ${refInfo.file.name}`;
-  $('note').innerHTML=`<b>หลักการ:</b> ReplaceHotel เป็น Master — ชื่อสเปคและชื่อแหล่งเดิมจะไม่ถูกเขียนทับ ถ้าช่องว่างจึงค่อยเติมจาก 4.1.1.2 โดยชื่อสเปคหาได้จากรหัส 16 หลัก และชื่อแหล่งหาได้จากรหัสแหล่ง 10 หลัก ส่วนราคาเปรียบเทียบต้อง Key 26 หลักตรงกัน.${s.conflicts.length?` <span class="warn">พบ Key ซ้ำที่มีราคาต่างกัน ${s.conflicts.length} Key — ใช้ค่าที่พบครั้งแรก</span>`:''}`;
-  $('previewBody').innerHTML=preview.map(x=>`<tr><td>${x.n}</td><td>${esc(x.a)}</td><td style="white-space:normal;min-width:260px">${esc(x.spec||'')}</td><td>${esc(x.b)}</td><td style="white-space:normal;min-width:220px">${esc(x.store||'')}</td><td><span class="badge ${x.hit?'matched':'unmatched'}">${x.hit?'พบราคา':'ไม่พบราคา'}</span></td><td class="num">${x.hit&&typeof x.price==='number'?Number(x.price).toLocaleString('th-TH',{minimumFractionDigits:2,maximumFractionDigits:2}):esc(x.price)}</td></tr>`).join('');
+  $('note').innerHTML=`<b>หลักการ:</b> ReplaceHotel เป็น Master — ชื่อสเปคและชื่อแหล่งเดิมจะไม่ถูกเขียนทับ ถ้าช่องว่างจึงค่อยเติมจาก 4.1.1.2 โดยชื่อสเปคหาได้จากรหัส 16 หลัก และชื่อแหล่งหาได้จากรหัสแหล่ง 10 หลัก ส่วนราคาเปรียบเทียบต้อง Key 26 หลักตรงกัน ถ้า 4.1.1.2 มีคอลัมน์ <b>ภาวะ (ผู้บันทึก)</b> หรือ <b>ภาวะ (ผู้ตรวจ)</b> ระบบจะนำค่าของ Key ที่ตรงกันเข้าผลลัพธ์ด้วย.${s.conflicts.length?` <span class="warn">พบ Key ซ้ำที่มีราคาต่างกัน ${s.conflicts.length} Key — ใช้ค่าที่พบครั้งแรก</span>`:''}`;
+  const hasRecorder=preview.some(x=>x.recorder!=='') || findHeader((outputAOA?.[0]||[]),'ภาวะ ผู้บันทึก','ภาวะ (ผู้บันทึก)')>=0;
+  const hasReviewer=preview.some(x=>x.reviewer!=='') || findHeader((outputAOA?.[0]||[]),'ภาวะ ผู้ตรวจ','ภาวะ (ผู้ตรวจ)')>=0;
+  const head=$('previewBody').closest('table').querySelector('thead tr');
+  head.innerHTML=`<th>#</th><th>รหัส 16</th><th>ชื่อสเปค</th><th>รหัสแหล่ง 10</th><th>ชื่อแหล่ง</th>${hasRecorder?'<th>ภาวะ (ผู้บันทึก)</th>':''}${hasReviewer?'<th>ภาวะ (ผู้ตรวจ)</th>':''}<th>สถานะ</th><th style="text-align:right">ราคาเปรียบเทียบ</th>`;
+  $('previewBody').innerHTML=preview.map(x=>`<tr><td>${x.n}</td><td>${esc(x.a)}</td><td style="white-space:normal;min-width:260px">${esc(x.spec||'')}</td><td>${esc(x.b)}</td><td style="white-space:normal;min-width:220px">${esc(x.store||'')}</td>${hasRecorder?`<td style="white-space:normal;min-width:180px">${esc(x.recorder||'')}</td>`:''}${hasReviewer?`<td style="white-space:normal;min-width:180px">${esc(x.reviewer||'')}</td>`:''}<td><span class="badge ${x.hit?'matched':'unmatched'}">${x.hit?'พบราคา':'ไม่พบราคา'}</span></td><td class="num">${x.hit&&typeof x.price==='number'?Number(x.price).toLocaleString('th-TH',{minimumFractionDigits:2,maximumFractionDigits:2}):esc(x.price)}</td></tr>`).join('');
 }
 function downloadResult(){
   if(!outputAOA)return;
   const ws=XLSX.utils.aoa_to_sheet(outputAOA);
-  ws['!cols']=[{wch:20},{wch:42},{wch:14},{wch:28},{wch:14},{wch:8},{wch:16},{wch:22},{wch:22}];
+  ws['!cols']=outputAOA[0].map(h=>{
+    const n=norm(h);
+    if(n==='ลักษณะจำเพาะ')return {wch:48};
+    if(n==='แหล่งจัดเก็บ')return {wch:32};
+    if(['ภาวะผู้บันทึก','ภาวะผู้ตรวจ'].includes(headerKey(n)))return {wch:28};
+    if(n==='ราคาเปรียบเทียบ'||n==='ราคาปัจจุบัน')return {wch:18};
+    if(n.includes('รหัส'))return {wch:20};
+    return {wch:16};
+  });
   const headerLen=outputAOA[0].length; const priceIdx=outputAOA[0].findIndex(h=>norm(h)==='ราคาเปรียบเทียบ');
   if(priceIdx>=0){for(let r=1;r<outputAOA.length;r++){const addr=XLSX.utils.encode_cell({r,c:priceIdx});if(ws[addr]&&typeof ws[addr].v==='number')ws[addr].z='#,##0.00';}}
   const wb=XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb,ws,'ReplaceHotel_LEFT_JOIN');
